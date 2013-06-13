@@ -75,4 +75,27 @@ gradle jettyStop
 
 Does not build source code whatsoever, simply sends jetty shutdown signal to localhost:9999.
 
+##Configuration
 
+It's possible to change gretty configuration via plugin extension object:
+
+```groovy
+gretty {
+  port = 8081
+  stopPort = 9998
+  onStart {
+    println "Jetty start"
+  }
+  onStop {
+    println "Jetty stop"
+  }
+}
+```
+
+"port" defines which TCP-port is used by Jetty for incoming HTTP-requests
+
+"stopPort" defines which TCP-port is used by gretty-plugin to communicate between jettyStart and jettyStop tasks.
+
+"onStart" allows to add one or more closures, which will be called just before jetty is started.
+
+"onStop" allows to add one or more closures, which will be called just after jetty is stopped.
