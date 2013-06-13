@@ -72,6 +72,46 @@ class GrettyPlugin implements Plugin<Project> {
       }
     }
 
+    project.task("jettyRun") {
+      dependsOn project.tasks.classes
+      doLast {
+        Server server = new Server();
+        SocketConnector connector = new SocketConnector();
+        
+        // Set some timeout options to make debugging easier.
+        connector.setMaxIdleTime(1000 * 60 * 60);
+        connector.setSoLingerTime(-1);
+        connector.setPort(project.gretty.port);
+        server.setConnectors([ connector ] as Connector[]);
+        
+        def urls = [
+          new File(project.buildDir, "classes/main").toURI().toURL(),
+          new File(project.buildDir, "resources/main").toURI().toURL()
+        ]
+        urls += project.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
+        URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)
+             
+        WebAppContext context = new WebAppContext();
+        context.setServer(server);
+        context.setContextPath("/");
+        //context.setWar(project.tasks.war.archivePath.toString());
+        context.setClassLoader(classLoader);
+        context.setResourceBase(new File("$project.projectDir", "src/main/webapp").absolutePath);
+     
+        server.setHandler(context);
+        server.start();
+        System.out.println "Started jetty server on localhost:${project.gretty.port}."
+        System.out.println "Press any key to stop the jetty server."
+        doOnStart();
+        System.out.println();
+        System.in.read();
+        server.stop();
+        server.join();
+        System.out.println "Jetty server stopped."
+        doOnStop();
+      }
+    }
+
     project.task("jettyRunWar") {
       dependsOn project.tasks.war
       doLast {

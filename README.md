@@ -37,6 +37,22 @@ dependencies {
 
 ##Supported tasks
 
+###jettyRun
+
+**Syntax:**
+
+```shell
+gradle jettyRun
+```
+
+**Effect:**
+
+The web-application gets compiled (if it's not up-to-date), then embedded jetty is started
+against compiled classes and their dependencies and goes online at port 8080. 
+Gradle script waits for the user keypress. When user presses any key 
+(in the same terminal), jetty shuts down and gradle continues normal execution of tasks.
+Note that this task does not depend from "war" task, nor does it use "war"-file.
+
 ###jettyRunWar
 
 **Syntax:**
