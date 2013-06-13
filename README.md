@@ -1,5 +1,7 @@
 #gretty
 
+**version 0.0.1**
+
 Gradle plugin for running web-applications under jetty 8.1.8.
 
 ##Usage:
@@ -99,3 +101,11 @@ gretty {
 "onStart" allows to add one or more closures, which will be called just before jetty is started.
 
 "onStop" allows to add one or more closures, which will be called just after jetty is stopped.
+
+##Copyright and License
+
+Copyright 2013 (c) Andrey Hihlovskiy
+
+All versions, present and past, of gretty-plugin are licensed under MIT license:
+
+* [MIT](http://opensource.org/licenses/MIT)
