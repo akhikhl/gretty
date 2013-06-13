@@ -1,0 +1,27 @@
+buildscript {
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+
+  apply plugin: "maven"
+  
+  dependencies {
+    classpath "org.akhikhl.gretty:gretty-plugin:0.0.1"
+  }
+}
+
+allprojects {
+  group = "org.akhikhl.gretty.examples"
+  version = "0.0.1"
+}
+
+subprojects {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+
+  apply plugin: "maven"
+}

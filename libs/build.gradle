@@ -1,0 +1,15 @@
+allprojects {
+  group = "org.akhikhl.gretty"
+  version = "0.0.1"
+}
+
+subprojects {
+  apply plugin: "maven"
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+}
+
+defaultTasks "install"
+

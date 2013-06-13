@@ -1,0 +1,15 @@
+apply plugin: "groovy"
+
+configurations {
+  compile.exclude(group: "org.eclipse.jetty.orbit", module: "javax.servlet") 
+}
+
+dependencies {
+  compile "org.codehaus.groovy:groovy-all:1.8.6"
+  compile gradleApi()
+  compile "javax.servlet:javax.servlet-api:3.0.1"
+  compile "org.eclipse.jetty:jetty-server:8.1.8.v20121106" 
+  compile "org.eclipse.jetty:jetty-servlet:8.1.8.v20121106"
+  compile "org.eclipse.jetty:jetty-webapp:8.1.8.v20121106"
+}
+
