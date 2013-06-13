@@ -72,7 +72,7 @@ class GrettyPlugin implements Plugin<Project> {
       }
     }
 
-    project.task("jettyRun") {
+    project.task("jettyRunWar") {
       dependsOn project.tasks.war
       doLast {
         Server server = new Server();
@@ -103,7 +103,7 @@ class GrettyPlugin implements Plugin<Project> {
       }
     }
     
-    project.task("jettyStart") {
+    project.task("jettyStartWar") {
       dependsOn project.tasks.war
       doLast {
         Server server = new Server();

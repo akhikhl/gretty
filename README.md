@@ -37,12 +37,12 @@ dependencies {
 
 ##Supported tasks
 
-###jettyRun
+###jettyRunWar
 
 **Syntax:**
 
 ```shell
-gradle jettyRun
+gradle jettyRunWar
 ```
 
 **Effect:**
@@ -51,12 +51,12 @@ The web-application gets compiled and assembled into WAR-file (if it's not up-to
 against WAR-file and goes online at port 8080. Gradle script waits for the user keypress. When user presses any key 
 (in the same terminal), jetty shuts down and gradle continues normal execution of tasks.
 
-###jettyStart
+###jettyStartWar
 
 **Syntax:**
 
 ```shell
-gradle jettyStart
+gradle jettyStartWar
 ```
 
 **Effect:**
@@ -96,7 +96,7 @@ gretty {
 
 "port" defines which TCP-port is used by Jetty for incoming HTTP-requests
 
-"stopPort" defines which TCP-port is used by gretty-plugin to communicate between jettyStart and jettyStop tasks.
+"stopPort" defines which TCP-port is used by gretty-plugin to communicate between jettyStart(War) and jettyStop tasks.
 
 "onStart" allows to add one or more closures, which will be called just before jetty is started.
 
