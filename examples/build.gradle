@@ -25,3 +25,5 @@ subprojects {
 
   apply plugin: "maven"
 }
+
+defaultTasks "build"

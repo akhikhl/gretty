@@ -36,13 +36,11 @@ class GrettyPlugin implements Plugin<Project> {
 
     @Override
     public void run() {
-      System.out.println("*** running jetty 'stop' thread");
       try {
         Socket accept = socket.accept();
         try {
           BufferedReader reader = new BufferedReader(new InputStreamReader(accept.getInputStream()));
           reader.readLine();
-          System.out.println("*** stopping jetty embedded server");
           server.stop();
         } finally {
           accept.close();
@@ -58,14 +56,53 @@ class GrettyPlugin implements Plugin<Project> {
   
     project.extensions.create("gretty", GrettyPluginExtension)
     
-    def doOnStart = {
+    def createConnectors = { Server jettyServer ->
+      SocketConnector connector = new SocketConnector();
+      // Set some timeout options to make debugging easier.
+      connector.setMaxIdleTime(1000 * 60 * 60);
+      connector.setSoLingerTime(-1);
+      connector.setPort(project.gretty.port);
+      jettyServer.setConnectors([ connector ] as Connector[]);
+    }
+    
+    def createInplaceWebAppContext = { Server jettyServer ->        
+      def urls = [
+        new File(project.buildDir, "classes/main").toURI().toURL(),
+        new File(project.buildDir, "resources/main").toURI().toURL()
+      ]
+      urls += project.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
+      URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)           
+      WebAppContext context = new WebAppContext()
+      context.setServer jettyServer
+      context.setContextPath "/"
+      context.setClassLoader classLoader
+      context.setResourceBase new File("$project.projectDir", "src/main/webapp").absolutePath
+      jettyServer.setHandler context
+    }
+    
+    def createWarWebAppContext = { Server jettyServer ->
+      WebAppContext context = new WebAppContext()
+      context.setServer jettyServer
+      context.setContextPath "/"
+      context.setWar project.tasks.war.archivePath.toString()
+      jettyServer.setHandler context
+    }
+    
+    def doOnStart = { boolean stopOnAnyKey ->
+      System.out.println "Started jetty server on localhost:${project.gretty.port}."
       project.gretty.onStart.each { onStart ->
         if(onStart instanceof Closure)
           onStart();
       }
+      if(stopOnAnyKey)
+        System.out.println "Press any key to stop the jetty server."
+      else
+        System.out.println "Enter 'gradle jettyStop' to stop the jetty server."      
+      System.out.println();
     }
     
     def doOnStop = {
+      System.out.println "Jetty server stopped."
       project.gretty.onStop.each { onStop ->
         if(onStop instanceof Closure)
           onStop();
@@ -75,116 +112,73 @@ class GrettyPlugin implements Plugin<Project> {
     project.task("jettyRun") {
       dependsOn project.tasks.classes
       doLast {
-        Server server = new Server();
-        SocketConnector connector = new SocketConnector();
-        
-        // Set some timeout options to make debugging easier.
-        connector.setMaxIdleTime(1000 * 60 * 60);
-        connector.setSoLingerTime(-1);
-        connector.setPort(project.gretty.port);
-        server.setConnectors([ connector ] as Connector[]);
-        
-        def urls = [
-          new File(project.buildDir, "classes/main").toURI().toURL(),
-          new File(project.buildDir, "resources/main").toURI().toURL()
-        ]
-        urls += project.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
-        URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)
-             
-        WebAppContext context = new WebAppContext();
-        context.setServer(server);
-        context.setContextPath("/");
-        //context.setWar(project.tasks.war.archivePath.toString());
-        context.setClassLoader(classLoader);
-        context.setResourceBase(new File("$project.projectDir", "src/main/webapp").absolutePath);
-     
-        server.setHandler(context);
-        server.start();
-        System.out.println "Started jetty server on localhost:${project.gretty.port}."
-        System.out.println "Press any key to stop the jetty server."
-        doOnStart();
-        System.out.println();
-        System.in.read();
-        server.stop();
-        server.join();
-        System.out.println "Jetty server stopped."
-        doOnStop();
+        Server server = new Server()
+        createConnectors server
+        createInplaceWebAppContext server
+        server.start()
+        doOnStart true
+        System.in.read()
+        server.stop()
+        server.join()
+        doOnStop()
       }
     }
 
     project.task("jettyRunWar") {
       dependsOn project.tasks.war
       doLast {
-        Server server = new Server();
-        SocketConnector connector = new SocketConnector();
-        
-        // Set some timeout options to make debugging easier.
-        connector.setMaxIdleTime(1000 * 60 * 60);
-        connector.setSoLingerTime(-1);
-        connector.setPort(project.gretty.port);
-        server.setConnectors([ connector ] as Connector[]);
-     
-        WebAppContext context = new WebAppContext();
-        context.setServer(server);
-        context.setContextPath("/");
-        context.setWar(project.tasks.war.archivePath.toString());
-     
-        server.setHandler(context);
-        server.start();
-        System.out.println "Started jetty server on localhost:${project.gretty.port}."
-        System.out.println "Press any key to stop the jetty server."
-        doOnStart();
-        System.out.println();
-        System.in.read();
-        server.stop();
-        server.join();
-        System.out.println "Jetty server stopped."
-        doOnStop();
+        Server server = new Server()
+        createConnectors server
+        createWarWebAppContext server
+        server.start()
+        doOnStart true
+        System.in.read()
+        server.stop()
+        server.join()
+        doOnStop()
+      }
+    }
+    
+    project.task("jettyStart") {
+      dependsOn project.tasks.classes
+      doLast {
+        Server server = new Server()
+        createConnectors server
+        createInplaceWebAppContext server
+        Thread monitor = new MonitorThread(project.gretty.stopPort, server)
+        monitor.start()
+        server.start()
+        doOnStart false
+        server.join()
+        doOnStop()
       }
     }
     
     project.task("jettyStartWar") {
       dependsOn project.tasks.war
       doLast {
-        Server server = new Server();
-        SocketConnector connector = new SocketConnector();
-     
-        // Set some timeout options to make debugging easier.
-        connector.setMaxIdleTime(1000 * 60 * 60);
-        connector.setSoLingerTime(-1);
-        connector.setPort(project.gretty.port);
-        server.setConnectors([ connector ] as Connector[]);
-     
-        WebAppContext context = new WebAppContext();
-        context.setServer(server);
-        context.setContextPath("/");
-        context.setWar(project.tasks.war.archivePath.toString());
-     
-        server.setHandler(context);
-        
-        Thread monitor = new MonitorThread(project.gretty.stopPort, server);
-        monitor.start();
-        server.start();
-        System.out.println "Started jetty server on localhost:${project.gretty.port}."
-        System.out.println "Enter 'gradle jettyStop' to stop the jetty server."
-        doOnStart();
-        System.out.println();
-        server.join();
-        System.out.println "Jetty server stopped."
-        doOnStop();
+        Server server = new Server()
+        createConnectors server
+        createWarWebAppContext server
+        Thread monitor = new MonitorThread(project.gretty.stopPort, server)
+        monitor.start()
+        server.start()
+        doOnStart false
+        server.join()
+        doOnStop()
       }
     }
 
     project.task("jettyStop") {
       doLast {
-        Socket s = new Socket(InetAddress.getByName("127.0.0.1"), project.gretty.stopPort);
+        Socket s = new Socket(InetAddress.getByName("127.0.0.1"), project.gretty.stopPort)
         try {      
-          OutputStream out = s.getOutputStream();
-          System.out.println("Sending jetty stop request");
-          out.write(("\r\n").getBytes());
-          out.flush();
+          OutputStream out = s.getOutputStream()
+          System.out.println "Sending jetty stop request"
+          out.write(("\r\n").getBytes())
+          out.flush()
         } finally {
-          s.close();
+          s.close()
         }
       }
     } // jettyStop task
