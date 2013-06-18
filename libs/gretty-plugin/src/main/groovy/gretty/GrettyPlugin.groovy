@@ -1,27 +1,19 @@
 package gretty
 
-import org.gradle.api.*
-import org.gradle.api.plugins.*
-import org.gradle.api.tasks.*
-
 import org.eclipse.jetty.server.Connector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
 import org.eclipse.jetty.webapp.WebAppContext
-
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.OutputStream
-import java.net.InetAddress
-import java.net.ServerSocket
-import java.net.Socket
+import org.gradle.api.*
+import org.gradle.api.plugins.*
+import org.gradle.api.tasks.*
 
 class GrettyPlugin implements Plugin<Project> {
 
   private static class MonitorThread extends Thread {
 
     private final Server server;
-    private ServerSocket socket;    
+    private ServerSocket socket;
 
     public MonitorThread(int stopPort, final Server server) {
       this.server = server;
@@ -51,27 +43,27 @@ class GrettyPlugin implements Plugin<Project> {
       }
     }
   }
-    
+
   void apply(final Project project) {
-  
+
     project.extensions.create("gretty", GrettyPluginExtension)
-    
+
     def createConnectors = { Server jettyServer ->
       SocketConnector connector = new SocketConnector();
       // Set some timeout options to make debugging easier.
       connector.setMaxIdleTime(1000 * 60 * 60);
       connector.setSoLingerTime(-1);
       connector.setPort(project.gretty.port);
-      jettyServer.setConnectors([ connector ] as Connector[]);
+      jettyServer.setConnectors([connector ] as Connector[]);
     }
-    
-    def createInplaceWebAppContext = { Server jettyServer ->        
+
+    def createInplaceWebAppContext = { Server jettyServer ->
       def urls = [
         new File(project.buildDir, "classes/main").toURI().toURL(),
         new File(project.buildDir, "resources/main").toURI().toURL()
       ]
       urls += project.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
-      URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)           
+      URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)
       WebAppContext context = new WebAppContext()
       context.setServer jettyServer
       context.setContextPath "/"
@@ -79,7 +71,7 @@ class GrettyPlugin implements Plugin<Project> {
       context.setResourceBase new File("$project.projectDir", "src/main/webapp").absolutePath
       jettyServer.setHandler context
     }
-    
+
     def createWarWebAppContext = { Server jettyServer ->
       WebAppContext context = new WebAppContext()
       context.setServer jettyServer
@@ -87,7 +79,7 @@ class GrettyPlugin implements Plugin<Project> {
       context.setWar project.tasks.war.archivePath.toString()
       jettyServer.setHandler context
     }
-    
+
     def doOnStart = { boolean stopOnAnyKey ->
       System.out.println "Started jetty server on localhost:${project.gretty.port}."
       project.gretty.onStart.each { onStart ->
@@ -97,10 +89,10 @@ class GrettyPlugin implements Plugin<Project> {
       if(stopOnAnyKey)
         System.out.println "Press any key to stop the jetty server."
       else
-        System.out.println "Enter 'gradle jettyStop' to stop the jetty server."      
+        System.out.println "Enter 'gradle jettyStop' to stop the jetty server."
       System.out.println();
     }
-    
+
     def doOnStop = {
       System.out.println "Jetty server stopped."
       project.gretty.onStop.each { onStop ->
@@ -109,9 +101,9 @@ class GrettyPlugin implements Plugin<Project> {
       }
     }
 
-    project.task("jettyRun") {
-      dependsOn project.tasks.classes
-      doLast {
+    project.task("jettyRun") { task ->
+      task.dependsOn project.tasks.classes
+      task.doLast {
         Server server = new Server()
         createConnectors server
         createInplaceWebAppContext server
@@ -124,9 +116,9 @@ class GrettyPlugin implements Plugin<Project> {
       }
     }
 
-    project.task("jettyRunWar") {
-      dependsOn project.tasks.war
-      doLast {
+    project.task("jettyRunWar") { task ->
+      task.dependsOn project.tasks.war
+      task.doLast {
         Server server = new Server()
         createConnectors server
         createWarWebAppContext server
@@ -138,10 +130,10 @@ class GrettyPlugin implements Plugin<Project> {
         doOnStop()
       }
     }
-    
-    project.task("jettyStart") {
-      dependsOn project.tasks.classes
-      doLast {
+
+    project.task("jettyStart") { task ->
+      task.dependsOn project.tasks.classes
+      task.doLast {
         Server server = new Server()
         createConnectors server
         createInplaceWebAppContext server
@@ -153,10 +145,10 @@ class GrettyPlugin implements Plugin<Project> {
         doOnStop()
       }
     }
-    
-    project.task("jettyStartWar") {
-      dependsOn project.tasks.war
-      doLast {
+
+    project.task("jettyStartWar") { task ->
+      task.dependsOn project.tasks.war
+      task.doLast {
         Server server = new Server()
         createConnectors server
         createWarWebAppContext server
@@ -169,10 +161,10 @@ class GrettyPlugin implements Plugin<Project> {
       }
     }
 
-    project.task("jettyStop") {
-      doLast {
+    project.task("jettyStop") { task ->
+      task.doLast {
         Socket s = new Socket(InetAddress.getByName("127.0.0.1"), project.gretty.stopPort)
-        try {      
+        try {
           OutputStream out = s.getOutputStream()
           System.out.println "Sending jetty stop request"
           out.write(("\r\n").getBytes())
