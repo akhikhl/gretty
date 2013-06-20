@@ -4,10 +4,39 @@ allprojects {
 }
 
 subprojects {
+
   apply plugin: "maven"
+
   repositories {
     mavenLocal()
     mavenCentral()
+  }
+
+  afterEvaluate {
+    if(tasks.findByName("classes")) {
+      task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+      }
+      artifacts {
+        archives sourcesJar
+      }
+    }
+
+    if(tasks.findByName("javadoc")) {
+      task javadocJar(type: Jar) {
+        dependsOn javadoc
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+        if(tasks.findByName("groovydoc")) {
+          dependsOn groovydoc
+          from groovydoc.destinationDir
+        }
+      }
+      artifacts {
+        archives javadocJar
+      }
+    }
   }
 }
 
