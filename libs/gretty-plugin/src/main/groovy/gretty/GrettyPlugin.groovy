@@ -12,34 +12,34 @@ class GrettyPlugin implements Plugin<Project> {
 
   private static class MonitorThread extends Thread {
 
-    private final Server server;
-    private ServerSocket socket;
+    private final Server server
+    private ServerSocket socket
 
     public MonitorThread(int stopPort, final Server server) {
-      this.server = server;
-      setDaemon(false);
-      setName("JettyServerStopMonitor");
+      this.server = server
+      setDaemon(false)
+      setName("JettyServerStopMonitor")
       try {
-        socket = new ServerSocket(stopPort, 1, InetAddress.getByName("127.0.0.1"));
+        socket = new ServerSocket(stopPort, 1, InetAddress.getByName("127.0.0.1"))
       } catch(Exception e) {
-        throw new RuntimeException(e);
+        throw new RuntimeException(e)
       }
     }
 
     @Override
     public void run() {
       try {
-        Socket accept = socket.accept();
+        Socket accept = socket.accept()
         try {
-          BufferedReader reader = new BufferedReader(new InputStreamReader(accept.getInputStream()));
-          reader.readLine();
-          server.stop();
+          BufferedReader reader = new BufferedReader(new InputStreamReader(accept.getInputStream()))
+          reader.readLine()
+          server.stop()
         } finally {
-          accept.close();
-          socket.close();
+          accept.close()
+          socket.close()
         }
       } catch(Exception e) {
-        throw new RuntimeException(e);
+        throw new RuntimeException(e)
       }
     }
   }
@@ -49,12 +49,17 @@ class GrettyPlugin implements Plugin<Project> {
     project.extensions.create("gretty", GrettyPluginExtension)
 
     def createConnectors = { Server jettyServer ->
-      SocketConnector connector = new SocketConnector();
+      SocketConnector connector = new SocketConnector()
       // Set some timeout options to make debugging easier.
-      connector.setMaxIdleTime(1000 * 60 * 60);
-      connector.setSoLingerTime(-1);
-      connector.setPort(project.gretty.port);
-      jettyServer.setConnectors([connector ] as Connector[]);
+      connector.setMaxIdleTime(1000 * 60 * 60)
+      connector.setSoLingerTime(-1)
+      connector.setPort(project.gretty.port)
+      jettyServer.setConnectors([connector ] as Connector[])
+    }
+
+    project.task("prepareInplaceWebApp", type: Copy) {
+      from "src/main/webapp"
+      into "${project.buildDir}/webapp"
     }
 
     def createInplaceWebAppContext = { Server jettyServer ->
@@ -68,7 +73,7 @@ class GrettyPlugin implements Plugin<Project> {
       context.setServer jettyServer
       context.setContextPath "/"
       context.setClassLoader classLoader
-      context.setResourceBase new File("$project.projectDir", "src/main/webapp").absolutePath
+      context.setResourceBase "${project.buildDir}/webapp"
       jettyServer.setHandler context
     }
 
@@ -84,25 +89,26 @@ class GrettyPlugin implements Plugin<Project> {
       System.out.println "Started jetty server on localhost:${project.gretty.port}."
       project.gretty.onStart.each { onStart ->
         if(onStart instanceof Closure)
-          onStart();
+          onStart()
       }
       if(stopOnAnyKey)
         System.out.println "Press any key to stop the jetty server."
       else
         System.out.println "Enter 'gradle jettyStop' to stop the jetty server."
-      System.out.println();
+      System.out.println()
     }
 
     def doOnStop = {
       System.out.println "Jetty server stopped."
       project.gretty.onStop.each { onStop ->
         if(onStop instanceof Closure)
-          onStop();
+          onStop()
       }
     }
 
     project.task("jettyRun") { task ->
       task.dependsOn project.tasks.classes
+      task.dependsOn project.tasks.prepareInplaceWebApp
       task.doLast {
         Server server = new Server()
         createConnectors server
@@ -133,6 +139,7 @@ class GrettyPlugin implements Plugin<Project> {
 
     project.task("jettyStart") { task ->
       task.dependsOn project.tasks.classes
+      task.dependsOn project.tasks.prepareInplaceWebApp
       task.doLast {
         Server server = new Server()
         createConnectors server
