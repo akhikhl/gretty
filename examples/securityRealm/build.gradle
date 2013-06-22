@@ -1,0 +1,17 @@
+apply plugin: "java"
+apply plugin: "war"
+apply plugin: "gretty"
+
+dependencies {
+  providedCompile "javax.servlet:javax.servlet-api:3.0.1"
+}
+
+gretty {
+  realm "auth"
+  realmConfigFile "WEB-INF/jetty-realm.properties"
+  onStart {
+    println "You can see web-application in browser under the address:"
+    println "http://localhost:8080/securityRealm"
+    println "Enter user name 'test' and password 'test123' for logon."
+  }
+}
