@@ -1,5 +1,6 @@
 package gretty
 
+import org.eclipse.jetty.security.HashLoginService
 import org.eclipse.jetty.server.Connector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
@@ -70,6 +71,12 @@ class GrettyPlugin implements Plugin<Project> {
       urls += project.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
       URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)
       WebAppContext context = new WebAppContext()
+      if(project.gretty.realm && project.gretty.realmConfigFile) {
+        File realmConfigFile = new File(project.gretty.realmConfigFile);
+        if(!realmConfigFile.isAbsolute())
+          realmConfigFile = new File("${project.buildDir}/webapp", realmConfigFile.path)
+        context.getSecurityHandler().setLoginService(new HashLoginService(project.gretty.realm, realmConfigFile.absolutePath))
+      }
       context.setServer jettyServer
       context.setContextPath "/"
       context.setClassLoader classLoader
@@ -79,6 +86,12 @@ class GrettyPlugin implements Plugin<Project> {
 
     def createWarWebAppContext = { Server jettyServer ->
       WebAppContext context = new WebAppContext()
+      if(project.gretty.realm && project.gretty.realmConfigFile) {
+        File realmConfigFile = new File(project.gretty.realmConfigFile);
+        if(!realmConfigFile.isAbsolute())
+          realmConfigFile = new File("${project.projectDir}/src/main/webapp", realmConfigFile.path)
+        context.getSecurityHandler().setLoginService(new HashLoginService(project.gretty.realm, realmConfigFile.absolutePath))
+      }
       context.setServer jettyServer
       context.setContextPath "/"
       context.setWar project.tasks.war.archivePath.toString()

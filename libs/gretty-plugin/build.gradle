@@ -11,5 +11,6 @@ dependencies {
   compile "org.eclipse.jetty:jetty-server:8.1.8.v20121106" 
   compile "org.eclipse.jetty:jetty-servlet:8.1.8.v20121106"
   compile "org.eclipse.jetty:jetty-webapp:8.1.8.v20121106"
+  compile "org.eclipse.jetty:jetty-security:8.1.8.v20121106" 
 }
 
