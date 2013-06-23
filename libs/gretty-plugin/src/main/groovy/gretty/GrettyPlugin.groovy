@@ -8,192 +8,238 @@ import org.eclipse.jetty.webapp.WebAppContext
 import org.gradle.api.*
 import org.gradle.api.plugins.*
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.bundling.*
 
 class GrettyPlugin implements Plugin<Project> {
-
-  private static class MonitorThread extends Thread {
-
-    private final Server server
-    private ServerSocket socket
-
-    public MonitorThread(int stopPort, final Server server) {
-      this.server = server
-      setDaemon(false)
-      setName("JettyServerStopMonitor")
-      try {
-        socket = new ServerSocket(stopPort, 1, InetAddress.getByName("127.0.0.1"))
-      } catch(Exception e) {
-        throw new RuntimeException(e)
-      }
-    }
-
-    @Override
-    public void run() {
-      try {
-        Socket accept = socket.accept()
-        try {
-          BufferedReader reader = new BufferedReader(new InputStreamReader(accept.getInputStream()))
-          reader.readLine()
-          server.stop()
-        } finally {
-          accept.close()
-          socket.close()
-        }
-      } catch(Exception e) {
-        throw new RuntimeException(e)
-      }
-    }
-  }
 
   void apply(final Project project) {
 
     project.extensions.create("gretty", GrettyPluginExtension)
 
-    def createConnectors = { Server jettyServer ->
-      SocketConnector connector = new SocketConnector()
-      // Set some timeout options to make debugging easier.
-      connector.setMaxIdleTime(1000 * 60 * 60)
-      connector.setSoLingerTime(-1)
-      connector.setPort(project.gretty.port)
-      jettyServer.setConnectors([connector ] as Connector[])
-    }
+    project.afterEvaluate {
 
-    project.task("prepareInplaceWebApp", type: Copy) {
-      from "src/main/webapp"
-      into "${project.buildDir}/webapp"
-    }
-
-    def createInplaceWebAppContext = { Server jettyServer ->
-      def urls = [
-        new File(project.buildDir, "classes/main").toURI().toURL(),
-        new File(project.buildDir, "resources/main").toURI().toURL()
-      ]
-      urls += project.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
-      URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)
-      WebAppContext context = new WebAppContext()
-      if(project.gretty.realm && project.gretty.realmConfigFile) {
-        File realmConfigFile = new File(project.gretty.realmConfigFile);
-        if(!realmConfigFile.isAbsolute())
-          realmConfigFile = new File("${project.buildDir}/webapp", realmConfigFile.path)
-        context.getSecurityHandler().setLoginService(new HashLoginService(project.gretty.realm, realmConfigFile.absolutePath))
+      def createConnectors = { Server jettyServer ->
+        SocketConnector connector = new SocketConnector()
+        // Set some timeout options to make debugging easier.
+        connector.setMaxIdleTime(1000 * 60 * 60)
+        connector.setSoLingerTime(-1)
+        connector.setPort(project.gretty.port)
+        jettyServer.setConnectors([connector ] as Connector[])
       }
-      context.setServer jettyServer
-      context.setContextPath project.gretty.contextPath ?: "/"
-      context.setClassLoader classLoader
-      context.setResourceBase "${project.buildDir}/webapp"
-      jettyServer.setHandler context
-    }
 
-    def createWarWebAppContext = { Server jettyServer ->
-      WebAppContext context = new WebAppContext()
-      if(project.gretty.realm && project.gretty.realmConfigFile) {
-        File realmConfigFile = new File(project.gretty.realmConfigFile);
-        if(!realmConfigFile.isAbsolute())
-          realmConfigFile = new File("${project.projectDir}/src/main/webapp", realmConfigFile.path)
-        context.getSecurityHandler().setLoginService(new HashLoginService(project.gretty.realm, realmConfigFile.absolutePath))
+      project.task("prepareInplaceWebApp", type: Copy) {
+        for(Project overlay in project.gretty.overlays) {
+          from "${overlay.projectDir}/src/main/webapp"
+          into "${project.buildDir}/webapp"
+        }
+        from "src/main/webapp"
+        into "${project.buildDir}/webapp"
       }
-      context.setServer jettyServer
-      context.setContextPath project.gretty.contextPath ?: "/"
-      context.setWar project.tasks.war.archivePath.toString()
-      jettyServer.setHandler context
-    }
-
-    def doOnStart = { boolean stopOnAnyKey ->
-      System.out.println "Started jetty server on localhost:${project.gretty.port}."
-      project.gretty.onStart.each { onStart ->
-        if(onStart instanceof Closure)
-          onStart()
+      
+      def setupRealm = { WebAppContext context ->
+        String realm = project.gretty.realm
+        String realmConfigFile = project.gretty.realmConfigFile
+        if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
+          realmConfigFile = "${project.buildDir}/webapp/${realmConfigFile}"
+        if(!realm || !realmConfigFile)
+          for(Project overlay in project.gretty.overlays.reverse())
+            if(overlay.gretty.realm && overlay.gretty.realmConfigFile) {
+              realm = overlay.gretty.realm
+              realmConfigFile = overlay.gretty.realmConfigFile
+              if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
+                realmConfigFile = "${overlay.buildDir}/webapp/${realmConfigFile}"
+              break
+            }
+        if(realm && realmConfigFile)
+          context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
       }
-      if(stopOnAnyKey)
-        System.out.println "Press any key to stop the jetty server."
-      else
-        System.out.println "Enter 'gradle jettyStop' to stop the jetty server."
-      System.out.println()
-    }
-
-    def doOnStop = {
-      System.out.println "Jetty server stopped."
-      project.gretty.onStop.each { onStop ->
-        if(onStop instanceof Closure)
-          onStop()
+      
+      def setupContextPath = { WebAppContext context ->
+        String contextPath = project.gretty.contextPath
+        if(!contextPath)
+          for(Project overlay in project.gretty.overlays.reverse())
+            if(overlay.gretty.contextPath) {
+              contextPath = overlay.gretty.contextPath
+              break
+            }
+        context.setContextPath contextPath ?: "/"
       }
-    }
 
-    project.task("jettyRun") { task ->
-      task.dependsOn project.tasks.classes
-      task.dependsOn project.tasks.prepareInplaceWebApp
-      task.doLast {
-        Server server = new Server()
-        createConnectors server
-        createInplaceWebAppContext server
-        server.start()
-        doOnStart true
-        System.in.read()
-        server.stop()
-        server.join()
-        doOnStop()
+      def setupInplaceWebAppDependencies = { task ->
+        task.dependsOn project.tasks.classes
+        task.dependsOn project.tasks.prepareInplaceWebApp
+        for(Project overlay in project.gretty.overlays)
+          task.dependsOn overlay.tasks.classes
       }
-    }
 
-    project.task("jettyRunWar") { task ->
-      task.dependsOn project.tasks.war
-      task.doLast {
-        Server server = new Server()
-        createConnectors server
-        createWarWebAppContext server
-        server.start()
-        doOnStart true
-        System.in.read()
-        server.stop()
-        server.join()
-        doOnStop()
+      def createInplaceWebAppContext = { Server jettyServer ->
+        def urls = [
+          new File(project.buildDir, "classes/main").toURI().toURL(),
+          new File(project.buildDir, "resources/main").toURI().toURL()
+        ]
+        urls += project.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
+        for(Project overlay in project.gretty.overlays.reverse()) {
+          urls.add new File(overlay.buildDir, "classes/main").toURI().toURL()
+          urls.add new File(overlay.buildDir, "resources/main").toURI().toURL()
+          urls += overlay.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
+        }
+        URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)
+        WebAppContext context = new WebAppContext()
+        setupRealm context
+        setupContextPath context
+        context.setServer jettyServer
+        context.setClassLoader classLoader
+        context.setResourceBase "${project.buildDir}/webapp"
+        jettyServer.setHandler context
       }
-    }
 
-    project.task("jettyStart") { task ->
-      task.dependsOn project.tasks.classes
-      task.dependsOn project.tasks.prepareInplaceWebApp
-      task.doLast {
-        Server server = new Server()
-        createConnectors server
-        createInplaceWebAppContext server
-        Thread monitor = new MonitorThread(project.gretty.stopPort, server)
-        monitor.start()
-        server.start()
-        doOnStart false
-        server.join()
-        doOnStop()
+      def createWarWebAppContext = { Server jettyServer ->
+        WebAppContext context = new WebAppContext()
+        setupRealm context
+        setupContextPath context
+        context.setServer jettyServer
+        context.setWar project.tasks.war.archivePath.toString()
+        jettyServer.setHandler context
       }
-    }
 
-    project.task("jettyStartWar") { task ->
-      task.dependsOn project.tasks.war
-      task.doLast {
-        Server server = new Server()
-        createConnectors server
-        createWarWebAppContext server
-        Thread monitor = new MonitorThread(project.gretty.stopPort, server)
-        monitor.start()
-        server.start()
-        doOnStart false
-        server.join()
-        doOnStop()
+      def doOnStart = { boolean interactive ->
+        System.out.println "Jetty server started."
+        System.out.println 'You can see web-application in browser under the address:'
+        System.out.println "http://localhost:${project.gretty.port}${project.gretty.contextPath}"
+        for(Project overlay in project.gretty.overlays)
+          overlay.gretty.onStart.each { onStart ->
+            if(onStart instanceof Closure)
+              onStart()
+          }
+        project.gretty.onStart.each { onStart ->
+          if(onStart instanceof Closure)
+            onStart()
+        }
+        if(interactive)
+          System.out.println "Press any key to stop the jetty server."
+        else
+          System.out.println "Enter 'gradle jettyStop' to stop the jetty server."
+        System.out.println()
       }
-    }
 
-    project.task("jettyStop") { task ->
-      task.doLast {
-        Socket s = new Socket(InetAddress.getByName("127.0.0.1"), project.gretty.stopPort)
-        try {
-          OutputStream out = s.getOutputStream()
-          System.out.println "Sending jetty stop request"
-          out.write(("\r\n").getBytes())
-          out.flush()
-        } finally {
-          s.close()
+      def doOnStop = {
+        System.out.println "Jetty server stopped."
+        project.gretty.onStop.each { onStop ->
+          if(onStop instanceof Closure)
+            onStop()
+        }
+        for(Project overlay in project.gretty.overlays.reverse())
+          overlay.gretty.onStop.each { onStop ->
+            if(onStop instanceof Closure)
+              onStop()
+          }
+      }
+      
+      if(project.gretty.overlays) {
+        def explodedWebAppDir = "${project.buildDir}/explodedWebApp"
+        
+        project.task("thisWar", type: War) {
+          archiveName "thiswar.war"
+        }
+
+        project.task("explodeWebApps", type: Copy) {
+          for(Project overlay in project.gretty.overlays) {
+            dependsOn overlay.tasks.war
+            from overlay.zipTree(overlay.tasks.war.archivePath)
+            into explodedWebAppDir
+          }
+          dependsOn project.tasks.thisWar
+          from project.zipTree(project.tasks.thisWar.archivePath)
+          into explodedWebAppDir
+        }      
+        
+        project.task("overlayWar", type: Zip) {
+          dependsOn project.tasks.explodeWebApps
+          destinationDir project.tasks.war.destinationDir
+          archiveName project.tasks.war.archiveName
+          from project.fileTree(explodedWebAppDir)
+        }
+        
+        project.tasks.war {
+          dependsOn project.tasks.overlayWar
+          rootSpec.exclude '**/*'
         }
       }
-    } // jettyStop task
+
+      project.task("jettyRun") { task ->
+        setupInplaceWebAppDependencies task
+        task.doLast {
+          Server server = new Server()
+          createConnectors server
+          createInplaceWebAppContext server
+          server.start()
+          doOnStart true
+          System.in.read()
+          server.stop()
+          server.join()
+          doOnStop()
+        }
+      }
+
+      project.task("jettyRunWar") { task ->
+        task.dependsOn project.tasks.war
+        task.doLast {
+          Server server = new Server()
+          createConnectors server
+          createWarWebAppContext server
+          server.start()
+          doOnStart true
+          System.in.read()
+          server.stop()
+          server.join()
+          doOnStop()
+        }
+      }
+
+      project.task("jettyStart") { task ->
+        setupInplaceWebAppDependencies task
+        task.doLast {
+          Server server = new Server()
+          createConnectors server
+          createInplaceWebAppContext server
+          Thread monitor = new MonitorThread(project.gretty.stopPort, server)
+          monitor.start()
+          server.start()
+          doOnStart false
+          server.join()
+          doOnStop()
+        }
+      }
+
+      project.task("jettyStartWar") { task ->
+        task.dependsOn project.tasks.war
+        task.doLast {
+          Server server = new Server()
+          createConnectors server
+          createWarWebAppContext server
+          Thread monitor = new MonitorThread(project.gretty.stopPort, server)
+          monitor.start()
+          server.start()
+          doOnStart false
+          server.join()
+          doOnStop()
+        }
+      }
+
+      project.task("jettyStop") { task ->
+        task.doLast {
+          Socket s = new Socket(InetAddress.getByName("127.0.0.1"), project.gretty.stopPort)
+          try {
+            OutputStream out = s.getOutputStream()
+            System.out.println "Sending jetty stop request"
+            out.write(("\r\n").getBytes())
+            out.flush()
+          } finally {
+            s.close()
+          }
+        }
+      } // jettyStop task
+    } // afterEvaluate
   } // apply
 } // plugin
 

@@ -9,8 +9,8 @@ dependencies {
 
 gretty {
   contextPath '/helloGretty'
-  onStart {
-    println 'You can see web-application in browser under the address:'
-    println "http://localhost:${port}${contextPath}"
-  }
+}
+
+war {
+  archiveName "helloGretty.war"
 }

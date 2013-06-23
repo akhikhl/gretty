@@ -1,5 +1,6 @@
 package gretty
 
+
 class GrettyPluginExtension {
 
   int port = 8080
@@ -7,14 +8,19 @@ class GrettyPluginExtension {
   String contextPath
   String realm
   String realmConfigFile
+  def overlays = []
   def onStart = []
   def onStop = []
 
+  def overlay(newValue) {
+    overlays.add newValue
+  }
+
   def onStart(newValue) {
-    onStart.add newValue;
+    onStart.add newValue
   }
 
   def onStop(newValue) {
-    onStop.add newValue;
+    onStop.add newValue
   }
 }

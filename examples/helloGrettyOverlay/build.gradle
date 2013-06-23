@@ -1,0 +1,12 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'gretty'
+
+gretty {
+  contextPath '/helloGrettyOverlay'
+  overlay project(':helloGretty')
+}
+
+war {
+  archiveName "helloGrettyOverlay.war"
+}
