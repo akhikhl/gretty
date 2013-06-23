@@ -78,7 +78,7 @@ class GrettyPlugin implements Plugin<Project> {
         context.getSecurityHandler().setLoginService(new HashLoginService(project.gretty.realm, realmConfigFile.absolutePath))
       }
       context.setServer jettyServer
-      context.setContextPath "/"
+      context.setContextPath project.gretty.contextPath ?: "/"
       context.setClassLoader classLoader
       context.setResourceBase "${project.buildDir}/webapp"
       jettyServer.setHandler context
@@ -93,7 +93,7 @@ class GrettyPlugin implements Plugin<Project> {
         context.getSecurityHandler().setLoginService(new HashLoginService(project.gretty.realm, realmConfigFile.absolutePath))
       }
       context.setServer jettyServer
-      context.setContextPath "/"
+      context.setContextPath project.gretty.contextPath ?: "/"
       context.setWar project.tasks.war.archivePath.toString()
       jettyServer.setHandler context
     }
