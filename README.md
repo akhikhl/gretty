@@ -135,6 +135,8 @@ gretty {
   onStop {
     println "Jetty stop"
   }
+  overlay project(":ProjectA")
+  overlay project(":ProjectB")
 }
 ```
 
@@ -145,6 +147,8 @@ gretty {
 "onStart" allows to add one or more closures, which will be called just before jetty is started.
 
 "onStop" allows to add one or more closures, which will be called just after jetty is stopped.
+
+"overlay" allows to specify one or more projects as WAR overlay source
 
 ##Copyright and License
 
