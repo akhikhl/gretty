@@ -29,31 +29,31 @@ class GrettyPlugin implements Plugin<Project> {
 
       project.task("prepareInplaceWebApp", type: Copy) {
         for(Project overlay in project.gretty.overlays) {
-          from "${overlay.projectDir}/src/main/webapp"
+          from overlay.webAppDir
           into "${project.buildDir}/webapp"
         }
-        from "src/main/webapp"
+        from project.webAppDir
         into "${project.buildDir}/webapp"
       }
-      
+
       def setupRealm = { WebAppContext context ->
         String realm = project.gretty.realm
         String realmConfigFile = project.gretty.realmConfigFile
         if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
-          realmConfigFile = "${project.buildDir}/webapp/${realmConfigFile}"
+          realmConfigFile = "${project.webAppDir.absolutePath}/${realmConfigFile}"
         if(!realm || !realmConfigFile)
           for(Project overlay in project.gretty.overlays.reverse())
             if(overlay.gretty.realm && overlay.gretty.realmConfigFile) {
               realm = overlay.gretty.realm
               realmConfigFile = overlay.gretty.realmConfigFile
               if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
-                realmConfigFile = "${overlay.buildDir}/webapp/${realmConfigFile}"
+                realmConfigFile = "${overlay.webAppDir.absolutePath}/${realmConfigFile}"
               break
             }
         if(realm && realmConfigFile)
           context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
       }
-      
+
       def setupContextPath = { WebAppContext context ->
         String contextPath = project.gretty.contextPath
         if(!contextPath)
@@ -134,13 +134,11 @@ class GrettyPlugin implements Plugin<Project> {
               onStop()
           }
       }
-      
+
       if(project.gretty.overlays) {
         def explodedWebAppDir = "${project.buildDir}/explodedWebApp"
-        
-        project.task("thisWar", type: War) {
-          archiveName "thiswar.war"
-        }
+
+        project.task("thisWar", type: War) { archiveName "thiswar.war" }
 
         project.task("explodeWebApps", type: Copy) {
           for(Project overlay in project.gretty.overlays) {
@@ -151,15 +149,15 @@ class GrettyPlugin implements Plugin<Project> {
           dependsOn project.tasks.thisWar
           from project.zipTree(project.tasks.thisWar.archivePath)
           into explodedWebAppDir
-        }      
-        
+        }
+
         project.task("overlayWar", type: Zip) {
           dependsOn project.tasks.explodeWebApps
           destinationDir project.tasks.war.destinationDir
           archiveName project.tasks.war.archiveName
           from project.fileTree(explodedWebAppDir)
         }
-        
+
         project.tasks.war {
           dependsOn project.tasks.overlayWar
           rootSpec.exclude '**/*'
