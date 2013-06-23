@@ -1,15 +1,16 @@
-apply plugin: "java"
-apply plugin: "war"
-apply plugin: "gretty"
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'gretty'
 
 dependencies {
-  compile "org.apache.commons:commons-lang3:3.1"
-  providedCompile "javax.servlet:javax.servlet-api:3.0.1"
+  compile 'commons-configuration:commons-configuration:1.9'
+  providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
 }
 
 gretty {
+  contextPath '/helloGretty'
   onStart {
-    println "You can see web-application in browser under the address:"
-    println "http://localhost:8080/helloGretty"
+    println 'You can see web-application in browser under the address:'
+    println "http://localhost:${port}${contextPath}"
   }
 }
