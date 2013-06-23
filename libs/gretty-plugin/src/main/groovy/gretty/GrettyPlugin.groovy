@@ -65,6 +65,14 @@ class GrettyPlugin implements Plugin<Project> {
         context.setContextPath contextPath ?: "/"
       }
 
+      def setupInitParameters = { WebAppContext context ->
+        for(Project overlay in project.gretty.overlays)
+          for(def e in overlay.gretty.initParameters)
+            context.setInitParameter e.key, e.value
+        for(def e in project.gretty.initParameters)
+          context.setInitParameter e.key, e.value
+      }
+
       def setupInplaceWebAppDependencies = { task ->
         task.dependsOn project.tasks.classes
         task.dependsOn project.tasks.prepareInplaceWebApp
@@ -87,6 +95,7 @@ class GrettyPlugin implements Plugin<Project> {
         WebAppContext context = new WebAppContext()
         setupRealm context
         setupContextPath context
+        setupInitParameters context
         context.setServer jettyServer
         context.setClassLoader classLoader
         context.setResourceBase "${project.buildDir}/webapp"
@@ -97,6 +106,7 @@ class GrettyPlugin implements Plugin<Project> {
         WebAppContext context = new WebAppContext()
         setupRealm context
         setupContextPath context
+        setupInitParameters context
         context.setServer jettyServer
         context.setWar project.tasks.war.archivePath.toString()
         jettyServer.setHandler context

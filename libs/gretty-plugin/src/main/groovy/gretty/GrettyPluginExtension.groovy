@@ -6,11 +6,16 @@ class GrettyPluginExtension {
   int port = 8080
   int stopPort = 9999
   String contextPath
+  def initParameters = [:]
   String realm
   String realmConfigFile
   def overlays = []
   def onStart = []
   def onStop = []
+
+  def initParameter(key, value) {
+    initParameters[key] = value
+  }
 
   def overlay(newValue) {
     overlays.add newValue
