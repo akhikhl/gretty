@@ -4,7 +4,7 @@ package gretty
 class GrettyPluginExtension {
 
   int port = 8080
-  int stopPort = 9900
+  int servicePort = 9900
   String contextPath
   def initParameters = [:]
   String realm

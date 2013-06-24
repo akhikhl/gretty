@@ -14,7 +14,9 @@ class GrettyPlugin implements Plugin<Project> {
 
   void apply(final Project project) {
 
-    project.extensions.create("gretty", GrettyPluginExtension)
+    project.extensions.create('gretty', GrettyPluginExtension)
+
+    project.task('thisWar', type: War, group: 'gretty', description: 'Creates thiswar.war. Could be used to configure \'slick\' WAR generation in case of WAR-overlays.') { archiveName 'thiswar.war' }
 
     project.afterEvaluate {
 
@@ -27,13 +29,42 @@ class GrettyPlugin implements Plugin<Project> {
         jettyServer.setConnectors([connector ] as Connector[])
       }
 
-      project.task("prepareInplaceWebApp", type: Copy) {
+      String buildWebAppFolder = "${project.buildDir}/webapp"
+
+      project.task('prepareInplaceWebAppFolder', type: Copy, group: 'gretty', description: 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
         for(Project overlay in project.gretty.overlays) {
           from overlay.webAppDir
-          into "${project.buildDir}/webapp"
+          into buildWebAppFolder
         }
         from project.webAppDir
-        into "${project.buildDir}/webapp"
+        into buildWebAppFolder
+      }
+
+      if(project.gretty.overlays) {
+        project.task('explodeWebApps', type: Copy, group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
+          for(Project overlay in project.gretty.overlays) {
+            dependsOn overlay.tasks.war
+            from overlay.zipTree(overlay.tasks.war.archivePath)
+            into buildWebAppFolder
+          }
+          dependsOn project.tasks.thisWar
+          from project.zipTree(project.tasks.thisWar.archivePath)
+          into buildWebAppFolder
+        }
+
+        project.task('overlayWar', type: Zip, group: 'gretty', description: 'Creates WAR from exploded web-application in ${buildDir}/webapp') {
+          dependsOn project.tasks.explodeWebApps
+          from project.fileTree(buildWebAppFolder)
+          destinationDir project.tasks.war.destinationDir
+          archiveName project.tasks.war.archiveName
+        }
+
+        project.tasks.war {
+          dependsOn project.tasks.overlayWar
+          // Here we effectively turn off war task. All work is done by sequence of tasks:
+          // thisWar -> explodeWebApps -> overlayWar
+          rootSpec.exclude '**/*'
+        }
       }
 
       def setupRealm = { WebAppContext context ->
@@ -62,7 +93,7 @@ class GrettyPlugin implements Plugin<Project> {
               contextPath = overlay.gretty.contextPath
               break
             }
-        context.setContextPath contextPath ?: "/"
+        context.setContextPath contextPath ?: '/'
       }
 
       def setupInitParameters = { WebAppContext context ->
@@ -83,22 +114,22 @@ class GrettyPlugin implements Plugin<Project> {
 
       def setupInplaceWebAppDependencies = { task ->
         task.dependsOn project.tasks.classes
-        task.dependsOn project.tasks.prepareInplaceWebApp
+        task.dependsOn project.tasks.prepareInplaceWebAppFolder
         for(Project overlay in project.gretty.overlays)
           task.dependsOn overlay.tasks.classes
       }
 
+      def addClassPath = { urls, proj ->
+        urls.add new File(proj.buildDir, 'classes/main').toURI().toURL()
+        urls.add new File(proj.buildDir, 'resources/main').toURI().toURL()
+        urls.addAll proj.configurations['runtime'].collect { dep -> dep.toURI().toURL() }
+      }
+
       def createInplaceWebAppContext = { Server jettyServer ->
-        def urls = [
-          new File(project.buildDir, "classes/main").toURI().toURL(),
-          new File(project.buildDir, "resources/main").toURI().toURL()
-        ]
-        urls += project.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
-        for(Project overlay in project.gretty.overlays.reverse()) {
-          urls.add new File(overlay.buildDir, "classes/main").toURI().toURL()
-          urls.add new File(overlay.buildDir, "resources/main").toURI().toURL()
-          urls += overlay.configurations["runtime"].collect { dep -> dep.toURI().toURL() }
-        }
+        def urls = []
+        addClassPath urls, project
+        for(Project overlay in project.gretty.overlays.reverse())
+          addClassPath urls, overlay
         URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)
         WebAppContext context = new WebAppContext()
         setupRealm context
@@ -106,8 +137,16 @@ class GrettyPlugin implements Plugin<Project> {
         setupInitParameters context
         context.setServer jettyServer
         context.setClassLoader classLoader
-        context.setResourceBase "${project.buildDir}/webapp"
+        context.setResourceBase buildWebAppFolder
         jettyServer.setHandler context
+      }
+
+      def setupWarDependencies = { task ->
+        task.dependsOn project.tasks.war
+        // need this for stable references to ${buildDir}/webapp folder,
+        // independent from presence/absence of overlays and inplace/war start mode.
+        if(!project.gretty.overlays)
+          task.dependsOn project.tasks.prepareInplaceWebAppFolder
       }
 
       def createWarWebAppContext = { Server jettyServer ->
@@ -121,7 +160,7 @@ class GrettyPlugin implements Plugin<Project> {
       }
 
       def doOnStart = { boolean interactive ->
-        System.out.println "Jetty server started."
+        System.out.println 'Jetty server started.'
         System.out.println 'You can see web-application in browser under the address:'
         System.out.println "http://localhost:${project.gretty.port}${project.gretty.contextPath}"
         for(Project overlay in project.gretty.overlays)
@@ -134,14 +173,14 @@ class GrettyPlugin implements Plugin<Project> {
             onStart()
         }
         if(interactive)
-          System.out.println "Press any key to stop the jetty server."
+          System.out.println 'Press any key to stop the jetty server.'
         else
-          System.out.println "Enter 'gradle jettyStop' to stop the jetty server."
+          System.out.println 'Enter \'gradle jettyStop\' to stop the jetty server.'
         System.out.println()
       }
 
       def doOnStop = {
-        System.out.println "Jetty server stopped."
+        System.out.println 'Jetty server stopped.'
         project.gretty.onStop.each { onStop ->
           if(onStop instanceof Closure)
             onStop()
@@ -153,36 +192,7 @@ class GrettyPlugin implements Plugin<Project> {
           }
       }
 
-      if(project.gretty.overlays) {
-        def explodedWebAppDir = "${project.buildDir}/explodedWebApp"
-
-        project.task("thisWar", type: War) { archiveName "thiswar.war" }
-
-        project.task("explodeWebApps", type: Copy) {
-          for(Project overlay in project.gretty.overlays) {
-            dependsOn overlay.tasks.war
-            from overlay.zipTree(overlay.tasks.war.archivePath)
-            into explodedWebAppDir
-          }
-          dependsOn project.tasks.thisWar
-          from project.zipTree(project.tasks.thisWar.archivePath)
-          into explodedWebAppDir
-        }
-
-        project.task("overlayWar", type: Zip) {
-          dependsOn project.tasks.explodeWebApps
-          destinationDir project.tasks.war.destinationDir
-          archiveName project.tasks.war.archiveName
-          from project.fileTree(explodedWebAppDir)
-        }
-
-        project.tasks.war {
-          dependsOn project.tasks.overlayWar
-          rootSpec.exclude '**/*'
-        }
-      }
-
-      project.task("jettyRun") { task ->
+      project.task('jettyRun', group: 'gretty', description: 'Starts jetty server inplace, in interactive mode (keypress stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
           Server server = new Server()
@@ -197,8 +207,8 @@ class GrettyPlugin implements Plugin<Project> {
         }
       }
 
-      project.task("jettyRunWar") { task ->
-        task.dependsOn project.tasks.war
+      project.task('jettyRunWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in interactive mode (keypress stops the server).') { task ->
+        setupWarDependencies task
         task.doLast {
           Server server = new Server()
           createConnectors server
@@ -212,13 +222,13 @@ class GrettyPlugin implements Plugin<Project> {
         }
       }
 
-      project.task("jettyStart") { task ->
+      project.task('jettyStart', group: 'gretty', description: 'Starts jetty server inplace, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
           Server server = new Server()
           createConnectors server
           createInplaceWebAppContext server
-          Thread monitor = new MonitorThread(project.gretty.stopPort, server)
+          Thread monitor = new JettyMonitorThread(project.gretty.servicePort, server)
           monitor.start()
           server.start()
           doOnStart false
@@ -227,13 +237,13 @@ class GrettyPlugin implements Plugin<Project> {
         }
       }
 
-      project.task("jettyStartWar") { task ->
-        task.dependsOn project.tasks.war
+      project.task('jettyStartWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in batch mode (\'jettyStop\' stops the server).') { task ->
+        setupWarDependencies task
         task.doLast {
           Server server = new Server()
           createConnectors server
           createWarWebAppContext server
-          Thread monitor = new MonitorThread(project.gretty.stopPort, server)
+          Thread monitor = new JettyMonitorThread(project.gretty.servicePort, server)
           monitor.start()
           server.start()
           doOnStart false
@@ -242,19 +252,25 @@ class GrettyPlugin implements Plugin<Project> {
         }
       }
 
-      project.task("jettyStop") { task ->
-        task.doLast {
-          Socket s = new Socket(InetAddress.getByName("127.0.0.1"), project.gretty.stopPort)
-          try {
-            OutputStream out = s.getOutputStream()
-            System.out.println "Sending jetty stop request"
-            out.write(("\r\n").getBytes())
-            out.flush()
-          } finally {
-            s.close()
-          }
+      def sendServiceCommand = { command ->
+        Socket s = new Socket(InetAddress.getByName('127.0.0.1'), project.gretty.servicePort)
+        try {
+          OutputStream out = s.getOutputStream()
+          System.out.println "Sending command: ${command}"
+          out.write(("${command}\n").getBytes())
+          out.flush()
+        } finally {
+          s.close()
         }
-      } // jettyStop task
+      }
+
+      project.task('jettyStop', group: 'gretty', description: 'Sends \'stop\' command to running jetty server.') { 
+        doLast { sendServiceCommand 'stop' } 
+      }
+
+      project.task('jettyRestart', group: 'gretty', description: 'Sends \'restart\' command to running jetty server.') { 
+        doLast { sendServiceCommand 'restart' } 
+      }
     } // afterEvaluate
   } // apply
 } // plugin
