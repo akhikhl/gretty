@@ -16,18 +16,7 @@ class GrettyPlugin implements Plugin<Project> {
 
     project.extensions.create('gretty', GrettyPluginExtension)
 
-    project.task('thisWar', type: War, group: 'gretty', description: 'Creates thiswar.war. Could be used to configure \'slick\' WAR generation in case of WAR-overlays.') { archiveName 'thiswar.war' }
-
     project.afterEvaluate {
-
-      def createConnectors = { Server jettyServer ->
-        SocketConnector connector = new SocketConnector()
-        // Set some timeout options to make debugging easier.
-        connector.setMaxIdleTime(1000 * 60 * 60)
-        connector.setSoLingerTime(-1)
-        connector.setPort(project.gretty.port)
-        jettyServer.setConnectors([connector ] as Connector[])
-      }
 
       String buildWebAppFolder = "${project.buildDir}/webapp"
 
@@ -41,14 +30,19 @@ class GrettyPlugin implements Plugin<Project> {
       }
 
       if(project.gretty.overlays) {
+
+        String warFileName = project.tasks.war.archiveName
+
+        project.tasks.war { archiveName 'thiswar.war' }
+
         project.task('explodeWebApps', type: Copy, group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
           for(Project overlay in project.gretty.overlays) {
             dependsOn overlay.tasks.war
             from overlay.zipTree(overlay.tasks.war.archivePath)
             into buildWebAppFolder
           }
-          dependsOn project.tasks.thisWar
-          from project.zipTree(project.tasks.thisWar.archivePath)
+          dependsOn project.tasks.war
+          from project.zipTree(project.tasks.war.archivePath)
           into buildWebAppFolder
         }
 
@@ -56,15 +50,10 @@ class GrettyPlugin implements Plugin<Project> {
           dependsOn project.tasks.explodeWebApps
           from project.fileTree(buildWebAppFolder)
           destinationDir project.tasks.war.destinationDir
-          archiveName project.tasks.war.archiveName
+          archiveName warFileName
         }
 
-        project.tasks.war {
-          dependsOn project.tasks.overlayWar
-          // Here we effectively turn off war task. All work is done by sequence of tasks:
-          // thisWar -> explodeWebApps -> overlayWar
-          rootSpec.exclude '**/*'
-        }
+        project.tasks.assemble.dependsOn project.tasks.overlayWar
       }
 
       def setupRealm = { WebAppContext context ->
@@ -192,6 +181,15 @@ class GrettyPlugin implements Plugin<Project> {
           }
       }
 
+      def createConnectors = { Server jettyServer ->
+        SocketConnector connector = new SocketConnector()
+        // Set some timeout options to make debugging easier.
+        connector.setMaxIdleTime(1000 * 60 * 60)
+        connector.setSoLingerTime(-1)
+        connector.setPort(project.gretty.port)
+        jettyServer.setConnectors([connector ] as Connector[])
+      }
+
       project.task('jettyRun', group: 'gretty', description: 'Starts jetty server inplace, in interactive mode (keypress stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
@@ -264,13 +262,9 @@ class GrettyPlugin implements Plugin<Project> {
         }
       }
 
-      project.task('jettyStop', group: 'gretty', description: 'Sends \'stop\' command to running jetty server.') { 
-        doLast { sendServiceCommand 'stop' } 
-      }
+      project.task('jettyStop', group: 'gretty', description: 'Sends \'stop\' command to running jetty server.') {  doLast { sendServiceCommand 'stop' }  }
 
-      project.task('jettyRestart', group: 'gretty', description: 'Sends \'restart\' command to running jetty server.') { 
-        doLast { sendServiceCommand 'restart' } 
-      }
+      project.task('jettyRestart', group: 'gretty', description: 'Sends \'restart\' command to running jetty server.') {  doLast { sendServiceCommand 'restart' }  }
     } // afterEvaluate
   } // apply
 } // plugin
