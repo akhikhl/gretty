@@ -67,10 +67,18 @@ class GrettyPlugin implements Plugin<Project> {
 
       def setupInitParameters = { WebAppContext context ->
         for(Project overlay in project.gretty.overlays)
-          for(def e in overlay.gretty.initParameters)
-            context.setInitParameter e.key, e.value
-        for(def e in project.gretty.initParameters)
-          context.setInitParameter e.key, e.value
+          for(def e in overlay.gretty.initParameters) {
+            def paramValue = e.value
+            if(paramValue instanceof Closure)
+              paramValue = paramValue()
+            context.setInitParameter e.key, paramValue
+          }
+        for(def e in project.gretty.initParameters) {
+          def paramValue = e.value
+          if(paramValue instanceof Closure)
+            paramValue = paramValue()
+          context.setInitParameter e.key, paramValue
+        }
       }
 
       def setupInplaceWebAppDependencies = { task ->
