@@ -2,12 +2,10 @@ package gretty
 
 final class JettyMonitorThread extends Thread {
 
-  private final def helper
   private final def server
   private ServerSocket socket
 
-  public JettyMonitorThread(int servicePort, def helper, def server) {
-    this.helper = helper
+  public JettyMonitorThread(int servicePort, def server) {
     this.server = server
     setDaemon false
     setName 'JettyMonitorThread'
@@ -32,12 +30,12 @@ final class JettyMonitorThread extends Thread {
             accept.close()
           }
           if(command == 'stop') {
-            helper.stopServer server
+            server.stop()
             break
           }
           if(command == 'restart') {
-            helper.stopServer server
-            helper.startServer server
+            server.stop()
+            server.start()
           }
           // more commands could be inserted here
         }

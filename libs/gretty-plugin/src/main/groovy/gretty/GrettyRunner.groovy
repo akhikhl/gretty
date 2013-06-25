@@ -27,13 +27,13 @@ final class GrettyRunner {
     }
     ClassLoader classLoader = new URLClassLoader(urls as URL[])
 
-    def helper = classLoader.findClass('gretty.GrettyHelper').newInstance()
+    def helper = classLoader.findClass('gretty.GrettyHelper')
 
     def server = helper.createServer()
-    helper.createConnectors server, project.gretty.port
+    server.setConnectors helper.createConnectors(project.gretty.port)
 
     def context = helper.createWebAppContext()
-    helper.setClassLoader context, classLoader
+    context.setClassLoader classLoader
 
     String realm = project.gretty.realm
     String realmConfigFile = project.gretty.realmConfigFile
@@ -49,7 +49,7 @@ final class GrettyRunner {
           break
         }
     if(realm && realmConfigFile)
-      helper.setRealm context, realm, realmConfigFile
+      context.getSecurityHandler().setLoginService(helper.createLoginService(realm, realmConfigFile))
 
     String contextPath = project.gretty.contextPath
     if(!contextPath)
@@ -58,30 +58,31 @@ final class GrettyRunner {
           contextPath = overlay.gretty.contextPath
           break
         }
-    helper.setContextPath context, contextPath ?: '/'
+    context.setContextPath contextPath ?: '/'
 
     for(Project overlay in project.gretty.overlays)
       for(def e in overlay.gretty.initParameters) {
         def paramValue = e.value
         if(paramValue instanceof Closure)
           paramValue = paramValue()
-        helper.setInitParameter context, e.key, paramValue
+        context.setInitParameter e.key, paramValue
       }
     for(def e in project.gretty.initParameters) {
       def paramValue = e.value
       if(paramValue instanceof Closure)
         paramValue = paramValue()
-      helper.setInitParameter context, e.key, paramValue
+      context.setInitParameter e.key, paramValue
     }
 
     if(params.inplace)
-      helper.setResourceBase context, "${project.buildDir}/webapp"
+      context.setResourceBase "${project.buildDir}/webapp"
     else
-      helper.setWar context, project.tasks.war.archivePath.toString()
+      context.setWar project.tasks.war.archivePath.toString()
 
-    helper.setHandler server, context
+    context.setServer server
+    server.setHandler context
 
-    helper.startServer server
+    server.start()
 
     boolean interactive = params.interactive
 
@@ -105,9 +106,9 @@ final class GrettyRunner {
 
     if(interactive) {
       System.in.read()
-      helper.stopServer server
+      server.stop()
     } else {
-      Thread monitor = new JettyMonitorThread(project.gretty.servicePort, helper, server)
+      Thread monitor = new JettyMonitorThread(project.gretty.servicePort, server)
       monitor.start()
     }
 
