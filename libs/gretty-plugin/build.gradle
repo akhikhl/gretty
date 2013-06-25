@@ -1,7 +1,7 @@
 apply plugin: 'groovy'
 
 dependencies {
-  compile project(':gretty-helper')
+  compile 'org.codehaus.groovy:groovy-all:1.8.6'
   compile gradleApi()
 }
 

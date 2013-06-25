@@ -1,13 +1,13 @@
 package gretty
 
-import org.eclipse.jetty.server.Server
-
 final class JettyMonitorThread extends Thread {
 
-  private final Server server
+  private final def helper
+  private final def server
   private ServerSocket socket
 
-  public JettyMonitorThread(int servicePort, final Server server) {
+  public JettyMonitorThread(int servicePort, def helper, def server) {
+    this.helper = helper
     this.server = server
     setDaemon false
     setName 'JettyMonitorThread'
@@ -32,12 +32,12 @@ final class JettyMonitorThread extends Thread {
             accept.close()
           }
           if(command == 'stop') {
-            server.stop()
+            helper.stopServer server
             break
           }
           if(command == 'restart') {
-            server.stop()
-            server.start()
+            helper.stopServer server
+            helper.startServer server
           }
           // more commands could be inserted here
         }

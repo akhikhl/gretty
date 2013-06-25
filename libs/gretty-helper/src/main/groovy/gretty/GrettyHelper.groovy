@@ -25,7 +25,40 @@ class GrettyHelper {
     return new WebAppContext()
   }
 
+  void setClassLoader(WebAppContext context, ClassLoader classLoader) {
+    context.setClassLoader(classLoader)
+  }
+
+  void setContextPath(WebAppContext context, String contextPath) {
+    context.setContextPath(contextPath)
+  }
+
+  void setHandler(Server server, WebAppContext context) {
+    context.setServer server
+    server.setHandler context
+  }
+
+  void setInitParameter(WebAppContext context, String key, String value) {
+    context.setInitParameter key, value
+  }
+
   void setRealm(WebAppContext context, String realmName, String realmConfigFile) {
     context.getSecurityHandler().setLoginService(new HashLoginService(realmName, realmConfigFile))
+  }
+
+  void setResourceBase(WebAppContext context, String resourceBase) {
+    context.setResourceBase(resourceBase)
+  }
+
+  void setWar(WebAppContext context, String warFileName) {
+    context.setWar(warFileName)
+  }
+
+  void startServer(Server jettyServer) {
+    jettyServer.start()
+  }
+
+  void stopServer(Server jettyServer) {
+    jettyServer.stop()
   }
 }
