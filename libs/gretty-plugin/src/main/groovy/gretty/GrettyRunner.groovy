@@ -33,7 +33,7 @@ final class GrettyRunner {
     server.setConnectors helper.createConnectors(project.gretty.port)
 
     def context = helper.createWebAppContext()
-    context.setClassLoader classLoader
+    helper.setClassLoader context, classLoader
 
     String realm = project.gretty.realm
     String realmConfigFile = project.gretty.realmConfigFile

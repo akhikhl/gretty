@@ -5,6 +5,7 @@ import org.eclipse.jetty.security.LoginService
 import org.eclipse.jetty.server.Connector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
+import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
 
 class GrettyHelper {
@@ -24,6 +25,10 @@ class GrettyHelper {
 
   public static Server createServer() {
     return new Server()
+  }
+
+  public static void setClassLoader(WebAppContext context, ClassLoader classLoader) {
+    context.setClassLoader(new WebAppClassLoader(classLoader, context))
   }
 
   public static WebAppContext createWebAppContext() {
