@@ -58,7 +58,8 @@ final class GrettyRunner {
           contextPath = overlay.gretty.contextPath
           break
         }
-    context.setContextPath contextPath ?: '/'
+    contextPath = contextPath ?: "/${project.name}"
+    context.setContextPath contextPath
 
     for(Project overlay in project.gretty.overlays)
       for(def e in overlay.gretty.initParameters) {
@@ -88,7 +89,7 @@ final class GrettyRunner {
 
     System.out.println 'Jetty server started.'
     System.out.println 'You can see web-application in browser under the address:'
-    System.out.println "http://localhost:${project.gretty.port}${project.gretty.contextPath}"
+    System.out.println "http://localhost:${project.gretty.port}${contextPath}"
     for(Project overlay in project.gretty.overlays)
       overlay.gretty.onStart.each { onStart ->
         if(onStart instanceof Closure)
