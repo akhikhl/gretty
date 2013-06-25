@@ -4,11 +4,6 @@ apply plugin: 'gretty'
 
 dependencies {
   compile 'commons-configuration:commons-configuration:1.9'
-  providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
-}
-
-gretty {
-  contextPath '/helloGretty'
 }
 
 war {
