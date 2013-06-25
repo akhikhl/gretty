@@ -11,23 +11,24 @@ final class GrettyPlugin implements Plugin<Project> {
 
     project.extensions.create('gretty', GrettyPluginExtension)
 
+    project.configurations {
+      compile.exclude group: 'javax.servlet', module: 'servlet-api'
+      grettyConfig
+      grettyConfig.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.servlet'
+    }
+
+    project.dependencies {
+      providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
+      grettyConfig 'org.akhikhl.gretty:gretty-helper:0.0.1'
+      grettyConfig 'javax.servlet:javax.servlet-api:3.0.1'
+      grettyConfig 'org.eclipse.jetty:jetty-server:8.1.8.v20121106'
+      grettyConfig 'org.eclipse.jetty:jetty-servlet:8.1.8.v20121106'
+      grettyConfig 'org.eclipse.jetty:jetty-webapp:8.1.8.v20121106'
+      grettyConfig 'org.eclipse.jetty:jetty-security:8.1.8.v20121106'
+      grettyConfig 'org.eclipse.jetty:jetty-jsp:8.1.8.v20121106'
+    }
+
     project.afterEvaluate {
-
-      project.configurations {
-        compile.exclude group: 'javax.servlet', module: 'servlet-api'
-        grettyConfig
-        grettyConfig.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.servlet'
-      }
-
-      project.dependencies {
-        grettyConfig 'org.akhikhl.gretty:gretty-helper:0.0.1'
-        grettyConfig 'javax.servlet:javax.servlet-api:3.0.1'
-        grettyConfig 'org.eclipse.jetty:jetty-server:8.1.8.v20121106'
-        grettyConfig 'org.eclipse.jetty:jetty-servlet:8.1.8.v20121106'
-        grettyConfig 'org.eclipse.jetty:jetty-webapp:8.1.8.v20121106'
-        grettyConfig 'org.eclipse.jetty:jetty-security:8.1.8.v20121106'
-        grettyConfig 'org.eclipse.jetty:jetty-jsp:8.1.8.v20121106'
-      }
 
       String buildWebAppFolder = "${project.buildDir}/webapp"
 
