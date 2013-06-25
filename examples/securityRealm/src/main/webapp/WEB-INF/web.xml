@@ -12,7 +12,7 @@
  
   <servlet-mapping>
     <servlet-name>ExampleServlet</servlet-name>
-    <url-pattern>/securityRealm</url-pattern>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
   
   <security-constraint>
