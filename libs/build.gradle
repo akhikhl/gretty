@@ -1,3 +1,8 @@
+ext {
+  generateSources = false
+  generateJavadoc = false
+}
+
 allprojects {
   group = "org.akhikhl.gretty"
   version = "0.0.1"
@@ -13,7 +18,13 @@ subprojects {
   }
 
   afterEvaluate {
-    if(tasks.findByName("classes")) {
+  
+    if(plugins.findPlugin("java")) {
+      sourceCompatibility = "1.7"
+      targetCompatibility = "1.7"
+    }
+  
+    if(generateSources && tasks.findByName("classes")) {
       task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allSource
@@ -23,7 +34,7 @@ subprojects {
       }
     }
 
-    if(tasks.findByName("javadoc")) {
+    if(generateJavadoc && tasks.findByName("javadoc")) {
       task javadocJar(type: Jar) {
         dependsOn javadoc
         classifier = 'javadoc'

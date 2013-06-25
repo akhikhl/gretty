@@ -1,10 +1,6 @@
 package gretty
 
-import org.eclipse.jetty.security.HashLoginService
-import org.eclipse.jetty.server.Connector
 import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.server.bio.SocketConnector
-import org.eclipse.jetty.webapp.WebAppContext
 import org.gradle.api.*
 import org.gradle.api.plugins.*
 import org.gradle.api.tasks.*
@@ -17,6 +13,22 @@ class GrettyPlugin implements Plugin<Project> {
     project.extensions.create('gretty', GrettyPluginExtension)
 
     project.afterEvaluate {
+
+      project.configurations {
+        compile.exclude group: 'javax.servlet', module: 'servlet-api'
+        gretty
+        gretty.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.servlet'
+      }
+
+      project.dependencies {
+        gretty 'org.akhikhl.gretty:gretty-helper:0.0.1'
+        gretty 'javax.servlet:javax.servlet-api:3.0.1'
+        gretty 'org.eclipse.jetty:jetty-server:8.1.8.v20121106'
+        gretty 'org.eclipse.jetty:jetty-servlet:8.1.8.v20121106'
+        gretty 'org.eclipse.jetty:jetty-webapp:8.1.8.v20121106'
+        gretty 'org.eclipse.jetty:jetty-security:8.1.8.v20121106'
+        gretty 'org.eclipse.jetty:jetty-jsp:8.1.8.v20121106'
+      }
 
       String buildWebAppFolder = "${project.buildDir}/webapp"
 
@@ -56,7 +68,7 @@ class GrettyPlugin implements Plugin<Project> {
         project.tasks.assemble.dependsOn project.tasks.overlayWar
       }
 
-      def setupRealm = { WebAppContext context ->
+      def setupRealm = { helper, context ->
         String realm = project.gretty.realm
         String realmConfigFile = project.gretty.realmConfigFile
         if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
@@ -71,10 +83,10 @@ class GrettyPlugin implements Plugin<Project> {
               break
             }
         if(realm && realmConfigFile)
-          context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
+          helper.setRealm context, realm, realmConfigFile
       }
 
-      def setupContextPath = { WebAppContext context ->
+      def setupContextPath = { context ->
         String contextPath = project.gretty.contextPath
         if(!contextPath)
           for(Project overlay in project.gretty.overlays.reverse())
@@ -85,7 +97,7 @@ class GrettyPlugin implements Plugin<Project> {
         context.setContextPath contextPath ?: '/'
       }
 
-      def setupInitParameters = { WebAppContext context ->
+      def setupInitParameters = { context ->
         for(Project overlay in project.gretty.overlays)
           for(def e in overlay.gretty.initParameters) {
             def paramValue = e.value
@@ -111,21 +123,24 @@ class GrettyPlugin implements Plugin<Project> {
       def addClassPath = { urls, proj ->
         urls.add new File(proj.buildDir, 'classes/main').toURI().toURL()
         urls.add new File(proj.buildDir, 'resources/main').toURI().toURL()
-        urls.addAll proj.configurations['runtime'].collect { dep -> dep.toURI().toURL() }
+        urls.addAll proj.configurations.runtime.collect { dep -> dep.toURI().toURL() }
       }
 
-      def createInplaceWebAppContext = { Server jettyServer ->
+      def createInplaceClassLoader = {
         def urls = []
+        urls.addAll project.configurations.gretty.collect { dep -> dep.toURI().toURL() }
         addClassPath urls, project
         for(Project overlay in project.gretty.overlays.reverse())
           addClassPath urls, overlay
-        URLClassLoader classLoader = new URLClassLoader(urls as URL[], GrettyPlugin.class.classLoader)
-        WebAppContext context = new WebAppContext()
-        setupRealm context
+        return new URLClassLoader(urls as URL[])
+      }
+
+      def createInplaceWebAppContext = { def helper, jettyServer ->
+        def context = helper.createWebAppContext()
+        setupRealm helper, context
         setupContextPath context
         setupInitParameters context
         context.setServer jettyServer
-        context.setClassLoader classLoader
         context.setResourceBase buildWebAppFolder
         jettyServer.setHandler context
       }
@@ -138,9 +153,9 @@ class GrettyPlugin implements Plugin<Project> {
           task.dependsOn project.tasks.prepareInplaceWebAppFolder
       }
 
-      def createWarWebAppContext = { Server jettyServer ->
-        WebAppContext context = new WebAppContext()
-        setupRealm context
+      def createWarWebAppContext = { def helper, jettyServer ->
+        def context = helper.createWebAppContext()
+        setupRealm helper, context
         setupContextPath context
         setupInitParameters context
         context.setServer jettyServer
@@ -181,21 +196,15 @@ class GrettyPlugin implements Plugin<Project> {
           }
       }
 
-      def createConnectors = { Server jettyServer ->
-        SocketConnector connector = new SocketConnector()
-        // Set some timeout options to make debugging easier.
-        connector.setMaxIdleTime(1000 * 60 * 60)
-        connector.setSoLingerTime(-1)
-        connector.setPort(project.gretty.port)
-        jettyServer.setConnectors([connector ] as Connector[])
-      }
-
       project.task('jettyRun', group: 'gretty', description: 'Starts jetty server inplace, in interactive mode (keypress stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          Server server = new Server()
-          createConnectors server
-          createInplaceWebAppContext server
+          ClassLoader classLoader = createInplaceClassLoader()
+          def helper = classLoader.findClass('gretty.GrettyHelper').newInstance()
+          def server = helper.createServer()
+          helper.createConnectors server, project.gretty.port
+          createInplaceWebAppContext helper, server
+          project.logger.warn "DBG InplaceWebAppContext created"
           server.start()
           doOnStart true
           System.in.read()
@@ -223,9 +232,11 @@ class GrettyPlugin implements Plugin<Project> {
       project.task('jettyStart', group: 'gretty', description: 'Starts jetty server inplace, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          Server server = new Server()
-          createConnectors server
-          createInplaceWebAppContext server
+          ClassLoader classLoader = createInplaceClassLoader()
+          def helper = classLoader.findClass('gretty.GrettyHelper').newInstance()
+          def server = helper.createServer()
+          helper.createConnectors server, project.gretty.port
+          createInplaceWebAppContext helper, server
           Thread monitor = new JettyMonitorThread(project.gretty.servicePort, server)
           monitor.start()
           server.start()
@@ -262,9 +273,11 @@ class GrettyPlugin implements Plugin<Project> {
         }
       }
 
-      project.task('jettyStop', group: 'gretty', description: 'Sends \'stop\' command to running jetty server.') {  doLast { sendServiceCommand 'stop' }  }
+      project.task('jettyStop', group: 'gretty', description: 'Sends \'stop\' command to running jetty server.') {  doLast { sendServiceCommand 'stop'
+        }  }
 
-      project.task('jettyRestart', group: 'gretty', description: 'Sends \'restart\' command to running jetty server.') {  doLast { sendServiceCommand 'restart' }  }
+      project.task('jettyRestart', group: 'gretty', description: 'Sends \'restart\' command to running jetty server.') {  doLast { sendServiceCommand 'restart'
+        }  }
     } // afterEvaluate
   } // apply
 } // plugin
