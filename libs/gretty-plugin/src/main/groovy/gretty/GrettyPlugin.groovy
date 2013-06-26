@@ -30,6 +30,9 @@ final class GrettyPlugin implements Plugin<Project> {
 
     project.afterEvaluate {
 
+      for(Project overlay in project.gretty.overlays)
+        project.dependencies.add "providedCompile", overlay
+
       String buildWebAppFolder = "${project.buildDir}/webapp"
 
       project.task('prepareInplaceWebAppFolder', type: Copy, group: 'gretty', description: 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
