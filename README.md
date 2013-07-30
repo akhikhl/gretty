@@ -14,6 +14,7 @@ Gradle plugin for running web-applications under jetty 8.1.8.
   * [jettyStartWar](#jettystartwar)
   * [jettyStop](#jettystop)
 * [Configuration](#configuration)
+* [WAR Overlays](#WAROverlays)
 * [Copyright and License](#copyright-and-license)
 
 ##Usage:
@@ -155,6 +156,16 @@ gretty {
 "onStop" allows to add one or more closures, which will be called just after jetty is stopped.
 
 "overlay" allows to specify one or more projects as WAR overlay source
+
+##WAR Overlays
+
+Overlay property "understands" only gradle projects as an input. Overlay has the following effect:
+
+1. Runtime classpath of overlay projects is added to the current project, when performing jettyRun, jettyStart. 
+   Classpath of the current project has priority.
+
+2. Overlay projects are added (overlayed) to the current project, when assembling WAR file. The files of the current 
+   project have priority over overlay files, this allows to effectively customize web-application.
 
 ##Copyright and License
 
