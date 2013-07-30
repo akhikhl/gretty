@@ -27,7 +27,10 @@ Gradle plugin for running web-applications under jetty 8.1.8.
 buildscript {
 
   repositories {
-    mavenLocal()
+    // mavenCentral() if needed for other dependencies
+    maven {
+      url 'https://raw.github.com/akhikhl/gretty/master/maven_repo'
+    }  
   }
 
   apply plugin: "maven"
@@ -37,13 +40,16 @@ buildscript {
   }
 }
 
+repositories {
+  // mavenCentral() if needed for other dependencies
+  maven {
+    url 'https://raw.github.com/akhikhl/gretty/master/maven_repo'
+  }  
+}
+
 apply plugin: "java"
 apply plugin: "war"
 apply plugin: "gretty"
-
-dependencies {
-  providedCompile "javax.servlet:javax.servlet-api:3.0.1"
-}
 
 ```
 
