@@ -1,8 +1,10 @@
 buildscript {
 
   repositories {
-    mavenLocal()
     mavenCentral()
+    maven {
+      url 'https://raw.github.com/akhikhl/gretty/master/maven_repo'
+    }  
   }
 
   apply plugin: "maven"
@@ -19,8 +21,10 @@ allprojects {
 
 subprojects {
   repositories {
-    mavenLocal()
     mavenCentral()
+    maven {
+      url 'https://raw.github.com/akhikhl/gretty/master/maven_repo'
+    }  
   }
 
   apply plugin: "maven"
