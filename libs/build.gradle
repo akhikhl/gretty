@@ -1,6 +1,6 @@
 ext {
-  generateSources = false
-  generateJavadoc = false
+  generateSources = true
+  generateJavadoc = true
 }
 
 allprojects {
