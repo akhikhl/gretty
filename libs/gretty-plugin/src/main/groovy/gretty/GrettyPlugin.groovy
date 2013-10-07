@@ -27,38 +27,57 @@ final class GrettyPlugin implements Plugin<Project> {
       grettyConfig 'org.eclipse.jetty:jetty-security:8.1.8.v20121106'
       grettyConfig 'org.eclipse.jetty:jetty-jsp:8.1.8.v20121106'
     }
+    
+    for(String overlay in project.gretty.overlays)
+      project.evaluationDependsOn(overlay)
 
     project.afterEvaluate {
 
-      for(Project overlay in project.gretty.overlays)
-        project.dependencies.add "providedCompile", overlay
+      for(String overlay in project.gretty.overlays)
+        project.dependencies.add "providedCompile", project.project(overlay)
 
       String buildWebAppFolder = "${project.buildDir}/webapp"
 
-      project.task('prepareInplaceWebAppFolder', type: Copy, group: 'gretty', description: 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
-        for(Project overlay in project.gretty.overlays) {
-          from { overlay.webAppDir }
-          into buildWebAppFolder
+      project.task('prepareInplaceWebAppFolder', group: 'gretty', description: 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
+        doLast {
+          for(String overlay in project.gretty.overlays) {
+            project.copy {
+              from project.project(overlay).webAppDir
+              into buildWebAppFolder
+            }
+          }
+          project.copy {
+            from project.webAppDir
+            into buildWebAppFolder
+          }
         }
-        from { project.webAppDir }
-        into buildWebAppFolder
       }
 
       if(project.gretty.overlays) {
 
         String warFileName = project.tasks.war.archiveName
+        project.ext.finalWarPath = project.tasks.war.archivePath
 
         project.tasks.war { archiveName 'thiswar.war' }
 
-        project.task('explodeWebApps', type: Copy, group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
-          for(Project overlay in project.gretty.overlays) {
-            dependsOn { overlay.tasks.war }
-            from { overlay.zipTree(overlay.tasks.war.archivePath) }
-            into buildWebAppFolder
-          }
+        project.task('explodeWebApps', group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
+          for(String overlay in project.gretty.overlays)
+            dependsOn "${overlay}:assemble" as String
           dependsOn project.tasks.war
-          from project.zipTree(project.tasks.war.archivePath)
-          into buildWebAppFolder
+          doLast {
+            for(String overlay in project.gretty.overlays) {
+              def overlayProject = project.project(overlay)
+              project.copy {
+                def overlayWarFilePath = overlayProject.ext.properties.containsKey('finalWarPath') ? overlayProject.ext.finalWarPath : overlayProject.tasks.war.archivePath
+                from overlayProject.zipTree(overlayWarFilePath) 
+                into buildWebAppFolder
+              }
+            }
+            project.copy {
+              from project.zipTree(project.tasks.war.archivePath)
+              into buildWebAppFolder
+            }
+          }
         }
 
         project.task('overlayWar', type: Zip, group: 'gretty', description: 'Creates WAR from exploded web-application in ${buildDir}/webapp') {
@@ -74,8 +93,8 @@ final class GrettyPlugin implements Plugin<Project> {
       def setupInplaceWebAppDependencies = { task ->
         task.dependsOn project.tasks.classes
         task.dependsOn project.tasks.prepareInplaceWebAppFolder
-        for(Project overlay in project.gretty.overlays)
-          task.dependsOn { overlay.tasks.classes }
+        for(String overlay in project.gretty.overlays)
+          task.dependsOn "${overlay}:classes" as String
       }
 
       def setupWarDependencies = { task ->

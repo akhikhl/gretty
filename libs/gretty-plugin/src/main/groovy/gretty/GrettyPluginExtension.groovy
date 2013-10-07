@@ -6,18 +6,20 @@ class GrettyPluginExtension {
   int port = 8080
   int servicePort = 9900
   String contextPath
-  def initParameters = [:]
+  Map initParameters = [:]
   String realm
   String realmConfigFile
-  def overlays = []
-  def onStart = []
-  def onStop = []
+  List overlays = []
+  List onStart = []
+  List onStop = []
 
   def initParameter(key, value) {
     initParameters[key] = value
   }
 
-  def overlay(newValue) {
+  def overlay(def newValue) {
+    if(!(newValue instanceof String))
+      throw GradleException("Overlay ${newValue?.toString()} should be a string")
     overlays.add newValue
   }
 

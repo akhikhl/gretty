@@ -22,8 +22,8 @@ final class GrettyRunner {
     urls.addAll project.configurations.grettyConfig.collect { dep -> dep.toURI().toURL() }
     if(params.inplace) {
       addProjectClassPath project
-      for(Project overlay in project.gretty.overlays.reverse())
-        addProjectClassPath overlay
+      for(String overlay in project.gretty.overlays.reverse())
+        addProjectClassPath project.project(overlay)
     }
     ClassLoader classLoader = new URLClassLoader(urls as URL[])
 
@@ -40,7 +40,8 @@ final class GrettyRunner {
     if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
       realmConfigFile = "${project.webAppDir.absolutePath}/${realmConfigFile}"
     if(!realm || !realmConfigFile)
-      for(Project overlay in project.gretty.overlays.reverse())
+      for(def overlay in project.gretty.overlays.reverse()) {
+        overlay = project.project(overlay)
         if(overlay.gretty.realm && overlay.gretty.realmConfigFile) {
           realm = overlay.gretty.realm
           realmConfigFile = overlay.gretty.realmConfigFile
@@ -48,26 +49,31 @@ final class GrettyRunner {
             realmConfigFile = "${overlay.webAppDir.absolutePath}/${realmConfigFile}"
           break
         }
+      }
     if(realm && realmConfigFile)
       context.getSecurityHandler().setLoginService(helper.createLoginService(realm, realmConfigFile))
 
     String contextPath = project.gretty.contextPath
     if(!contextPath)
-      for(Project overlay in project.gretty.overlays.reverse())
+      for(def overlay in project.gretty.overlays.reverse()) {
+        overlay = project.project(overlay)
         if(overlay.gretty.contextPath) {
           contextPath = overlay.gretty.contextPath
           break
         }
+      }
     contextPath = contextPath ?: "/${project.name}"
     context.setContextPath contextPath
 
-    for(Project overlay in project.gretty.overlays)
+    for(def overlay in project.gretty.overlays) {
+      overlay = project.project(overlay)
       for(def e in overlay.gretty.initParameters) {
         def paramValue = e.value
         if(paramValue instanceof Closure)
           paramValue = paramValue()
         context.setInitParameter e.key, paramValue
       }
+    }
     for(def e in project.gretty.initParameters) {
       def paramValue = e.value
       if(paramValue instanceof Closure)
@@ -90,11 +96,13 @@ final class GrettyRunner {
     System.out.println 'Jetty server started.'
     System.out.println 'You can see web-application in browser under the address:'
     System.out.println "http://localhost:${project.gretty.port}${contextPath}"
-    for(Project overlay in project.gretty.overlays)
+    for(def overlay in project.gretty.overlays) {
+      overlay = project.project(overlay)
       overlay.gretty.onStart.each { onStart ->
         if(onStart instanceof Closure)
           onStart()
       }
+    }
     project.gretty.onStart.each { onStart ->
       if(onStart instanceof Closure)
         onStart()
@@ -120,11 +128,13 @@ final class GrettyRunner {
       if(onStop instanceof Closure)
         onStop()
     }
-    for(Project overlay in project.gretty.overlays.reverse())
+    for(def overlay in project.gretty.overlays.reverse()) {
+      overlay = project.project(overlay)
       overlay.gretty.onStop.each { onStop ->
         if(onStop instanceof Closure)
           onStop()
       }
+    }
   }
 
   public static void sendServiceCommand(int servicePort, String command) {
