@@ -37,10 +37,10 @@ final class GrettyPlugin implements Plugin<Project> {
 
       project.task('prepareInplaceWebAppFolder', type: Copy, group: 'gretty', description: 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
         for(Project overlay in project.gretty.overlays) {
-          from overlay.webAppDir
+          from { overlay.webAppDir }
           into buildWebAppFolder
         }
-        from project.webAppDir
+        from { project.webAppDir }
         into buildWebAppFolder
       }
 
@@ -52,8 +52,8 @@ final class GrettyPlugin implements Plugin<Project> {
 
         project.task('explodeWebApps', type: Copy, group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
           for(Project overlay in project.gretty.overlays) {
-            dependsOn overlay.tasks.war
-            from overlay.zipTree(overlay.tasks.war.archivePath)
+            dependsOn { overlay.tasks.war }
+            from { overlay.zipTree(overlay.tasks.war.archivePath) }
             into buildWebAppFolder
           }
           dependsOn project.tasks.war
@@ -75,7 +75,7 @@ final class GrettyPlugin implements Plugin<Project> {
         task.dependsOn project.tasks.classes
         task.dependsOn project.tasks.prepareInplaceWebAppFolder
         for(Project overlay in project.gretty.overlays)
-          task.dependsOn overlay.tasks.classes
+          task.dependsOn { overlay.tasks.classes }
       }
 
       def setupWarDependencies = { task ->
