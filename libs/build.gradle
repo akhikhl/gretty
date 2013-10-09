@@ -4,13 +4,13 @@ ext {
 }
 
 allprojects {
-  group = "org.akhikhl.gretty"
-  version = "0.0.1"
+  group = 'org.akhikhl.gretty'
+  version = '0.0.2'
 }
 
 subprojects {
 
-  apply plugin: "maven"
+  apply plugin: 'maven'
 
   repositories {
     mavenLocal()
@@ -19,12 +19,12 @@ subprojects {
 
   afterEvaluate {
   
-    if(plugins.findPlugin("java")) {
-      sourceCompatibility = "1.7"
-      targetCompatibility = "1.7"
+    if(plugins.findPlugin('java')) {
+      sourceCompatibility = '1.7'
+      targetCompatibility = '1.7'
     }
   
-    if(generateSources && tasks.findByName("classes")) {
+    if(generateSources && tasks.findByName('classes')) {
       task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allSource
@@ -34,12 +34,12 @@ subprojects {
       }
     }
 
-    if(generateJavadoc && tasks.findByName("javadoc")) {
+    if(generateJavadoc && tasks.findByName('javadoc')) {
       task javadocJar(type: Jar) {
         dependsOn javadoc
         classifier = 'javadoc'
         from javadoc.destinationDir
-        if(tasks.findByName("groovydoc")) {
+        if(tasks.findByName('groovydoc')) {
           dependsOn groovydoc
           from groovydoc.destinationDir
         }
@@ -51,5 +51,5 @@ subprojects {
   }
 }
 
-defaultTasks "install"
+defaultTasks 'install'
 

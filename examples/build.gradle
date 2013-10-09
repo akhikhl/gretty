@@ -1,22 +1,23 @@
 buildscript {
 
   repositories {
-    mavenCentral()
+    mavenLocal()
     maven {
       url 'https://raw.github.com/akhikhl/gretty/master/maven_repo'
     }  
+    mavenCentral()
   }
 
-  apply plugin: "maven"
+  apply plugin: 'maven'
   
   dependencies {
-    classpath "org.akhikhl.gretty:gretty-plugin:0.0.1"
+    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.2'
   }
 }
 
 allprojects {
-  group = "org.akhikhl.gretty.examples"
-  version = "0.0.1"
+  group = 'org.akhikhl.gretty.examples'
+  version = '0.0.2'
 }
 
 subprojects {
@@ -27,7 +28,7 @@ subprojects {
     }  
   }
 
-  apply plugin: "maven"
+  apply plugin: 'maven'
 }
 
-defaultTasks "build"
+defaultTasks 'build'
