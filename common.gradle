@@ -1,0 +1,86 @@
+//
+// This script is applied to every subproject.
+//
+
+apply plugin: 'maven'
+
+// It is not recommended to put infrastructure-specific repositories here.
+// Better place for this would be "$HOME/.gradle/init.d/"
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+group = mavenGroupId
+version = mavenVersion
+
+afterEvaluate {
+
+  if(plugins.findPlugin('java')) {
+    sourceCompatibility = '1.7'
+    targetCompatibility = '1.7'
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+  }
+
+  if(plugins.findPlugin('groovy')) {
+    dependencies {
+      compile "org.codehaus.groovy:groovy-all:$groovy_version"
+    }
+  }
+
+  if(plugins.findPlugin('java') || plugins.findPlugin('groovy')) {
+
+    if(tasks.findByName('test')) {
+      dependencies {
+        testCompile "junit:junit:$junit_version"
+        if(!plugins.findPlugin('groovy'))
+          testCompile "org.codehaus.groovy:groovy-all:$groovy_version"
+        testCompile "org.spockframework:spock-core:$spock_version"
+      }
+    }
+
+    if(project.parent.name == 'libs') {
+      // lib projects should be always installed into "$HOME/.m2"
+      project.tasks.build.finalizedBy project.tasks.install
+    }
+
+    if(project.parent.name == 'apps' || project.parent.name == 'examples') {
+      // apps and examples should not be uploaded to maven repository
+      project.tasks.uploadArchives.enabled = false
+    }
+
+    task('createFolders', description: 'Creates the source folders if they do not exist.') << {
+      sourceSets*.allSource*.srcDirs*.each { File srcDir ->
+        if (!srcDir.isDirectory()) {
+          println "Creating source folder: ${srcDir}"
+          srcDir.mkdirs()
+        }
+      }
+    }
+
+    if(generateSources && tasks.findByName('classes')) {
+      task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+      }
+      artifacts {
+        archives sourcesJar
+      }
+    }
+
+    if(generateJavadoc && tasks.findByName('javadoc')) {
+      task javadocJar(type: Jar, description: 'Creates javadoc jar') {
+        dependsOn javadoc
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+        if(tasks.findByName('groovydoc')) {
+          dependsOn groovydoc
+          from groovydoc.destinationDir
+        }
+      }
+      artifacts {
+        archives javadocJar
+      }
+    }
+  }
+}

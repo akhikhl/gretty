@@ -1,0 +1,7 @@
+def subDirs = settingsDir.listFiles({ File f ->
+    f.isDirectory() && new File(f, 'build.gradle').isFile()
+  } as FileFilter)
+subDirs.each { File subdir ->
+  include subdir.name
+}
+

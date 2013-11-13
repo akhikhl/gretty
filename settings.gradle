@@ -1,0 +1,16 @@
+void includeProjects(relativeDirPath, filter = null) {
+  def dir = new File(rootProject.projectDir, relativeDirPath)
+  if(dir.exists() && dir.isDirectory()) {
+    def rootPath = rootProject.projectDir.absolutePath
+    def subDirs = dir.listFiles({ File f ->
+        f.isDirectory() && f.name != 'buildSrc' && new File(f, 'build.gradle').isFile() && (filter == null || filter(f))
+      } as FileFilter)
+    subDirs.each { File subdir ->
+      include subdir.absolutePath.substring(rootPath.length() + 1).replace(File.separator, ':')
+    }
+  }
+}
+
+includeProjects 'libs'
+includeProjects 'examples'
+includeProjects 'apps'

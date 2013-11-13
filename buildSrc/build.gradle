@@ -1,0 +1,25 @@
+apply plugin: 'base' // add "clean" task to the root project.
+
+ext {
+  groovy_version = '2.1.9'
+}
+
+subprojects {
+  apply plugin: 'maven'
+
+  // It is not recommended to put infrastructure-specific repositories here.
+  // Better place for this would be "$HOME/.gradle/init.d/"
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+
+  group = 'org.akhikhl.gretty'
+  version = '0.0.3'
+
+  afterEvaluate {  
+    build {
+      finalizedBy install
+    }
+  }
+}
