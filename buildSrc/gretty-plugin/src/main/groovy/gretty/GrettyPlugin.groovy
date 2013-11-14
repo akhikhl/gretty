@@ -19,7 +19,7 @@ final class GrettyPlugin implements Plugin<Project> {
 
     project.dependencies {
       providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
-      grettyConfig 'org.akhikhl.gretty:gretty-helper:0.0.2'
+      grettyConfig 'org.akhikhl.gretty:gretty-helper:0.0.3'
       grettyConfig 'javax.servlet:javax.servlet-api:3.0.1'
       grettyConfig 'org.eclipse.jetty:jetty-server:8.1.8.v20121106'
       grettyConfig 'org.eclipse.jetty:jetty-servlet:8.1.8.v20121106'
