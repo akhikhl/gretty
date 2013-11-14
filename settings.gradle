@@ -1,3 +1,6 @@
+// This script automatically discovers sub-projects.
+// It should not contain any project-specific information.
+
 void includeProjects(relativeDirPath, filter = null) {
   def dir = new File(rootProject.projectDir, relativeDirPath)
   if(dir.exists() && dir.isDirectory()) {

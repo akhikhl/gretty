@@ -1,20 +1,21 @@
-//
 // This script is applied to every subproject.
-//
+// It should not contain any project-specific information.
 
 apply plugin: 'maven'
 
-// It is not recommended to put infrastructure-specific repositories here.
-// Better place for this would be "$HOME/.gradle/init.d/"
 repositories {
   mavenLocal()
   mavenCentral()
 }
 
-group = mavenGroupId
-version = mavenVersion
-
 afterEvaluate {
+
+  group = (rootProject.ext.has('group') ? rootProject.ext.group : group)
+  version = (version == 'unspecified' ? (rootProject.ext.has('version') ? rootProject.ext.version : '0.0.1') : version)
+
+  def groovy_version = rootProject.ext.has('groovy_version') ? rootProject.ext.groovy_version : '2.1.9'
+  def junit_version = rootProject.ext.has('junit_version') ? rootProject.ext.junit_version : '4.11'
+  def spock_version = rootProject.ext.has('spock_version') ? rootProject.ext.spock_version : '0.7-groovy-2.0'
 
   if(plugins.findPlugin('java')) {
     sourceCompatibility = '1.7'

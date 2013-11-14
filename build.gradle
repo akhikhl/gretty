@@ -11,32 +11,12 @@ buildscript {
   }
 }
 
-apply plugin: 'base' // add "clean" task to the root project.
-
 ext {
-  mavenGroupId = 'org.akhikhl.gretty'
-  mavenVersion = '0.0.3'
-  groovy_version = '2.1.9'
-  junit_version = '4.11'
-  spock_version = '0.7-groovy-2.0'
+  group = 'org.akhikhl.gretty'
+  version = '0.0.3'
   generateSources = true
   generateJavadoc = true
 }
 
-subprojects {
-  apply from: rootProject.file('common.gradle')
-}
+apply from: file('root.gradle')
 
-task('buildSrc_uploadArchives', type: GradleBuild) { task ->
-  dir = 'buildSrc'
-  tasks = [ 'uploadArchives' ]
-}
-
-uploadArchives.dependsOn buildSrc_uploadArchives
-
-task('buildSrc_clean', type: GradleBuild) { task ->
-  dir = 'buildSrc'
-  tasks = [ 'clean' ]
-}
-
-clean.finalizedBy buildSrc_clean

@@ -1,0 +1,24 @@
+// This script is applied once to the root project.
+// It should not contain any project-specific information.
+
+apply plugin: 'base' // add "clean" task to the root project.
+
+subprojects {
+  apply from: rootProject.file('common.gradle')
+}
+
+if(file('buildSrc').exists()) {
+  task('buildSrc_uploadArchives', type: GradleBuild) { task ->
+    dir = 'buildSrc'
+    tasks = [ 'uploadArchives' ]
+  }
+
+  uploadArchives.dependsOn buildSrc_uploadArchives
+
+  task('buildSrc_clean', type: GradleBuild) { task ->
+    dir = 'buildSrc'
+    tasks = [ 'clean' ]
+  }
+
+  clean.dependsOn buildSrc_clean
+}
