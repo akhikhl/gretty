@@ -140,44 +140,48 @@ gretty {
 
 "stopPort" defines TCP-port used by gretty-plugin to communicate between jettyStart(War) and jettyStop tasks.
 
-"contextPath" defines context path for the web-application (defaults to project name).
+"contextPath" defines context path for the web-application (defaults to project name). "contextPath" affects 
+only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
+to some other servlet container, you'll have to define context path by means of that container.
 
 "initParameter" defines web-application initialization parameter. It has the same meaning/effect, 
 as /web-app/servlet/init-param element in "web.xml". You can specify more than one initParameter.
 
-"realm" defines security realm for the given web-application. See more information in [Security Realms](#security-realms) chapter.
+"realm" defines security realm for the given web-application. See more information in chapter [Security Realms](#security-realms).
 
-"realmConfigFile" defines properties file, containing security realm properties. See more information in [Security Realms](#security-realms) chapter.
+"realmConfigFile" defines properties file, containing security realm properties. See more information in chapter [Security Realms](#security-realms).
 
 "onStart" defines closure to be called just before jetty is started.
 
 "onStop" defines closure to be called just after jetty is stopped.
 
-"overlay" defines another project as WAR overlay source. You can specify more than one overlay.
-
-##WAR Overlays
-
-Overlay property "understands" only gradle projects (not maven artifacts) as an input. Overlay has the following effect:
-
-1. Runtime classpath of overlay projects is added to the current project, when performing jettyRun and jettyStart. 
-   Classpath of the current project has priority.
-
-2. Overlay projects are added (overlayed) to the current project, when assembling WAR file. The files of the current 
-   project have priority over overlay files, this allows to effectively customize web-application.
+"overlay" defines another project as WAR overlay source. See more information in chapter [WAR Overlays](#war-overlays).
 
 ##Security realms
 
-"realm" defines security realm for the given web-application. When defined, it must match 
+"realm" property defines security realm for the given web-application. When defined, it must match 
 /web-app/login-config/realm-name element in "web.xml".
 
-"realmConfigFile" defines relative (to web-application root) path to the properties file, 
+"realmConfigFile" property defines relative (to web-application root) path to the properties file, 
 containing properties for HashLoginService. See more information at http://wiki.eclipse.org/Jetty/Tutorial/Realms.
 
 "realm" and "realmConfigFile" affect only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
-to some other servlet container, you'll have to define security realms with the help of that container.
+to some other servlet container, you'll have to define security realms by means of that container.
 
 gretty sources contain example program "securityRealm" ( https://github.com/akhikhl/gretty/tree/master/examples/securityRealm ),
 which shows minimal working realm configuration.
+
+##WAR Overlays
+
+"overlay" property "understands" only gradle projects (not maven artifacts) as an input. "overlay" has the following effects:
+
+1. When performing jettyRun and jettyStart, runtime classpath of overlay projects is added to the current project.
+   Classpath of the current project has priority.
+
+2. When assembling WAR file, overlay projects are added (overlayed) to the current project. The files of the current 
+   project have priority over overlay files, this allows to effectively customize web-application.
+
+You can specify more than one overlay.
 
 ##Copyright and License
 
