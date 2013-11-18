@@ -1,6 +1,6 @@
 #gretty
 
-**version 0.0.1**
+**version 0.0.3**
 
 Gradle plugin for running web-applications under jetty 8.1.8.
 
@@ -19,40 +19,23 @@ Gradle plugin for running web-applications under jetty 8.1.8.
 
 ##Usage:
 
-1. Run "gradle install" in "libs" folder (at least once).
-
-2. Add the following to "build.gradle" of your web-application:
+1. Add the following to "build.gradle" of your web-application:
 
 
 ```groovy
-buildscript {
-
-  repositories {
-    // mavenCentral() if needed for other dependencies
-    maven {
-      url 'https://raw.github.com/akhikhl/gretty/master/maven_repo'
-    }  
-  }
-
-  apply plugin: "maven"
-  
-  dependencies {
-    classpath "org.akhikhl.gretty:gretty-plugin:0.0.1"
-  }
-}
-
-repositories {
-  // mavenCentral() if needed for other dependencies
-  maven {
-    url 'https://raw.github.com/akhikhl/gretty/master/maven_repo'
-  }  
-}
-
-apply plugin: "java"
-apply plugin: "war"
-apply plugin: "gretty"
-
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 ```
+
+then do "gradle jettyRun" from command-line.
+
+Alternatively, you can download the script from https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin 
+to the project folder and include it like this:
+
+```groovy
+apply from: 'gretty.plugin'
+```
+
+or feel free copying (and modifying) the declarations from this script to your "build.gradle".
 
 ##Supported tasks
 
