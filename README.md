@@ -20,7 +20,7 @@ Gradle plugin for running web-applications under jetty 8.1.8.
 
 ##Usage:
 
-1. Add the following to "build.gradle" of your web-application:
+Add the following to "build.gradle" of your web-application:
 
 
 ```groovy
@@ -168,7 +168,7 @@ containing properties for HashLoginService. See more information at http://wiki.
 "realm" and "realmConfigFile" affect only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
 to some other servlet container, you'll have to define security realms by means of that container.
 
-gretty sources contain example program "securityRealm" ( https://github.com/akhikhl/gretty/tree/master/examples/securityRealm ),
+gretty sources contain example program ["securityRealm"](https://github.com/akhikhl/gretty/tree/master/examples/securityRealm),
 which shows minimal working realm configuration.
 
 ##WAR Overlays
