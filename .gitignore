@@ -2,3 +2,4 @@ build
 .gradle
 .groovy
 .settings
+.nb-*

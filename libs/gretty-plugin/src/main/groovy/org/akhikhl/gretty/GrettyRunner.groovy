@@ -1,4 +1,11 @@
-package gretty
+/* 
+ * gretty
+ *
+ * Copyright 2013  Andrey Hihlovskiy.
+ *
+ * See the file "license.txt" for copying and usage permission.
+ */
+package org.akhikhl.gretty
 
 import org.gradle.api.*
 import org.gradle.api.plugins.*
@@ -27,7 +34,7 @@ final class GrettyRunner {
     }
     ClassLoader classLoader = new URLClassLoader(urls as URL[])
 
-    def helper = classLoader.findClass('gretty.GrettyHelper')
+    def helper = classLoader.findClass('org.akhikhl.gretty.GrettyHelper')
 
     def server = helper.createServer()
     server.setConnectors helper.createConnectors(project.gretty.port)
