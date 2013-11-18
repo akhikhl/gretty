@@ -13,6 +13,7 @@ Gradle plugin for running web-applications under jetty 8.1.8.
   * [jettyStart](#jettystart)
   * [jettyStartWar](#jettystartwar)
   * [jettyStop](#jettystop)
+  * [jettyRestart](#jettyrestart)
 * [Configuration](#configuration)
 * [WAR Overlays](#war-overlays)
 * [Security Realms](#security-realms)
