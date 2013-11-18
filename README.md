@@ -15,6 +15,7 @@ Gradle plugin for running web-applications under jetty 8.1.8.
   * [jettyStop](#jettystop)
 * [Configuration](#configuration)
 * [WAR Overlays](#war-overlays)
+* [Security Realms](#security-realms)
 * [Copyright and License](#copyright-and-license)
 
 ##Usage:
@@ -119,36 +120,64 @@ It's possible to change gretty configuration via plugin extension object:
 gretty {
   port = 8081
   stopPort = 9998
+  contextPath = '/myWebApp'
+  initParameter 'param1', 'buildTimeEvaluationParameter'
+  initParameter 'param2', { 'lazyEvaluationParameter' }
+  realm 'auth'
+  realmConfigFile 'WEB-INF/jetty-realm.properties'
   onStart {
-    println "Jetty start"
+    println 'Jetty start'
   }
   onStop {
-    println "Jetty stop"
+    println 'Jetty stop'
   }
-  overlay project(":ProjectA")
-  overlay project(":ProjectB")
+  overlay ':ProjectA'
+  overlay ':ProjectB'
 }
 ```
 
-"port" defines which TCP-port is used by Jetty for incoming HTTP-requests
+"port" defines TCP-port used by Jetty for incoming HTTP-requests.
 
-"stopPort" defines which TCP-port is used by gretty-plugin to communicate between jettyStart(War) and jettyStop tasks.
+"stopPort" defines TCP-port used by gretty-plugin to communicate between jettyStart(War) and jettyStop tasks.
 
-"onStart" allows to add one or more closures, which will be called just before jetty is started.
+"contextPath" defines context path for the web-application (defaults to project name).
 
-"onStop" allows to add one or more closures, which will be called just after jetty is stopped.
+"initParameter" defines web-application initialization parameter. It has the same meaning/effect, 
+as /web-app/servlet/init-param element in "web.xml". You can specify more than one initParameter.
 
-"overlay" allows to specify one or more projects as WAR overlay source
+"realm" defines security realm for the given web-application. See more information in [Security Realms](#security-realms) chapter.
+
+"realmConfigFile" defines properties file, containing security realm properties. See more information in [Security Realms](#security-realms) chapter.
+
+"onStart" defines closure to be called just before jetty is started.
+
+"onStop" defines closure to be called just after jetty is stopped.
+
+"overlay" defines another project as WAR overlay source. You can specify more than one overlay.
 
 ##WAR Overlays
 
-Overlay property "understands" only gradle projects as an input. Overlay has the following effect:
+Overlay property "understands" only gradle projects (not maven artifacts) as an input. Overlay has the following effect:
 
-1. Runtime classpath of overlay projects is added to the current project, when performing jettyRun, jettyStart. 
+1. Runtime classpath of overlay projects is added to the current project, when performing jettyRun and jettyStart. 
    Classpath of the current project has priority.
 
 2. Overlay projects are added (overlayed) to the current project, when assembling WAR file. The files of the current 
    project have priority over overlay files, this allows to effectively customize web-application.
+
+##Security realms
+
+"realm" defines security realm for the given web-application. When defined, it must match 
+/web-app/login-config/realm-name element in "web.xml".
+
+"realmConfigFile" defines relative (to web-application root) path to the properties file, 
+containing properties for HashLoginService. See more information at http://wiki.eclipse.org/Jetty/Tutorial/Realms.
+
+"realm" and "realmConfigFile" affect only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
+to some other servlet container, you'll have to define security realms with the help of that container.
+
+gretty sources contain example program "securityRealm" ( https://github.com/akhikhl/gretty/tree/master/examples/securityRealm ),
+which shows minimal working realm configuration.
 
 ##Copyright and License
 
