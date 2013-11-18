@@ -1,7 +1,6 @@
 apply plugin: 'groovy'
 
 dependencies {
-  compile "org.codehaus.groovy:groovy-all:$groovy_version"
   compile gradleApi()
 }
 

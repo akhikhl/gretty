@@ -2,6 +2,10 @@ apply plugin: "java"
 apply plugin: "war"
 apply plugin: "gretty"
 
+dependencies {
+  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+}
+
 gretty {
   realm "auth"
   realmConfigFile "WEB-INF/jetty-realm.properties"

@@ -15,5 +15,4 @@ void includeProjects(relativeDirPath, filter = null) {
 }
 
 includeProjects 'libs'
-includeProjects 'examples'
-includeProjects 'apps'
+

@@ -1,22 +1,11 @@
-buildscript {
-  apply plugin: 'maven'
-
-  repositories {
-    mavenLocal()
-    mavenCentral()
-  }
-  
-  dependencies {
-    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.3'
-  }
-}
+apply plugin: 'base' // add "clean" task to the root project.
 
 ext {
   group = 'org.akhikhl.gretty'
   version = '0.0.3'
-  generateSources = true
-  generateJavadoc = true
+  servlet_api_version = '3.0.1'
+  jetty_version = '8.1.8.v20121106'
 }
 
-apply from: file('root.gradle')
+apply from: 'root.gradle'
 

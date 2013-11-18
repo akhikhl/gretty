@@ -1,0 +1,27 @@
+buildscript {
+  apply plugin: 'maven'
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.3'
+  }
+}
+
+apply plugin: 'base' // add "clean" task to the root project.
+
+ext {
+  groovy_version = '2.1.9'
+}
+
+subprojects {
+  apply plugin: 'maven'
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+}

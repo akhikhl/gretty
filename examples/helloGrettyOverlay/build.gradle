@@ -4,7 +4,7 @@ apply plugin: 'gretty'
 
 gretty {
   contextPath '/helloGrettyOverlay'
-  overlay ':examples:helloGretty'
+  overlay ':helloGretty'
 }
 
 war {
