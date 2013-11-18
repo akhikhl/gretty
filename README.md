@@ -163,7 +163,7 @@ gretty {
 
 "port" defines TCP-port used by Jetty for incoming HTTP-requests.
 
-"stopPort" defines TCP-port used by gretty-plugin to communicate between jettyStart(War) and jettyStop tasks.
+"stopPort" defines TCP-port used by gretty-plugin to communicate between jettyStart(War) and jettyStop/jettyRestart tasks.
 
 "contextPath" defines context path for the web-application (defaults to project name). "contextPath" affects 
 only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
