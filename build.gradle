@@ -1,5 +1,3 @@
-apply plugin: 'base' // add "clean" task to the root project.
-
 ext {
   group = 'org.akhikhl.gretty'
   version = '0.0.3'
