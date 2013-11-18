@@ -50,10 +50,11 @@ gradle jettyRun
 
 **Effect:**
 
-The web-application gets compiled (if it's not up-to-date), then embedded jetty is started
-against compiled classes and their dependencies and goes online at port 8080. 
-Gradle script waits for the user keypress. When user presses any key 
-(in the same terminal), jetty shuts down and gradle continues normal execution of tasks.
+1. The web-application gets compiled (if it's not up-to-date).
+2. Embedded jetty is started against compiled classes and their dependencies and listens for HTTP-requests on port 8080.
+3. Gradle script waits for the user keypress. 
+4. When user presses any key (in the same terminal), jetty shuts down and gradle continues normal execution of tasks.
+
 Note that this task does not depend on "war" task, nor does it use "war"-file.
 
 ###jettyRunWar
@@ -66,9 +67,10 @@ gradle jettyRunWar
 
 **Effect:**
 
-The web-application gets compiled and assembled into WAR-file (if it's not up-to-date), then embedded jetty is started
-against WAR-file and goes online at port 8080. Gradle script waits for the user keypress. When user presses any key 
-(in the same terminal), jetty shuts down and gradle continues normal execution of tasks.
+1. The web-application gets compiled and assembled into WAR-file (if it's not up-to-date).
+2. Embedded jetty is started against WAR-file and listens for HTTP-requests on port 8080.
+3. Gradle script waits for the user keypress. 
+4. When user presses any key (in the same terminal), jetty shuts down and gradle continues normal execution of tasks.
 
 ###jettyStart
 
@@ -80,11 +82,15 @@ gradle jettyStart
 
 **Effect:**
 
-The web-application gets compiled (if it's not up-to-date), then embedded jetty is started
-against compiled classes and their dependencies and goes online at port 8080. 
-Gradle script waits for shutdown signal via port 9999.
-When shutdown signal comes, jetty shuts down and gradle continues normal execution of tasks.
+1. The web-application gets compiled (if it's not up-to-date).
+2. Embedded jetty is started against compiled classes and their dependencies and listens for HTTP-requests on port 8080.
+3. Gradle script goes to infinite loop and listens for service signals on port 9999.
+4. When "shutdown" signal comes, jetty shuts down and gradle continues normal execution of tasks.
+5. When "restart" signal comes, jetty restarts the web-application and continues waiting for signals.
+
 Note that this task does not depend on "war" task, nor does it use "war"-file.
+
+See also: tasks [jettyStop](#jettystop) and [jettyRestart](#jettyRestart).
 
 ###jettyStartWar
 
@@ -96,9 +102,13 @@ gradle jettyStartWar
 
 **Effect:**
 
-The web-application gets compiled and assembled into WAR-file (if it's not up-to-date), then embedded jetty is started
-against WAR-file and goes online at port 8080. Gradle script waits for shutdown signal via port 9999.
-When shutdown signal comes, jetty shuts down and gradle continues normal execution of tasks.
+1. The web-application gets compiled and assembled into WAR-file (if it's not up-to-date).
+2. Embedded jetty is started against WAR-file and listens for HTTP-requests on port 8080.
+3. Gradle script goes to infinite loop and listens for service signals on port 9999.
+4. When "shutdown" signal comes, jetty shuts down and gradle continues normal execution of tasks.
+5. When "restart" signal comes, jetty restarts the web-application and continues waiting for signals.
+
+See also: tasks [jettyStop](#jettystop) and [jettyRestart](#jettyRestart).
 
 ###jettyStop
 
@@ -110,7 +120,21 @@ gradle jettyStop
 
 **Effect:**
 
-Does not build source code whatsoever, simply sends jetty shutdown signal to localhost:9999.
+Does not build source code whatsoever, only sends "shutdown" signal to localhost:9999.
+This task assumes that jetty was started with "jettyStart" task and listens for signals on the designated port.
+
+###jettyRestart
+
+**Syntax:**
+
+```shell
+gradle jettyRestart
+```
+
+**Effect:**
+
+Does not build source code whatsoever, only sends "restart" signal to localhost:9999.
+This task assumes that jetty was started with "jettyStart" task and listens for signals on the designated port.
 
 ##Configuration
 
