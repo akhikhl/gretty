@@ -14,7 +14,7 @@ buildscript {
 apply plugin: 'base' // add "clean" task to the root project.
 
 ext {
-  groovy_version = '2.1.9'
+  groovy_version = '2.2.0'
 }
 
 subprojects {
