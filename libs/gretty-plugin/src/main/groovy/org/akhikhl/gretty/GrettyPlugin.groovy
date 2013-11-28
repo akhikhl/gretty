@@ -1,4 +1,4 @@
-/* 
+/*
  * gretty
  *
  * Copyright 2013  Andrey Hihlovskiy.
@@ -19,22 +19,14 @@ final class GrettyPlugin implements Plugin<Project> {
     project.extensions.create('gretty', GrettyPluginExtension)
 
     project.configurations {
-      compile.exclude group: 'javax.servlet', module: 'servlet-api'
       grettyConfig
-      grettyConfig.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.servlet'
     }
 
     project.dependencies {
       providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
       grettyConfig 'org.akhikhl.gretty:gretty-helper:0.0.3'
-      grettyConfig 'javax.servlet:javax.servlet-api:3.0.1'
-      grettyConfig 'org.eclipse.jetty:jetty-server:8.1.8.v20121106'
-      grettyConfig 'org.eclipse.jetty:jetty-servlet:8.1.8.v20121106'
-      grettyConfig 'org.eclipse.jetty:jetty-webapp:8.1.8.v20121106'
-      grettyConfig 'org.eclipse.jetty:jetty-security:8.1.8.v20121106'
-      grettyConfig 'org.eclipse.jetty:jetty-jsp:8.1.8.v20121106'
     }
-    
+
     for(String overlay in project.gretty.overlays)
       project.evaluationDependsOn(overlay)
 
@@ -76,7 +68,7 @@ final class GrettyPlugin implements Plugin<Project> {
               def overlayProject = project.project(overlay)
               project.copy {
                 def overlayWarFilePath = overlayProject.ext.properties.containsKey('finalWarPath') ? overlayProject.ext.finalWarPath : overlayProject.tasks.war.archivePath
-                from overlayProject.zipTree(overlayWarFilePath) 
+                from overlayProject.zipTree(overlayWarFilePath)
                 into buildWebAppFolder
               }
             }
