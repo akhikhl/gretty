@@ -48,7 +48,10 @@ final class Runner {
     Thread monitor = new MonitorThread(this)
     monitor.start()
 
-    onStart()
+    project.gretty.onStart.each { onStart ->
+      if(onStart instanceof Closure)
+        onStart()
+    }
 
     System.out.println 'Jetty server started.'
     System.out.println 'You can see web-application in browser under the address:'
@@ -69,7 +72,11 @@ final class Runner {
     monitor.join()
 
     System.out.println 'Jetty server stopped.'
-    onStop()
+    
+    project.gretty.onStop.each { onStop ->
+      if(onStop instanceof Closure)
+        onStop()
+    }
   }
 
   void startServer() {
@@ -190,36 +197,6 @@ final class Runner {
           project.logger.warn 'Project {} is not gretty-enabled, could not extract it\'s realm', overlay
       }
     return new RealmInfo(realm: realm, realmConfigFile: realmConfigFile)
-  }
-
-  private void onStart() {
-    for(def overlay in project.gretty.overlays) {
-      overlay = project.project(overlay)
-      if(overlay.extensions.findByName('gretty'))
-        overlay.gretty.onStart.each { onStart ->
-          if(onStart instanceof Closure)
-            onStart()
-        }
-    }
-    project.gretty.onStart.each { onStart ->
-      if(onStart instanceof Closure)
-        onStart()
-    }
-  }
-
-  private void onStop() {
-    project.gretty.onStop.each { onStop ->
-      if(onStop instanceof Closure)
-        onStop()
-    }
-    for(def overlay in project.gretty.overlays.reverse()) {
-      overlay = project.project(overlay)
-      if(overlay.extensions.findByName('gretty'))
-        overlay.gretty.onStop.each { onStop ->
-          if(onStop instanceof Closure)
-            onStop()
-        }
-    }
   }
 
   private setupInplaceScanner() {
