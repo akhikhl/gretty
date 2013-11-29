@@ -2,7 +2,7 @@
 
 **version 0.0.4**
 
-Gradle plugin for running web-applications under jetty 8.1.8.
+Gradle plugin for running web-applications under jetty 8.1.8 and servlet API 3.0.1.
 
 NEW in version 0.0.4: support of [hot deployment](#hot-deployment).
 
