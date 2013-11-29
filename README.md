@@ -242,22 +242,27 @@ Gretty hot deployment assumes the following defaults:
 "scanInterval" is set to zero, that means that hot deployment is disabled. You need to assign it to non-zero value to enable hot deployment.
 
 Hot deployment scans the following folders:
-${projectDir}/build/classes/main
-${projectDir}/build/resources/main
-${projectDir}/src/main/webapp
+
+* ${projectDir}/build/classes/main
+* ${projectDir}/build/resources/main
+* ${projectDir}/src/main/webapp
+
 as well as all dependency jars and overlay-WARs, comprising the web-application.
 
-Attention: gretty hot deployment does not detect changes in the source code files. That means: whenever you just save ".java", ".groovy" or resource file - nothing happens. But as soon as you compile things - for example, invoke "build" (or "compileJava" or "compileGroovy" or "processResources") - hot deployment detects changes and restarts web-application.
+*Attention*: gretty hot deployment does not detect changes in the source code files. That means: whenever you just save ".java", ".groovy" or resource file - nothing happens. But as soon as you compile things - for example, invoke "build" (or "compileJava" or "compileGroovy" or "processResources") - hot deployment detects changes and restarts web-application.
 
 Current implementation of hot deployment does not detect changes in gretty parameters. That means: whenever you change "build.gradle", containing "gretty" section, you'll need to restart the web-application "by hand", only then the changes will have effect.
 
 Here is more information on some of the parameters [of gretty plugin extension] affecting hot-deployment:
 
 "scanDir" defines one or more directories, scanned by hot-deployment. The directory could be a string, denoting relative (to the project) or absolute path, or instance of java.io.File class. You don't need to call "scanDir" for the following folders:
-${projectDir}/build/classes/main
-${projectDir}/build/resources/main
-${projectDir}/src/main/webapp
+
+* ${projectDir}/build/classes/main
+* ${projectDir}/build/resources/main
+* ${projectDir}/src/main/webapp
+
 since hot-deployment already scans these folders by default.
+
 Also you don't need to call scanDir for dependency jars or overlay WARs - all these things are already scanned by hot deployment.
 
 "onScan" defines closure to be called on hot-deployment scan, i.e. each scanInterval seconds. The function is called unconditionally, regardless of whether hot deployment detects changed files or not.
