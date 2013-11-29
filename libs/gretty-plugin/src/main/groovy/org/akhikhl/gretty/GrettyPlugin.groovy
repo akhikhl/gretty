@@ -35,22 +35,11 @@ final class GrettyPlugin implements Plugin<Project> {
       for(String overlay in project.gretty.overlays)
         project.dependencies.add 'providedCompile', project.project(overlay)
 
-      String buildWebAppFolder = "${project.buildDir}/webapp"
-
       project.task('prepareInplaceWebAppFolder', group: 'gretty', description: 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
         doLast {
-          for(String overlay in project.gretty.overlays) {
-            project.copy {
-              from project.project(overlay).webAppDir
-              into buildWebAppFolder
-            }
-          }
-          project.copy {
-            from project.webAppDir
-            into buildWebAppFolder
-          }
+          Runner.prepareInplaceWebAppFolder(project)
         }
-      }
+      } // prepareInplaceWebAppFolder
 
       if(project.gretty.overlays) {
 
@@ -70,12 +59,12 @@ final class GrettyPlugin implements Plugin<Project> {
               project.copy {
                 def overlayWarFilePath = overlayProject.ext.properties.containsKey('finalWarPath') ? overlayProject.ext.finalWarPath : overlayProject.tasks.war.archivePath
                 from overlayProject.zipTree(overlayWarFilePath)
-                into buildWebAppFolder
+                into "${project.buildDir}/webapp"
               }
             }
             project.copy {
               from project.zipTree(project.tasks.war.archivePath)
-              into buildWebAppFolder
+              into "${project.buildDir}/webapp"
             }
           }
         }
@@ -83,7 +72,7 @@ final class GrettyPlugin implements Plugin<Project> {
         // 'overlayWar' task is only activated by 'assemble' task
         project.task('overlayWar', type: Zip, group: 'gretty', description: 'Creates WAR from exploded web-application in ${buildDir}/webapp') {
           dependsOn project.tasks.explodeWebApps
-          from project.fileTree(buildWebAppFolder)
+          from project.fileTree("${project.buildDir}/webapp")
           destinationDir project.tasks.war.destinationDir
           archiveName warFileName
         }

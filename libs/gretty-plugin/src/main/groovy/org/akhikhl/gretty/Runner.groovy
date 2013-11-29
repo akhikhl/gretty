@@ -11,12 +11,30 @@ import org.gradle.api.*
 import org.gradle.api.plugins.*
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.bundling.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 final class Runner {
+
+  private static final Logger log = LoggerFactory.getLogger(Runner)
 
   private static class RealmInfo {
     String realm
     String realmConfigFile
+  }
+
+  static void prepareInplaceWebAppFolder(Project project) {
+    // attention: copy order is important!
+    for(String overlay in project.gretty.overlays) {
+      project.copy {
+        from project.project(overlay).webAppDir
+        into "${project.buildDir}/webapp"
+      }
+    }
+    project.copy {
+      from project.webAppDir
+      into "${project.buildDir}/webapp"
+    }
   }
 
   static void sendServiceCommand(int servicePort, String command) {
@@ -116,13 +134,12 @@ final class Runner {
 
     server.start()
 
-    if(params.inplace)
-      setupInplaceScanner()
+    setupScanner()
   }
 
   void stopServer() {
     if(scanner != null) {
-      project.logger.trace 'Stopping scanner {}', scanner
+      log.info 'Stopping scanner'
       scanner.stop()
       scanner = null
     }
@@ -142,7 +159,7 @@ final class Runner {
             break
           }
         } else
-          project.logger.warn 'Project {} is not gretty-enabled, could not extract it\'s context path', overlay
+          log.warn 'Project {} is not gretty-enabled, could not extract it\'s context path', overlay
       }
     contextPath = contextPath ?: "/${project.name}"
     return contextPath
@@ -160,7 +177,7 @@ final class Runner {
           initParams[e.key] = paramValue
         }
       } else
-        project.logger.warn 'Project {} is not gretty-enabled, could not extract it\'s init parameters', overlay
+        log.warn 'Project {} is not gretty-enabled, could not extract it\'s init parameters', overlay
     }
     for(def e in project.gretty.initParameters) {
       def paramValue = e.value
@@ -188,36 +205,46 @@ final class Runner {
             break
           }
         } else
-          project.logger.warn 'Project {} is not gretty-enabled, could not extract it\'s realm', overlay
+          log.warn 'Project {} is not gretty-enabled, could not extract it\'s realm', overlay
       }
     return new RealmInfo(realm: realm, realmConfigFile: realmConfigFile)
   }
 
-  private setupInplaceScanner() {
-    List scanDirs = []
-    scanDirs.addAll project.sourceSets.main.runtimeClasspath.files
-    // ATTENTION: order of overlays is important!
-    for(String overlay in project.gretty.overlays.reverse())
-      scanDirs.addAll project.project(overlay).sourceSets.main.runtimeClasspath.files
+  private void setupScanner() {
+    if(project.gretty.scanInterval == 0) {
+      log.warn 'scanInterval not specified (or zero), scanning disabled'
+      return
+    }
+    List<File> scanDirs = []
+    if(params.inplace) {
+      scanDirs.addAll project.sourceSets.main.runtimeClasspath.files
+      scanDirs.add project.webAppDir
+      for(def overlay in project.gretty.overlays) {
+        overlay = project.project(overlay)
+        scanDirs.addAll overlay.sourceSets.main.runtimeClasspath.files
+        scanDirs.add overlay.webAppDir
+      }
+    }
+    scanDirs.addAll project.gretty.scanDirs
     for(File f in scanDirs)
-      project.logger.trace 'scanDir: {}', f
+      log.debug 'scanDir: {}', f
     scanner = helper.createScanner()
     scanner.reportDirs = true
     scanner.reportExistingFilesOnStartup = false
-    scanner.scanInterval = 5
+    scanner.scanInterval = project.gretty.scanInterval
     scanner.recursive = true
     scanner.scanDirs = scanDirs
     helper.addScannerScanCycleListener scanner, { started, cycle ->
-      project.logger.trace 'ScanCycleListener started={}, cycle={}', started, cycle
+      log.debug 'ScanCycleListener started={}, cycle={}', started, cycle
       project.gretty.onScan*.call()
     }
     helper.addScannerBulkListener scanner, { changedFiles ->
-      project.logger.trace 'BulkListener changedFiles={}', changedFiles
+      log.debug 'BulkListener changedFiles={}', changedFiles
       project.gretty.onScanFilesChanged*.call(changedFiles)
-      sendServiceCommand project.gretty.servicePort, 'restart'
+      prepareInplaceWebAppFolder(project)
+      sendServiceCommand(project.gretty.servicePort, 'restart')
     }
-    project.logger.trace 'Starting scanner {}', scanner
+    log.info 'Starting scanner with interval of {} second(s)', project.gretty.scanInterval
     scanner.start()
-    return scanner
   }
 }
