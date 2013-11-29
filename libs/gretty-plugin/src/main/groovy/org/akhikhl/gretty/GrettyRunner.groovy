@@ -115,12 +115,13 @@ final class GrettyRunner {
       System.out.println 'Enter \'gradle jettyStop\' to stop the jetty server.'
     System.out.println()
 
+    Thread monitor = new JettyMonitorThread(project.gretty.servicePort, server)
+    monitor.start()
+
     if(interactive) {
       System.in.read()
-      server.stop()
-    } else {
-      Thread monitor = new JettyMonitorThread(project.gretty.servicePort, server)
-      monitor.start()
+      if(monitor.running)
+        sendServiceCommand project.gretty.servicePort, 'stop'
     }
 
     server.join()

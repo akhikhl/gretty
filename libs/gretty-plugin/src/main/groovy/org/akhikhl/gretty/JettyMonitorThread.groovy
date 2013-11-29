@@ -1,4 +1,4 @@
-/* 
+/*
  * gretty
  *
  * Copyright 2013  Andrey Hihlovskiy.
@@ -11,11 +11,12 @@ final class JettyMonitorThread extends Thread {
 
   private final def server
   private ServerSocket socket
+  private boolean running = false
 
   public JettyMonitorThread(int servicePort, def server) {
     this.server = server
-    setDaemon false
-    setName 'JettyMonitorThread'
+    daemon = false
+    name = 'JettyMonitorThread'
     try {
       socket = new ServerSocket(servicePort, 1, InetAddress.getByName('127.0.0.1'))
     } catch(Exception e) {
@@ -23,9 +24,18 @@ final class JettyMonitorThread extends Thread {
     }
   }
 
+  public boolean getRunning() {
+    synchronized(this) {
+      return running
+    }
+  }
+
   @Override
   public void run() {
     try {
+      synchronized(this) {
+        running = true
+      }
       try {
         while(true) {
           String command
@@ -47,6 +57,9 @@ final class JettyMonitorThread extends Thread {
           // more commands could be inserted here
         }
       } finally {
+        synchronized(this) {
+          running = false
+        }
         socket.close()
       }
     } catch(Exception e) {
