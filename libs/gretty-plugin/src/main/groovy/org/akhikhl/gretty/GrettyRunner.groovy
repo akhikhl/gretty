@@ -1,4 +1,4 @@
-/* 
+/*
  * gretty
  *
  * Copyright 2013  Andrey Hihlovskiy.
@@ -20,17 +20,12 @@ final class GrettyRunner {
 
     def urls = []
 
-    def addProjectClassPath = { Project proj ->
-      urls.add new File(proj.buildDir, 'classes/main').toURI().toURL()
-      urls.add new File(proj.buildDir, 'resources/main').toURI().toURL()
-      urls.addAll proj.configurations.runtime.collect { dep -> dep.toURI().toURL() }
-    }
-
-    urls.addAll project.configurations.grettyConfig.collect { dep -> dep.toURI().toURL() }
+    urls.addAll project.configurations.grettyConfig.collect { it.toURI().toURL() }
     if(params.inplace) {
-      addProjectClassPath project
+      urls.addAll project.sourceSets.main.runtimeClasspath.files.collect { it.toURI().toURL() }
+      // ATTENTION: order of overlays is important!
       for(String overlay in project.gretty.overlays.reverse())
-        addProjectClassPath project.project(overlay)
+        urls.addAll project.project(overlay).sourceSets.main.runtimeClasspath.files.collect { it.toURI().toURL() }
     }
     ClassLoader classLoader = new URLClassLoader(urls as URL[])
 
