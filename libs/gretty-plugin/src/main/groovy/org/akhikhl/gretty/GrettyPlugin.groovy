@@ -24,7 +24,7 @@ final class GrettyPlugin implements Plugin<Project> {
 
     project.dependencies {
       providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
-      grettyHelperConfig 'org.akhikhl.gretty:gretty-helper:0.0.3'
+      grettyHelperConfig 'org.akhikhl.gretty:gretty-helper:0.0.4'
     }
 
     for(String overlay in project.gretty.overlays)

@@ -2,11 +2,12 @@
 <metadata>
   <groupId>org.akhikhl.gretty</groupId>
   <artifactId>gretty-plugin</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
   <versioning>
     <versions>
       <version>0.0.3</version>
+      <version>0.0.4</version>
     </versions>
-    <lastUpdated>20131118212052</lastUpdated>
+    <lastUpdated>20131129195233</lastUpdated>
   </versioning>
 </metadata>
