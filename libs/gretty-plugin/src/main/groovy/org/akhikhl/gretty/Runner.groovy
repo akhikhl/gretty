@@ -278,7 +278,11 @@ final class Runner {
       for(def overlay in project.gretty.overlays)
         scanDirs.add getFinalWarPath(project.project(overlay))
     }
-    scanDirs.addAll project.gretty.scanDirs
+    for(def dir in project.gretty.scanDirs) {
+      if(!(dir instanceof File))
+        dir = project.file(dir.toString())
+      scanDirs.add dir
+    }
     for(File f in scanDirs)
       log.debug 'scanDir: {}', f
     scanner = helper.createScanner()

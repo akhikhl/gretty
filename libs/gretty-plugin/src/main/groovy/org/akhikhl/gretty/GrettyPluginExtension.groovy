@@ -23,7 +23,7 @@ class GrettyPluginExtension {
   List<Closure> onScan = []
   List<Closure> onScanFilesChanged = []
   int scanInterval = 0 // scan interval in seconds. When zero, scanning is disabled.
-  List<File> scanDirs = [] // list of additional scan directories
+  List scanDirs = [] // list of additional scan directories
 
   def scanDir(String value) {
     scanDirs.add(new File(value))
@@ -34,20 +34,9 @@ class GrettyPluginExtension {
   }
 
   def scanDir(Object[] args) {
-    for(def arg in args) {
-      File f;
-      switch(arg) {
-        case String:
-          f = new File(arg)
-          break
-        case File:
-          f = arg
-          break
-        default:
-          throw new GradleException('Invalid file: {}', arg)
-      }
-      scanDirs.add(f)
-    }
+    for(def arg in args)
+      if(arg != null)
+        scanDirs.add(arg)
   }
 
   def initParameter(key, value) {
