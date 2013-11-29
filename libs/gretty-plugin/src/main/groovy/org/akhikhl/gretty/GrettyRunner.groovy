@@ -93,8 +93,6 @@ final class GrettyRunner {
 
     server.start()
 
-    boolean interactive = params.interactive
-
     System.out.println 'Jetty server started.'
     System.out.println 'You can see web-application in browser under the address:'
     System.out.println "http://localhost:${project.gretty.port}${contextPath}"
@@ -109,7 +107,7 @@ final class GrettyRunner {
       if(onStart instanceof Closure)
         onStart()
     }
-    if(interactive)
+    if(params.interactive)
       System.out.println 'Press any key to stop the jetty server.'
     else
       System.out.println 'Enter \'gradle jettyStop\' to stop the jetty server.'
@@ -118,7 +116,7 @@ final class GrettyRunner {
     Thread monitor = new JettyMonitorThread(project.gretty.servicePort, server)
     monitor.start()
 
-    if(interactive) {
+    if(params.interactive) {
       System.in.read()
       if(monitor.running)
         sendServiceCommand project.gretty.servicePort, 'stop'
