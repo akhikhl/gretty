@@ -188,13 +188,19 @@ as /web-app/servlet/init-param element in "web.xml". You can specify more than o
 
 "realmConfigFile" defines properties file, containing security realm properties. See more information in chapter [Security Realms](#security-realms).
 
-"onStart" defines closure to be called just before jetty is started.
+"onStart" defines closure to be called just before jetty server is started.
 
-"onStop" defines closure to be called just after jetty is stopped.
+"onStop" defines closure to be called just after jetty server is stopped.
 
 "overlay" defines another project as WAR overlay source. See more information in chapter [WAR Overlays](#war-overlays).
 
-"scanInterval" defines hot-deployment scan interval, in seconds. Default is zero, which means that hot-deployment is disabled. See more information in chapter [Hot deployment](#hot-deployment).
+"scanInterval" defines hot-deployment scan interval, in seconds. See more information in chapter [Hot deployment](#hot-deployment).
+
+"scanDir" defines one or more directories, scanned by hot-deployment. See more information in chapter [Hot deployment](#hot-deployment).
+
+"onScan" defines closure to be called on hot-deployment scan. See more information in chapter [Hot deployment](#hot-deployment).
+
+"onScanFilesChanged" defines closure to be called whenever hot-deployment detects that files or folders were changed. See more information in chapter [Hot deployment](#hot-deployment).
 
 ##WAR Overlays
 
@@ -230,6 +236,33 @@ which shows minimal working realm configuration.
 ##Hot deployment
 
 Gretty supports hot deployment: whenever the classes, jars or resources [comprising the web-application] are updated, the web-application automatically restarts itself.
+
+Gretty hot deployment assumes the following defaults:
+
+"scanInterval" is set to zero, that means that hot deployment is disabled. You need to assign it to non-zero value to enable hot deployment.
+
+Hot deployment scans the following folders:
+${projectDir}/build/classes/main
+${projectDir}/build/resources/main
+${projectDir}/src/main/webapp
+as well as all dependency jars and overlay-WARs, comprising the web-application.
+
+Attention: gretty hot deployment does not detect changes in the source code files. That means: whenever you just save ".java", ".groovy" or resource file - nothing happens. But as soon as you compile things - for example, invoke "build" (or "compileJava" or "compileGroovy" or "processResources") - hot deployment detects changes and restarts web-application.
+
+Current implementation of hot deployment does not detect changes in gretty parameters. That means: whenever you change "build.gradle", containing "gretty" section, you'll need to restart the web-application "by hand", only then the changes will have effect.
+
+Here is more information on some of the parameters [of gretty plugin extension] affecting hot-deployment:
+
+"scanDir" defines one or more directories, scanned by hot-deployment. The directory could be a string, denoting relative (to the project) or absolute path, or instance of java.io.File class. You don't need to call "scanDir" for the following folders:
+${projectDir}/build/classes/main
+${projectDir}/build/resources/main
+${projectDir}/src/main/webapp
+since hot-deployment already scans these folders by default.
+Also you don't need to call scanDir for dependency jars or overlay WARs - all these things are already scanned by hot deployment.
+
+"onScan" defines closure to be called on hot-deployment scan, i.e. each scanInterval seconds. The function is called unconditionally, regardless of whether hot deployment detects changed files or not.
+
+"onScanFilesChanged" defines closure to be called whenever hot-deployment detects that files or folders were changed. The closure receives List<File> as the parameter, which holds all changed files and folders.
 
 ##Copyright and License
 
