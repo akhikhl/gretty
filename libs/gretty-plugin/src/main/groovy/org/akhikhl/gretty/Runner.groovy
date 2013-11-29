@@ -44,36 +44,6 @@ final class Runner {
     project.ext.properties.containsKey('finalWarPath') ? project.ext.finalWarPath : project.tasks.war.archivePath
   }
 
-  static void prepareExplodedWebAppFolder(Project project) {
-    // ATTENTION: overlay copy order is important!
-    for(String overlay in project.gretty.overlays) {
-      def overlayProject = project.project(overlay)
-      project.copy {
-        from overlayProject.zipTree(Runner.getFinalWarPath(overlayProject))
-        into "${project.buildDir}/explodedWebapp"
-      }
-    }
-    project.copy {
-      from project.zipTree(project.tasks.war.archivePath)
-      into "${project.buildDir}/explodedWebapp"
-    }
-  }
-
-  static void prepareInplaceWebAppFolder(Project project) {
-    // ATTENTION: overlay copy order is important!
-    for(String overlay in project.gretty.overlays) {
-      def overlayProject = project.project(overlay)
-      project.copy {
-        from overlayProject.webAppDir
-        into "${project.buildDir}/inplaceWebapp"
-      }
-    }
-    project.copy {
-      from project.webAppDir
-      into "${project.buildDir}/inplaceWebapp"
-    }
-  }
-
   static void sendServiceCommand(int servicePort, String command) {
     Socket s = new Socket(InetAddress.getByName('127.0.0.1'), servicePort)
     try {
@@ -274,8 +244,11 @@ final class Runner {
         scanDirs.addAll overlay.sourceSets.main.runtimeClasspath.files
         scanDirs.add overlay.webAppDir
       }
-    } else
+    } else {
       scanDirs.add getFinalWarPath(project)
+      for(def overlay in project.gretty.overlays)
+        scanDirs.add getFinalWarPath(project.project(overlay))
+    }
     scanDirs.addAll project.gretty.scanDirs
     for(File f in scanDirs)
       log.debug 'scanDir: {}', f
@@ -292,7 +265,10 @@ final class Runner {
     helper.addScannerBulkListener scanner, { changedFiles ->
       log.debug 'BulkListener changedFiles={}', changedFiles
       project.gretty.onScanFilesChanged*.call(changedFiles)
-      prepareInplaceWebAppFolder(project)
+      if(params.inplace)
+        project.tasks.prepareInplaceWebAppFolder.execute()
+      else
+        project.tasks.overlayWar.execute()
       sendServiceCommand(project.gretty.servicePort, 'restart')
     }
     log.info 'Starting scanner with interval of {} second(s)', project.gretty.scanInterval

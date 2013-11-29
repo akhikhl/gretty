@@ -10,3 +10,7 @@ dependencies {
 war {
   archiveName "helloGretty.war"
 }
+
+gretty {
+  scanInterval = 1
+}

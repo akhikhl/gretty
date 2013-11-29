@@ -5,6 +5,7 @@ apply plugin: 'gretty'
 gretty {
   contextPath '/helloGrettyOverlay'
   overlay ':helloGretty'
+  scanInterval = 1
 }
 
 war {

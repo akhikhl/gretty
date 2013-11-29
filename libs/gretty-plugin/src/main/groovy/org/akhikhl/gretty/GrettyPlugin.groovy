@@ -35,10 +35,12 @@ final class GrettyPlugin implements Plugin<Project> {
       for(String overlay in project.gretty.overlays)
         project.dependencies.add 'providedCompile', project.project(overlay)
 
-      project.task('prepareInplaceWebAppFolder', group: 'gretty', description: 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/inplaceWebapp') {
-        doLast {
-          Runner.prepareInplaceWebAppFolder(project)
-        }
+      project.task('prepareInplaceWebAppFolder', type: Copy, group: 'gretty', description: 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/inplaceWebapp') {
+        // ATTENTION: overlay copy order is important!
+        for(String overlay in project.gretty.overlays)
+          from project.project(overlay).webAppDir
+        from project.webAppDir
+        into "${project.buildDir}/inplaceWebapp"
       }
 
       if(project.gretty.overlays) {
@@ -49,13 +51,17 @@ final class GrettyPlugin implements Plugin<Project> {
         project.tasks.war.archiveName = 'partialWar.war'
 
         // 'explodeWebApps' task is only activated by 'overlayWar' task
-        project.task('explodeWebApps', group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/explodedWebapp') {
+        project.task('explodeWebApps', type: Copy, group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/explodedWebapp') {
           for(String overlay in project.gretty.overlays)
             dependsOn "${overlay}:assemble" as String
           dependsOn project.tasks.war
-          doLast {
-            Runner.prepareExplodedWebAppFolder(project)
+          // ATTENTION: overlay copy order is important!
+          for(String overlay in project.gretty.overlays) {
+            def overlayProject = project.project(overlay)
+            from overlayProject.zipTree(Runner.getFinalWarPath(overlayProject))
           }
+          from project.zipTree(project.tasks.war.archivePath)
+          into "${project.buildDir}/explodedWebapp"
         }
 
         project.task('overlayWar', type: Zip, group: 'gretty', description: 'Creates WAR from exploded web-application in ${buildDir}/explodedWebapp') {
