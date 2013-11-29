@@ -27,17 +27,13 @@ final class GrettyPlugin implements Plugin<Project> {
       grettyHelperConfig 'org.akhikhl.gretty:gretty-helper:0.0.4'
     }
 
-    for(String overlay in project.gretty.overlays)
-      project.evaluationDependsOn(overlay)
-
     project.afterEvaluate {
-
       for(String overlay in project.gretty.overlays)
         project.dependencies.add 'providedCompile', project.project(overlay)
 
       project.task('prepareInplaceWebAppFolder', group: 'gretty', description: 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/inplaceWebapp') {
         for(String overlay in project.gretty.overlays)
-          inputs.dir project.project(overlay).webAppDir
+          inputs.dir { project.project(overlay).webAppDir }
         inputs.dir project.webAppDir
         outputs.dir "${project.buildDir}/inplaceWebapp"
         doLast {
@@ -54,10 +50,10 @@ final class GrettyPlugin implements Plugin<Project> {
         // 'explodeWebApps' task is only activated by 'overlayWar' task
         project.task('explodeWebApps', group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/explodedWebapp') {
           for(String overlay in project.gretty.overlays)
-            dependsOn project.project(overlay).tasks.war
+            dependsOn "$overlay:war" as String
           dependsOn project.tasks.war
           for(String overlay in project.gretty.overlays)
-            inputs.file Runner.getFinalWarPath(project.project(overlay))
+            inputs.file { Runner.getFinalWarPath(project.project(overlay)) }
           inputs.file project.tasks.war.archivePath
           outputs.dir "${project.buildDir}/explodedWebapp"
           doLast {
@@ -81,7 +77,7 @@ final class GrettyPlugin implements Plugin<Project> {
         task.dependsOn project.tasks.classes
         task.dependsOn project.tasks.prepareInplaceWebAppFolder
         for(String overlay in project.gretty.overlays)
-          task.dependsOn "${overlay}:classes" as String
+          task.dependsOn "$overlay:classes" as String
       }
 
       def setupWarDependencies = { task ->
