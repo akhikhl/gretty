@@ -7,18 +7,18 @@
  */
 package org.akhikhl.gretty
 
-final class JettyMonitorThread extends Thread {
+final class MonitorThread extends Thread {
 
-  private final def server
+  private final Runner runner
   private ServerSocket socket
   private boolean running = false
 
-  public JettyMonitorThread(int servicePort, def server) {
-    this.server = server
+  public MonitorThread(Runner runner) {
+    this.runner = runner
     daemon = false
-    name = 'JettyMonitorThread'
+    name = 'MonitorThread'
     try {
-      socket = new ServerSocket(servicePort, 1, InetAddress.getByName('127.0.0.1'))
+      socket = new ServerSocket(runner.project.gretty.servicePort, 1, InetAddress.getByName('127.0.0.1'))
     } catch(Exception e) {
       throw new RuntimeException(e)
     }
@@ -47,12 +47,12 @@ final class JettyMonitorThread extends Thread {
             accept.close()
           }
           if(command == 'stop') {
-            server.stop()
+            runner.stopServer()
             break
           }
           if(command == 'restart') {
-            server.stop()
-            server.start()
+            runner.stopServer()
+            runner.startServer()
           }
           // more commands could be inserted here
         }

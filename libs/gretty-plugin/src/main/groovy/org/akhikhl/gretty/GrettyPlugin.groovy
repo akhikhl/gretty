@@ -109,40 +109,40 @@ final class GrettyPlugin implements Plugin<Project> {
       project.task('jettyRun', group: 'gretty', description: 'Starts jetty server inplace, in interactive mode (keypress stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          GrettyRunner.run project: project, inplace: true, interactive: true
+          new Runner(project, inplace: true, interactive: true).consoleStart()
         }
       }
 
       project.task('jettyRunWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in interactive mode (keypress stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          GrettyRunner.run project: project, inplace: false, interactive: true
+          new Runner(project, inplace: false, interactive: true).consoleStart()
         }
       }
 
       project.task('jettyStart', group: 'gretty', description: 'Starts jetty server inplace, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          GrettyRunner.run project: project, inplace: true, interactive: false
+          new Runner(project, inplace: true, interactive: false).consoleStart()
         }
       }
 
       project.task('jettyStartWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          GrettyRunner.run project: project, inplace: false, interactive: false
+          new Runner(project, inplace: false, interactive: false).consoleStart()
         }
       }
 
       project.task('jettyStop', group: 'gretty', description: 'Sends \'stop\' command to running jetty server.') {
         doLast {
-          GrettyRunner.sendServiceCommand project.gretty.servicePort, 'stop'
+          Runner.sendServiceCommand project.gretty.servicePort, 'stop'
         }
       }
 
       project.task('jettyRestart', group: 'gretty', description: 'Sends \'restart\' command to running jetty server.') {
         doLast {
-          GrettyRunner.sendServiceCommand project.gretty.servicePort, 'restart'
+          Runner.sendServiceCommand project.gretty.servicePort, 'restart'
         }
       }
     } // afterEvaluate
