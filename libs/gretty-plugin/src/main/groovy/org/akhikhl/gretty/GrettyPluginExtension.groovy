@@ -1,4 +1,4 @@
-/* 
+/*
  * gretty
  *
  * Copyright 2013  Andrey Hihlovskiy.
@@ -6,6 +6,8 @@
  * See the file "license.txt" for copying and usage permission.
  */
 package org.akhikhl.gretty
+
+import org.gradle.api.GradleException
 
 class GrettyPluginExtension {
 
@@ -16,8 +18,10 @@ class GrettyPluginExtension {
   String realm
   String realmConfigFile
   List overlays = []
-  List onStart = []
-  List onStop = []
+  List<Closure> onStart = []
+  List<Closure> onStop = []
+  List<Closure> onScan = []
+  List<Closure> onScanFilesChanged = []
 
   def initParameter(key, value) {
     initParameters[key] = value
@@ -25,15 +29,23 @@ class GrettyPluginExtension {
 
   def overlay(def newValue) {
     if(!(newValue instanceof String))
-      throw GradleException("Overlay ${newValue?.toString()} should be a string")
+      throw new GradleException("Overlay ${newValue?.toString()} should be a string")
     overlays.add newValue
   }
 
-  def onStart(newValue) {
+  def onScan(Closure newValue) {
+    onScan.add newValue
+  }
+
+  def onScanFilesChanged(Closure newValue) {
+    onScanFilesChanged.add newValue
+  }
+
+  def onStart(Closure newValue) {
     onStart.add newValue
   }
 
-  def onStop(newValue) {
+  def onStop(Closure newValue) {
     onStop.add newValue
   }
 }

@@ -48,10 +48,7 @@ final class Runner {
     Thread monitor = new MonitorThread(this)
     monitor.start()
 
-    project.gretty.onStart.each { onStart ->
-      if(onStart instanceof Closure)
-        onStart()
-    }
+    project.gretty.onStart*.call()
 
     System.out.println 'Jetty server started.'
     System.out.println 'You can see web-application in browser under the address:'
@@ -72,11 +69,8 @@ final class Runner {
     monitor.join()
 
     System.out.println 'Jetty server stopped.'
-    
-    project.gretty.onStop.each { onStop ->
-      if(onStop instanceof Closure)
-        onStop()
-    }
+
+    project.gretty.onStop*.call()
   }
 
   void startServer() {
@@ -215,9 +209,11 @@ final class Runner {
     scanner.scanDirs = scanDirs
     helper.addScannerScanCycleListener scanner, { started, cycle ->
       project.logger.trace 'ScanCycleListener started={}, cycle={}', started, cycle
+      project.gretty.onScan*.call()
     }
     helper.addScannerBulkListener scanner, { changedFiles ->
       project.logger.trace 'BulkListener changedFiles={}', changedFiles
+      project.gretty.onScanFilesChanged*.call(changedFiles)
       sendServiceCommand project.gretty.servicePort, 'restart'
     }
     project.logger.trace 'Starting scanner {}', scanner
