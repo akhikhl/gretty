@@ -135,10 +135,13 @@ final class Runner {
     if(!contextPath)
       for(def overlay in project.gretty.overlays.reverse()) {
         overlay = project.project(overlay)
-        if(overlay.gretty.contextPath) {
-          contextPath = overlay.gretty.contextPath
-          break
-        }
+        if(overlay.extensions.findByName('gretty')) {
+          if(overlay.gretty.contextPath) {
+            contextPath = overlay.gretty.contextPath
+            break
+          }
+        } else
+          project.logger.warn 'Project {} is not gretty-enabled, could not extract it\'s context path', overlay
       }
     contextPath = contextPath ?: "/${project.name}"
     return contextPath
@@ -148,12 +151,15 @@ final class Runner {
     Map initParams = [:]
     for(def overlay in project.gretty.overlays) {
       overlay = project.project(overlay)
-      for(def e in overlay.gretty.initParameters) {
-        def paramValue = e.value
-        if(paramValue instanceof Closure)
-          paramValue = paramValue()
-        initParams[e.key] = paramValue
-      }
+      if(overlay.extensions.findByName('gretty')) {
+        for(def e in overlay.gretty.initParameters) {
+          def paramValue = e.value
+          if(paramValue instanceof Closure)
+            paramValue = paramValue()
+          initParams[e.key] = paramValue
+        }
+      } else
+        project.logger.warn 'Project {} is not gretty-enabled, could not extract it\'s init parameters', overlay
     }
     for(def e in project.gretty.initParameters) {
       def paramValue = e.value
@@ -172,13 +178,16 @@ final class Runner {
     if(!realm || !realmConfigFile)
       for(def overlay in project.gretty.overlays.reverse()) {
         overlay = project.project(overlay)
-        if(overlay.gretty.realm && overlay.gretty.realmConfigFile) {
-          realm = overlay.gretty.realm
-          realmConfigFile = overlay.gretty.realmConfigFile
-          if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
-            realmConfigFile = "${overlay.webAppDir.absolutePath}/${realmConfigFile}"
-          break
-        }
+        if(overlay.extensions.findByName('gretty')) {
+          if(overlay.gretty.realm && overlay.gretty.realmConfigFile) {
+            realm = overlay.gretty.realm
+            realmConfigFile = overlay.gretty.realmConfigFile
+            if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
+              realmConfigFile = "${overlay.webAppDir.absolutePath}/${realmConfigFile}"
+            break
+          }
+        } else
+          project.logger.warn 'Project {} is not gretty-enabled, could not extract it\'s realm', overlay
       }
     return new RealmInfo(realm: realm, realmConfigFile: realmConfigFile)
   }
@@ -186,10 +195,11 @@ final class Runner {
   private void onStart() {
     for(def overlay in project.gretty.overlays) {
       overlay = project.project(overlay)
-      overlay.gretty.onStart.each { onStart ->
-        if(onStart instanceof Closure)
-          onStart()
-      }
+      if(overlay.extensions.findByName('gretty'))
+        overlay.gretty.onStart.each { onStart ->
+          if(onStart instanceof Closure)
+            onStart()
+        }
     }
     project.gretty.onStart.each { onStart ->
       if(onStart instanceof Closure)
@@ -204,10 +214,11 @@ final class Runner {
     }
     for(def overlay in project.gretty.overlays.reverse()) {
       overlay = project.project(overlay)
-      overlay.gretty.onStop.each { onStop ->
-        if(onStop instanceof Closure)
-          onStop()
-      }
+      if(overlay.extensions.findByName('gretty'))
+        overlay.gretty.onStop.each { onStop ->
+          if(onStop instanceof Closure)
+            onStop()
+        }
     }
   }
 
