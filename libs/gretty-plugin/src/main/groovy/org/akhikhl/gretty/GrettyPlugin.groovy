@@ -33,7 +33,7 @@ final class GrettyPlugin implements Plugin<Project> {
     project.afterEvaluate {
 
       for(String overlay in project.gretty.overlays)
-        project.dependencies.add "providedCompile", project.project(overlay)
+        project.dependencies.add 'providedCompile', project.project(overlay)
 
       String buildWebAppFolder = "${project.buildDir}/webapp"
 
@@ -59,6 +59,7 @@ final class GrettyPlugin implements Plugin<Project> {
 
         project.tasks.war { archiveName 'thiswar.war' }
 
+        // 'explodeWebApps' task is only activated by 'overlayWar' task
         project.task('explodeWebApps', group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/webapp') {
           for(String overlay in project.gretty.overlays)
             dependsOn "${overlay}:assemble" as String
@@ -79,6 +80,7 @@ final class GrettyPlugin implements Plugin<Project> {
           }
         }
 
+        // 'overlayWar' task is only activated by 'assemble' task
         project.task('overlayWar', type: Zip, group: 'gretty', description: 'Creates WAR from exploded web-application in ${buildDir}/webapp') {
           dependsOn project.tasks.explodeWebApps
           from project.fileTree(buildWebAppFolder)
