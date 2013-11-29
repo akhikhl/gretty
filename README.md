@@ -1,8 +1,10 @@
 #gretty
 
-**version 0.0.3**
+**version 0.0.4**
 
 Gradle plugin for running web-applications under jetty 8.1.8.
+
+NEW in version 0.0.4: support of [hot deployment](#hot-deployment).
 
 **Content of this document**
 
@@ -17,6 +19,7 @@ Gradle plugin for running web-applications under jetty 8.1.8.
 * [Configuration](#configuration)
 * [WAR Overlays](#war-overlays)
 * [Security Realms](#security-realms)
+* [Hot deployment](#hot-deployment)
 * [Copyright and License](#copyright-and-license)
 
 ##Usage:
@@ -158,6 +161,15 @@ gretty {
   }
   overlay ':ProjectA'
   overlay ':ProjectB'
+  scanInterval = 5
+  scanDir 'dir1'
+  scanDir 'dir2'
+  onScan {
+    println 'Scanning files for changes'
+  }
+  onScanFilesChanged { fileList ->
+    println "Files were changed: $fileList"
+  }
 }
 ```
 
@@ -182,6 +194,25 @@ as /web-app/servlet/init-param element in "web.xml". You can specify more than o
 
 "overlay" defines another project as WAR overlay source. See more information in chapter [WAR Overlays](#war-overlays).
 
+"scanInterval" defines hot-deployment scan interval, in seconds. Default is zero, which means that hot-deployment is disabled. See more information in chapter [Hot deployment](#hot-deployment).
+
+##WAR Overlays
+
+"overlay" property has the following effects:
+
+1. When performing jettyRun and jettyStart, runtime classpath of overlay projects is added to the current project.
+   Classpath of the current project has priority.
+
+2. When assembling WAR file, overlay projects are added (overlayed) to the current project. The files of the current 
+   project have priority over overlay files, this allows to effectively customize web-application.
+
+You can specify more than one overlay.
+
+Note that "overlay" property "understands" only gradle projects (not maven artifacts) as an input. 
+
+gretty contains example program ["helloGrettyOverlay"](https://github.com/akhikhl/gretty/tree/master/examples/helloGrettyOverlay),
+which shows minimal working overlay configuration.
+
 ##Security realms
 
 "realm" property defines security realm for the given web-application. When defined, it must match 
@@ -193,20 +224,12 @@ containing properties for HashLoginService. See more information at http://wiki.
 "realm" and "realmConfigFile" affect only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
 to some other servlet container, you'll have to define security realms by means of that container.
 
-gretty sources contain example program ["securityRealm"](https://github.com/akhikhl/gretty/tree/master/examples/securityRealm),
+gretty contains example program ["securityRealm"](https://github.com/akhikhl/gretty/tree/master/examples/securityRealm),
 which shows minimal working realm configuration.
 
-##WAR Overlays
+##Hot deployment
 
-"overlay" property "understands" only gradle projects (not maven artifacts) as an input. "overlay" has the following effects:
-
-1. When performing jettyRun and jettyStart, runtime classpath of overlay projects is added to the current project.
-   Classpath of the current project has priority.
-
-2. When assembling WAR file, overlay projects are added (overlayed) to the current project. The files of the current 
-   project have priority over overlay files, this allows to effectively customize web-application.
-
-You can specify more than one overlay.
+Gretty supports hot deployment: whenever the classes, jars or resources [comprising the web-application] are updated, the web-application automatically restarts itself.
 
 ##Copyright and License
 
