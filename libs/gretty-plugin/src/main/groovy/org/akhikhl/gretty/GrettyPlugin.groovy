@@ -91,8 +91,10 @@ final class GrettyPlugin implements Plugin<Project> {
         setupInplaceWebAppDependencies task
         task.doLast {
           def runner = new Runner(project, inplace: true, interactive: true,
-            classpath: ProjectUtils.getProjectClassPath(project, true),
-            contextPath: ProjectUtils.getContextPath(project))
+            classpath: ProjectUtils.getClassPath(project, true),
+            contextPath: ProjectUtils.getContextPath(project),
+            initParams: ProjectUtils.getInitParameters(project),
+            realmInfo: ProjectUtils.getRealmInfo(project))
           runner.consoleStart()
         }
       }
@@ -101,8 +103,10 @@ final class GrettyPlugin implements Plugin<Project> {
         setupWarDependencies task
         task.doLast {
           def runner = new Runner(project, inplace: false, interactive: true,
-            classpath: ProjectUtils.getProjectClassPath(project, false),
-            contextPath: ProjectUtils.getContextPath(project))
+            classpath: ProjectUtils.getClassPath(project, false),
+            contextPath: ProjectUtils.getContextPath(project),
+            initParams: ProjectUtils.getInitParameters(project),
+            realmInfo: ProjectUtils.getRealmInfo(project))
           runner.consoleStart()
         }
       }
@@ -111,8 +115,10 @@ final class GrettyPlugin implements Plugin<Project> {
         setupInplaceWebAppDependencies task
         task.doLast {
           def runner = new Runner(project, inplace: true, interactive: false,
-            classpath: ProjectUtils.getProjectClassPath(project, true),
-            contextPath: ProjectUtils.getContextPath(project))
+            classpath: ProjectUtils.getClassPath(project, true),
+            contextPath: ProjectUtils.getContextPath(project),
+            initParams: ProjectUtils.getInitParameters(project),
+            realmInfo: ProjectUtils.getRealmInfo(project))
           runner.consoleStart()
         }
       }
@@ -121,8 +127,10 @@ final class GrettyPlugin implements Plugin<Project> {
         setupWarDependencies task
         task.doLast {
           def runner = new Runner(project, inplace: false, interactive: false,
-            classpath: ProjectUtils.getProjectClassPath(project, false),
-            contextPath: ProjectUtils.getContextPath(project))
+            classpath: ProjectUtils.getClassPath(project, false),
+            contextPath: ProjectUtils.getContextPath(project),
+            initParams: ProjectUtils.getInitParameters(project),
+            realmInfo: ProjectUtils.getRealmInfo(project))
           runner.consoleStart()
         }
       }
