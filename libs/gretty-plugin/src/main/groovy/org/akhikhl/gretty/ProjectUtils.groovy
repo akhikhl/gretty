@@ -13,6 +13,11 @@ import org.slf4j.LoggerFactory
 
 class ProjectUtils {
 
+  static class RealmInfo {
+    String realm
+    String realmConfigFile
+  }
+
   private static final Logger log = LoggerFactory.getLogger(ProjectUtils)
 
   private static Set collectOverlayJars(Project project) {
@@ -49,7 +54,7 @@ class ProjectUtils {
     return contextPath
   }
 
-  static Set<URL> getProjectClassPath(Project project, boolean inplace) {
+  static Set<URL> getClassPath(Project project, boolean inplace) {
     Set<URL> urls = new LinkedHashSet()
     urls.addAll project.configurations.grettyHelperConfig.collect { it.toURI().toURL() }
     if(inplace) {
@@ -72,6 +77,51 @@ class ProjectUtils {
 
   static File getFinalWarPath(Project project) {
     project.ext.properties.containsKey('finalWarPath') ? project.ext.finalWarPath : project.tasks.war.archivePath
+  }
+
+  static Map getInitParameters(Project project) {
+    Map initParams = [:]
+    for(def overlay in project.gretty.overlays) {
+      overlay = project.project(overlay)
+      if(overlay.extensions.findByName('gretty')) {
+        for(def e in overlay.gretty.initParameters) {
+          def paramValue = e.value
+          if(paramValue instanceof Closure)
+            paramValue = paramValue()
+          initParams[e.key] = paramValue
+        }
+      } else
+        log.warn 'Project {} is not gretty-enabled, could not extract it\'s init parameters', overlay
+    }
+    for(def e in project.gretty.initParameters) {
+      def paramValue = e.value
+      if(paramValue instanceof Closure)
+        paramValue = paramValue()
+      initParams[e.key] = paramValue
+    }
+    return initParams
+  }
+
+  static RealmInfo getRealmInfo(Project project) {
+    String realm = project.gretty.realm
+    String realmConfigFile = project.gretty.realmConfigFile
+    if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
+      realmConfigFile = "${project.webAppDir.absolutePath}/${realmConfigFile}"
+    if(!realm || !realmConfigFile)
+      for(def overlay in project.gretty.overlays.reverse()) {
+        overlay = project.project(overlay)
+        if(overlay.extensions.findByName('gretty')) {
+          if(overlay.gretty.realm && overlay.gretty.realmConfigFile) {
+            realm = overlay.gretty.realm
+            realmConfigFile = overlay.gretty.realmConfigFile
+            if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
+              realmConfigFile = "${overlay.webAppDir.absolutePath}/${realmConfigFile}"
+            break
+          }
+        } else
+          log.warn 'Project {} is not gretty-enabled, could not extract it\'s realm', overlay
+      }
+    return new RealmInfo(realm: realm, realmConfigFile: realmConfigFile)
   }
 
   static void prepareInplaceWebAppFolder(Project project) {
