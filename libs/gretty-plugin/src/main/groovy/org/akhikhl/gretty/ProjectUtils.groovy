@@ -32,6 +32,23 @@ class ProjectUtils {
     return overlayJars
   }
 
+  static String getContextPath(Project project) {
+    String contextPath = project.gretty.contextPath
+    if(!contextPath)
+      for(def overlay in project.gretty.overlays.reverse()) {
+        overlay = project.project(overlay)
+        if(overlay.extensions.findByName('gretty')) {
+          if(overlay.gretty.contextPath) {
+            contextPath = overlay.gretty.contextPath
+            break
+          }
+        } else
+          log.warn 'Project {} is not gretty-enabled, could not extract it\'s context path', overlay
+      }
+    contextPath = contextPath ?: "/${project.name}"
+    return contextPath
+  }
+
   static Set<URL> getProjectClassPath(Project project, boolean inplace) {
     Set<URL> urls = new LinkedHashSet()
     urls.addAll project.configurations.grettyHelperConfig.collect { it.toURI().toURL() }

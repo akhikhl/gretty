@@ -56,7 +56,7 @@ final class Runner {
 
     System.out.println 'Jetty server started.'
     System.out.println 'You can see web-application in browser under the address:'
-    System.out.println "http://localhost:${project.gretty.port}${contextPath}"
+    System.out.println "http://localhost:${project.gretty.port}${params.contextPath}"
 
     if(params.interactive)
       System.out.println 'Press any key to stop the jetty server.'
@@ -95,8 +95,7 @@ final class Runner {
     if(realmInfo.realm && realmInfo.realmConfigFile)
       context.getSecurityHandler().setLoginService(helper.createLoginService(realmInfo.realm, realmInfo.realmConfigFile))
 
-    String contextPath = getContextPath()
-    context.contextPath = contextPath
+    context.contextPath = params.contextPath
 
     getInitParameters().each { key, value ->
       context.setInitParameter key, value
@@ -124,23 +123,6 @@ final class Runner {
     server.stop()
     server = null
     helper = null
-  }
-
-  private String getContextPath() {
-    String contextPath = project.gretty.contextPath
-    if(!contextPath)
-      for(def overlay in project.gretty.overlays.reverse()) {
-        overlay = project.project(overlay)
-        if(overlay.extensions.findByName('gretty')) {
-          if(overlay.gretty.contextPath) {
-            contextPath = overlay.gretty.contextPath
-            break
-          }
-        } else
-          log.warn 'Project {} is not gretty-enabled, could not extract it\'s context path', overlay
-      }
-    contextPath = contextPath ?: "/${project.name}"
-    return contextPath
   }
 
   private Map getInitParameters() {
