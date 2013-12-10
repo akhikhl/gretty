@@ -108,7 +108,7 @@ afterEvaluate {
 
             scm {
               url 'scm:git@github.com:akhikhl/gretty.git'
-              connection 'scm:git@github.com:GradleFx/GradleFx.git'
+              connection 'scm:git@github.com:akhikhl/gretty.git'
               developerConnection 'scm:git@github.com:akhikhl/gretty.git'
             }
 
