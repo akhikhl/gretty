@@ -37,7 +37,7 @@ final class GrettyPlugin implements Plugin<Project> {
         inputs.dir project.webAppDir
         outputs.dir "${project.buildDir}/inplaceWebapp"
         doLast {
-          Runner.prepareInplaceWebAppFolder(project)
+          ProjectUtils.prepareInplaceWebAppFolder(project)
         }
       }
 
@@ -53,11 +53,11 @@ final class GrettyPlugin implements Plugin<Project> {
             dependsOn "$overlay:war" as String
           dependsOn project.tasks.war
           for(String overlay in project.gretty.overlays)
-            inputs.file { Runner.getFinalWarPath(project.project(overlay)) }
+            inputs.file { ProjectUtils.getFinalWarPath(project.project(overlay)) }
           inputs.file project.tasks.war.archivePath
           outputs.dir "${project.buildDir}/explodedWebapp"
           doLast {
-            Runner.prepareExplodedWebAppFolder(project)
+            ProjectUtils.prepareExplodedWebAppFolder(project)
           }
         }
 
@@ -90,28 +90,32 @@ final class GrettyPlugin implements Plugin<Project> {
       project.task('jettyRun', group: 'gretty', description: 'Starts jetty server inplace, in interactive mode (keypress stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          new Runner(project, inplace: true, interactive: true).consoleStart()
+          def runner = new Runner(project, inplace: true, interactive: true, classpath: ProjectUtils.getProjectClassPath(project, true))
+          runner.consoleStart()
         }
       }
 
       project.task('jettyRunWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in interactive mode (keypress stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          new Runner(project, inplace: false, interactive: true).consoleStart()
+          def runner = new Runner(project, inplace: false, interactive: true, classpath: ProjectUtils.getProjectClassPath(project, false))
+          runner.consoleStart()
         }
       }
 
       project.task('jettyStart', group: 'gretty', description: 'Starts jetty server inplace, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          new Runner(project, inplace: true, interactive: false).consoleStart()
+          def runner = new Runner(project, inplace: true, interactive: false, classpath: ProjectUtils.getProjectClassPath(project, true))
+          runner.consoleStart()
         }
       }
 
       project.task('jettyStartWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          new Runner(project, inplace: false, interactive: false).consoleStart()
+          def runner = new Runner(project, inplace: false, interactive: false, classpath: ProjectUtils.getProjectClassPath(project, false))
+          runner.consoleStart()
         }
       }
 

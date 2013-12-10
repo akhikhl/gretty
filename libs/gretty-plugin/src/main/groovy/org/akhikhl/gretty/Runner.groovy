@@ -23,55 +23,6 @@ final class Runner {
     String realmConfigFile
   }
 
-  private static Set collectOverlayJars(Project project) {
-    Set overlayJars = new HashSet()
-    def addOverlayJars // separate declaration from init to enable recursion
-    addOverlayJars = { Project proj ->
-      if(proj.extensions.findByName('gretty'))
-        for(def overlay in proj.gretty.overlays) {
-          overlay = proj.project(overlay)
-          File archivePath = overlay.tasks.findByName('jar')?.archivePath
-          if(archivePath)
-            overlayJars.add(archivePath)
-          addOverlayJars(overlay) // recursion
-        }
-    }
-    addOverlayJars(project)
-    return overlayJars
-  }
-
-  static File getFinalWarPath(Project project) {
-    project.ext.properties.containsKey('finalWarPath') ? project.ext.finalWarPath : project.tasks.war.archivePath
-  }
-
-  static void prepareInplaceWebAppFolder(Project project) {
-    // ATTENTION: overlay copy order is important!
-    for(String overlay in project.gretty.overlays)
-      project.copy {
-        from project.project(overlay).webAppDir
-        into "${project.buildDir}/inplaceWebapp"
-      }
-    project.copy {
-      from project.webAppDir
-      into "${project.buildDir}/inplaceWebapp"
-    }
-  }
-
-  static void prepareExplodedWebAppFolder(Project project) {
-    // ATTENTION: overlay copy order is important!
-    for(String overlay in project.gretty.overlays) {
-      def overlayProject = project.project(overlay)
-      project.copy {
-        from overlayProject.zipTree(Runner.getFinalWarPath(overlayProject))
-        into "${project.buildDir}/explodedWebapp"
-      }
-    }
-    project.copy {
-      from project.zipTree(project.tasks.war.archivePath)
-      into "${project.buildDir}/explodedWebapp"
-    }
-  }
-
   static void sendServiceCommand(int servicePort, String command) {
     Socket s = new Socket(InetAddress.getByName('127.0.0.1'), servicePort)
     try {
@@ -130,7 +81,7 @@ final class Runner {
     assert helper == null
     assert server == null
 
-    ClassLoader classLoader = new URLClassLoader(getProjectClassPath(project) as URL[])
+    ClassLoader classLoader = new URLClassLoader(params.classpath as URL[])
 
     helper = classLoader.findClass('org.akhikhl.gretty.GrettyHelper')
 
@@ -154,7 +105,7 @@ final class Runner {
     if(params.inplace)
       context.setResourceBase "${project.buildDir}/inplaceWebapp"
     else
-      context.setWar getFinalWarPath(project).toString()
+      context.setWar ProjectUtils.getFinalWarPath(project).toString()
 
     context.server = server
     server.handler = context
@@ -215,27 +166,6 @@ final class Runner {
     return initParams
   }
 
-  private Set<URL> getProjectClassPath(Project project) {
-    Set<URL> urls = new LinkedHashSet()
-    urls.addAll project.configurations.grettyHelperConfig.collect { it.toURI().toURL() }
-    if(params.inplace) {
-      Set overlayJars = collectOverlayJars(project)
-      def addProjectClassPath
-      addProjectClassPath = { Project proj ->
-        urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
-        urls.addAll proj.configurations.runtime.files.findAll { !overlayJars.contains(it) }.collect { it.toURI().toURL() }
-        // ATTENTION: order of overlay classpath is important!
-        if(proj.extensions.findByName('gretty'))
-          for(String overlay in proj.gretty.overlays.reverse())
-            addProjectClassPath(proj.project(overlay))
-      }
-      addProjectClassPath(project)
-    }
-    for(URL url in urls)
-      log.debug 'classLoader URL: {}', url
-    return urls
-  }
-
   private RealmInfo getRealmInfo() {
     String realm = project.gretty.realm
     String realmConfigFile = project.gretty.realmConfigFile
@@ -274,9 +204,9 @@ final class Runner {
       }
     } else {
       scanDirs.add project.tasks.war.archivePath
-      scanDirs.add getFinalWarPath(project)
+      scanDirs.add ProjectUtils.getFinalWarPath(project)
       for(def overlay in project.gretty.overlays)
-        scanDirs.add getFinalWarPath(project.project(overlay))
+        scanDirs.add ProjectUtils.getFinalWarPath(project.project(overlay))
     }
     for(def dir in project.gretty.scanDirs) {
       if(!(dir instanceof File))
@@ -299,9 +229,9 @@ final class Runner {
       log.debug 'BulkListener changedFiles={}', changedFiles
       project.gretty.onScanFilesChanged*.call(changedFiles)
       if(params.inplace)
-        prepareInplaceWebAppFolder(project)
+        ProjectUtils.prepareInplaceWebAppFolder(project)
       else if(project.gretty.overlays) {
-        prepareExplodedWebAppFolder(project)
+        ProjectUtils.prepareExplodedWebAppFolder(project)
         project.ant.zip destfile: project.ext.finalWarPath,  basedir: "${project.buildDir}/explodedWebapp"
       }
       else
