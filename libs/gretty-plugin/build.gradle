@@ -2,5 +2,6 @@ apply plugin: 'groovy'
 
 dependencies {
   compile gradleApi()
+  compile "org.eclipse.jetty:jetty-util:$jetty_version"
 }
 

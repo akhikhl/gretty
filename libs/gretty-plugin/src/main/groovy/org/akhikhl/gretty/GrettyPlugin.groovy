@@ -95,7 +95,13 @@ final class GrettyPlugin implements Plugin<Project> {
             contextPath: ProjectUtils.getContextPath(project),
             initParams: ProjectUtils.getInitParameters(project),
             realmInfo: ProjectUtils.getRealmInfo(project))
-          runner.consoleStart()
+          def scanman = new ScannerManager()
+          scanman.startScanner(project, true)
+          try {
+            runner.consoleStart()
+          } finally {
+            scanman.stopScanner()
+          }
         }
       }
 
@@ -107,7 +113,13 @@ final class GrettyPlugin implements Plugin<Project> {
             contextPath: ProjectUtils.getContextPath(project),
             initParams: ProjectUtils.getInitParameters(project),
             realmInfo: ProjectUtils.getRealmInfo(project))
-          runner.consoleStart()
+          def scanman = new ScannerManager()
+          scanman.startScanner(project, false)
+          try {
+            runner.consoleStart()
+          } finally {
+            scanman.stopScanner()
+          }
         }
       }
 
@@ -119,7 +131,13 @@ final class GrettyPlugin implements Plugin<Project> {
             contextPath: ProjectUtils.getContextPath(project),
             initParams: ProjectUtils.getInitParameters(project),
             realmInfo: ProjectUtils.getRealmInfo(project))
-          runner.consoleStart()
+          def scanman = new ScannerManager()
+          scanman.startScanner(project, true)
+          try {
+            runner.consoleStart()
+          } finally {
+            scanman.stopScanner()
+          }
         }
       }
 
@@ -131,19 +149,25 @@ final class GrettyPlugin implements Plugin<Project> {
             contextPath: ProjectUtils.getContextPath(project),
             initParams: ProjectUtils.getInitParameters(project),
             realmInfo: ProjectUtils.getRealmInfo(project))
-          runner.consoleStart()
+          def scanman = new ScannerManager()
+          scanman.startScanner(project, false)
+          try {
+            runner.consoleStart()
+          } finally {
+            scanman.stopScanner()
+          }
         }
       }
 
       project.task('jettyStop', group: 'gretty', description: 'Sends \'stop\' command to running jetty server.') {
         doLast {
-          Runner.sendServiceCommand project.gretty.servicePort, 'stop'
+          ServiceControl.send(project.gretty.servicePort, 'stop')
         }
       }
 
       project.task('jettyRestart', group: 'gretty', description: 'Sends \'restart\' command to running jetty server.') {
         doLast {
-          Runner.sendServiceCommand project.gretty.servicePort, 'restart'
+          ServiceControl.send(project.gretty.servicePort, 'restart')
         }
       }
     } // afterEvaluate
