@@ -2,7 +2,6 @@
 // It should not contain any project-specific information.
 
 apply plugin: 'maven'
-apply plugin: 'signing'
 
 repositories {
   mavenLocal()
@@ -86,51 +85,5 @@ afterEvaluate {
         archives javadocJar
       }
     }
-
-    if(project.hasProperty('signing.keyId') && project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
-      signing {
-        sign configurations.archives
-      }
-
-      uploadArchives {
-        repositories {
-          mavenDeployer {
-            beforeDeployment { deployment -> signing.signPom(deployment) }
-
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-              authentication(userName: project.sonatypeUsername, password: project.sonatypePassword)
-            }
-
-            pom.project {
-              name project.name
-              packaging 'jar'
-              description 'Gradle plugin for running web-applications under jetty 8.1.8 and servlet API 3.0.1.'
-              url 'https://github.com/akhikhl/gretty'
-
-              scm {
-                url 'scm:git@github.com:akhikhl/gretty.git'
-                connection 'scm:git@github.com:akhikhl/gretty.git'
-                developerConnection 'scm:git@github.com:akhikhl/gretty.git'
-              }
-
-              licenses {
-                license {
-                  name 'The MIT License'
-                  url 'http://opensource.org/licenses/mit-license.php/'
-                  distribution 'repo'
-                }
-              }
-
-              developers {
-                developer {
-                  id 'akhikhl'
-                  name 'Andrey Hihlovskiy'
-                }
-              }
-            }
-          }
-        }
-      } // uploadArchives
-    }
-  } // java or groovy
+ } // java or groovy
 }

@@ -40,7 +40,3 @@ if(file('buildSrc').exists()) {
   clean.dependsOn buildSrc_clean
 }
 
-subprojects {
-  apply from: rootProject.file('common.gradle')
-}
-
