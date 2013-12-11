@@ -430,12 +430,6 @@ Gretty Plugin implements pre-configured logging:
 
 You can fine-tune gretty logging by adjusting the following parameters [of gretty plugin extension]:
 
-loggingLevel = 'INFO'
-consoleLogEnabled = true
-fileLogEnabled = true
-logFileName = project.name
-logDir = "${System.getProperty('user.home')}/logs"
-
 "loggingLevel" defines slf4j logging-level for jetty process. It is a string, having one of the values: 'ALL', 'DEBUG', 'ERROR', 'INFO', 'OFF', 'TRACE', 'WARN'. The default value is 'INFO'.
 
 "consoleLogEnabled" defines, whether log messages are written to the terminal. It is a boolean, default value is "true".
