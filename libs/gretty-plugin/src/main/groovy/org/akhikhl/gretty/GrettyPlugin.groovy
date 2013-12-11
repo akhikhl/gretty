@@ -90,6 +90,7 @@ final class GrettyPlugin implements Plugin<Project> {
       project.task('jettyRun', group: 'gretty', description: 'Starts jetty server inplace, in interactive mode (keypress stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
+          project.gretty.onStart*.call()
           def runner = new Runner(project, inplace: true, interactive: true,
             classpath: ProjectUtils.getClassPath(project, true),
             contextPath: ProjectUtils.getContextPath(project),
@@ -102,12 +103,14 @@ final class GrettyPlugin implements Plugin<Project> {
           } finally {
             scanman.stopScanner()
           }
+          project.gretty.onStop*.call()
         }
       }
 
       project.task('jettyRunWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in interactive mode (keypress stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
+          project.gretty.onStart*.call()
           def runner = new Runner(project, inplace: false, interactive: true,
             classpath: ProjectUtils.getClassPath(project, false),
             contextPath: ProjectUtils.getContextPath(project),
@@ -120,12 +123,14 @@ final class GrettyPlugin implements Plugin<Project> {
           } finally {
             scanman.stopScanner()
           }
+          project.gretty.onStop*.call()
         }
       }
 
       project.task('jettyStart', group: 'gretty', description: 'Starts jetty server inplace, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
+          project.gretty.onStart*.call()
           def runner = new Runner(project, inplace: true, interactive: false,
             classpath: ProjectUtils.getClassPath(project, true),
             contextPath: ProjectUtils.getContextPath(project),
@@ -138,12 +143,14 @@ final class GrettyPlugin implements Plugin<Project> {
           } finally {
             scanman.stopScanner()
           }
+          project.gretty.onStop*.call()
         }
       }
 
       project.task('jettyStartWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
+          project.gretty.onStart*.call()
           def runner = new Runner(project, inplace: false, interactive: false,
             classpath: ProjectUtils.getClassPath(project, false),
             contextPath: ProjectUtils.getContextPath(project),
@@ -156,6 +163,7 @@ final class GrettyPlugin implements Plugin<Project> {
           } finally {
             scanman.stopScanner()
           }
+          project.gretty.onStop*.call()
         }
       }
 

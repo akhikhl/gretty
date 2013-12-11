@@ -8,9 +8,21 @@ dependencies {
 }
 
 war {
-  archiveName "helloGretty.war"
+  archiveName 'helloGretty.war'
 }
 
 gretty {
-  scanInterval = 1
+  scanInterval = 3
+  /* onStart {
+    println 'onStart'
+  }
+  onStop {
+    println 'onStop'
+  }
+  onScan { count ->
+    println "onScan $count"
+  }
+  onScanFilesChanged { changedFiles ->
+    println "onScanFiles $changedFiles"
+  } */
 }

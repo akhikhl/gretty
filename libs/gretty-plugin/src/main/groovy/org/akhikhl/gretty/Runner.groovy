@@ -34,8 +34,6 @@ final class Runner {
     Thread monitor = new MonitorThread(this)
     monitor.start()
 
-    project.gretty.onStart*.call()
-
     System.out.println 'Jetty server started.'
     System.out.println 'You can see web-application in browser under the address:'
     System.out.println "http://localhost:${project.gretty.port}${params.contextPath}"
@@ -55,8 +53,6 @@ final class Runner {
     monitor.join()
 
     System.out.println 'Jetty server stopped.'
-
-    project.gretty.onStop*.call()
   }
 
   void startServer() {

@@ -74,7 +74,8 @@ final class ScannerManager {
     scanner.scanDirs = scanDirs
     addScannerScanCycleListener { started, cycle ->
       log.debug 'ScanCycleListener started={}, cycle={}', started, cycle
-      project.gretty.onScan*.call()
+      if(started)
+        project.gretty.onScan*.call(cycle)
     }
     addScannerBulkListener { changedFiles ->
       log.debug 'BulkListener changedFiles={}', changedFiles
