@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -54,7 +55,7 @@ final class ProjectUtils {
     return contextPath
   }
 
-  static Set<URL> getClassPath(Project project, boolean inplace) {
+  static FileCollection getClassPath(Project project, boolean inplace) {
     Set<URL> urls = new LinkedHashSet()
     urls.addAll project.configurations.grettyHelperConfig.collect { it.toURI().toURL() }
     if(inplace) {
@@ -71,8 +72,8 @@ final class ProjectUtils {
       addProjectClassPath(project)
     }
     for(URL url in urls)
-      log.debug 'classLoader URL: {}', url
-    return urls
+      log.debug 'classpath URL: {}', url
+    return project.files(urls)
   }
 
   static File getFinalWarPath(Project project) {

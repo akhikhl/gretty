@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.GradleException
+import ch.qos.logback.classic.Level
 
 class GrettyPluginExtension {
 
@@ -24,6 +25,11 @@ class GrettyPluginExtension {
   List<Closure> onScanFilesChanged = []
   int scanInterval = 0 // scan interval in seconds. When zero, scanning is disabled.
   List scanDirs = [] // list of additional scan directories
+  String loggingLevel = 'OFF'
+  boolean consoleLogEnabled = true
+  boolean fileLogEnabled = true
+  String logFileName = null
+  String logDir = "${System.getProperty('user.home')}/logs"
 
   def scanDir(String value) {
     scanDirs.add(new File(value))

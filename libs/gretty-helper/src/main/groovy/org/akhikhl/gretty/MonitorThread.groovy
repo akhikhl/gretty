@@ -18,7 +18,7 @@ final class MonitorThread extends Thread {
     daemon = false
     name = 'MonitorThread'
     try {
-      socket = new ServerSocket(runner.project.gretty.servicePort, 1, InetAddress.getByName('127.0.0.1'))
+      socket = new ServerSocket(runner.params.servicePort, 1, InetAddress.getByName('127.0.0.1'))
     } catch(Exception e) {
       throw new RuntimeException(e)
     }

@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty
 
+import groovy.json.JsonBuilder
 import org.gradle.api.*
 import org.gradle.api.plugins.*
 import org.gradle.api.tasks.*
@@ -26,6 +27,9 @@ final class GrettyPlugin implements Plugin<Project> {
       providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
       grettyHelperConfig 'org.akhikhl.gretty:gretty-helper:0.0.4'
     }
+
+    project.task('run')
+    project.task('debug')
 
     project.afterEvaluate {
       for(String overlay in project.gretty.overlays)
@@ -87,83 +91,98 @@ final class GrettyPlugin implements Plugin<Project> {
           task.dependsOn project.tasks.war
       }
 
+      def run = { Map options ->
+        project.gretty.onStart*.call()
+        def json = new JsonBuilder()
+        json {
+          inplace options.inplace as boolean
+          interactive options.interactive as boolean
+          port project.gretty.port
+          servicePort project.gretty.servicePort
+          contextPath ProjectUtils.getContextPath(project)
+          resourceBase (options.inplace ? "${project.buildDir}/inplaceWebapp" : ProjectUtils.getFinalWarPath(project).toString())
+          initParams ProjectUtils.getInitParameters(project)
+          realmInfo ProjectUtils.getRealmInfo(project)
+        }
+        def scanman = new ScannerManager()
+        scanman.startScanner(project, options.inplace)
+        try {
+          project.javaexec {
+            classpath = ProjectUtils.getClassPath(project, options.inplace)
+            main = 'org.akhikhl.gretty.Runner'
+            args = [json.toString()]
+            standardInput = System.in
+            debug = options.debug as boolean
+            // system properties for logback config
+            systemProperty 'loggingLevel', project.gretty.loggingLevel
+            systemProperty 'consoleLogEnabled', project.gretty.consoleLogEnabled
+            systemProperty 'fileLogEnabled', project.gretty.fileLogEnabled
+            systemProperty 'logFileName', project.gretty.logFileName ?: project.name
+            systemProperty 'logDir', project.gretty.logDir
+          }
+        } finally {
+          scanman.stopScanner()
+        }
+        project.gretty.onStop*.call()
+      }
+
       project.task('jettyRun', group: 'gretty', description: 'Starts jetty server inplace, in interactive mode (keypress stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          project.gretty.onStart*.call()
-          def runner = new Runner(project, inplace: true, interactive: true,
-            classpath: ProjectUtils.getClassPath(project, true),
-            contextPath: ProjectUtils.getContextPath(project),
-            initParams: ProjectUtils.getInitParameters(project),
-            realmInfo: ProjectUtils.getRealmInfo(project))
-          def scanman = new ScannerManager()
-          scanman.startScanner(project, true)
-          try {
-            runner.consoleStart()
-          } finally {
-            scanman.stopScanner()
-          }
-          project.gretty.onStop*.call()
+          run inplace: true, interactive: true
         }
       }
+
+      project.tasks.run.dependsOn 'jettyRun'
+
+      project.task('jettyRunDebug', group: 'gretty', description: 'Starts jetty server inplace, in debug and interactive mode (keypress stops the server).') { task ->
+        setupInplaceWebAppDependencies task
+        task.doLast {
+          run inplace: true, interactive: true, debug: true
+        }
+      }
+
+      project.tasks.debug.dependsOn 'jettyRunDebug'
 
       project.task('jettyRunWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in interactive mode (keypress stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          project.gretty.onStart*.call()
-          def runner = new Runner(project, inplace: false, interactive: true,
-            classpath: ProjectUtils.getClassPath(project, false),
-            contextPath: ProjectUtils.getContextPath(project),
-            initParams: ProjectUtils.getInitParameters(project),
-            realmInfo: ProjectUtils.getRealmInfo(project))
-          def scanman = new ScannerManager()
-          scanman.startScanner(project, false)
-          try {
-            runner.consoleStart()
-          } finally {
-            scanman.stopScanner()
-          }
-          project.gretty.onStop*.call()
+          run inplace: false, interactive: true
+        }
+      }
+
+      project.task('jettyRunWarDebug', group: 'gretty', description: 'Starts jetty server on WAR-file, in debug and interactive mode (keypress stops the server).') { task ->
+        setupWarDependencies task
+        task.doLast {
+          run inplace: false, interactive: true, debug: true
         }
       }
 
       project.task('jettyStart', group: 'gretty', description: 'Starts jetty server inplace, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          project.gretty.onStart*.call()
-          def runner = new Runner(project, inplace: true, interactive: false,
-            classpath: ProjectUtils.getClassPath(project, true),
-            contextPath: ProjectUtils.getContextPath(project),
-            initParams: ProjectUtils.getInitParameters(project),
-            realmInfo: ProjectUtils.getRealmInfo(project))
-          def scanman = new ScannerManager()
-          scanman.startScanner(project, true)
-          try {
-            runner.consoleStart()
-          } finally {
-            scanman.stopScanner()
-          }
-          project.gretty.onStop*.call()
+          run inplace: true, interactive: false
+        }
+      }
+
+      project.task('jettyStartDebug', group: 'gretty', description: 'Starts jetty server inplace, in debug and batch mode (\'jettyStop\' stops the server).') { task ->
+        setupInplaceWebAppDependencies task
+        task.doLast {
+          run inplace: true, interactive: false, debug: true
         }
       }
 
       project.task('jettyStartWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          project.gretty.onStart*.call()
-          def runner = new Runner(project, inplace: false, interactive: false,
-            classpath: ProjectUtils.getClassPath(project, false),
-            contextPath: ProjectUtils.getContextPath(project),
-            initParams: ProjectUtils.getInitParameters(project),
-            realmInfo: ProjectUtils.getRealmInfo(project))
-          def scanman = new ScannerManager()
-          scanman.startScanner(project, false)
-          try {
-            runner.consoleStart()
-          } finally {
-            scanman.stopScanner()
-          }
-          project.gretty.onStop*.call()
+          run inplace: false, interactive: false
+        }
+      }
+
+      project.task('jettyStartWarDebug', group: 'gretty', description: 'Starts jetty server on WAR-file, in debug and batch mode (\'jettyStop\' stops the server).') { task ->
+        setupWarDependencies task
+        task.doLast {
+          run inplace: false, interactive: false, debug: true
         }
       }
 

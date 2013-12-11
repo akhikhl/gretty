@@ -13,4 +13,5 @@ dependencies {
   compile "org.eclipse.jetty:jetty-webapp:$jetty_version"
   compile "org.eclipse.jetty:jetty-security:$jetty_version"
   compile "org.eclipse.jetty:jetty-jsp:$jetty_version"
+  compile "ch.qos.logback:logback-classic:$logback_version"
 }

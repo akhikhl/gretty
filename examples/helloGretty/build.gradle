@@ -13,6 +13,7 @@ war {
 
 gretty {
   scanInterval = 3
+  // loggingLevel = 'INFO'
   /* onStart {
     println 'onStart'
   }
