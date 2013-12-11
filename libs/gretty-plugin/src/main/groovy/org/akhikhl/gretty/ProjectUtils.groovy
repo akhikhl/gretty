@@ -142,7 +142,7 @@ final class ProjectUtils {
     for(String overlay in project.gretty.overlays) {
       def overlayProject = project.project(overlay)
       project.copy {
-        from overlayProject.zipTree(Runner.getFinalWarPath(overlayProject))
+        from overlayProject.zipTree(getFinalWarPath(overlayProject))
         into "${project.buildDir}/explodedWebapp"
       }
     }
