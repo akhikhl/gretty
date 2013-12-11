@@ -76,6 +76,26 @@ final class ProjectUtils {
     return project.files(urls)
   }
 
+  static Set<URL> getClassPath_(Project project, boolean inplace) {
+    Set<URL> urls = new LinkedHashSet()
+    if(inplace) {
+      Set overlayJars = collectOverlayJars(project)
+      def addProjectClassPath
+      addProjectClassPath = { Project proj ->
+        urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
+        urls.addAll proj.configurations.runtime.files.findAll { !overlayJars.contains(it) }.collect { it.toURI().toURL() }
+        // ATTENTION: order of overlay classpath is important!
+        if(proj.extensions.findByName('gretty'))
+          for(String overlay in proj.gretty.overlays.reverse())
+            addProjectClassPath(proj.project(overlay))
+      }
+      addProjectClassPath(project)
+    }
+    for(URL url in urls)
+      log.debug 'classpath URL: {}', url
+    return urls
+  }
+
   static File getFinalWarPath(Project project) {
     project.ext.properties.containsKey('finalWarPath') ? project.ext.finalWarPath : project.tasks.war.archivePath
   }

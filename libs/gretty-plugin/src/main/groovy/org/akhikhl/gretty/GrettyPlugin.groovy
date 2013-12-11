@@ -103,12 +103,14 @@ final class GrettyPlugin implements Plugin<Project> {
           resourceBase (options.inplace ? "${project.buildDir}/inplaceWebapp" : ProjectUtils.getFinalWarPath(project).toString())
           initParams ProjectUtils.getInitParameters(project)
           realmInfo ProjectUtils.getRealmInfo(project)
+          projectClassPath ProjectUtils.getClassPath_(project, options.inplace)
         }
         def scanman = new ScannerManager()
         scanman.startScanner(project, options.inplace)
         try {
           project.javaexec {
-            classpath = ProjectUtils.getClassPath(project, options.inplace)
+            classpath = project.configurations.grettyHelperConfig
+            //ProjectUtils.getClassPath(project, options.inplace)
             main = 'org.akhikhl.gretty.Runner'
             args = [json.toString()]
             standardInput = System.in

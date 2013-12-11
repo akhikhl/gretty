@@ -71,6 +71,8 @@ class Runner {
   void startServer() {
     assert server == null
 
+    ClassLoader classLoader = new URLClassLoader(params.projectClassPath.collect { new URL(it) } as URL[], this.getClass().getClassLoader())
+
     server = new Server()
 
     SocketConnector connector = new SocketConnector()
@@ -81,7 +83,7 @@ class Runner {
     server.setConnectors([ connector ] as Connector[])
 
     WebAppContext context = new WebAppContext()
-    context.setClassLoader(new WebAppClassLoader(this.getClass().getClassLoader(), context))
+    context.setClassLoader(new WebAppClassLoader(classLoader, context))
 
     Map realmInfo = params.realmInfo
     if(realmInfo?.realm && realmInfo?.realmConfigFile)
