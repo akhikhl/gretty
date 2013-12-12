@@ -2,11 +2,7 @@ buildscript {
 
   repositories {
     mavenLocal()
-    maven {
-      name = 'gretty repository'
-      url = 'https://raw.github.com/akhikhl/gretty/master/maven_repo'
-    }  
-    mavenCentral() // to get groovy-all (required by gretty plugin)
+    mavenCentral()
   }
 
   apply plugin: 'maven'
@@ -18,11 +14,7 @@ buildscript {
 
 repositories {
   mavenLocal()
-  maven {
-    name = 'gretty repository'
-    url = 'https://raw.github.com/akhikhl/gretty/master/maven_repo'
-  }  
-  mavenCentral() // to get groovy-all (required by gretty plugin)
+  mavenCentral()
 }
 
 apply plugin: 'java'
