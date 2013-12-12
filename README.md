@@ -8,6 +8,8 @@ New in version 0.0.5: [debugger support](#debugger-support) and [logging](#loggi
 
 New in version 0.0.4: support of [hot deployment](#hot-deployment).
 
+Version 0.0.4 is in maven central. Version 0.0.5 will be there soon.
+
 **Content of this document**
 
 * [Usage](#usage)
