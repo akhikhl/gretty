@@ -8,14 +8,13 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonSlurper
-import org.mortbay.jetty.security.HashUserRealm
-import org.mortbay.jetty.security.SecurityHandler
-import org.mortbay.jetty.security.UserRealm
-import org.mortbay.jetty.Connector
-import org.mortbay.jetty.Server
-import org.mortbay.jetty.bio.SocketConnector
-import org.mortbay.jetty.webapp.WebAppClassLoader
-import org.mortbay.jetty.webapp.WebAppContext
+import org.eclipse.jetty.security.HashLoginService
+import org.eclipse.jetty.security.LoginService
+import org.eclipse.jetty.server.Connector
+import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.server.bio.SocketConnector
+import org.eclipse.jetty.webapp.WebAppClassLoader
+import org.eclipse.jetty.webapp.WebAppContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -50,7 +49,7 @@ final class Runner extends RunnerBase {
   protected void configureRealm(context) {
     Map realmInfo = params.realmInfo
     if(realmInfo?.realm && realmInfo?.realmConfigFile)
-      context.getSecurityHandler().setUserRealm(new HashUserRealm(realmInfo.realm, realmInfo.realmConfigFile))
+      context.getSecurityHandler().setLoginService(new HashLoginService(realmInfo.realm, realmInfo.realmConfigFile))
   }
 
   protected createServer() {

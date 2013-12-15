@@ -7,8 +7,9 @@ buildscript {
   }
   
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.5'
     classpath 'org.akhikhl.gretty:gretty6-plugin:0.0.5'
+    classpath 'org.akhikhl.gretty:gretty8-plugin:0.0.5'
+    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.5'
   }
 }
 

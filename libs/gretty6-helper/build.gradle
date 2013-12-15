@@ -8,6 +8,7 @@ configurations {
 }
 
 dependencies {
+  compile project(':libs:gretty-helper-commons')
   compile 'javax.servlet:servlet-api:2.5'
   compile "org.mortbay.jetty:jetty:$jetty6_version"
   compile "org.mortbay.jetty:jsp-2.0:$jetty6_version"

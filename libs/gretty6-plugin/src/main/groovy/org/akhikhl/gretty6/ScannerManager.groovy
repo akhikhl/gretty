@@ -9,18 +9,12 @@ package org.akhikhl.gretty6
 
 import org.mortbay.util.Scanner
 import org.mortbay.util.Scanner.BulkListener
-import org.gradle.api.Project
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.akhikhl.gretty.ProjectUtils
+import org.akhikhl.gretty.ScannerManagerBase
 
-final class ScannerManager {
+final class ScannerManager extends ScannerManagerBase {
 
-  private static final Logger log = LoggerFactory.getLogger(ScannerManager)
-
-  private Scanner scanner
-
-  def addScannerBulkListener(Closure listener) {
+  @Override
+  protected void addScannerBulkListener(Closure listener) {
     scanner.addListener(new BulkListener() {
       void filesChanged(List<String> filenames) {
         listener.call(filenames)
@@ -28,60 +22,9 @@ final class ScannerManager {
     });
   }
 
-  void startScanner(Project project, boolean inplace) {
-    if(project.gretty.scanInterval == 0) {
-      log.warn 'scanInterval not specified (or zero), scanning disabled'
-      return
-    }
-    List<File> scanDirs = []
-    if(inplace) {
-      scanDirs.addAll project.sourceSets.main.runtimeClasspath.files
-      scanDirs.add project.webAppDir
-      for(def overlay in project.gretty.overlays) {
-        overlay = project.project(overlay)
-        scanDirs.addAll overlay.sourceSets.main.runtimeClasspath.files
-        scanDirs.add overlay.webAppDir
-      }
-    } else {
-      scanDirs.add project.tasks.war.archivePath
-      scanDirs.add ProjectUtils.getFinalWarPath(project)
-      for(def overlay in project.gretty.overlays)
-        scanDirs.add ProjectUtils.getFinalWarPath(project.project(overlay))
-    }
-    for(def dir in project.gretty.scanDirs) {
-      if(!(dir instanceof File))
-        dir = project.file(dir.toString())
-      scanDirs.add dir
-    }
-    for(File f in scanDirs)
-      log.debug 'scanDir: {}', f
-    scanner = new Scanner()
-    scanner.reportExistingFilesOnStartup = false
-    scanner.scanInterval = project.gretty.scanInterval
-    scanner.scanDirs = scanDirs
-    addScannerBulkListener { changedFiles ->
-      log.debug 'BulkListener changedFiles={}', changedFiles
-      project.gretty.onScanFilesChanged*.call(changedFiles)
-      if(inplace)
-        ProjectUtils.prepareInplaceWebAppFolder(project)
-      else if(project.gretty.overlays) {
-        ProjectUtils.prepareExplodedWebAppFolder(project)
-        project.ant.zip destfile: project.ext.finalWarPath,  basedir: "${project.buildDir}/explodedWebapp"
-      }
-      else
-        project.tasks.war.execute()
-      ServiceControl.send(project.gretty.servicePort, 'restart')
-    }
-    log.info 'Starting scanner with interval of {} second(s)', project.gretty.scanInterval
-    scanner.start()
-  }
-
-  void stopScanner() {
-    if(scanner != null) {
-      log.info 'Stopping scanner'
-      scanner.stop()
-      scanner = null
-    }
+  @Override
+  protected createScanner() {
+    return new Scanner()
   }
 }
 
