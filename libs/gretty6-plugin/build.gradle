@@ -2,7 +2,6 @@ apply plugin: 'groovy'
 
 dependencies {
   compile project(':libs:gretty-commons')
-  compile "org.eclipse.jetty:jetty-util:$jetty_version"
-  compile gradleApi()
+  compile "org.mortbay.jetty:jetty-util:$jetty6_version"
 }
 

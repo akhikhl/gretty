@@ -1,0 +1,16 @@
+apply plugin: 'groovy'
+
+configurations {
+  compile {
+    exclude group: 'org.mortbay.jetty', module: 'servlet-api'
+    exclude group: 'org.slf4j', module: 'slf4j-simple'
+  }
+}
+
+dependencies {
+  compile 'javax.servlet:servlet-api:2.5'
+  compile "org.mortbay.jetty:jetty:$jetty6_version"
+  compile "org.mortbay.jetty:jsp-2.0:$jetty6_version"
+  compile "ch.qos.logback:logback-classic:$logback_version"
+  compile "org.slf4j:jcl-over-slf4j:$slf4j_version"
+}

@@ -3,7 +3,9 @@ ext {
   version = '0.0.5'
   servlet_api_version = '3.0.1'
   jetty_version = '8.1.8.v20121106'
+  jetty6_version = '6.1.26'
   logback_version = '1.0.13'
+  slf4j_version = '1.7.5'
 }
 
 apply from: 'root.gradle'
