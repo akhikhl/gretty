@@ -40,35 +40,31 @@ final class ProjectUtils {
     return overlayJars
   }
 
-  static boolean findFileInClassPath(Project project, Pattern filePattern) {
-    Set overlayJars = collectOverlayJars(project)
+  static File findFileInOutput(Project project, Pattern filePattern) {
     def findInDir
     findInDir = { File dir ->
-      dir.listFiles().find {
+      dir.listFiles().findResult {
         if(it.isFile())
-          it.path =~ filePattern
+          it.path =~ filePattern ? it : null
         else
           findInDir(it)
       }
     }
     def findIt
     findIt = { Project proj ->
-      if(proj.sourceSets.main.output.files.find { dir ->
-        boolean result = findInDir(dir)
-        log.debug 'findFileInClassPath dir: {}, result: {}', dir, result
-        result
-      })
-        return true
-      if(proj.configurations.runtime.files.findAll { !overlayJars.contains(it) }.find({ jarFile ->
-        boolean result = project.zipTree(jarFile).files.find { it.path =~ filePattern }
-        log.debug 'findFileInClassPath jar: {}, result: {}', jarFile, result
-        result
-      }))
-        return true
+      File result = proj.sourceSets.main.output.files.findResult(findInDir)
+      if(result) {
+        log.debug 'findFileInOutput filePattern: {}, result: {}', filePattern, result
+        return result
+      }
       if(proj.extensions.findByName('gretty'))
-        for(String overlay in proj.gretty.overlays.reverse())
-          if(findIt(proj.project(overlay)))
-            return true
+        for(String overlay in proj.gretty.overlays.reverse()) {
+          result = findIt(proj.project(overlay))
+          if(result) {
+            log.debug 'findFileInOutput filePattern: {}, result: {}', filePattern, result
+            return result
+          }
+        }
     }
     findIt(project)
   }

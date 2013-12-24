@@ -90,6 +90,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
       def run = { Map options ->
         project.gretty.onStart*.call()
+        File logbackConfigFile = ProjectUtils.findFileInOutput(project, ~/logback\.(xml|groovy)/)
         def json = new JsonBuilder()
         json {
           inplace options.inplace as boolean
@@ -101,10 +102,10 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           initParams ProjectUtils.getInitParameters(project)
           realmInfo ProjectUtils.getRealmInfo(project)
           projectClassPath ProjectUtils.getClassPath(project, options.inplace)
-          if(ProjectUtils.findFileInClassPath(project, ~/logback\.(xml|groovy)/))
-            project.logger.warn 'logback config file detected, gretty will not configure logback'
+          if(logbackConfigFile)
+            project.logger.info 'logback config file detected, gretty will use it'
           else {
-            project.logger.warn 'logback config file is not detected, gretty will configure logback'
+            project.logger.info 'logback config file is not detected, gretty will configure logback'
             logging {
               loggingLevel project.gretty.loggingLevel
               consoleLogEnabled project.gretty.consoleLogEnabled
@@ -123,6 +124,8 @@ abstract class GrettyPluginBase implements Plugin<Project> {
             args = [json.toString()]
             standardInput = System.in
             debug = options.debug as boolean
+            if(logbackConfigFile)
+              systemProperty 'logback.configurationFile', logbackConfigFile
           }
         } finally {
           scanman.stopScanner()
