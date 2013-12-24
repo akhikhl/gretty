@@ -19,8 +19,5 @@ repositories {
 
 apply plugin: 'java'
 apply plugin: 'war'
-
-if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
-  project.apply(plugin: org.akhikhl.gretty.GrettyPlugin)
-
+apply plugin: 'gretty'
 

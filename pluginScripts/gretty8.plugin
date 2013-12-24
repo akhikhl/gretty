@@ -8,7 +8,7 @@ buildscript {
   apply plugin: 'maven'
   
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty-plugin:+'
+    classpath 'org.akhikhl.gretty:gretty8-plugin:+'
   }
 }
 
@@ -20,7 +20,7 @@ repositories {
 apply plugin: 'java'
 apply plugin: 'war'
 
-if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
-  project.apply(plugin: org.akhikhl.gretty.GrettyPlugin)
+if (!project.plugins.findPlugin(org.akhikhl.gretty8.GrettyPlugin))
+  project.apply(plugin: org.akhikhl.gretty8.GrettyPlugin)
 
 
