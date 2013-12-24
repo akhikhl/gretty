@@ -1,7 +1,7 @@
 apply plugin: 'groovy'
 
 dependencies {
-  compile gradleApi()
   compile "ch.qos.logback:logback-classic:$logback_version"
+  compile gradleApi()
 }
 

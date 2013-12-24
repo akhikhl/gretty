@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 
 dependencies {
   compile project(':libs:gretty-plugin-commons')
-  compile "org.eclipse.jetty:jetty-util:$jetty8_version"
+  compile "org.eclipse.jetty:jetty-util:$jetty7_version"
   compile gradleApi()
 }
 

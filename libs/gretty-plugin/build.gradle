@@ -1,6 +1,5 @@
 apply plugin: 'groovy'
 
 dependencies {
-  compile project(':libs:gretty8-plugin')
+  compile project(':libs:gretty9-plugin')
 }
-

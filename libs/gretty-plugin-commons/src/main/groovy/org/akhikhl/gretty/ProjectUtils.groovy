@@ -7,8 +7,10 @@
  */
 package org.akhikhl.gretty
 
+import java.util.regex.Pattern
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTree
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -38,6 +40,30 @@ final class ProjectUtils {
     return overlayJars
   }
 
+  static boolean findFileInClassPath(Project project, Pattern filePattern) {
+    Set overlayJars = collectOverlayJars(project)
+    def findIt
+    findIt = { Project proj ->
+      if(proj.sourceSets.main.output.files.find { dir ->
+        boolean result = dir.listFiles().find { it.path =~ filePattern }
+        log.debug 'findFileInClassPath dir: {}, result: {}', dir, result
+        result
+      })
+        return true
+      if(proj.configurations.runtime.files.findAll { !overlayJars.contains(it) }.find({ jarFile ->
+        boolean result = project.zipTree(jarFile).files.find { it.path =~ filePattern }
+        log.debug 'findFileInClassPath jar: {}, result: {}', jarFile, result
+        result
+      }))
+        return true
+      if(proj.extensions.findByName('gretty'))
+        for(String overlay in proj.gretty.overlays.reverse())
+          if(findIt(proj.project(overlay)))
+            return true
+    }
+    findIt(project)
+  }
+
   static String getContextPath(Project project) {
     String contextPath = project.gretty.contextPath
     if(!contextPath)
@@ -55,41 +81,25 @@ final class ProjectUtils {
     return contextPath
   }
 
-  static FileCollection getClassPath(Project project, boolean inplace) {
+  static Set<URL> getClassPath(Project project, boolean inplace) {
     Set<URL> urls = new LinkedHashSet()
-    urls.addAll project.configurations.grettyHelperConfig.collect { it.toURI().toURL() }
     if(inplace) {
-      Set overlayJars = collectOverlayJars(project)
       def addProjectClassPath
       addProjectClassPath = { Project proj ->
         urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
-        urls.addAll proj.configurations.runtime.files.findAll { !overlayJars.contains(it) }.collect { it.toURI().toURL() }
+        urls.addAll proj.configurations.runtime.files.collect { it.toURI().toURL() }
         // ATTENTION: order of overlay classpath is important!
         if(proj.extensions.findByName('gretty'))
           for(String overlay in proj.gretty.overlays.reverse())
             addProjectClassPath(proj.project(overlay))
       }
       addProjectClassPath(project)
-    }
-    for(URL url in urls)
-      log.debug 'classpath URL: {}', url
-    return project.files(urls)
-  }
-
-  static Set<URL> getClassPath_(Project project, boolean inplace) {
-    Set<URL> urls = new LinkedHashSet()
-    if(inplace) {
-      Set overlayJars = collectOverlayJars(project)
-      def addProjectClassPath
-      addProjectClassPath = { Project proj ->
-        urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
-        urls.addAll proj.configurations.runtime.files.findAll { !overlayJars.contains(it) }.collect { it.toURI().toURL() }
-        // ATTENTION: order of overlay classpath is important!
-        if(proj.extensions.findByName('gretty'))
-          for(String overlay in proj.gretty.overlays.reverse())
-            addProjectClassPath(proj.project(overlay))
-      }
-      addProjectClassPath(project)
+      for(File overlayJar in collectOverlayJars(project))
+        if(urls.remove(overlayJar.toURI().toURL()))
+          log.debug '{} is overlay jar, exclude from classpath', overlayJar
+      for(File grettyConfigJar in project.configurations.grettyHelperConfig.files)
+        if(urls.remove(grettyConfigJar.toURI().toURL()))
+          log.debug '{} is gretty-config jar, exclude from classpath', grettyConfigJar
     }
     for(URL url in urls)
       log.debug 'classpath URL: {}', url

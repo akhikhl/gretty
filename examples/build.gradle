@@ -7,9 +7,10 @@ buildscript {
   }
   
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty6-plugin:0.0.5'
-    classpath 'org.akhikhl.gretty:gretty8-plugin:0.0.5'
-    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.5'
+    classpath 'org.akhikhl.gretty:gretty7-plugin:0.0.6'
+    classpath 'org.akhikhl.gretty:gretty8-plugin:0.0.6'
+    classpath 'org.akhikhl.gretty:gretty9-plugin:0.0.6'
+    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.6'
   }
 }
 
@@ -17,6 +18,7 @@ apply plugin: 'base' // add "clean" task to the root project.
 
 ext {
   groovy_version = '2.2.0'
+  logback_version = '1.0.13'
 }
 
 subprojects {

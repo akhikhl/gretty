@@ -1,0 +1,13 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'gretty7'
+
+gretty {
+  contextPath '/helloGrettyOverlay'
+  overlay ':helloGretty'
+  scanInterval = 1
+}
+
+war {
+  archiveName "helloGrettyOverlay.war"
+}

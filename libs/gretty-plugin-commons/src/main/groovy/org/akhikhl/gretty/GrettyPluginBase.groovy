@@ -100,24 +100,29 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           resourceBase (options.inplace ? "${project.buildDir}/inplaceWebapp" : ProjectUtils.getFinalWarPath(project).toString())
           initParams ProjectUtils.getInitParameters(project)
           realmInfo ProjectUtils.getRealmInfo(project)
-          projectClassPath ProjectUtils.getClassPath_(project, options.inplace)
+          projectClassPath ProjectUtils.getClassPath(project, options.inplace)
+          if(ProjectUtils.findFileInClassPath(project, ~$/^logback\.(xml|groovy)/$))
+            project.logger.warn 'logback config file detected, gretty will not configure logback'
+          else {
+            project.logger.warn 'logback config file is not detected, gretty will configure logback'
+            logging {
+              loggingLevel project.gretty.loggingLevel
+              consoleLogEnabled project.gretty.consoleLogEnabled
+              fileLogEnabled project.gretty.fileLogEnabled
+              logFileName project.gretty.logFileName ?: project.name
+              logDir project.gretty.logDir
+            }
+          }
         }
         ScannerManagerBase scanman = createScannerManager()
         scanman.startScanner(project, options.inplace)
         try {
           project.javaexec {
             classpath = project.configurations.grettyHelperConfig
-            //ProjectUtils.getClassPath(project, options.inplace)
             main = 'org.akhikhl.gretty.Runner'
             args = [json.toString()]
             standardInput = System.in
             debug = options.debug as boolean
-            // system properties for logback config
-            systemProperty 'loggingLevel', project.gretty.loggingLevel
-            systemProperty 'consoleLogEnabled', project.gretty.consoleLogEnabled
-            systemProperty 'fileLogEnabled', project.gretty.fileLogEnabled
-            systemProperty 'logFileName', project.gretty.logFileName ?: project.name
-            systemProperty 'logDir', project.gretty.logDir
           }
         } finally {
           scanman.stopScanner()

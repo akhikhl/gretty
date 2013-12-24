@@ -1,10 +1,11 @@
 apply plugin: 'java'
 apply plugin: 'war'
-apply plugin: 'gretty'
+apply plugin: 'gretty7'
 
 dependencies {
   compile 'commons-configuration:commons-configuration:1.9'
   compile "org.codehaus.groovy:groovy-all:$groovy_version"
+  compile "ch.qos.logback:logback-classic:$logback_version"
 }
 
 war {
@@ -12,8 +13,9 @@ war {
 }
 
 gretty {
+  contextPath = '/helloGretty'
   scanInterval = 3
-  loggingLevel = 'INFO'
+  // loggingLevel = 'INFO'
   /* onStart {
     println 'onStart'
   }

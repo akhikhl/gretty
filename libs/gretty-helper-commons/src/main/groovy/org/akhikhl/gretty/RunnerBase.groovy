@@ -26,6 +26,9 @@ abstract class RunnerBase {
 
   final void run() {
 
+    if(params.logging)
+      LoggingUtils.configureLogging(params.logging)
+
     startServer()
 
     Thread monitor = new MonitorThread(this)
