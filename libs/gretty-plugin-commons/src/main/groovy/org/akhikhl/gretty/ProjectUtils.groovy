@@ -42,10 +42,19 @@ final class ProjectUtils {
 
   static boolean findFileInClassPath(Project project, Pattern filePattern) {
     Set overlayJars = collectOverlayJars(project)
+    def findInDir
+    findInDir = { File dir ->
+      dir.listFiles().find {
+        if(it.isFile())
+          it.path =~ filePattern
+        else
+          findInDir(it)
+      }
+    }
     def findIt
     findIt = { Project proj ->
       if(proj.sourceSets.main.output.files.find { dir ->
-        boolean result = dir.listFiles().find { it.path =~ filePattern }
+        boolean result = findInDir(dir)
         log.debug 'findFileInClassPath dir: {}, result: {}', dir, result
         result
       })

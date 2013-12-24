@@ -101,7 +101,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           initParams ProjectUtils.getInitParameters(project)
           realmInfo ProjectUtils.getRealmInfo(project)
           projectClassPath ProjectUtils.getClassPath(project, options.inplace)
-          if(ProjectUtils.findFileInClassPath(project, ~$/^logback\.(xml|groovy)/$))
+          if(ProjectUtils.findFileInClassPath(project, ~/logback\.(xml|groovy)/))
             project.logger.warn 'logback config file detected, gretty will not configure logback'
           else {
             project.logger.warn 'logback config file is not detected, gretty will configure logback'
