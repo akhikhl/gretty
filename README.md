@@ -1,18 +1,19 @@
 #gretty
 
-Gradle plugin for running web-applications under jetty 8.1.8 and servlet API 3.0.1.
+Gradle plugin for running web-applications under jetty 7, 8 and 9 and servlet API 2.5, 3.0.1 and 3.1.0.
 
-**version 0.0.5**
+**version 0.0.6**
+
+New in version 0.0.6: support of [multiple jetty versions and multiple servlet API versions](#switching-between-jetty-and-servlet-API-versions).
 
 New in version 0.0.5: [debugger support](#debugger-support) and [logging](#logging).
 
 New in version 0.0.4: support of [hot deployment](#hot-deployment).
 
-Version 0.0.4 is in maven central. Version 0.0.5 will be there soon.
-
 **Content of this document**
 
 * [Usage](#usage)
+* [Switching between jetty and servlet API versions](#switching-between-jetty-and-servlet-API-versions)
 * [Supported tasks](#supported-tasks)
   * [jettyRun](#jettyrun)
   * [run](#run)
@@ -38,7 +39,6 @@ Version 0.0.4 is in maven central. Version 0.0.5 will be there soon.
 
 Add the following to "build.gradle" of your web-application:
 
-
 ```groovy
 apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 ```
@@ -53,6 +53,34 @@ apply from: 'gretty.plugin'
 ```
 
 or feel free copying (and modifying) the declarations from this script to your "build.gradle".
+
+All versions of gretty are available in maven central under the group 'org.akhikhl.gretty'.
+
+##Switching between jetty and servlet API versions
+
+'gretty.plugin' described above uses the latest version of jetty and latest version of servlet API.
+
+To use specific version of jetty and servlet API, add one of the following to "build.gradle" of your web-application (instead of 'gretty.plugin'):
+
+```groovy
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty7.plugin'
+```
+
+  This adds jetty 7.6.14.v20131031 and servlet API 2.5 to the web-application.
+
+```groovy
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty8.plugin'
+```
+
+  This adds jetty 8.1.8.v20121106 and servlet API 3.0.1 to the web-application.
+
+```groovy
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty9.plugin'
+```
+
+  This adds jetty 9.1.0.v20131115 and servlet API 3.1.0 to the web-application.
+  
+**Attention:** please *do not* add several variants of grettyX.plugin at the same time. Only one of the abovementioned plugins should be used in the same web-application.
 
 ##Supported tasks
 
