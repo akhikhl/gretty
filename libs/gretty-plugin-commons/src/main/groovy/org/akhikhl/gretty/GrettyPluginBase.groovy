@@ -21,6 +21,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
     project.configurations {
       grettyHelperConfig
+      grettyLoggingConfig
     }
 
     injectDependencies(project)
@@ -102,10 +103,12 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           initParams ProjectUtils.getInitParameters(project)
           realmInfo ProjectUtils.getRealmInfo(project)
           projectClassPath ProjectUtils.getClassPath(project, options.inplace)
-          if(logbackConfigFile)
-            project.logger.info 'logback config file detected, gretty will use it'
+          if(logbackConfigFile) {
+            project.logger.warn 'logback config file detected, gretty will use it'
+            logbackConfig logbackConfigFile.absolutePath
+          }
           else {
-            project.logger.info 'logback config file is not detected, gretty will configure logback'
+            project.logger.warn 'logback config file is not detected, gretty will configure logback'
             logging {
               loggingLevel project.gretty.loggingLevel
               consoleLogEnabled project.gretty.consoleLogEnabled
@@ -124,8 +127,8 @@ abstract class GrettyPluginBase implements Plugin<Project> {
             args = [json.toString()]
             standardInput = System.in
             debug = options.debug as boolean
-            if(logbackConfigFile)
-              systemProperty 'logback.configurationFile', logbackConfigFile
+            //if(logbackConfigFile)
+              //systemProperty 'logback.configurationFile', logbackConfigFile
           }
         } finally {
           scanman.stopScanner()

@@ -26,9 +26,6 @@ abstract class RunnerBase {
 
   final void run() {
 
-    if(params.logging)
-      LoggingUtils.configureLogging(params.logging)
-
     startServer()
 
     Thread monitor = new MonitorThread(this)
@@ -58,11 +55,17 @@ abstract class RunnerBase {
   final void startServer() {
     assert server == null
 
-    ClassLoader classLoader = new URLClassLoader(params.projectClassPath.collect { new URL(it) } as URL[], this.getClass().getClassLoader())
+    Set<URL> classpathUrls = params.projectClassPath.collect { new URL(it) } as LinkedHashSet
+
+    if(params.logging)
+      LoggingUtils.configureLogging(params.logging)
+    else if(params.logbackConfig)
+      LoggingUtils.useConfig(params.logbackConfig)
 
     server = createServer()
     configureConnectors()
 
+    ClassLoader classLoader = new URLClassLoader(classpathUrls as URL[], this.getClass().getClassLoader())
     def context = createWebAppContext(classLoader)
 
     configureRealm(context)

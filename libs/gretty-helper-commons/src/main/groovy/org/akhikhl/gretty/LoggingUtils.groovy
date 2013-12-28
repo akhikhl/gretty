@@ -12,6 +12,7 @@ import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.turbo.ReconfigureOnChangeFilter
+import ch.qos.logback.classic.util.ContextInitializer
 import ch.qos.logback.core.ConsoleAppender
 import ch.qos.logback.core.rolling.RollingFileAppender
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy
@@ -28,11 +29,12 @@ final class LoggingUtils {
     String logFileName = options.logFileName
     String logDir = options.logDir
 
+    resetLogging()
     LoggerContext logCtx = LoggerFactory.getILoggerFactory()
 
     logCtx.addTurboFilter(new ReconfigureOnChangeFilter().with {
       context = logCtx
-      refreshPeriod = 3 * 1000 // milliseconds
+      refreshPeriod = 60 * 1000 // milliseconds
       start()
       it
     })
@@ -87,5 +89,19 @@ final class LoggingUtils {
         addAppender(logFileAppender)
     }
   }
-}
 
+  private static void resetLogging() {
+    LoggerContext logCtx = LoggerFactory.getILoggerFactory()
+    logCtx.stop()
+    Map loggerCache = LoggerFactory.getILoggerFactory().@loggerCache
+    for(String loggerName in new HashSet(loggerCache.keySet()))
+      if(!loggerName.startsWith('org.eclipse.jetty'))
+        loggerCache.remove(loggerName)
+  }
+
+  static void useConfig(String logbackConfigFile) {
+    resetLogging()
+    LoggerContext logCtx = LoggerFactory.getILoggerFactory()
+    new ContextInitializer(logCtx).configureByResource(new File(logbackConfigFile).toURI().toURL())
+  }
+}

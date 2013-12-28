@@ -16,8 +16,4 @@ dependencies {
   compile "org.eclipse.jetty:jetty-webapp:$jetty7_version"
   compile "org.eclipse.jetty:jetty-security:$jetty7_version"
   compile "org.eclipse.jetty:jetty-jsp:$jetty7_version"
-  compile "ch.qos.logback:logback-classic:$logback_version"
-  compile "org.slf4j:log4j-over-slf4j:$slf4j_version"
-  compile "org.slf4j:jcl-over-slf4j:$slf4j_version"
-  compile "uk.org.lidalia:sysout-over-slf4j:1.0.2"
 }

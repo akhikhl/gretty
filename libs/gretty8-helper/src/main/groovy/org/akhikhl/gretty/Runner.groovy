@@ -7,6 +7,8 @@
  */
 package org.akhikhl.gretty
 
+import ch.qos.logback.classic.selector.servlet.ContextDetachingSCL
+import ch.qos.logback.classic.selector.servlet.LoggerContextFilter
 import groovy.json.JsonSlurper
 import org.eclipse.jetty.security.HashLoginService
 import org.eclipse.jetty.security.LoginService
@@ -15,21 +17,13 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import javax.servlet.DispatcherType
 
 final class Runner extends RunnerBase {
 
-  private static final Logger log = LoggerFactory.getLogger(Runner)
-
   static void main(String[] args) {
-    if(args.length == 0) {
-      log.error 'Arguments to Runner not specified'
-      return
-    }
-    log.trace 'Runner args: {}', args
+    assert args.length != 0
     Map params = new JsonSlurper().parseText(args[0])
-    log.trace 'Runner params: {}', params
     new Runner(params).run()
   }
 
@@ -59,6 +53,8 @@ final class Runner extends RunnerBase {
   protected createWebAppContext(ClassLoader classLoader) {
     WebAppContext context = new WebAppContext()
     context.setClassLoader(new WebAppClassLoader(classLoader, context))
+    context.addEventListener(new ContextDetachingSCL())
+    context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
   }
 }
