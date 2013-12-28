@@ -2,7 +2,9 @@
 
 Gradle plugin for running web-applications under jetty 7, 8 and 9 and servlet API 2.5, 3.0.1 and 3.1.0.
 
-**version 0.0.6**
+**version 0.0.7**
+
+New in version 0.0.7: implemented accurate re-configuration of logback loggers and appenders on hot-deployment.
 
 New in version 0.0.6: support of [multiple jetty versions and multiple servlet API versions](#switching-between-jetty-and-servlet-API-versions).
 
