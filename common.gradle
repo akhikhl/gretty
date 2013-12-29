@@ -13,7 +13,7 @@ afterEvaluate {
   group = (rootProject.ext.has('group') ? rootProject.ext.group : group)
   version = (version == 'unspecified' ? (rootProject.ext.has('version') ? rootProject.ext.version : '0.0.1') : version)
 
-  def groovy_version = rootProject.ext.has('groovy_version') ? rootProject.ext.groovy_version : '2.2.0'
+  def groovy_version = rootProject.ext.has('groovy_version') ? rootProject.ext.groovy_version : '2.2.1'
   def junit_version = rootProject.ext.has('junit_version') ? rootProject.ext.junit_version : '4.11'
   def spock_version = rootProject.ext.has('spock_version') ? rootProject.ext.spock_version : '0.7-groovy-2.0'
 
