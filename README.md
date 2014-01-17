@@ -479,3 +479,7 @@ Copyright 2013 (c) Andrey Hihlovskiy
 All versions, present and past, of gretty-plugin are licensed under MIT license:
 
 * [MIT](http://opensource.org/licenses/MIT)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
