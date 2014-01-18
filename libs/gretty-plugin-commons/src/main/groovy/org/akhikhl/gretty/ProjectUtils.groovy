@@ -161,6 +161,14 @@ final class ProjectUtils {
   }
 
   static String getJettyXml(Project project) {
+    String jettyHome = System.getenv('JETTY_HOME')
+    if(!jettyHome)
+      jettyHome = System.getProperty('jetty.home')
+    if(jettyHome != null) {
+      File file = new File(jettyHome, 'etc/jetty.xml')
+      if(file.exists())
+        return file
+    }
     return resolveFileProperty(project, 'jettyXmlFile', 'jetty.xml')
   }
 
