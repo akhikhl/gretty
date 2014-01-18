@@ -2,7 +2,7 @@
 
 Gradle plugin for running web-applications under jetty 7, 8 and 9 and servlet API 2.5, 3.0.1 and 3.1.0.
 
-**version 0.0.7**
+New in version 0.0.8: implemented support of [jetty.xml](#jettyxml-support) and [jetty-env.xml](#jetty-envxml-support)
 
 New in version 0.0.7: implemented accurate re-configuration of logback loggers and appenders on hot-deployment.
 
@@ -35,6 +35,8 @@ New in version 0.0.4: support of [hot deployment](#hot-deployment).
 * [Hot deployment](#hot-deployment)
 * [Debugger support](#debugger-support)
 * [Logging](#logging)
+* [jetty.xml support](#jettyxml-support)
+* [jetty-env.xml support](#jetty-envxml-support)
 * [Copyright and License](#copyright-and-license)
 
 ##Usage:
@@ -307,6 +309,8 @@ gretty {
   contextPath = '/myWebApp'
   initParameter 'param1', 'buildTimeEvaluationParameter'
   initParameter 'param2', { 'lazyEvaluationParameter' }
+  jettyXml 'jetty.xml'
+  jettyEnvXml 'jetty-env.xml'
   realm 'auth'
   realmConfigFile 'WEB-INF/jetty-realm.properties'
   onStart {
@@ -344,6 +348,10 @@ to some other servlet container, you'll have to define context path by means of 
 
 "initParameter" defines web-application initialization parameter. It has the same meaning/effect, 
 as /web-app/servlet/init-param element in "web.xml". You can specify more than one initParameter.
+
+"jettyXml" defines name and/or location of "jetty.xml" file. See more information in chapter [jetty.xml support](#jettyxml-support).
+
+"jettyEnvXml" defines name and/or location of "jetty-env.xml" file. See more information in chapter [jetty-env.xml support](#jetty-envxml-support).
 
 "realm" defines security realm for the given web-application. See more information in chapter [Security Realms](#security-realms).
 
@@ -472,9 +480,98 @@ You can fine-tune gretty logging by adjusting the following parameters [of grett
 
 "logDir" defines directory, where log file is created. It is a string, default value is "${System.getProperty('user.home')}/logs".
 
+##jetty.xml support
+
+"jetty.xml" is the configuration file for Jetty (for server itself, not for web-application).
+
+The purpose and syntax of "jetty.xml" is documented on [this page](http://wiki.eclipse.org/Jetty/Reference/jetty.xml).
+
+Gretty recognizes and supports "jetty.xml". As soon as Gretty finds existing "jetty.xml" file,
+it reads the file and uses it to configure jetty server.
+Even if "jetty.xml" is not found, gretty still works - with reasonable defaults
+and possible configuration in gretty extension object.
+
+By convension gretty looks for the file name "jetty.xml". You can (but you don't have to) change the file name
+by specifying property "jettyXml" in gretty extension object:
+
+```groovy
+gretty {
+  // ...
+  jettyXml = 'someFile.xml'
+  // ...
+}
+```
+
+If explicitly defined jettyXml represents an absolute path, gretty will try to use just that.
+
+If implicitly or explicitly defined jettyXml represents a relative path, gretty tries 
+to find corresponding existing file in the following directories:
+
+- $JETTY_HOME/etc
+
+- $project.projectDir
+
+- $project.webAppDir/WEB-INF
+
+- $project.buildDir/classes
+
+- $project.buildDir/resources
+
+- recursively in all abovementioned folders of the referenced overlay projects (if any)
+
+Gretty sources contain example programs demonstrating integration of "jetty.xml" at work:
+
+- [examples/testJettyXml7](https://github.com/akhikhl/gretty/tree/master/examples/testJettyXml7)
+
+- [examples/testJettyXml8](https://github.com/akhikhl/gretty/tree/master/examples/testJettyXml8)
+
+- [examples/testJettyXml9](https://github.com/akhikhl/gretty/tree/master/examples/testJettyXml9)
+
+##jetty-env.xml support
+
+"jetty-env.xml" jetty-env.xml is an optional Jetty file that configures individual webapp. 
+The format of jetty-web.xml is the same as jetty.xml - it is an XML mapping of the Jetty API. 
+
+The purpose and syntax of "jetty-env.xml" is documented on [this page](http://wiki.eclipse.org/Jetty/Reference/jetty-env.xml).
+
+Gretty recognizes and supports "jetty-env.xml". As soon as Gretty finds existing "jetty-env.xml" file,
+it reads the file and uses it to configure jetty webapp.
+Even if "jetty-env.xml" is not found, gretty still works - with reasonable defaults
+and possible configuration in gretty extension object.
+
+By convension gretty looks for the file name "jetty-env.xml". You can (but you don't have to) change the file name
+by specifying property "jettyEnvXml" in gretty extension object:
+
+```groovy
+gretty {
+  // ...
+  jettyEnvXml = 'someFile.xml'
+  // ...
+}
+```
+
+If explicitly defined jettyEnvXml represents an absolute path, gretty will try to use just that.
+
+If implicitly or explicitly defined jettyEnvXml represents a relative path, gretty tries 
+to find corresponding existing file in the following directories:
+
+- $project.projectDir
+
+- $project.webAppDir/WEB-INF
+
+- $project.buildDir/classes
+
+- $project.buildDir/resources
+
+- recursively in all abovementioned folders of the referenced overlay projects (if any)
+
+Gretty sources contain example program demonstrating integration of "jetty-env.xml" at work:
+
+- [examples/testJettyEnvXml](https://github.com/akhikhl/gretty/tree/master/examples/testJettyEnvXml)
+
 ##Copyright and License
 
-Copyright 2013 (c) Andrey Hihlovskiy
+Copyright 2013-2014 (c) Andrey Hihlovskiy
 
 All versions, present and past, of gretty-plugin are licensed under MIT license:
 
