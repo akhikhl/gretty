@@ -1,0 +1,26 @@
+buildscript {
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+
+  apply plugin: 'maven'
+  
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty7-plugin:0.0.7'
+  }
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+apply plugin: 'java'
+apply plugin: 'war'
+
+if (!project.plugins.findPlugin(org.akhikhl.gretty7.GrettyPlugin))
+  project.apply(plugin: org.akhikhl.gretty7.GrettyPlugin)
+
+
