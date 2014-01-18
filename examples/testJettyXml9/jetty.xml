@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+  <Get name="ThreadPool">
+    <Set name="minThreads">10</Set>
+    <Set name="maxThreads">2000</Set>
+    <Set name="detailedDump">false</Set>
+  </Get>
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.eclipse.jetty.server.ServerConnector">
+        <Arg name="server"><Ref refid="Server"/></Arg>
+        <Set name="port">7777</Set>
+      </New>  
+    </Arg>
+  </Call>
+</Configure>

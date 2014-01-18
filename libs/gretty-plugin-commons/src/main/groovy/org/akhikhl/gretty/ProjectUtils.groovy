@@ -40,7 +40,7 @@ final class ProjectUtils {
     return overlayJars
   }
 
-  static File findFileInOutput(Project project, Pattern filePattern) {
+  static File findFileInOutput(Project project, Pattern filePattern, boolean searchOverlays = true) {
     def findInDir
     findInDir = { File dir ->
       dir.listFiles().findResult {
@@ -57,7 +57,7 @@ final class ProjectUtils {
         log.debug 'findFileInOutput filePattern: {}, result: {}', filePattern, result
         return result
       }
-      if(proj.extensions.findByName('gretty'))
+      if(searchOverlays && proj.extensions.findByName('gretty'))
         for(String overlay in proj.gretty.overlays.reverse()) {
           result = findIt(proj.project(overlay))
           if(result) {
@@ -160,6 +160,14 @@ final class ProjectUtils {
     return new RealmInfo(realm: realm, realmConfigFile: realmConfigFile)
   }
 
+  static String getJettyXml(Project project) {
+    return resolveFileProperty(project, 'jettyXmlFile', 'jetty.xml')
+  }
+
+  static String getJettyEnvXml(Project project) {
+    return resolveFileProperty(project, 'jettyEnvXmlFile', 'jetty-env.xml')
+  }
+
   static void prepareInplaceWebAppFolder(Project project) {
     // ATTENTION: overlay copy order is important!
     for(String overlay in project.gretty.overlays)
@@ -187,5 +195,37 @@ final class ProjectUtils {
       into "${project.buildDir}/explodedWebapp"
     }
   }
-}
 
+  private static String resolveFileProperty(Project project, String propertyName, defaultValue = null) {
+    def file = project.gretty[propertyName]
+    if(file == null)
+      file = defaultValue
+    if(file != null) {
+      if(!(file instanceof File))
+        file = new File(file)
+      if(file.isAbsolute())
+        return file.absolutePath
+      File f = new File(project.projectDir, file.path)
+      if(f.exists())
+        return f.absolutePath
+      f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
+      if(f.exists())
+        return f.absolutePath
+      f = findFileInOutput(project, Pattern.compile(file.path), false)
+      if(f != null && f.exists())
+        return f.absolutePath
+    }
+    for(def overlay in project.gretty.overlays.reverse()) {
+      overlay = project.project(overlay)
+      if(overlay.extensions.findByName('gretty')) {
+        File f = resolveFileProperty(overlay, propertyName, defaultValue)
+        if(f)
+          return file
+      } else
+        log.warn 'Project {} is not gretty-enabled, could not extract \'{}\'', overlay, propertyName
+    }
+    if(project.gretty[propertyName] != null && project.gretty[propertyName] != defaultValue)
+      log.warn 'Could not find file \'{}\' specified in \'{}\'', file.path, propertyName
+    return null
+  }
+}

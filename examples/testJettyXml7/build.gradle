@@ -1,0 +1,13 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'gretty7'
+
+dependencies {
+  compile 'commons-configuration:commons-configuration:1.9'
+  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+}
+
+war {
+  archiveName 'testJettyXml7.war'
+}
+

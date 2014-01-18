@@ -17,7 +17,9 @@ class GrettyPluginExtension {
   String contextPath
   Map initParameters = [:]
   String realm
-  String realmConfigFile
+  def realmConfigFile
+  def jettyXmlFile
+  def jettyEnvXmlFile
   List overlays = []
   List<Closure> onStart = []
   List<Closure> onStop = []

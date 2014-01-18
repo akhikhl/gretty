@@ -11,10 +11,15 @@ abstract class RunnerBase {
 
   protected final Map params
   protected server
+  protected contextPath
 
   RunnerBase(Map params) {
     this.params = params
   }
+
+  protected abstract void applyJettyEnvXml(webAppContext)
+
+  protected abstract void applyJettyXml()
 
   protected abstract void configureConnectors()
 
@@ -23,6 +28,8 @@ abstract class RunnerBase {
   protected abstract createServer()
 
   protected abstract createWebAppContext(ClassLoader classLoader)
+
+  protected abstract int getServerPort()
 
   final void run() {
 
@@ -33,7 +40,7 @@ abstract class RunnerBase {
 
     System.out.println 'Jetty server started.'
     System.out.println 'You can see web-application in browser under the address:'
-    System.out.println "http://localhost:${params.port}${params.contextPath}"
+    System.out.println "http://localhost:${getServerPort()}${contextPath}"
 
     if(params.interactive)
       System.out.println 'Press any key to stop the jetty server.'
@@ -63,23 +70,29 @@ abstract class RunnerBase {
       LoggingUtils.useConfig(params.logbackConfig)
 
     server = createServer()
+    applyJettyXml()
     configureConnectors()
 
     ClassLoader classLoader = new URLClassLoader(classpathUrls as URL[], this.getClass().getClassLoader())
     def context = createWebAppContext(classLoader)
 
+    applyJettyEnvXml(context)
     configureRealm(context)
 
-    context.setContextPath(params.contextPath)
+    if(params.contextPath != null)
+      context.setContextPath(params.contextPath)
+    contextPath = context.getContextPath()
 
     params.initParams?.each { key, value ->
       context.setInitParameter(key, value)
     }
 
-    if(params.inplace)
-      context.setResourceBase(params.resourceBase)
-    else
-      context.setWar(params.resourceBase)
+    if(params.resourceBase != null) {
+      if(params.inplace)
+        context.setResourceBase(params.resourceBase)
+      else
+        context.setWar(params.resourceBase)
+    }
 
     context.setServer(server)
     server.setHandler(context)

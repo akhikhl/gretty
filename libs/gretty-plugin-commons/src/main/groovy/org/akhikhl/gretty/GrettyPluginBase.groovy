@@ -102,13 +102,15 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           resourceBase (options.inplace ? "${project.buildDir}/inplaceWebapp" : ProjectUtils.getFinalWarPath(project).toString())
           initParams ProjectUtils.getInitParameters(project)
           realmInfo ProjectUtils.getRealmInfo(project)
+          jettyXml ProjectUtils.getJettyXml(project)
+          jettyEnvXml ProjectUtils.getJettyEnvXml(project)
           projectClassPath ProjectUtils.getClassPath(project, options.inplace)
           if(logbackConfigFile) {
             project.logger.warn 'logback config file detected, gretty will use it'
             logbackConfig logbackConfigFile.absolutePath
           }
           else {
-            project.logger.warn 'logback config file is not detected, gretty will configure logback'
+            project.logger.info 'logback config file is not detected, gretty will configure logback'
             logging {
               loggingLevel project.gretty.loggingLevel
               consoleLogEnabled project.gretty.consoleLogEnabled
@@ -118,6 +120,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
             }
           }
         }
+        project.logger.info json.toPrettyString()
         ScannerManagerBase scanman = createScannerManager()
         scanman.startScanner(project, options.inplace)
         try {
