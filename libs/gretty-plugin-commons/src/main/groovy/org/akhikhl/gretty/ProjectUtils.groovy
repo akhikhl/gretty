@@ -82,7 +82,6 @@ final class ProjectUtils {
         } else
           log.warn 'Project {} is not gretty-enabled, could not extract it\'s context path', overlay
       }
-    contextPath = contextPath ?: "/${project.name}"
     return contextPath
   }
 

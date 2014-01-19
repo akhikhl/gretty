@@ -94,6 +94,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
         File logbackConfigFile = ProjectUtils.findFileInOutput(project, ~/logback\.(xml|groovy)/)
         def json = new JsonBuilder()
         json {
+          projectName project.name
           inplace options.inplace as boolean
           interactive options.interactive as boolean
           port project.gretty.port

@@ -79,8 +79,14 @@ abstract class RunnerBase {
     applyJettyEnvXml(context)
     configureRealm(context)
 
-    if(params.contextPath != null)
+    if(params.contextPath == null) {
+      if(context.getContextPath() == '/')
+        context.setContextPath('/' + params.projectName)
+    } else if(params.contextPath.startsWith('/'))
       context.setContextPath(params.contextPath)
+    else
+      context.setContextPath('/' + params.contextPath)
+
     contextPath = context.getContextPath()
 
     params.initParams?.each { key, value ->
