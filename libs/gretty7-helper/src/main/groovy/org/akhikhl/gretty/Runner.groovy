@@ -33,6 +33,26 @@ final class Runner extends RunnerBase {
     super(params)
   }
 
+  protected void addConfigurationClasses(webAppContext) {
+    List configClasses = webAppContext.getConfigurationClasses() as List
+    int idx = configClasses.indexOf(org.eclipse.jetty.webapp.FragmentConfiguration)
+    if(idx < 0)
+      idx = configClasses.size()
+    System.out.println "DBG idx=$idx"
+    configClasses.addAll(idx, [org.eclipse.jetty.plus.webapp.EnvConfiguration, org.eclipse.jetty.plus.webapp.PlusConfiguration])
+    idx = configClasses.indexOf(org.eclipse.jetty.webapp.JettyWebXmlConfiguration)
+    if(idx < 0)
+      idx = configClasses.size() + 1
+    System.out.println "DBG idx=$idx"
+    configClasses.add(idx - 1, org.eclipse.jetty.annotations.AnnotationConfiguration)
+    webAppContext.setConfigurationClasses(configClasses)
+  }
+
+  protected void applyContainerIncludeJarPattern(webAppContext) {
+    if(!webAppContext.getAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern'))
+      webAppContext.setAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern', '.*/classes/.*')
+  }
+
   protected void applyJettyEnvXml(webAppContext) {
     if(params.jettyEnvXml != null) {
       System.out.println "Configuring webAppContext from ${params.jettyEnvXml}"

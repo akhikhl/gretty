@@ -17,6 +17,7 @@ import org.eclipse.jetty.server.HttpConnectionFactory
 import org.eclipse.jetty.server.NetworkConnector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
+import org.eclipse.jetty.webapp.Configuration
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.xml.XmlConfiguration
@@ -33,6 +34,17 @@ final class Runner extends RunnerBase {
 
   private Runner(Map params) {
     super(params)
+  }
+
+  protected void addConfigurationClassesToServer() {
+    Configuration.ClassList classlist = org.eclipse.jetty.webapp.Configuration.ClassList.setServerDefault(server)
+    classlist.addAfter('org.eclipse.jetty.webapp.FragmentConfiguration', 'org.eclipse.jetty.plus.webapp.EnvConfiguration', 'org.eclipse.jetty.plus.webapp.PlusConfiguration')
+    classlist.addBefore('org.eclipse.jetty.webapp.JettyWebXmlConfiguration', 'org.eclipse.jetty.annotations.AnnotationConfiguration')
+  }
+
+  protected void applyContainerIncludeJarPattern(webAppContext) {
+    if(!webAppContext.getAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern'))
+      webAppContext.setAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern', '.*/classes/.*')
   }
 
   protected void applyJettyEnvXml(webAppContext) {

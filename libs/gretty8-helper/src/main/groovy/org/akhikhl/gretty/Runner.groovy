@@ -15,6 +15,8 @@ import org.eclipse.jetty.security.LoginService
 import org.eclipse.jetty.server.Connector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
+import org.eclipse.jetty.util.resource.FileResource
+import org.eclipse.jetty.webapp.Configuration
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.xml.XmlConfiguration
@@ -31,6 +33,35 @@ final class Runner extends RunnerBase {
 
   private Runner(Map params) {
     super(params)
+  }
+
+  protected void addConfigurationClasses(webAppContext) {
+    /* List configClasses = webAppContext.getConfigurationClasses() as List
+    int idx = configClasses.indexOf('org.eclipse.jetty.webapp.FragmentConfiguration')
+    if(idx < 0)
+      idx = configClasses.size() - 1
+    configClasses.addAll(idx + 1, ['org.eclipse.jetty.plus.webapp.EnvConfiguration', 'org.eclipse.jetty.plus.webapp.PlusConfiguration'])
+    idx = configClasses.indexOf('org.eclipse.jetty.webapp.JettyWebXmlConfiguration')
+    if(idx < 0)
+      idx = configClasses.size()
+    configClasses.add(idx, 'org.eclipse.jetty.annotations.AnnotationConfiguration')
+    webAppContext.setConfigurationClasses(configClasses as String[]) */
+    webAppContext.setConfigurations([
+      new org.eclipse.jetty.webapp.WebInfConfiguration(),
+      new org.eclipse.jetty.webapp.WebXmlConfiguration(),
+      new org.eclipse.jetty.webapp.MetaInfConfiguration(),
+      new org.eclipse.jetty.webapp.FragmentConfiguration(),
+      new org.eclipse.jetty.plus.webapp.EnvConfiguration(),
+      new org.eclipse.jetty.plus.webapp.PlusConfiguration(),
+      new AnnotationConfigurationEx(),
+      new org.eclipse.jetty.webapp.JettyWebXmlConfiguration()
+    ] as Configuration[])
+  }
+
+  protected void applyContainerIncludeJarPattern(webAppContext) {
+    //webAppContext.getMetaData().addContainerResource(new FileResource(new File("build/classes").toURI().toURL()))
+    //if(!webAppContext.getAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern'))
+      //webAppContext.setAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern', '.*/classes/.*')
   }
 
   protected void applyJettyEnvXml(webAppContext) {

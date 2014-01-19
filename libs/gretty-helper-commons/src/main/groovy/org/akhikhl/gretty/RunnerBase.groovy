@@ -17,6 +17,14 @@ abstract class RunnerBase {
     this.params = params
   }
 
+  protected void addConfigurationClasses(webAppContext) {
+  }
+
+  protected void addConfigurationClassesToServer() {
+  }
+
+  protected abstract void applyContainerIncludeJarPattern(webAppContext)
+
   protected abstract void applyJettyEnvXml(webAppContext)
 
   protected abstract void applyJettyXml()
@@ -71,12 +79,14 @@ abstract class RunnerBase {
 
     server = createServer()
     applyJettyXml()
+    addConfigurationClassesToServer()
     configureConnectors()
 
     ClassLoader classLoader = new URLClassLoader(classpathUrls as URL[], this.getClass().getClassLoader())
     def context = createWebAppContext(classLoader)
-
+    addConfigurationClasses(context)
     applyJettyEnvXml(context)
+    applyContainerIncludeJarPattern(context)
     configureRealm(context)
 
     if(params.contextPath == null) {

@@ -14,4 +14,6 @@ dependencies {
   compile "org.eclipse.jetty:jetty-webapp:$jetty8_version"
   compile "org.eclipse.jetty:jetty-security:$jetty8_version"
   compile "org.eclipse.jetty:jetty-jsp:$jetty8_version"
+  compile "org.eclipse.jetty:jetty-annotations:$jetty8_version"
+  compile "org.eclipse.jetty:jetty-plus:$jetty8_version"
 }
