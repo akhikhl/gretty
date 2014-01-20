@@ -2,7 +2,9 @@
 
 Gradle plugin for running web-applications under jetty 7, 8 and 9 and servlet API 2.5, 3.0.1 and 3.1.0.
 
-New in version 0.0.8: implemented support of [jetty.xml](#jettyxml-support) and [jetty-env.xml](#jetty-envxml-support)
+New in version 0.0.9: out-of-the-box [JEE annotations support](#jee-annotations-support), bug-fixes.
+
+New in version 0.0.8: implemented support of [jetty.xml](#jettyxml-support) and [jetty-env.xml](#jetty-envxml-support).
 
 New in version 0.0.7: implemented accurate re-configuration of logback loggers and appenders on hot-deployment.
 
@@ -37,6 +39,7 @@ New in version 0.0.4: support of [hot deployment](#hot-deployment).
 * [Logging](#logging)
 * [jetty.xml support](#jettyxml-support)
 * [jetty-env.xml support](#jetty-envxml-support)
+* [JEE annotations support](#jee-annotations-support)
 * [Copyright and License](#copyright-and-license)
 
 ##Usage:
@@ -568,6 +571,52 @@ to find corresponding existing file in the following directories:
 Gretty sources contain example program demonstrating integration of "jetty-env.xml" at work:
 
 - [examples/testJettyEnvXml](https://github.com/akhikhl/gretty/tree/master/examples/testJettyEnvXml)
+
+##JEE annotations support
+
+Gretty supports JEE annotations out-of-the-box. That means: you don't have to configure anything,
+you just use JEE annotations in the web-application:
+
+```java
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet( name="AnnotatedServlet", displayName="Annotated Servlet", urlPatterns = {"/annotations/*"}, loadOnStartup=1)
+public class ExampleServlet extends HttpServlet {
+
+  private static final long serialVersionUID = -6506276378398106663L;
+
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    // doGet implementation
+  }
+}
+```
+
+Note that jetty-7 flavor of gretty does not support JEE annotations, since it is using servlet-api 2.5.
+
+jetty-8 and jetty-9 flavors of gretty support JEE annotations in the current web-application
+and in it's overlays (if any).
+
+Normally gretty looks for JEE-annotated classes in "build/classes" directories belonging to the web-application
+classpath. You can change this behavior by inserting the following into "jetty-env.xml":
+
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure class="org.eclipse.jetty.webapp.WebAppContext"> 
+  <Call name="setContextAttribute">
+    <Arg>org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern</Arg>
+    <Arg>.*/foo-[^/]*\.jar$|.*/bar-[^/]*\.jar$|.*/classes/.*</Arg>
+  </Call>
+</Configure>
+```
+
+in the example above we specify, that gretty should scan for annotations any jar whose name starts with "foo-" or "bar-", or a directory named "classes".
 
 ##Copyright and License
 
