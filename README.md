@@ -1,3 +1,7 @@
+[![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty)
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
 #gretty
 
 Gradle plugin for running web-applications under jetty 7, 8 and 9 and servlet API 2.5, 3.0.1 and 3.1.0.
@@ -626,6 +630,4 @@ All versions, present and past, of gretty-plugin are licensed under MIT license:
 
 * [MIT](http://opensource.org/licenses/MIT)
 
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
