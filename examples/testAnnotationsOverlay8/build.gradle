@@ -1,0 +1,8 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'gretty8'
+
+gretty {
+  overlay ':testAnnotations8'
+}
+

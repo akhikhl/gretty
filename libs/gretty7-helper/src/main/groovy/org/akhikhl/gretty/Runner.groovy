@@ -17,6 +17,7 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
+import org.eclipse.jetty.webapp.Configuration
 import org.eclipse.jetty.xml.XmlConfiguration
 
 import org.eclipse.jetty.server.DispatcherType
@@ -31,26 +32,6 @@ final class Runner extends RunnerBase {
 
   private Runner(Map params) {
     super(params)
-  }
-
-  protected void addConfigurationClasses(webAppContext) {
-    List configClasses = webAppContext.getConfigurationClasses() as List
-    int idx = configClasses.indexOf(org.eclipse.jetty.webapp.FragmentConfiguration)
-    if(idx < 0)
-      idx = configClasses.size()
-    System.out.println "DBG idx=$idx"
-    configClasses.addAll(idx, [org.eclipse.jetty.plus.webapp.EnvConfiguration, org.eclipse.jetty.plus.webapp.PlusConfiguration])
-    idx = configClasses.indexOf(org.eclipse.jetty.webapp.JettyWebXmlConfiguration)
-    if(idx < 0)
-      idx = configClasses.size() + 1
-    System.out.println "DBG idx=$idx"
-    configClasses.add(idx - 1, org.eclipse.jetty.annotations.AnnotationConfiguration)
-    webAppContext.setConfigurationClasses(configClasses)
-  }
-
-  protected void applyContainerIncludeJarPattern(webAppContext) {
-    if(!webAppContext.getAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern'))
-      webAppContext.setAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern', '.*/classes/.*')
   }
 
   protected void applyJettyEnvXml(webAppContext) {

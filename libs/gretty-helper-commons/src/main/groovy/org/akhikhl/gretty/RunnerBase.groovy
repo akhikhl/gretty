@@ -23,7 +23,8 @@ abstract class RunnerBase {
   protected void addConfigurationClassesToServer() {
   }
 
-  protected abstract void applyContainerIncludeJarPattern(webAppContext)
+  protected void applyContainerIncludeJarPattern(webAppContext) {
+  }
 
   protected abstract void applyJettyEnvXml(webAppContext)
 
