@@ -4,6 +4,8 @@
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
+[![endorse](https://api.coderwall.com/akhikhl/endorsecount.png)](https://coderwall.com/akhikhl)
+
 #gretty
 
 Gradle plugin for running web-applications under jetty 7, 8 and 9 and servlet API 2.5, 3.0.1 and 3.1.0.
