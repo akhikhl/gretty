@@ -7,7 +7,7 @@
  */
 package org.akhikhl.gretty
 
-import javax.annotation.Resource
+import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.annotations.AbstractDiscoverableAnnotationHandler
 import org.eclipse.jetty.annotations.AnnotationConfiguration
 import org.eclipse.jetty.annotations.AnnotationDecorator
@@ -22,82 +22,80 @@ import org.eclipse.jetty.webapp.WebAppContext
 
 class AnnotationConfigurationEx extends AnnotationConfiguration {
 
+  private final Set<String> classPath
+
+  AnnotationConfigurationEx(List<String> classPath) {
+    this.classPath = classPath as LinkedHashSet
+  }
+
   @Override
-  public void configure(WebAppContext context) throws Exception {
-    boolean metadataComplete = context.getMetaData().isMetaDataComplete();
-    context.addDecorator(new AnnotationDecorator(context));
+  public void configure(WebAppContext context) {
+
+    context.addDecorator(new AnnotationDecorator(context))
 
     //Even if metadata is complete, we still need to scan for ServletContainerInitializers - if there are any
-    AnnotationParser parser = null;
-    if (!metadataComplete) {
+    if (!context.getMetaData().isMetaDataComplete()) {
       //If metadata isn't complete, if this is a servlet 3 webapp or isConfigDiscovered is true, we need to search for annotations
       if (context.getServletContext().getEffectiveMajorVersion() >= 3 || context.isConfigurationDiscovered()) {
-        _discoverableAnnotationHandlers.add(new WebServletAnnotationHandler(context));
-        _discoverableAnnotationHandlers.add(new WebFilterAnnotationHandler(context));
-        _discoverableAnnotationHandlers.add(new WebListenerAnnotationHandler(context));
+        _discoverableAnnotationHandlers.add(new WebServletAnnotationHandler(context))
+        _discoverableAnnotationHandlers.add(new WebFilterAnnotationHandler(context))
+        _discoverableAnnotationHandlers.add(new WebListenerAnnotationHandler(context))
       }
     }
 
     //Regardless of metadata, if there are any ServletContainerInitializers with @HandlesTypes, then we need to scan all the
     //classes so we can call their onStartup() methods correctly
-    createServletContainerInitializerAnnotationHandlers(context, getNonExcludedInitializers(context));
+    createServletContainerInitializerAnnotationHandlers(context, getNonExcludedInitializers(context))
 
     if (!_discoverableAnnotationHandlers.isEmpty() || _classInheritanceHandler != null || !_containerInitializerAnnotationHandlers.isEmpty()) {
-      parser = createAnnotationParser();
 
-      parse(context, parser);
+      parseAnnotations(context)
 
-      for (DiscoverableAnnotationHandler h:_discoverableAnnotationHandlers)
-        context.getMetaData().addDiscoveredAnnotations(((AbstractDiscoverableAnnotationHandler)h).getAnnotationList());
+      for (DiscoverableAnnotationHandler h : _discoverableAnnotationHandlers)
+        context.getMetaData().addDiscoveredAnnotations(h.getAnnotationList())
     }
   }
 
-  private void parse(final WebAppContext context, AnnotationParser parser) throws Exception {
-    List<Resource> _resources = getResources(getClass().getClassLoader());
+  private void parseAnnotations(WebAppContext context) {
 
-    for (Resource _resource : _resources) {
-      if (_resource == null)
-        return;
+    def containerIncludeJarPattern = context.getAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern')
+    if(containerIncludeJarPattern)
+      containerIncludeJarPattern = java.util.regex.Pattern.compile(containerIncludeJarPattern)
 
-      parser.clearHandlers();
-      for (DiscoverableAnnotationHandler h:_discoverableAnnotationHandlers) {
+    AnnotationParser parser = createAnnotationParser()
+
+    for(String classPathElem in classPath) {
+      URL url = new URL(classPathElem)
+      Resource res = Resource.newResource(url)
+      if (res == null)
+        continue
+      if(containerIncludeJarPattern != null && !(url.toString() =~ containerIncludeJarPattern))
+        continue
+
+      parser.clearHandlers()
+      for (DiscoverableAnnotationHandler h : _discoverableAnnotationHandlers)
         if (h instanceof AbstractDiscoverableAnnotationHandler)
-          ((AbstractDiscoverableAnnotationHandler)h).setResource(null); //
-      }
+          ((AbstractDiscoverableAnnotationHandler)h).setResource(null)
 
-      parser.registerHandlers(_discoverableAnnotationHandlers);
-      parser.registerHandler(_classInheritanceHandler);
-      parser.registerHandlers(_containerInitializerAnnotationHandlers);
+      parser.registerHandlers(_discoverableAnnotationHandlers)
+      parser.registerHandler(_classInheritanceHandler)
+      parser.registerHandlers(_containerInitializerAnnotationHandlers)
 
-      parser.parse(_resource,
+      parser.parse(res,
         new ClassNameResolver() {
-          public boolean isExcluded (String name)
-          {
-            if (context.isSystemClass(name)) return true;
-            if (context.isServerClass(name)) return false;
-            return false;
+
+          @Override
+          public boolean isExcluded (String name) {
+            return context.isSystemClass(name)
           }
 
-          public boolean shouldOverride (String name)
-          {
+          @Override
+          public boolean shouldOverride (String name) {
             //looking at webapp classpath, found already-parsed class of same name - did it come from system or duplicate in webapp?
-            if (context.isParentLoaderPriority())
-            return false;
-            return true;
+            return !context.isParentLoaderPriority()
           }
-      });
+      })
     }
-  }
-
-  private List<Resource> getResources(ClassLoader aLoader) throws IOException {
-    if (aLoader instanceof URLClassLoader) {
-      List<Resource> _result = new ArrayList<Resource>();
-      URL[] _urls = ((URLClassLoader)aLoader).getURLs();
-      for (URL _url : _urls)
-        _result.add(Resource.newResource(_url));
-      return _result;
-    }
-    return Collections.emptyList();
   }
 }
 
