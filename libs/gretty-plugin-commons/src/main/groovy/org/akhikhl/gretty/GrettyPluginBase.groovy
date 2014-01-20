@@ -122,13 +122,16 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           }
         }
         project.logger.info json.toPrettyString()
+        json = json.toString()
+        if(System.getProperty("os.name") =~ /(?i).*windows.*/)
+          json = json.replace('"', '\\"')
         ScannerManagerBase scanman = createScannerManager()
         scanman.startScanner(project, options.inplace)
         try {
           project.javaexec {
             classpath = project.configurations.grettyHelperConfig
             main = 'org.akhikhl.gretty.Runner'
-            args = [json.toString()]
+            args = [json]
             standardInput = System.in
             debug = options.debug as boolean
             //if(logbackConfigFile)
