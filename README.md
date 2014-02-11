@@ -8,7 +8,7 @@ New in version 0.0.8: implemented support of [jetty.xml](#jettyxml-support) and 
 
 New in version 0.0.7: implemented accurate re-configuration of logback loggers and appenders on hot-deployment.
 
-New in version 0.0.6: support of [multiple jetty versions and multiple servlet API versions](#switching-between-jetty-and-servlet-API-versions).
+New in version 0.0.6: support of [multiple jetty versions and multiple servlet API versions](#switching-between-jetty-and-servlet-api-versions).
 
 New in version 0.0.5: [debugger support](#debugger-support) and [logging](#logging).
 
@@ -17,7 +17,7 @@ New in version 0.0.4: support of [hot deployment](#hot-deployment).
 **Content of this document**
 
 * [Usage](#usage)
-* [Switching between jetty and servlet API versions](#switching-between-jetty-and-servlet-API-versions)
+* [Switching between jetty and servlet API versions](#switching-between-jetty-and-servlet-api-versions)
 * [Supported tasks](#supported-tasks)
   * [jettyRun](#jettyrun)
   * [run](#run)
