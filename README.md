@@ -1,23 +1,15 @@
-#gretty [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![endorse](https://api.coderwall.com/akhikhl/endorsecount.png)](https://coderwall.com/akhikhl)
+[![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![endorse](https://api.coderwall.com/akhikhl/endorsecount.png)](https://coderwall.com/akhikhl)
 
-Gradle plugin for running web-applications under jetty 7, 8 and 9 and servlet API 2.5, 3.0.1 and 3.1.0.
+# Gretty Version 0.0.10 
 
-New in version 0.0.9: out-of-the-box [JEE annotations support](#jee-annotations-support), bug-fixes.
+**Gretty** is a [feature-rich](#main-features) gradle plugin for running web-applications under jetty.
 
-New in version 0.0.8: implemented support of [jetty.xml](#jettyxml-support) and [jetty-env.xml](#jetty-envxml-support).
+### Content of this document:
 
-New in version 0.0.7: implemented accurate re-configuration of logback loggers and appenders on hot-deployment.
-
-New in version 0.0.6: support of [multiple jetty versions and multiple servlet API versions](#switching-between-jetty-and-servlet-api-versions).
-
-New in version 0.0.5: [debugger support](#debugger-support) and [logging](#logging).
-
-New in version 0.0.4: support of [hot deployment](#hot-deployment).
-
-**Content of this document**
-
+* [Main features](#main-features)
+* [What's new](whatsnew.md)
 * [Usage](#usage)
-* [Switching between jetty and servlet API versions](#switching-between-jetty-and-servlet-api-versions)
+* [Switching between jetty and servlet-API versions](#switching-between-jetty-and-servlet-api-versions)
 * [Supported tasks](#supported-tasks)
   * [jettyRun](#jettyrun)
   * [run](#run)
@@ -42,7 +34,28 @@ New in version 0.0.4: support of [hot deployment](#hot-deployment).
 * [JEE annotations support](#jee-annotations-support)
 * [Copyright and License](#copyright-and-license)
 
-##Usage:
+## Main features:
+
+* [Easy switch between jetty and servlet-API versions](#switching-between-jetty-and-servlet-api-versions). 
+  Gretty supports jetty 7, 8 and 9 and servlet API 2.5, 3.0.1 and 3.1.0.
+  
+* [WAR Overlays](#war-overlays). Gretty can generate WAR overlays automatically, each time you build your project.
+
+* [Security Realms](#security-realms). Gretty supports jetty security realms.
+
+* [Hot deployment](#hot-deployment). Gretty accurately reloads your web-application, as soon as assets or compiled classes have changed.
+
+* [Debugger support](#debugger-support). Gretty integrates nicely with Java IDE debuggers.
+
+* [Logging](#logging). Gretty incorporates logback logging, although it does not force it on your web-application.
+
+* [jetty.xml support](#jettyxml-support). Gretty automatically uses jetty.xml, if it's present.
+
+* [jetty-env.xml support](#jetty-envxml-support). Gretty automatically uses jetty-env.xml, if it's present.
+
+* [JEE annotations support](#jee-annotations-support). Gretty supports JEE annotations out-of-the-box, no effort needed.
+
+## Usage:
 
 Add the following to "build.gradle" of your web-application:
 
@@ -63,7 +76,7 @@ or feel free copying (and modifying) the declarations from this script to your "
 
 All versions of gretty are available in maven central under the group 'org.akhikhl.gretty'.
 
-##Switching between jetty and servlet API versions
+## Switching between jetty and servlet API versions
 
 'gretty.plugin' described above uses the latest version of jetty and latest version of servlet API.
 
@@ -89,9 +102,9 @@ apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty9.
   
 **Attention:** please *do not* add several variants of grettyX.plugin at the same time. Only one of the abovementioned plugins should be used in the same web-application.
 
-##Supported tasks
+## Supported tasks
 
-###jettyRun
+### jettyRun
 
 **Syntax:**
 
@@ -109,7 +122,7 @@ gradle jettyRun
 
 Note that this task does not depend on "war" task, nor does it use "war"-file.
 
-###run
+### run
 
 **Syntax:**
 
@@ -121,7 +134,7 @@ gradle run
 
 "run" task is the same as "jettyRun". It was implemented for better integration of gretty with netbeans IDE.
 
-###jettyRunDebug
+### jettyRunDebug
 
 **Syntax:**
 
@@ -142,7 +155,7 @@ Note that this task does not depend on "war" task, nor does it use "war"-file.
 
 See also: [Debugger support](#debugger-support).
 
-###debug
+### debug
 
 **Syntax:**
 
@@ -154,7 +167,7 @@ gradle debug
 
 "debug" task is the same as "jettyRunDebug". It was implemented for better integration of gretty with netbeans IDE.
 
-###jettyRunWar
+### jettyRunWar
 
 **Syntax:**
 
@@ -170,7 +183,7 @@ gradle jettyRunWar
 4. Gradle script waits for jetty process to complete.
 5. When user presses any key (in the same terminal), jetty process shuts down and gradle script continues normal execution of tasks.
 
-###jettyRunWarDebug
+### jettyRunWarDebug
 
 **Syntax:**
 
@@ -189,7 +202,7 @@ gradle jettyRunWarDebug
 
 See also: [Debugger support](#debugger-support).
 
-###jettyStart
+### jettyStart
 
 **Syntax:**
 
@@ -210,7 +223,7 @@ Note that this task does not depend on "war" task, nor does it use "war"-file.
 
 See also: tasks [jettyStop](#jettystop) and [jettyRestart](#jettyRestart).
 
-###jettyStartDebug
+### jettyStartDebug
 
 **Syntax:**
 
@@ -234,7 +247,7 @@ See also: tasks [jettyStop](#jettystop) and [jettyRestart](#jettyRestart).
 
 See also: [Debugger support](#debugger-support).
 
-###jettyStartWar
+### jettyStartWar
 
 **Syntax:**
 
@@ -253,7 +266,7 @@ gradle jettyStartWar
 
 See also: tasks [jettyStop](#jettystop) and [jettyRestart](#jettyRestart).
 
-###jettyStartWarDebug
+### jettyStartWarDebug
 
 **Syntax:**
 
@@ -275,7 +288,7 @@ See also: tasks [jettyStop](#jettystop) and [jettyRestart](#jettyRestart).
 
 See also: [Debugger support](#debugger-support).
 
-###jettyStop
+### jettyStop
 
 **Syntax:**
 
@@ -288,7 +301,7 @@ gradle jettyStop
 Does not build source code whatsoever, only sends "shutdown" signal to localhost:9999.
 This task assumes that jetty was started with "jettyStart" task and listens for signals on the designated port.
 
-###jettyRestart
+### jettyRestart
 
 **Syntax:**
 
@@ -301,7 +314,7 @@ gradle jettyRestart
 Does not build source code whatsoever, only sends "restart" signal to localhost:9999.
 This task assumes that jetty was started with "jettyStart" task and listens for signals on the designated port.
 
-##Configuration
+## Configuration
 
 It's possible to change gretty configuration via plugin extension object:
 
@@ -384,7 +397,7 @@ as /web-app/servlet/init-param element in "web.xml". You can specify more than o
 
 "logDir" defines directory, where log file is created. See more information in chapter [Logging](#logging).
 
-##WAR Overlays
+## WAR Overlays
 
 "overlay" property has the following effects:
 
@@ -401,7 +414,7 @@ Note that "overlay" property "understands" only gradle projects (not maven artif
 gretty contains example program ["helloGrettyOverlay"](https://github.com/akhikhl/gretty/tree/master/examples/helloGrettyOverlay),
 which shows minimal working overlay configuration.
 
-##Security realms
+## Security realms
 
 "realm" property defines security realm for the given web-application. When defined, it must match 
 /web-app/login-config/realm-name element in "web.xml".
@@ -415,7 +428,7 @@ to some other servlet container, you'll have to define security realms by means 
 gretty contains example program ["securityRealm"](https://github.com/akhikhl/gretty/tree/master/examples/securityRealm),
 which shows minimal working realm configuration.
 
-##Hot deployment
+## Hot deployment
 
 Gretty supports hot deployment: whenever the classes, jars or resources [comprising the web-application] are updated, the web-application automatically restarts itself.
 
@@ -451,13 +464,13 @@ Also you should not call scanDir for dependency jars or overlay WARs - all these
 
 "onScanFilesChanged" defines closure to be called whenever hot-deployment detects that files or folders were changed. The closure receives List<File> as the parameter, which holds all changed files and folders.
 
-##Debugger support
+## Debugger support
 
 All jettyRunXXX and jettyStartXXX tasks have their debugging counterparts. For example, there are tasks jettyRun and jettyRunDebug. jettyRun starts web-application "normally", while jettyRunDebug starts web-application in suspended mode and listens for debugger commands on port 5005.
 
 Author of gretty plugin tested debugging only under netbeans IDE. It should also work under eclipse IDE, but it's untested yet.
 
-##Logging
+## Logging
 
 Gretty Plugin implements pre-configured logging:
 
@@ -483,7 +496,7 @@ You can fine-tune gretty logging by adjusting the following parameters [of grett
 
 "logDir" defines directory, where log file is created. It is a string, default value is "${System.getProperty('user.home')}/logs".
 
-##jetty.xml support
+## jetty.xml support
 
 "jetty.xml" is the configuration file for Jetty (for server itself, not for web-application).
 
@@ -530,7 +543,7 @@ Gretty sources contain example programs demonstrating integration of "jetty.xml"
 
 - [examples/testJettyXml9](https://github.com/akhikhl/gretty/tree/master/examples/testJettyXml9)
 
-##jetty-env.xml support
+## jetty-env.xml support
 
 "jetty-env.xml" jetty-env.xml is an optional Jetty file that configures individual webapp. 
 The format of jetty-web.xml is the same as jetty.xml - it is an XML mapping of the Jetty API. 
@@ -572,7 +585,7 @@ Gretty sources contain example program demonstrating integration of "jetty-env.x
 
 - [examples/testJettyEnvXml](https://github.com/akhikhl/gretty/tree/master/examples/testJettyEnvXml)
 
-##JEE annotations support
+## JEE annotations support
 
 Gretty supports JEE annotations out-of-the-box. That means: you don't have to configure anything,
 you just use JEE annotations in the web-application:
@@ -618,12 +631,9 @@ classpath. You can change this behavior by inserting the following into "jetty-e
 
 in the example above we specify, that gretty should scan for annotations any jar whose name starts with "foo-" or "bar-", or a directory named "classes".
 
-##Copyright and License
+## Copyright and License
 
 Copyright 2013-2014 (c) Andrey Hihlovskiy
 
-All versions, present and past, of gretty-plugin are licensed under MIT license:
-
-* [MIT](http://opensource.org/licenses/MIT)
-
+All versions, present and past, of gretty-plugin are licensed under [MIT license](license.txt).
 

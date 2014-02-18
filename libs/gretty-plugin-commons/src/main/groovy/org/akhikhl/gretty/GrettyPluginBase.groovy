@@ -52,7 +52,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
         // 'explodeWebApps' task is only activated by 'overlayWar' task
         project.task('explodeWebApps', group: 'gretty', description: 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/explodedWebapp') {
           for(String overlay in project.gretty.overlays)
-            dependsOn "$overlay:war" as String
+            dependsOn "$overlay:assemble" as String
           dependsOn project.tasks.war
           for(String overlay in project.gretty.overlays)
             inputs.file { ProjectUtils.getFinalWarPath(project.project(overlay)) }
