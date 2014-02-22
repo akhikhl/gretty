@@ -97,6 +97,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           projectName project.name
           inplace options.inplace as boolean
           interactive options.interactive as boolean
+          testTask options.testTask as boolean
           port project.gretty.port
           servicePort project.gretty.servicePort
           contextPath ProjectUtils.getContextPath(project)
@@ -214,6 +215,53 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           ServiceControl.send(project.gretty.servicePort, 'restart')
         }
       }
+
+      project.task('jettyStartBeforeTest', group: 'gretty', description: 'Starts jetty server before test task.') {
+        setupInplaceWebAppDependencies it
+        doLast {
+          Object startSignal = new Object()
+          Thread.start {
+            ServiceControl.readMessage(7777)
+            synchronized(startSignal) {
+              startSignal.notifyAll()
+            }
+          }
+          Thread.start {
+            project.println '----> jettyStartBeforeTest before run'
+            run inplace: true, interactive: false, testTask: true
+            project.println '----> jettyStartBeforeTest after run'
+          }
+          project.println '----> jettyStartBeforeTest before wait'
+          synchronized(startSignal) {
+            startSignal.wait()
+          }
+          project.println '----> jettyStartBeforeTest after wait'
+        }
+        dependsOn 'testClasses'
+      }
+
+      project.tasks.test.dependsOn project.tasks.jettyStartBeforeTest
+
+      project.task('jettyStopAfterTest', group: 'gretty', description: 'Stops jetty server after test task.') {
+        doLast {
+          Object stopSignal = new Object()
+          Thread.start {
+            ServiceControl.readMessage(7777)
+            synchronized(stopSignal) {
+              stopSignal.notifyAll()
+            }
+          }
+          ServiceControl.send(project.gretty.servicePort, 'stop')
+          project.println '----> jettyStopAfterTest before wait'
+          synchronized(stopSignal) {
+            stopSignal.wait()
+          }
+          project.println '----> jettyStopAfterTest after wait'
+        }
+      }
+
+      project.tasks.test.finalizedBy project.tasks.jettyStopAfterTest
+
     } // afterEvaluate
   } // apply
 

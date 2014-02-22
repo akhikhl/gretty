@@ -9,8 +9,8 @@ package org.akhikhl.gretty
 
 final class ServiceControl {
 
-  static void send(int servicePort, String command) {
-    Socket s = new Socket(InetAddress.getByName('127.0.0.1'), servicePort)
+  static void send(int port, String command) {
+    Socket s = new Socket(InetAddress.getByName('127.0.0.1'), port)
     try {
       OutputStream out = s.getOutputStream()
       out.write(("${command}\n").getBytes())
