@@ -346,6 +346,7 @@ gretty {
   onScanFilesChanged { fileList ->
     println "Files were changed: $fileList"
   }
+  logbackConfigFile = 'xyz/logback.groovy'
   loggingLevel = 'INFO'
   consoleLogEnabled = true
   fileLogEnabled = true
@@ -386,6 +387,8 @@ as /web-app/servlet/init-param element in "web.xml". You can specify more than o
 "onScan" defines closure to be called on hot-deployment scan. See more information in chapter [Hot deployment](#hot-deployment).
 
 "onScanFilesChanged" defines closure to be called whenever hot-deployment detects that files or folders were changed. See more information in chapter [Hot deployment](#hot-deployment).
+
+"logbackConfigFile" defines the absolute or relative path to logback configuration file (.groovy or .xml). See more information in chapter [Logging](#logging).
 
 "loggingLevel" defines slf4j logging-level for jetty process. See more information in chapter [Logging](#logging).
 
@@ -472,19 +475,30 @@ Author of gretty plugin tested debugging only under netbeans IDE. It should also
 
 ## Logging
 
-Gretty Plugin implements pre-configured logging:
+Gretty appends logback-classic to the project's classpath.
+Gretty Plugin supports configuring slf4j/logback logging in three forms:
+
+1. If you place "logback.groovy" or "logback.xml" to "src/main/resources", it is compiled (copied) to "build/resources/main" folder
+  before running any jetty tasks. Gretty recognizes logback configuration file in that folder and applies it to jetty process.
+  
+2. If you place "logback.groovy" or "logback.xml" to arbitrary folder and then reference it by "logbackConfigFile" property,
+  gretty applies the specified configuration to jetty process.
+  
+3. If there's no "logback.groovy" or "logback.xml" file, gretty configures logging with default settings:
+
+  - It enables slf4j logging with level INFO.
+
+  - It configures two appenders: one for console and another for the log file.
+
+  - Log file by default has name "${project.name}.log" and is created in folder "${System.getProperty('user.home')}/logs".
+
+**Attention**: gretty logging is only effective in gretty tasks. Gretty does not reconfigure logging (or libraries) of the compiled WAR-file.
 
 1. It appends logback-classic to the project's classpath.
 
-2. It enables slf4j logging with level INFO.
-
-3. It configures two appenders: one for console and another for the log file.
-
-4. Log file by default has name "${project.name}.log" and is created in folder "${System.getProperty('user.home')}/logs".
-
-**Attention**: gretty logging is only effective in gretty tasks. Gretty does not reconfigure logging (or libs) of the compiled WAR-file.
-
 You can fine-tune gretty logging by adjusting the following parameters [of gretty plugin extension]:
+
+"logbackConfigFile" defines the absolute or relative path to logback configuration file (.groovy or .xml). See more information in chapter [Logging](#logging).
 
 "loggingLevel" defines slf4j logging-level for jetty process. It is a string, having one of the values: 'ALL', 'DEBUG', 'ERROR', 'INFO', 'OFF', 'TRACE', 'WARN'. The default value is 'INFO'.
 

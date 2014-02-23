@@ -27,6 +27,7 @@ class GrettyPluginExtension {
   List<Closure> onScanFilesChanged = []
   int scanInterval = 0 // scan interval in seconds. When zero, scanning is disabled.
   List scanDirs = [] // list of additional scan directories
+  String logbackConfigFile
   String loggingLevel = 'INFO'
   boolean consoleLogEnabled = true
   boolean fileLogEnabled = true

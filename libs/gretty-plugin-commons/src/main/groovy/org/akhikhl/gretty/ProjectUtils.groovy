@@ -40,19 +40,27 @@ final class ProjectUtils {
     return overlayJars
   }
 
-  static File findFileInOutput(Project project, Pattern filePattern, boolean searchOverlays = true) {
-    def findInDir
-    findInDir = { File dir ->
-      dir.listFiles().findResult {
-        if(it.isFile())
-          it.path =~ filePattern ? it : null
-        else
-          findInDir(it)
+  static File findFileInOutput(Project project, Object filePattern, boolean searchOverlays = true) {
+    def findInSourceDir = { File sourceDir ->
+      def findInDir
+      findInDir = { File dir ->
+        dir.listFiles().findResult {
+          if(it.isFile()) {
+            String relPath = sourceDir.toPath().relativize(it.toPath())
+            if(filePattern instanceof java.util.regex.Pattern)
+              relPath =~ filePattern ? it : null
+            else
+              relPath == filePattern ? it : null
+          }
+          else
+            findInDir(it)
+        }
       }
+      findInDir(sourceDir)
     }
     def findIt
     findIt = { Project proj ->
-      File result = proj.sourceSets.main.output.files.findResult(findInDir)
+      File result = proj.sourceSets.main.output.files.findResult(findInSourceDir)
       if(result) {
         log.debug 'findFileInOutput filePattern: {}, result: {}', filePattern, result
         return result

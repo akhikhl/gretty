@@ -13,8 +13,9 @@ war {
 
 gretty {
   scanInterval = 3
+  /* 
   loggingLevel = 'INFO'
-  /* onStart {
+  onStart {
     println 'onStart'
   }
   onStop {

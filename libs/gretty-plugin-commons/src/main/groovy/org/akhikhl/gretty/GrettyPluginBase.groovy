@@ -91,7 +91,26 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
       def run = { Map options ->
         project.gretty.onStart*.call()
-        File logbackConfigFile = ProjectUtils.findFileInOutput(project, ~/logback\.(xml|groovy)/)
+        File logbackConfigFile
+        if(project.gretty.logbackConfigFile) {
+          if(project.gretty.logbackConfigFile instanceof String)
+            logbackConfigFile = new File(project.gretty.logbackConfigFile)
+          if(!logbackConfigFile || !logbackConfigFile.isAbsolute()) {
+            logbackConfigFile = new File(project.projectDir, project.gretty.logbackConfigFile)
+            if(!logbackConfigFile || !logbackConfigFile.exists())
+              logbackConfigFile = ProjectUtils.findFileInOutput(project, project.gretty.logbackConfigFile)
+          }
+          if(!logbackConfigFile || !logbackConfigFile.exists())
+            project.logger.warn 'The specified logback config file "{}" does not exist, ignoring', project.gretty.logbackConfigFile
+          else
+            project.logger.warn 'Using specified logback config file "{}"', project.gretty.logbackConfigFile
+        } else {
+          logbackConfigFile = ProjectUtils.findFileInOutput(project, ~/logback\.(xml|groovy)/)
+          if(logbackConfigFile)
+            project.logger.warn 'Using discovered logback config file "{}"', logbackConfigFile
+          else
+            project.logger.warn 'Auto-configuring logback'
+        }
         def json = new JsonBuilder()
         json {
           projectName project.name
@@ -106,12 +125,9 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           jettyXml ProjectUtils.getJettyXml(project)
           jettyEnvXml ProjectUtils.getJettyEnvXml(project)
           projectClassPath ProjectUtils.getClassPath(project, options.inplace)
-          if(logbackConfigFile) {
-            project.logger.warn 'logback config file detected, gretty will use it'
+          if(logbackConfigFile)
             logbackConfig logbackConfigFile.absolutePath
-          }
-          else {
-            project.logger.info 'logback config file is not detected, gretty will configure logback'
+          else
             logging {
               loggingLevel project.gretty.loggingLevel
               consoleLogEnabled project.gretty.consoleLogEnabled
@@ -119,7 +135,6 @@ abstract class GrettyPluginBase implements Plugin<Project> {
               logFileName project.gretty.logFileName ?: project.name
               logDir project.gretty.logDir
             }
-          }
         }
         project.logger.info json.toPrettyString()
         json = json.toString()
