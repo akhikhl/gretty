@@ -48,10 +48,10 @@ abstract class RunnerBase {
     monitor.start()
 
     System.out.println 'Jetty server started.'
-    System.out.println 'You can see web-application in browser under the address:'
-    System.out.println "http://localhost:${getServerPort()}${contextPath}"
 
     if(!params.testTask) {
+      System.out.println 'You can see web-application in browser under the address:'
+      System.out.println "http://localhost:${getServerPort()}${contextPath}"
       if(params.interactive)
         System.out.println 'Press any key to stop the jetty server.'
       else
@@ -68,7 +68,7 @@ abstract class RunnerBase {
 
     monitor.join()
 
-    System.out.println 'Run finished.'
+    System.out.println 'Jetty server stopped.'
   }
 
   final void startServer() {
@@ -123,6 +123,5 @@ abstract class RunnerBase {
   final void stopServer() {
     server.stop()
     server = null
-    System.out.println 'Jetty server stopped.'
   }
 }

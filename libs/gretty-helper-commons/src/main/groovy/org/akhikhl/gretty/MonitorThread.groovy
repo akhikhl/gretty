@@ -36,7 +36,8 @@ final class MonitorThread extends Thread {
       synchronized(this) {
         running = true
       }
-      ServiceControl.send(7788, 'started')
+      if(runner.params.testTask)
+        ServiceControl.send(runner.params.statusPort, 'started')
       try {
         while(true) {
           String command
@@ -62,7 +63,8 @@ final class MonitorThread extends Thread {
         synchronized(this) {
           running = false
         }
-        ServiceControl.send(7788, 'stopped')
+        if(runner.params.testTask)
+          ServiceControl.send(runner.params.statusPort, 'stopped')
       }
     } catch(Exception e) {
       throw new RuntimeException(e)

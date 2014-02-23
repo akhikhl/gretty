@@ -103,6 +103,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           testTask options.testTask as boolean
           port project.gretty.port
           servicePort project.gretty.servicePort
+          statusPort project.gretty.statusPort
           contextPath ProjectUtils.getContextPath(project)
           resourceBase (options.inplace ? "${project.buildDir}/inplaceWebapp" : ProjectUtils.getFinalWarPath(project).toString())
           initParams ProjectUtils.getInitParameters(project)
@@ -219,37 +220,34 @@ abstract class GrettyPluginBase implements Plugin<Project> {
         }
       }
       
-      ExecutorService executor
+      if(project.gretty.encloseTestTask) {
+        ExecutorService executor
 
-      project.task('jettyStartBeforeTest', group: 'gretty', description: 'Starts jetty server before test task.') {
-        setupInplaceWebAppDependencies it
-        doLast {
-          project.println '----> jettyStartBeforeTest begin'
-          executor = Executors.newSingleThreadExecutor()
-          Future started = ServiceControl.readMessage(executor, 7788)
-          Thread.start {
-            run inplace: true, interactive: false, testTask: true
+        project.task('jettyStartBeforeTest', group: 'gretty', description: 'Starts jetty server before test task.') {
+          setupInplaceWebAppDependencies it
+          doLast {
+            executor = Executors.newSingleThreadExecutor()
+            Future started = ServiceControl.readMessage(executor, project.gretty.statusPort)
+            Thread.start {
+              run inplace: true, interactive: false, testTask: true
+            }
+            started.get()
           }
-          started.get()
-          project.println '----> jettyStartBeforeTest end'
+          dependsOn 'testClasses'
         }
-        dependsOn 'testClasses'
-      }
 
-      project.tasks.test.dependsOn project.tasks.jettyStartBeforeTest
+        project.tasks.test.dependsOn project.tasks.jettyStartBeforeTest
 
-      project.task('jettyStopAfterTest', group: 'gretty', description: 'Stops jetty server after test task.') {
-        doLast {
-          project.println '----> jettyStopAfterTest begin'
-          Future stopped = ServiceControl.readMessage(executor, 7788)         
-          ServiceControl.send(project.gretty.servicePort, 'stop')
-          stopped.get()
-          project.println '----> jettyStopAfterTest end'
+        project.task('jettyStopAfterTest', group: 'gretty', description: 'Stops jetty server after test task.') {
+          doLast {
+            Future stopped = ServiceControl.readMessage(executor, project.gretty.statusPort)         
+            ServiceControl.send(project.gretty.servicePort, 'stop')
+            stopped.get()
+          }
         }
-      }
 
-      project.tasks.test.finalizedBy project.tasks.jettyStopAfterTest
-
+        project.tasks.test.finalizedBy project.tasks.jettyStopAfterTest      
+      } // encloseTestTask
     } // afterEvaluate
   } // apply
 
