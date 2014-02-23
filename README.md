@@ -1,6 +1,6 @@
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![endorse](https://api.coderwall.com/akhikhl/endorsecount.png)](https://coderwall.com/akhikhl)
 
-# Gretty Version 0.0.10 
+# Gretty Version 0.0.11
 
 **Gretty** is a [feature-rich](#main-features) gradle plugin for running web-applications under jetty.
 
@@ -475,11 +475,12 @@ Author of gretty plugin tested debugging only under netbeans IDE. It should also
 
 ## Logging
 
-Gretty appends logback-classic to the project's classpath.
-Gretty Plugin supports configuring slf4j/logback logging in three forms:
+When gretty runs it's tasks, it appends logback-classic to the project's classpath.
+
+Gretty supports configuring slf4j/logback logging in three forms:
 
 1. If you place "logback.groovy" or "logback.xml" to "src/main/resources", it is compiled (copied) to "build/resources/main" folder
-  before running any jetty tasks. Gretty recognizes logback configuration file in that folder and applies it to jetty process.
+  before running any jetty tasks. Gretty auto-discovers logback configuration file in that folder and applies it to jetty process.
   
 2. If you place "logback.groovy" or "logback.xml" to arbitrary folder and then reference it by "logbackConfigFile" property,
   gretty applies the specified configuration to jetty process.
@@ -494,11 +495,17 @@ Gretty Plugin supports configuring slf4j/logback logging in three forms:
 
 **Attention**: gretty logging is only effective in gretty tasks. Gretty does not reconfigure logging (or libraries) of the compiled WAR-file.
 
-1. It appends logback-classic to the project's classpath.
+You can fine-tune gretty logging by adjusting the following properties [of gretty plugin extension]:
 
-You can fine-tune gretty logging by adjusting the following parameters [of gretty plugin extension]:
+<a name="logbackconfigfile"></a>
+"logbackConfigFile" defines the absolute or relative path to logback configuration file (.groovy or .xml).
+If "logbackConfigFile" is relative, it is first combined with projectDir. If the resulting path points to an existing file,
+it is used for logback configuration. If not, gretty tries to combine "logbackConfigFile" with each output folder
+(typically "${projectDir}/build/classes/main" and "${projectDir}/build/resources/main"). If any resulting path points to an existing file,
+it is used for logback configuration.
 
-"logbackConfigFile" defines the absolute or relative path to logback configuration file (.groovy or .xml). See more information in chapter [Logging](#logging).
+  - **Attention**: when logback configuration file is used (either auto-discovered or specified via "logbackConfigFile" property),
+  other logging properties ("loggingLevel", "consoleLogEnabled", "fileLogEnabled", "logFileName", "logDir") have no effect.
 
 "loggingLevel" defines slf4j logging-level for jetty process. It is a string, having one of the values: 'ALL', 'DEBUG', 'ERROR', 'INFO', 'OFF', 'TRACE', 'WARN'. The default value is 'INFO'.
 

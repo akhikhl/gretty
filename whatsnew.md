@@ -2,7 +2,8 @@
 
 ### Version 0.0.11
 
-- Introduced plugin extension parameter "logbackConfigFile" (in response to [issue #6](https://github.com/akhikhl/gretty/issues/6) "Possibility to provide custom logback.xml or logback.groovy configuration")
+- Introduced plugin extension property ["logbackConfigFile"](README.md#logbackconfigfile)
+  (in response to [issue #6](https://github.com/akhikhl/gretty/issues/6) "Possibility to provide custom logback.xml or logback.groovy configuration")
 
 ### Version 0.0.10
 
