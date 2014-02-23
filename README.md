@@ -320,8 +320,8 @@ It's possible to change gretty configuration via plugin extension object:
 
 ```groovy
 gretty {
-  port = 8081
-  stopPort = 9998
+  port = 8080
+  servicePort = 9900
   contextPath = '/myWebApp'
   initParameter 'param1', 'buildTimeEvaluationParameter'
   initParameter 'param2', { 'lazyEvaluationParameter' }
@@ -356,7 +356,7 @@ gretty {
 
 "port" defines TCP-port used by Jetty for incoming HTTP-requests.
 
-"stopPort" defines TCP-port used by gretty-plugin to communicate between jettyStart(War) and jettyStop/jettyRestart tasks.
+"servicePort" defines TCP-port used by gretty-plugin to communicate between jettyStart(War) and jettyStop/jettyRestart tasks.
 
 "contextPath" defines context path for the web-application (defaults to project name). "contextPath" affects 
 only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
