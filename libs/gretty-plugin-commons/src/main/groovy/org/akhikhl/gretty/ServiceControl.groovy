@@ -7,21 +7,27 @@
  */
 package org.akhikhl.gretty
 
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
+
 final class ServiceControl {
 
-  static String readMessage(int port) {
-    ServerSocket socket = new ServerSocket(port, 1, InetAddress.getByName('127.0.0.1'))
-    try {
-      Socket acceptSocket = socket.accept()
+  static Future readMessage(ExecutorService executor, int port) {
+    executor.submit({
+      ServerSocket socket = new ServerSocket(port, 1, InetAddress.getByName('127.0.0.1'))
       try {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(acceptSocket.getInputStream()))
-        return reader.readLine()
+        Socket acceptSocket = socket.accept()
+        try {
+          BufferedReader reader = new BufferedReader(new InputStreamReader(acceptSocket.getInputStream()))
+          return reader.readLine()
+        } finally {
+          acceptSocket.close()
+        }
       } finally {
-        acceptSocket.close()
+        socket.close()
       }
-    } finally {
-      socket.close()
-    }
+    } as Callable)
   }
 
   static void send(int port, String command) {

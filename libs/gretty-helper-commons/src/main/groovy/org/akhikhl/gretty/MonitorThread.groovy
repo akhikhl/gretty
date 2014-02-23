@@ -36,7 +36,7 @@ final class MonitorThread extends Thread {
       synchronized(this) {
         running = true
       }
-      ServiceControl.send(7777, 'started')
+      ServiceControl.send(7788, 'started')
       try {
         while(true) {
           String command
@@ -62,7 +62,7 @@ final class MonitorThread extends Thread {
         synchronized(this) {
           running = false
         }
-        ServiceControl.send(7777, 'stopped')
+        ServiceControl.send(7788, 'stopped')
       }
     } catch(Exception e) {
       throw new RuntimeException(e)

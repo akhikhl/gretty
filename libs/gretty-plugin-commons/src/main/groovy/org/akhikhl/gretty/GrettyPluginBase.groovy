@@ -8,6 +8,9 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonBuilder
+import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 import org.gradle.api.*
 import org.gradle.api.plugins.*
 import org.gradle.api.tasks.*
@@ -215,27 +218,20 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           ServiceControl.send(project.gretty.servicePort, 'restart')
         }
       }
+      
+      ExecutorService executor
 
       project.task('jettyStartBeforeTest', group: 'gretty', description: 'Starts jetty server before test task.') {
         setupInplaceWebAppDependencies it
         doLast {
-          Object startSignal = new Object()
+          project.println '----> jettyStartBeforeTest begin'
+          executor = Executors.newSingleThreadExecutor()
+          Future started = ServiceControl.readMessage(executor, 7788)
           Thread.start {
-            ServiceControl.readMessage(7777)
-            synchronized(startSignal) {
-              startSignal.notifyAll()
-            }
-          }
-          Thread.start {
-            project.println '----> jettyStartBeforeTest before run'
             run inplace: true, interactive: false, testTask: true
-            project.println '----> jettyStartBeforeTest after run'
           }
-          project.println '----> jettyStartBeforeTest before wait'
-          synchronized(startSignal) {
-            startSignal.wait()
-          }
-          project.println '----> jettyStartBeforeTest after wait'
+          started.get()
+          project.println '----> jettyStartBeforeTest end'
         }
         dependsOn 'testClasses'
       }
@@ -244,19 +240,11 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
       project.task('jettyStopAfterTest', group: 'gretty', description: 'Stops jetty server after test task.') {
         doLast {
-          Object stopSignal = new Object()
-          Thread.start {
-            ServiceControl.readMessage(7777)
-            synchronized(stopSignal) {
-              stopSignal.notifyAll()
-            }
-          }
+          project.println '----> jettyStopAfterTest begin'
+          Future stopped = ServiceControl.readMessage(executor, 7788)         
           ServiceControl.send(project.gretty.servicePort, 'stop')
-          project.println '----> jettyStopAfterTest before wait'
-          synchronized(stopSignal) {
-            stopSignal.wait()
-          }
-          project.println '----> jettyStopAfterTest after wait'
+          stopped.get()
+          project.println '----> jettyStopAfterTest end'
         }
       }
 
