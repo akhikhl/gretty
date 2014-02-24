@@ -1,8 +1,14 @@
-[![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![endorse](https://api.coderwall.com/akhikhl/endorsecount.png)](https://coderwall.com/akhikhl)
+[![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![endorse](https://api.coderwall.com/akhikhl/endorsecount.png)](https://coderwall.com/akhikhl)
 
-# Gretty Version 0.0.11
+![logo](images/gretty_logo.png "gretty logo")
 
-**Gretty** is a [feature-rich](#main-features) gradle plugin for running web-applications under jetty.
+Feature-rich gradle plugin for running your web-apps under jetty.
+
+**Version 0.0.12**
+
+If you are new with gretty, good starting point would be learning [main features](#main-features).
+
+If you already use gretty, it is always a good idea to look in [what's new](whatsnew.md) section.
 
 ### Content of this document:
 
@@ -23,6 +29,8 @@
   * [jettyStartWarDebug](#jettystartwardebug)
   * [jettyStop](#jettystop)
   * [jettyRestart](#jettyrestart)
+  * [jettyBeforeIntegrationTest](#jettybeforeintegrationtest)
+  * [jettyAfterIntegrationTest](#jettyafterintegrationtest)
 * [Configuration](#configuration)
 * [WAR Overlays](#war-overlays)
 * [Security Realms](#security-realms)
@@ -32,6 +40,7 @@
 * [jetty.xml support](#jettyxml-support)
 * [jetty-env.xml support](#jetty-envxml-support)
 * [JEE annotations support](#jee-annotations-support)
+* [Integration tests support](#integration-tests-support)
 * [Copyright and License](#copyright-and-license)
 
 ## Main features:
@@ -54,6 +63,8 @@
 * [jetty-env.xml support](#jetty-envxml-support). Gretty automatically uses jetty-env.xml, if it's present.
 
 * [JEE annotations support](#jee-annotations-support). Gretty supports JEE annotations out-of-the-box, no effort needed.
+
+* [Integration tests support](#integration-tests-support). Gretty can start jetty before integration tests and stop it after.
 
 ## Usage:
 
@@ -214,9 +225,9 @@ gradle jettyStart
 
 1. The web-application gets compiled (if it's not up-to-date).
 2. Embedded jetty starts in separate java process against compiled classes and their dependencies and listens for HTTP-requests on port 8080.
-3. Jetty process goes to infinite loop and listens for service signals on port 9999.
+3. Jetty process goes to infinite loop and listens for service signals on port 9900.
 4. Gradle script waits for jetty process to complete.
-5. When "shutdown" signal comes, jetty process shuts down and gradle script continues normal execution of tasks.
+5. When "stop" signal comes, jetty process stops and gradle script continues normal execution of tasks.
 6. When "restart" signal comes, jetty process restarts the web-application and continues waiting for signals.
 
 Note that this task does not depend on "war" task, nor does it use "war"-file.
@@ -236,9 +247,9 @@ gradle jettyStartDebug
 1. The web-application gets compiled (if it's not up-to-date).
 2. Embedded jetty starts in separate java process against compiled classes and their dependencies.
    **important**: Upon start, the process is in suspended-mode and listens for debugger commands on port 5005.
-3. Upon resume, jetty process starts listening for HTTP-requests on port 8080, goes to infinite loop and listens for service signals on port 9999.
+3. Upon resume, jetty process starts listening for HTTP-requests on port 8080, goes to infinite loop and listens for service signals on port 9900.
 4. Gradle script waits for jetty process to complete.
-5. When "shutdown" signal comes, jetty process shuts down and gradle script continues normal execution of tasks.
+5. When "stop" signal comes, jetty process stops and gradle script continues normal execution of tasks.
 6. When "restart" signal comes, jetty process restarts the web-application and continues waiting for signals.
 
 Note that this task does not depend on "war" task, nor does it use "war"-file.
@@ -259,9 +270,9 @@ gradle jettyStartWar
 
 1. The web-application gets compiled and assembled into WAR-file (if it's not up-to-date).
 2. Embedded jetty starts in separate java process against WAR-file and listens for HTTP-requests on port 8080.
-3. Jetty process goes to infinite loop and listens for service signals on port 9999.
+3. Jetty process goes to infinite loop and listens for service signals on port 9900.
 4. Gradle script waits for jetty process to complete.
-5. When "shutdown" signal comes, jetty process shuts down and gradle script continues normal execution of tasks.
+5. When "stop" signal comes, jetty process stops and gradle script continues normal execution of tasks.
 6. When "restart" signal comes, jetty process restarts the web-application and continues waiting for signals.
 
 See also: tasks [jettyStop](#jettystop) and [jettyRestart](#jettyRestart).
@@ -279,9 +290,9 @@ gradle jettyStartWarDebug
 1. The web-application gets compiled and assembled into WAR-file (if it's not up-to-date).
 2. Embedded jetty starts in separate java process against WAR-file.
    **important**: Upon start, the process is in suspended-mode and listens for debugger commands on port 5005.
-3. Upon resume, jetty process starts listening for HTTP-requests on port 8080, goes to infinite loop and listens for service signals on port 9999.
+3. Upon resume, jetty process starts listening for HTTP-requests on port 8080, goes to infinite loop and listens for service signals on port 9900.
 4. Gradle script waits for jetty process to complete.
-5. When "shutdown" signal comes, jetty process shuts down and gradle script continues normal execution of tasks.
+5. When "stop" signal comes, jetty process stops and gradle script continues normal execution of tasks.
 6. When "restart" signal comes, jetty process restarts the web-application and continues waiting for signals.
 
 See also: tasks [jettyStop](#jettystop) and [jettyRestart](#jettyRestart).
@@ -298,7 +309,7 @@ gradle jettyStop
 
 **Effect:**
 
-Does not build source code whatsoever, only sends "shutdown" signal to localhost:9999.
+Does not build source code whatsoever, only sends "stop" signal to localhost:9900.
 This task assumes that jetty was started with "jettyStart" task and listens for signals on the designated port.
 
 ### jettyRestart
@@ -311,8 +322,34 @@ gradle jettyRestart
 
 **Effect:**
 
-Does not build source code whatsoever, only sends "restart" signal to localhost:9999.
+Does not build source code whatsoever, only sends "restart" signal to localhost:9900.
 This task assumes that jetty was started with "jettyStart" task and listens for signals on the designated port.
+
+### jettyBeforeIntegrationTest
+
+Internal task, please, don't invoke it on command line!
+
+Gretty automatically defines and invokes this task, when you define "integrationTestTask" property.
+
+**Effect:**
+
+1. Embedded jetty starts in separate java process against compiled classes and their dependencies and listens for HTTP-requests on port 8080.
+2. Jetty process goes to infinite loop and listens for service signals on port 9900.
+3. Gradle script waits until jetty is online.
+4. Gradle script proceeds to integration test task.
+
+### jettyAfterIntegrationTest
+
+Internal task, please, don't invoke it on command line!
+
+Gretty automatically defines and invokes this task, when you define "integrationTestTask" property.
+
+**Effect:**
+
+1. Sends "stop" signal to localhost:9900.
+2. When "stop" signal comes, jetty process stops.
+3. Gradle script waits for jetty process to complete.
+4. Gradle script continues normal execution of tasks.
 
 ## Configuration
 
@@ -352,12 +389,15 @@ gretty {
   fileLogEnabled = true
   logFileName = project.name
   logDir = "${System.getProperty('user.home')}/logs"
+  integrationTestTask = 'integrationTest'
+  integrationTestStatusPort = 9901
 }
 ```
 
-"port" defines TCP-port used by Jetty for incoming HTTP-requests.
+"port" defines TCP-port used by Jetty for incoming HTTP-requests. Default value is 8080.
 
 "servicePort" defines TCP-port used by gretty-plugin to communicate between jettyStart(War) and jettyStop/jettyRestart tasks.
+Default value is 9900.
 
 "contextPath" defines context path for the web-application (defaults to project name). "contextPath" affects 
 only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
@@ -399,6 +439,12 @@ as /web-app/servlet/init-param element in "web.xml". You can specify more than o
 "logFileName" defines log file name (without path). See more information in chapter [Logging](#logging).
 
 "logDir" defines directory, where log file is created. See more information in chapter [Logging](#logging).
+
+"integrationTestTask" defines name of existing gradle task, which gretty "encloses" with jetty start/stop. 
+See more information in chapter [Integration tests support](#integration-tests-support).
+
+"integrationTestStatusPort" defines TCP-port used by gretty-plugin to communicate between jettyBeforeIntegrationTest/jettyAfterIntegrationTest 
+tasks and jetty process. Default value is 9901. See more information in chapter [Integration tests support](#integration-tests-support).
 
 ## WAR Overlays
 
@@ -651,6 +697,38 @@ classpath. You can change this behavior by inserting the following into "jetty-e
 ```
 
 in the example above we specify, that gretty should scan for annotations any jar whose name starts with "foo-" or "bar-", or a directory named "classes".
+
+## Integration tests support
+
+Gretty provides you a very simple way to start jetty before integration tests and stop it after.
+All you have to do is to specify "integrationTestTask" property:
+
+```groovy
+gretty {
+  integrationTestTask = 'integrationTest' // name of existing gradle task
+}
+```
+
+and then do "gradle integrationTest" from command-line.
+
+As a side effect, gretty starts jetty before the given task and stops it after.
+
+**Attention:** gretty does not define integration test task nor does it augment it in any way. All it does is start and stop jetty.
+
+By default gretty-plugin uses TCP-port 9901 to communicate between jettyBeforeIntegrationTest/jettyAfterIntegrationTest 
+tasks and jetty process. You can change this port by assigning "integrationTestStatusPort" property:
+
+```groovy
+gretty {
+  integrationTestTask = 'integrationTest' // name of existing gradle task
+  integrationTestStatusPort = 9902
+}
+```
+
+Gretty sources contain [a complete example](../../tree/master/examples/helloGretty) of implementation of integration tests 
+with gretty, [geb](http://www.gebish.org/) and [spock](http://code.google.com/p/spock/).
+
+See also: tasks [jettyBeforeIntegrationTest](#jettybeforeintegrationtest) and [jettyAfterIntegrationTest](#jettyafterintegrationtest).
 
 ## Copyright and License
 

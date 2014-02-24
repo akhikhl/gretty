@@ -1,5 +1,9 @@
 # What's new in Gretty:
 
+### Version 0.0.12
+
+- Implemented [support of integration tests](README.md#integration-tests-support)
+
 ### Version 0.0.11
 
 - Introduced plugin extension property ["logbackConfigFile"](README.md#logbackconfigfile)
