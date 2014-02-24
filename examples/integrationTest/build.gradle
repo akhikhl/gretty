@@ -25,7 +25,7 @@ test {
 
 task integrationTest(type: Test, dependsOn: 'test') {
   include '**/*IT.*'
-  systemProperty 'geb.build.reportsDir', reporting.file("${project.name}/build/geb")
+  systemProperty 'geb.build.reportsDir', reporting.file('geb')
 }
 
 gretty {
