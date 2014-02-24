@@ -52,6 +52,6 @@ Total time: 16.944 secs
 
 You can inspect spock/geb output in "build/reports/tests/index.html" upon build completion:
 
-![logo](../../images/integrationTestReport.png "integration test report")
+![logo](images/integrationTestReport.png "integration test report")
 
 
