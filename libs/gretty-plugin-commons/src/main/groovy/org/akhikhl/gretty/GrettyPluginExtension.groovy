@@ -33,8 +33,8 @@ class GrettyPluginExtension {
   boolean fileLogEnabled = true
   String logFileName = null
   String logDir = "${System.getProperty('user.home')}/logs"
-  boolean encloseTestTask = false
-  int statusPort = 9901
+  String integrationTestTask
+  int integrationTestStatusPort = 9901
 
   def scanDir(String value) {
     scanDirs.add(new File(value))

@@ -1,15 +1,11 @@
-apply plugin: "java"
-apply plugin: "war"
-apply plugin: "gretty"
-
-dependencies {
-  compile "org.codehaus.groovy:groovy-all:$groovy_version"
-}
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'gretty'
 
 gretty {
-  realm "auth"
-  realmConfigFile "WEB-INF/jetty-realm.properties"
+  realm 'auth'
+  realmConfigFile 'WEB-INF/jetty-realm.properties'
   onStart {
-    println "Enter user name 'test' and password 'test123' for logon."
+    println 'Enter user name "test" and password "test123" for logon.'
   }
 }

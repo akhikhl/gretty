@@ -117,12 +117,13 @@ abstract class GrettyPluginBase implements Plugin<Project> {
         def json = new JsonBuilder()
         json {
           projectName project.name
+          autoStart options.autoStart as boolean
           inplace options.inplace as boolean
           interactive options.interactive as boolean
-          testTask options.testTask as boolean
+          integrationTest options.integrationTest as boolean
           port project.gretty.port
           servicePort project.gretty.servicePort
-          statusPort project.gretty.statusPort
+          integrationTestStatusPort project.gretty.integrationTestStatusPort
           contextPath ProjectUtils.getContextPath(project)
           resourceBase (options.inplace ? "${project.buildDir}/inplaceWebapp" : ProjectUtils.getFinalWarPath(project).toString())
           initParams ProjectUtils.getInitParameters(project)
@@ -166,7 +167,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
       project.task('jettyRun', group: 'gretty', description: 'Starts jetty server inplace, in interactive mode (keypress stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          run inplace: true, interactive: true
+          run autoStart: true, inplace: true, interactive: true
         }
       }
 
@@ -175,7 +176,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
       project.task('jettyRunDebug', group: 'gretty', description: 'Starts jetty server inplace, in debug and interactive mode (keypress stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          run inplace: true, interactive: true, debug: true
+          run autoStart: true, inplace: true, interactive: true, debug: true
         }
       }
 
@@ -184,42 +185,42 @@ abstract class GrettyPluginBase implements Plugin<Project> {
       project.task('jettyRunWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in interactive mode (keypress stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          run inplace: false, interactive: true
+          run autoStart: true, inplace: false, interactive: true
         }
       }
 
       project.task('jettyRunWarDebug', group: 'gretty', description: 'Starts jetty server on WAR-file, in debug and interactive mode (keypress stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          run inplace: false, interactive: true, debug: true
+          run autoStart: true, inplace: false, interactive: true, debug: true
         }
       }
 
       project.task('jettyStart', group: 'gretty', description: 'Starts jetty server inplace, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          run inplace: true, interactive: false
+          run autoStart: true, inplace: true, interactive: false
         }
       }
 
       project.task('jettyStartDebug', group: 'gretty', description: 'Starts jetty server inplace, in debug and batch mode (\'jettyStop\' stops the server).') { task ->
         setupInplaceWebAppDependencies task
         task.doLast {
-          run inplace: true, interactive: false, debug: true
+          run autoStart: true, inplace: true, interactive: false, debug: true
         }
       }
 
       project.task('jettyStartWar', group: 'gretty', description: 'Starts jetty server on WAR-file, in batch mode (\'jettyStop\' stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          run inplace: false, interactive: false
+          run autoStart: true, inplace: false, interactive: false
         }
       }
 
       project.task('jettyStartWarDebug', group: 'gretty', description: 'Starts jetty server on WAR-file, in debug and batch mode (\'jettyStop\' stops the server).') { task ->
         setupWarDependencies task
         task.doLast {
-          run inplace: false, interactive: false, debug: true
+          run autoStart: true, inplace: false, interactive: false, debug: true
         }
       }
 
@@ -234,35 +235,36 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           ServiceControl.send(project.gretty.servicePort, 'restart')
         }
       }
-      
-      if(project.gretty.encloseTestTask) {
-        ExecutorService executor
 
-        project.task('jettyStartBeforeTest', group: 'gretty', description: 'Starts jetty server before test task.') {
+      if(project.gretty.integrationTestTask) {
+        Task integrationTestTask = project.tasks.getByName(project.gretty.integrationTestTask)
+
+        ExecutorService executor = Executors.newSingleThreadExecutor()
+
+        project.task('jettyBeforeIntegrationTest', group: 'gretty', description: 'Starts jetty server before integration test.') {
           setupInplaceWebAppDependencies it
           doLast {
-            executor = Executors.newSingleThreadExecutor()
-            Future started = ServiceControl.readMessage(executor, project.gretty.statusPort)
+            Future started = ServiceControl.readMessage(executor, project.gretty.integrationTestStatusPort)
             Thread.start {
-              run inplace: true, interactive: false, testTask: true
+              run autoStart: true, inplace: true, interactive: false, integrationTest: true
             }
             started.get()
           }
           dependsOn 'testClasses'
         }
 
-        project.tasks.test.dependsOn project.tasks.jettyStartBeforeTest
+        integrationTestTask.dependsOn project.tasks.jettyBeforeIntegrationTest
 
-        project.task('jettyStopAfterTest', group: 'gretty', description: 'Stops jetty server after test task.') {
+        project.task('jettyAfterIntegrationTest', group: 'gretty', description: 'Stops jetty server after integration test.') {
           doLast {
-            Future stopped = ServiceControl.readMessage(executor, project.gretty.statusPort)         
+            Future stopped = ServiceControl.readMessage(executor, project.gretty.integrationTestStatusPort)
             ServiceControl.send(project.gretty.servicePort, 'stop')
             stopped.get()
           }
         }
 
-        project.tasks.test.finalizedBy project.tasks.jettyStopAfterTest      
-      } // encloseTestTask
+        integrationTestTask.finalizedBy project.tasks.jettyAfterIntegrationTest
+      } // integrationTestTask
     } // afterEvaluate
   } // apply
 

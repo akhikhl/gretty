@@ -19,6 +19,8 @@ apply plugin: 'base' // add "clean" task to the root project.
 ext {
   groovy_version = '2.2.1'
   logback_version = '1.1.1'
+  junit_version = '4.11'
+  spock_version = '0.7-groovy-2.0'
 }
 
 subprojects {
