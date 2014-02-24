@@ -1,6 +1,15 @@
 # integrationTest
 
-Gretty example of web-application integration test. Uses jetty latest version.
+Gretty example of web-application integration test.
+
+This program features:
+
+1. Simple servlet showing html page with div containing text 'Hello, integration test!'
+2. Integration test based on [geb](http://www.gebish.org/) and [spock](http://code.google.com/p/spock/).
+3. Gretty configuration to start/stop jetty on integration test.
+
+This program requires Firefox to be installed on your machine.
+If you use different browser, please change selenium driver in "build.gradle" accordingly.
 
 ## Usage
 
@@ -41,5 +50,8 @@ BUILD SUCCESSFUL
 Total time: 16.944 secs
 ```
 
-You can see test report at "build/reports/tests/index.html" after completion.
+You can inspect spock/geb output in "build/reports/tests/index.html" upon build completion:
+
+![logo](../../images/integrationTestReport.png "integration test report")
+
 
