@@ -2,8 +2,6 @@
 
 ![logo](images/gretty_logo.png "gretty logo")
 
-Feature-rich gradle plugin for running your web-apps under jetty.
-
 **Version 0.0.12**
 
 If you are new with gretty, good starting point would be learning [main features](#main-features).
