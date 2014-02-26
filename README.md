@@ -723,8 +723,7 @@ gretty {
 }
 ```
 
-Gretty sources contain [a complete example](../../tree/master/examples/helloGretty) of implementation of integration tests 
-with gretty, [geb](http://www.gebish.org/) and [spock](http://code.google.com/p/spock/).
+Gretty sources contain [a complete example](../../tree/master/examples/integrationTest) of implementation of integration tests with gretty, [geb](http://www.gebish.org/) and [spock](http://code.google.com/p/spock/).
 
 See also: tasks [jettyBeforeIntegrationTest](#jettybeforeintegrationtest) and [jettyAfterIntegrationTest](#jettyafterintegrationtest).
 
