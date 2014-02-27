@@ -336,6 +336,8 @@ Gretty automatically defines and invokes this task, when you define "integration
 3. Gradle script waits until jetty is online.
 4. Gradle script proceeds to integration test task.
 
+See also: [integration tests support](#integration-tests-support).
+
 ### jettyAfterIntegrationTest
 
 Internal task, please, don't invoke it on command line!
@@ -348,6 +350,8 @@ Gretty automatically defines and invokes this task, when you define "integration
 2. When "stop" signal comes, jetty process stops.
 3. Gradle script waits for jetty process to complete.
 4. Gradle script continues normal execution of tasks.
+
+See also: [integration tests support](#integration-tests-support).
 
 ## Configuration
 
