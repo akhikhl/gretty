@@ -81,9 +81,33 @@ to the project folder and include it like this:
 apply from: 'gretty.plugin'
 ```
 
-or feel free copying (and modifying) the declarations from this script to your "build.gradle".
+or feel free copying (and modifying) the declarations from this script to your "build.gradle", like this:
 
-All versions of gretty are available in maven central under the group 'org.akhikhl.gretty'.
+```groovy
+buildscript {
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+
+  apply plugin: 'maven'
+  
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty-plugin:+'
+  }
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+apply plugin: 'war'
+apply plugin: 'gretty'
+```
+
+All versions of gretty are available on maven central under the group 'org.akhikhl.gretty'.
 
 ## Switching between jetty and servlet API versions
 
