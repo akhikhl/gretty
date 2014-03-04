@@ -20,6 +20,9 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
   void apply(final Project project) {
 
+    if (!project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin))
+      project.apply(plugin: org.gradle.api.plugins.WarPlugin)
+
     project.extensions.create('gretty', GrettyPluginExtension)
 
     project.configurations {
