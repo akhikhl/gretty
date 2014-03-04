@@ -39,6 +39,7 @@ If you already use gretty, it is always a good idea to look in [what's new](what
 * [jetty-env.xml support](#jetty-envxml-support)
 * [JEE annotations support](#jee-annotations-support)
 * [Integration tests support](#integration-tests-support)
+* [Publishing gretty to sonatype and bintray](#publishing-gretty-to-sonatype-and-bintray)
 * [Copyright and License](#copyright-and-license)
 
 ## Main features:
@@ -754,6 +755,16 @@ gretty {
 Gretty sources contain [a complete example](../../tree/master/examples/integrationTest) of implementation of integration tests with gretty, [geb](http://www.gebish.org/) and [spock](http://code.google.com/p/spock/).
 
 See also: tasks [jettyBeforeIntegrationTest](#jettybeforeintegrationtest) and [jettyAfterIntegrationTest](#jettyafterintegrationtest).
+
+## Publishing gretty to sonatype and bintray
+
+Gretty sources are configured for publishing gretty artifacts to sonatype and bintray.
+Publishing typically consists of two steps: 
+
+1. Define publishing-specific properties 
+2. Invoke publishing task. 
+
+If you are going to publish gretty to sonatype and/or bintray, see [more information here](publishing.md).
 
 ## Copyright and License
 

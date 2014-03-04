@@ -1,3 +1,12 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.3'
+  }
+}
+
 ext {
   group = 'org.akhikhl.gretty'
   version = '0.0.12'
@@ -7,15 +16,163 @@ ext {
   jetty8_servlet_api_version = '3.0.1'
   jetty9_version = '9.1.0.v20131115'
   jetty9_servlet_api_version = '3.1.0'
+  groovy_version = '2.2.2'
+  spock_version = '0.7-groovy-2.0'
   logback_version = '1.1.1'
   slf4j_version = '1.7.6'
 }
 
-apply from: 'root.gradle'
+apply plugin: 'base' // add "clean" task to the root project.
+
+task('build')
+
+task('buildExamples', type: GradleBuild) { task ->
+  dir = file('examples')
+  tasks = [ 'build' ]
+}
+
+build.finalizedBy buildExamples
+
+task('cleanExamples', type: GradleBuild) { task ->
+  dir = file('examples')
+  tasks = [ 'clean' ]
+}
+
+clean.dependsOn cleanExamples
 
 subprojects {
-  apply from: rootProject.file('common.gradle')
-  apply from: rootProject.file('sonatype.gradle')
-  apply from: rootProject.file('bintray.gradle')
+
+  if(project.parent.name == 'libs') {
+
+    apply plugin: 'maven'
+    apply plugin: 'groovy'
+    apply plugin: 'signing'
+    apply plugin: 'maven-publish'
+    apply plugin: 'bintray'
+
+    repositories {
+      mavenLocal()
+      mavenCentral()
+    }
+      
+    group = rootProject.ext.group
+    version = rootProject.ext.version
+
+    dependencies {
+      compile "org.codehaus.groovy:groovy-all:${rootProject.ext.groovy_version}"
+      testCompile "org.spockframework:spock-core:${rootProject.ext.spock_version}"
+    }
+
+    // lib projects should be always installed into "$HOME/.m2"
+    project.tasks.build.finalizedBy project.tasks.install
+    rootProject.tasks.buildExamples.dependsOn project.tasks.install
+
+    task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
+      classifier = 'sources'
+      from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, description: 'Creates javadoc jar') {
+      dependsOn javadoc
+      classifier = 'javadoc'
+      from javadoc.destinationDir
+      if(tasks.findByName('groovydoc')) {
+        dependsOn groovydoc
+        from groovydoc.destinationDir
+      }
+    }
+    
+    artifacts {
+      archives sourcesJar, javadocJar
+    }
+
+    if(project.hasProperty('publishToSonatype')) {
+      
+      assert project.hasProperty('signing.keyId')
+      assert project.hasProperty('signing.password')
+      assert project.hasProperty('signing.secretKeyRingFile')
+      assert project.hasProperty('sonatypeUsername')
+      assert project.hasProperty('sonatypePassword')
+      
+      signing {
+        sign configurations.archives
+      }
+
+      uploadArchives {
+        repositories {
+          mavenDeployer {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+
+            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+              authentication(userName: project.sonatypeUsername, password: project.sonatypePassword)
+            }
+
+            pom.project {
+              name project.name
+              packaging 'jar'
+              description 'Advanced gradle plugin for running web-apps on jetty'
+              url 'https://github.com/akhikhl/gretty'
+
+              scm {
+                url 'scm:git@github.com:akhikhl/gretty.git'
+                connection 'scm:git@github.com:akhikhl/gretty.git'
+                developerConnection 'scm:git@github.com:akhikhl/gretty.git'
+              }
+
+              licenses {
+                license {
+                  name 'The MIT License'
+                  url 'https://raw.github.com/akhikhl/gretty/master/license.txt'
+                  distribution 'repo'
+                }
+              }
+
+              developers {
+                developer {
+                  id 'akhikhl'
+                  name 'Andrey Hihlovskiy'
+                }
+              }
+            }
+          }
+        }
+      } // uploadArchives
+    } // publishToSonatype
+
+    // used by bintray
+    publishing {
+      publications {
+        mavenAll(MavenPublication) {
+          if (plugins.hasPlugin('java')) {
+            from components.java
+          }
+
+          artifact sourcesJar {
+            classifier "sources"
+          }
+
+          artifact javadocJar {
+            classifier "javadoc"
+          }
+        }
+      }
+    } // publishing
+        
+    bintray {
+      user = bintrayUser
+      key = bintrayKey
+      // configurations = ['deployables'] // When uploading configuration files
+      publications = ['mavenAll'] // When uploading Maven-based publication files
+      pkg {
+        repo = 'maven'
+        name = 'org.akhikhl.gretty'
+        desc = 'Advanced gradle plugin for running web-apps on jetty.'
+        licenses = ['MIT']
+        labels = ['gretty', 'jetty', 'gradle', 'plugin']
+      }
+      dryRun = true // whether to run this as dry-run, without deploying
+    }
+    
+  } // if libs
 }
 
