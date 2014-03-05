@@ -17,7 +17,14 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
+import org.eclipse.jetty.webapp.WebInfConfiguration
+import org.eclipse.jetty.webapp.WebXmlConfiguration
 import org.eclipse.jetty.webapp.Configuration
+import org.eclipse.jetty.webapp.FragmentConfiguration
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
+import org.eclipse.jetty.webapp.MetaInfConfiguration
+import org.eclipse.jetty.plus.webapp.EnvConfiguration
+import org.eclipse.jetty.plus.webapp.PlusConfiguration
 import org.eclipse.jetty.xml.XmlConfiguration
 
 import org.eclipse.jetty.server.DispatcherType
@@ -32,6 +39,18 @@ final class Runner extends RunnerBase {
 
   private Runner(Map params) {
     super(params)
+  }
+
+  protected void addConfigurationClasses(webAppContext) {
+    webAppContext.setConfigurations([
+      new WebInfConfiguration(),
+      new WebXmlConfiguration(),
+      new MetaInfConfiguration(),
+      new FragmentConfiguration(),
+      new EnvConfiguration(),
+      new PlusConfiguration(),
+      new JettyWebXmlConfiguration()
+    ] as Configuration[])
   }
 
   protected void applyJettyEnvXml(webAppContext) {

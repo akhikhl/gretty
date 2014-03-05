@@ -1,5 +1,3 @@
-apply plugin: 'java'
-apply plugin: 'war'
 apply plugin: 'gretty8'
 
 dependencies {

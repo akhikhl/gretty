@@ -1,0 +1,5 @@
+apply plugin: 'gretty8'
+
+dependencies {
+  compile 'commons-configuration:commons-configuration:1.9'
+}

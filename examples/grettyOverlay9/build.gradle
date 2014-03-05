@@ -1,0 +1,7 @@
+apply plugin: 'gretty9'
+
+gretty {
+  contextPath '/grettyOverlay9'
+  overlay ':helloGretty9'
+}
+

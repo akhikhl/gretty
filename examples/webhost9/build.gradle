@@ -1,0 +1,6 @@
+apply plugin: 'gretty9'
+
+dependencies {
+  compile project(':webfragment9')
+}
+

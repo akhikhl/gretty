@@ -5,7 +5,7 @@ buildscript {
     mavenLocal()
     mavenCentral()
   }
-  
+
   dependencies {
     classpath 'org.akhikhl.gretty:gretty7-plugin:0.0.12'
     classpath 'org.akhikhl.gretty:gretty8-plugin:0.0.12'
@@ -25,13 +25,46 @@ ext {
   jetty9_servlet_api_version = '3.1.0'
   groovy_version = '2.2.2'
   logback_version = '1.1.1'
+  spock_version = '0.7-groovy-2.0'
+  gebVersion = '0.9.2'
+  seleniumVersion = '2.40.0'
 }
 
 subprojects {
-  apply plugin: 'maven'
+  apply plugin: 'groovy'
 
   repositories {
     mavenLocal()
     mavenCentral()
   }
+
+  afterEvaluate {
+    if(extensions.findByName('gretty')) {
+
+      dependencies {
+        testCompile "org.codehaus.groovy:groovy-all:$groovy_version"
+        testCompile "org.spockframework:spock-core:$spock_version"
+        testCompile "org.gebish:geb-spock:$gebVersion"
+        testCompile "org.seleniumhq.selenium:selenium-support:$seleniumVersion"
+        testCompile "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion"
+      }
+
+      test {
+        include '**/Test*.*'
+        include '**/*Test.*'
+        exclude '**/*IT.*'
+      }
+
+      task integrationTest(type: Test, dependsOn: 'test') {
+        outputs.upToDateWhen { false }
+        include '**/*IT.*'
+        systemProperty 'geb.build.reportsDir', reporting.file('geb')
+      }
+
+      gretty {
+        integrationTestTask = 'integrationTest'
+      }
+    }
+  }
 }
+

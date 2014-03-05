@@ -33,6 +33,16 @@ task('buildExamples', type: GradleBuild) { task ->
 
 build.finalizedBy buildExamples
 
+task('integrationTest', dependsOn: build)
+
+task('integrationTestExamples', type: GradleBuild) { task ->
+  dependsOn buildExamples
+  dir = file('examples')
+  tasks = [ 'integrationTest' ]
+}
+
+integrationTest.finalizedBy integrationTestExamples
+
 task('cleanExamples', type: GradleBuild) { task ->
   dir = file('examples')
   tasks = [ 'clean' ]
