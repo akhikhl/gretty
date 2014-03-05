@@ -10,6 +10,9 @@ package org.akhikhl.gretty
 import ch.qos.logback.classic.selector.servlet.ContextDetachingSCL
 import ch.qos.logback.classic.selector.servlet.LoggerContextFilter
 import groovy.json.JsonSlurper
+import org.eclipse.jetty.annotations.AnnotationConfiguration
+import org.eclipse.jetty.plus.webapp.EnvConfiguration
+import org.eclipse.jetty.plus.webapp.PlusConfiguration
 import org.eclipse.jetty.security.HashLoginService
 import org.eclipse.jetty.security.LoginService
 import org.eclipse.jetty.server.Connector
@@ -17,9 +20,15 @@ import org.eclipse.jetty.server.HttpConnectionFactory
 import org.eclipse.jetty.server.NetworkConnector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
+import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.webapp.Configuration
+import org.eclipse.jetty.webapp.FragmentConfiguration
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
+import org.eclipse.jetty.webapp.MetaInfConfiguration
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
+import org.eclipse.jetty.webapp.WebInfConfiguration
+import org.eclipse.jetty.webapp.WebXmlConfiguration
 import org.eclipse.jetty.xml.XmlConfiguration
 
 import javax.servlet.DispatcherType
@@ -36,17 +45,21 @@ final class Runner extends RunnerBase {
     super(params)
   }
 
-  protected void addConfigurationClassesToServer() {
-    Configuration.ClassList classlist = org.eclipse.jetty.webapp.Configuration.ClassList.setServerDefault(server)
-    classlist.addAfter('org.eclipse.jetty.webapp.FragmentConfiguration', 'org.eclipse.jetty.plus.webapp.EnvConfiguration', 'org.eclipse.jetty.plus.webapp.PlusConfiguration')
-    classlist.addBefore('org.eclipse.jetty.webapp.JettyWebXmlConfiguration', 'org.eclipse.jetty.annotations.AnnotationConfiguration')
+  @Override
+  protected void addConfigurationClasses(webAppContext) {
+    webAppContext.setConfigurations([
+      new WebInfConfiguration(),
+      new WebXmlConfiguration(),
+      new MetaInfConfiguration(),
+      new FragmentConfiguration(),
+      new EnvConfiguration(),
+      new PlusConfiguration(),
+      new AnnotationConfiguration(),
+      new JettyWebXmlConfiguration()
+    ] as Configuration[])
   }
 
-  protected void applyContainerIncludeJarPattern(webAppContext) {
-    if(!webAppContext.getAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern'))
-      webAppContext.setAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern', '.*/classes/.*')
-  }
-
+  @Override
   protected void applyJettyEnvXml(webAppContext) {
     if(params.jettyEnvXml != null) {
       System.out.println "Configuring webAppContext from ${params.jettyEnvXml}"
@@ -55,6 +68,7 @@ final class Runner extends RunnerBase {
     }
   }
 
+  @Override
   protected void applyJettyXml() {
     if(params.jettyXml != null) {
       System.out.println "Configuring server from ${params.jettyXml}"
@@ -63,6 +77,7 @@ final class Runner extends RunnerBase {
     }
   }
 
+  @Override
   protected void configureConnectors() {
     if(server.getConnectors() != null && server.getConnectors().length != 0)
       return
@@ -75,6 +90,7 @@ final class Runner extends RunnerBase {
     server.addConnector(conn)
   }
 
+  @Override
   protected void configureRealm(context) {
     if(context.getSecurityHandler().getLoginService() != null)
       return
@@ -84,18 +100,21 @@ final class Runner extends RunnerBase {
       context.getSecurityHandler().setLoginService(new HashLoginService(realmInfo.realm, realmInfo.realmConfigFile))
   }
 
+  @Override
   protected createServer() {
     return new Server()
   }
 
+  @Override
   protected createWebAppContext(ClassLoader classLoader) {
     WebAppContext context = new WebAppContext()
-    context.setClassLoader(new WebAppClassLoader(classLoader, context))
+    context.setExtraClasspath(params.projectClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !(it =~ /.*javax\.servlet-api.*\.jar/) }.join(';'))
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
   }
 
+  @Override
   protected int getServerPort() {
     if(server.getConnectors() != null)
       for(Connector conn in server.getConnectors())

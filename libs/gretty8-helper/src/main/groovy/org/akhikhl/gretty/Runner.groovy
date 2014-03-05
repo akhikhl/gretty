@@ -20,7 +20,13 @@ import org.eclipse.jetty.webapp.Configuration
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.xml.XmlConfiguration
-
+import org.eclipse.jetty.webapp.WebInfConfiguration
+import org.eclipse.jetty.webapp.WebXmlConfiguration
+import org.eclipse.jetty.webapp.MetaInfConfiguration
+import org.eclipse.jetty.webapp.FragmentConfiguration
+import org.eclipse.jetty.plus.webapp.EnvConfiguration
+import org.eclipse.jetty.plus.webapp.PlusConfiguration
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
 import javax.servlet.DispatcherType
 
 final class Runner extends RunnerBase {
@@ -37,20 +43,15 @@ final class Runner extends RunnerBase {
 
   protected void addConfigurationClasses(webAppContext) {
     webAppContext.setConfigurations([
-      new org.eclipse.jetty.webapp.WebInfConfiguration(),
-      new org.eclipse.jetty.webapp.WebXmlConfiguration(),
-      new org.eclipse.jetty.webapp.MetaInfConfiguration(),
-      new org.eclipse.jetty.webapp.FragmentConfiguration(),
-      new org.eclipse.jetty.plus.webapp.EnvConfiguration(),
-      new org.eclipse.jetty.plus.webapp.PlusConfiguration(),
+      new WebInfConfigurationEx(),
+      new WebXmlConfiguration(),
+      new MetaInfConfiguration(),
+      new FragmentConfiguration(),
+      new EnvConfiguration(),
+      new PlusConfiguration(),
       new AnnotationConfigurationEx(params.projectClassPath),
-      new org.eclipse.jetty.webapp.JettyWebXmlConfiguration()
+      new JettyWebXmlConfiguration()
     ] as Configuration[])
-  }
-
-  protected void applyContainerIncludeJarPattern(webAppContext) {
-    if(!webAppContext.getAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern'))
-      webAppContext.setAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern', '.*/classes/.*')
   }
 
   protected void applyJettyEnvXml(webAppContext) {
@@ -96,7 +97,7 @@ final class Runner extends RunnerBase {
 
   protected createWebAppContext(ClassLoader classLoader) {
     WebAppContext context = new WebAppContext()
-    context.setClassLoader(new WebAppClassLoader(classLoader, context))
+    context.setExtraClasspath(params.projectClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !(it =~ /.*javax\.servlet-api.*\.jar/) }.join(';'))
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context

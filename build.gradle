@@ -159,9 +159,8 @@ subprojects {
     } // publishing
         
     bintray {
-      user = bintrayUser
-      key = bintrayKey
-      // configurations = ['deployables'] // When uploading configuration files
+      user = project.hasProperty('bintrayUser') ? project.bintrayUser : ''
+      key = project.hasProperty('bintrayKey') ? project.bintrayKey : ''
       publications = ['mavenAll'] // When uploading Maven-based publication files
       pkg {
         repo = 'maven'
@@ -170,7 +169,7 @@ subprojects {
         licenses = ['MIT']
         labels = ['gretty', 'jetty', 'gradle', 'plugin']
       }
-      dryRun = true // whether to run this as dry-run, without deploying
+      dryRun = true
     }
     
   } // if libs
