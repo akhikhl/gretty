@@ -61,8 +61,7 @@ subprojects {
     apply plugin: 'bintray'
 
     repositories {
-      mavenLocal()
-      mavenCentral()
+      jcenter()
     }
       
     group = rootProject.ext.group

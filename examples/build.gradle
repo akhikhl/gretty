@@ -1,9 +1,7 @@
 buildscript {
-  apply plugin: 'maven'
-
   repositories {
     mavenLocal()
-    mavenCentral()
+    jcenter()
   }
 
   dependencies {
@@ -35,7 +33,7 @@ subprojects {
 
   repositories {
     mavenLocal()
-    mavenCentral()
+    jcenter()
   }
 
   afterEvaluate {
