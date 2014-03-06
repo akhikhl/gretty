@@ -156,11 +156,9 @@ subprojects {
           if (plugins.hasPlugin('java')) {
             from components.java
           }
-
           artifact sourcesJar {
             classifier "sources"
           }
-
           artifact javadocJar {
             classifier "javadoc"
           }
@@ -174,12 +172,12 @@ subprojects {
       publications = ['mavenAll'] // When uploading Maven-based publication files
       pkg {
         repo = 'maven'
-        name = 'org.akhikhl.gretty'
+        name = 'gretty'
         desc = 'Advanced gradle plugin for running web-apps on jetty.'
         licenses = ['MIT']
         labels = ['gretty', 'jetty', 'gradle', 'plugin']
       }
-      dryRun = true
+      dryRun = false
     }
     
   } // if libs
