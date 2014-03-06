@@ -2,7 +2,7 @@
 
 ![logo](images/gretty_logo.png "gretty logo")
 
-**Version 0.0.12**
+**Version 0.0.13**
 
 If you are new with gretty, good starting point would be learning [main features](#main-features).
 
@@ -38,6 +38,7 @@ If you already use gretty, it is always a good idea to look in [what's new](what
 * [jetty.xml support](#jettyxml-support)
 * [jetty-env.xml support](#jetty-envxml-support)
 * [JEE annotations support](#jee-annotations-support)
+* [Web fragments support](#web-fragments-support)
 * [Integration tests support](#integration-tests-support)
 * [Publishing gretty to sonatype and bintray](#publishing-gretty-to-sonatype-and-bintray)
 * [Copyright and License](#copyright-and-license)
@@ -62,6 +63,9 @@ If you already use gretty, it is always a good idea to look in [what's new](what
 * [jetty-env.xml support](#jetty-envxml-support). Gretty automatically uses jetty-env.xml, if it's present.
 
 * [JEE annotations support](#jee-annotations-support). Gretty supports JEE annotations out-of-the-box, no effort needed.
+
+* [Web fragments support](#web-fragments-support). Gretty supports META-INF/web-fragment.xml and META-INF/resources
+  in dependency libraries - both in inplace and WAR tasks.
 
 * [Integration tests support](#integration-tests-support). Gretty can start jetty before integration tests and stop it after.
 
@@ -725,6 +729,12 @@ classpath. You can change this behavior by inserting the following into "jetty-e
 
 in the example above we specify, that gretty should scan for annotations any jar whose name starts with "foo-" or "bar-", or a directory named "classes".
 
+## Web fragments support
+
+Gretty supports META-INF/web-fragment.xml and META-INF/resources in dependency libraries - both for inplace and WAR tasks.
+
+**Attention:** web fragments feature was introduced in servlet 3.0 specification, therefore it is not available with jetty 7 (and with gretty7).
+
 ## Integration tests support
 
 Gretty provides you a very simple way to start jetty before integration tests and stop it after.
@@ -751,8 +761,6 @@ gretty {
   integrationTestStatusPort = 9902
 }
 ```
-
-Gretty sources contain [a complete example](../../tree/master/examples/integrationTest) of implementation of integration tests with gretty, [geb](http://www.gebish.org/) and [spock](http://code.google.com/p/spock/).
 
 See also: tasks [jettyBeforeIntegrationTest](#jettybeforeintegrationtest) and [jettyAfterIntegrationTest](#jettyafterintegrationtest).
 

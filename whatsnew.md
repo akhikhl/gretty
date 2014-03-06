@@ -1,5 +1,11 @@
 # What's new in Gretty:
 
+### Version 0.0.13
+
+- Implemented [support of web fragments](README.md#web-fragments-support)
+- Implemented integration tests for most of the examples
+- Introduced bintray publishing configuration in build.gradle
+
 ### Version 0.0.12
 
 - Implemented [support of integration tests](README.md#integration-tests-support)
