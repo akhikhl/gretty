@@ -6,7 +6,7 @@ If you are new with gretty, good starting point would be learning [main features
 
 If you already use gretty, it is always a good idea to look in [what's new](whatsnew.md) section.
 
-All versions of gretty are available at jcenter and maven central under the group 'org.akhikhl.gretty'.
+All versions of gretty are available at jcenter and maven central under the group 'org.akhikhl.gretty'. See more in [usage](#usage) section.
 
 ### Content of this document:
 
@@ -112,7 +112,7 @@ apply plugin: 'war'
 apply plugin: 'gretty'
 ```
 
-All versions of gretty are available on maven central under the group 'org.akhikhl.gretty'.
+All versions of gretty are available at jcenter and maven central under the group 'org.akhikhl.gretty'.
 
 ## Switching between jetty and servlet API versions
 
