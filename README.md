@@ -1,12 +1,12 @@
-[![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/akhikhl/gretty/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![endorse](https://api.coderwall.com/akhikhl/endorsecount.png)](https://coderwall.com/akhikhl)
-
 ![logo](images/gretty_logo.png "gretty logo")
 
-**Version 0.0.13**
+[![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Latest Version](http://img.shields.io/badge/latest_version-0.0.13-blue.svg)](https://github.com/akhikhl/gretty/tree/v0.0.13) [![License](http://img.shields.io/badge/license-MIT-ff69b4.svg)](#copyright-and-license)
 
 If you are new with gretty, good starting point would be learning [main features](#main-features).
 
 If you already use gretty, it is always a good idea to look in [what's new](whatsnew.md) section.
+
+All versions of gretty are available at jcenter and maven central under the group 'org.akhikhl.gretty'. See more in [usage](#usage) section.
 
 ### Content of this document:
 
@@ -112,7 +112,7 @@ apply plugin: 'war'
 apply plugin: 'gretty'
 ```
 
-All versions of gretty are available on maven central under the group 'org.akhikhl.gretty'.
+All versions of gretty are available at jcenter and maven central under the group 'org.akhikhl.gretty'.
 
 ## Switching between jetty and servlet API versions
 
@@ -391,6 +391,7 @@ gretty {
   port = 8080
   servicePort = 9900
   contextPath = '/myWebApp'
+  jvmArgs = ['-Xms256m', '-Xmx512m']
   initParameter 'param1', 'buildTimeEvaluationParameter'
   initParameter 'param2', { 'lazyEvaluationParameter' }
   jettyXml 'jetty.xml'
@@ -433,6 +434,8 @@ Default value is 9900.
 "contextPath" defines context path for the web-application (defaults to project name). "contextPath" affects 
 only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
 to some other servlet container, you'll have to define context path by means of that container.
+
+"jvmArgs" defines the JVM arguments which will be passed to the Jetty process when it starts. 
 
 "initParameter" defines web-application initialization parameter. It has the same meaning/effect, 
 as /web-app/servlet/init-param element in "web.xml". You can specify more than one initParameter.
