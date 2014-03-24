@@ -15,6 +15,7 @@ class GrettyPluginExtension {
   int port = 8080
   int servicePort = 9900
   String contextPath
+  List<String> jvmArgs = []
   Map initParameters = [:]
   String realm
   def realmConfigFile

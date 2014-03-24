@@ -156,6 +156,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
             classpath = project.configurations.grettyHelperConfig
             main = 'org.akhikhl.gretty.Runner'
             args = [json]
+            jvmArgs = project.gretty.jvmArgs
             standardInput = System.in
             debug = options.debug as boolean
             //if(logbackConfigFile)
