@@ -1,24 +1,18 @@
 buildscript {
-
   repositories {
-    mavenLocal()
-    mavenCentral()
+    jcenter()
   }
-
-  apply plugin: 'maven'
   
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.12'
+    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.14'
   }
 }
 
 repositories {
-  mavenLocal()
-  mavenCentral()
+  jcenter()
 }
 
-apply plugin: 'java'
-apply plugin: 'war'
+project.apply plugin: 'war'
 
 if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
   project.apply(plugin: org.akhikhl.gretty.GrettyPlugin)

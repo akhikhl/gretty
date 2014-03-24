@@ -1,5 +1,9 @@
 # What's new in Gretty:
 
+### Version 0.0.14
+
+- Introduced [jvmArgs parameter](README.md#jvmargs) in plugin extension.
+
 ### Version 0.0.13
 
 - Implemented [support of web fragments](README.md#web-fragments-support)

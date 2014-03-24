@@ -8,7 +8,7 @@ buildscript {
   apply plugin: 'maven'
   
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.12'
+    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.13'
   }
 }
 

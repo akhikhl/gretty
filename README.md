@@ -1,6 +1,6 @@
 ![logo](images/gretty_logo.png "gretty logo")
 
-[![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Latest Version](http://img.shields.io/badge/latest_version-0.0.13-blue.svg)](https://github.com/akhikhl/gretty/tree/v0.0.13) [![License](http://img.shields.io/badge/license-MIT-ff69b4.svg)](#copyright-and-license)
+[![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Latest Version](http://img.shields.io/badge/latest_version-0.0.14-blue.svg)](https://github.com/akhikhl/gretty/tree/v0.0.14) [![License](http://img.shields.io/badge/license-MIT-ff69b4.svg)](#copyright-and-license)
 
 If you are new with gretty, good starting point would be learning [main features](#main-features).
 
@@ -435,6 +435,7 @@ Default value is 9900.
 only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
 to some other servlet container, you'll have to define context path by means of that container.
 
+<a name="jvmargs"></a>
 "jvmArgs" defines the JVM arguments which will be passed to the Jetty process when it starts. 
 
 "initParameter" defines web-application initialization parameter. It has the same meaning/effect, 
