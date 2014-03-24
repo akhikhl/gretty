@@ -391,6 +391,7 @@ gretty {
   port = 8080
   servicePort = 9900
   contextPath = '/myWebApp'
+  jvmArgs = ['-Xms256m', '-Xmx512m']
   initParameter 'param1', 'buildTimeEvaluationParameter'
   initParameter 'param2', { 'lazyEvaluationParameter' }
   jettyXml 'jetty.xml'
@@ -433,6 +434,8 @@ Default value is 9900.
 "contextPath" defines context path for the web-application (defaults to project name). "contextPath" affects 
 only jettyRun[War], jettyStart[War] tasks. If you assemble WAR file and deploy it
 to some other servlet container, you'll have to define context path by means of that container.
+
+"jvmArgs" defines the JVM arguments which will be passed to the Jetty process when it starts. 
 
 "initParameter" defines web-application initialization parameter. It has the same meaning/effect, 
 as /web-app/servlet/init-param element in "web.xml". You can specify more than one initParameter.
