@@ -28,6 +28,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
     project.configurations {
       grettyHelperConfig
       grettyLoggingConfig
+	  gretty.extendsFrom(grettyHelperConfig)
     }
 
     injectDependencies(project)
@@ -153,7 +154,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
         scanman.startScanner(project, options.inplace)
         try {
           project.javaexec {
-            classpath = project.configurations.grettyHelperConfig
+            classpath = project.configurations.gretty
             main = 'org.akhikhl.gretty.Runner'
             args = [json]
             jvmArgs = project.gretty.jvmArgs
