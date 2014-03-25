@@ -394,8 +394,8 @@ gretty {
   jvmArgs = ['-Xms256m', '-Xmx512m']
   initParameter 'param1', 'buildTimeEvaluationParameter'
   initParameter 'param2', { 'lazyEvaluationParameter' }
-  jettyXml 'jetty.xml'
-  jettyEnvXml 'jetty-env.xml'
+  jettyXmlFile 'jetty.xml'
+  jettyEnvXmlFile 'jetty-env.xml'
   realm 'auth'
   realmConfigFile 'WEB-INF/jetty-realm.properties'
   onStart {
@@ -441,9 +441,9 @@ to some other servlet container, you'll have to define context path by means of 
 "initParameter" defines web-application initialization parameter. It has the same meaning/effect, 
 as /web-app/servlet/init-param element in "web.xml". You can specify more than one initParameter.
 
-"jettyXml" defines name and/or location of "jetty.xml" file. See more information in chapter [jetty.xml support](#jettyxml-support).
+"jettyXmlFile" defines name and/or location of "jetty.xml" file. See more information in chapter [jetty.xml support](#jettyxml-support).
 
-"jettyEnvXml" defines name and/or location of "jetty-env.xml" file. See more information in chapter [jetty-env.xml support](#jetty-envxml-support).
+"jettyEnvXmlFile" defines name and/or location of "jetty-env.xml" file. See more information in chapter [jetty-env.xml support](#jetty-envxml-support).
 
 "realm" defines security realm for the given web-application. See more information in chapter [Security Realms](#security-realms).
 
@@ -610,19 +610,19 @@ Even if "jetty.xml" is not found, gretty still works - with reasonable defaults
 and possible configuration in gretty extension object.
 
 By convension gretty looks for the file name "jetty.xml". You can (but you don't have to) change the file name
-by specifying property "jettyXml" in gretty extension object:
+by specifying property "jettyXmlFile" in gretty extension object:
 
 ```groovy
 gretty {
   // ...
-  jettyXml = 'someFile.xml'
+  jettyXmlFile = 'someFile.xml'
   // ...
 }
 ```
 
-If explicitly defined jettyXml represents an absolute path, gretty will try to use just that.
+If explicitly defined jettyXmlFile represents an absolute path, gretty will try to use just that.
 
-If implicitly or explicitly defined jettyXml represents a relative path, gretty tries 
+If implicitly or explicitly defined jettyXmlFile represents a relative path, gretty tries 
 to find corresponding existing file in the following directories:
 
 - $JETTY_HOME/etc
@@ -658,19 +658,19 @@ Even if "jetty-env.xml" is not found, gretty still works - with reasonable defau
 and possible configuration in gretty extension object.
 
 By convension gretty looks for the file name "jetty-env.xml". You can (but you don't have to) change the file name
-by specifying property "jettyEnvXml" in gretty extension object:
+by specifying property "jettyEnvXmlFile" in gretty extension object:
 
 ```groovy
 gretty {
   // ...
-  jettyEnvXml = 'someFile.xml'
+  jettyEnvXmlFile = 'someFile.xml'
   // ...
 }
 ```
 
-If explicitly defined jettyEnvXml represents an absolute path, gretty will try to use just that.
+If explicitly defined jettyEnvXmlFile represents an absolute path, gretty will try to use just that.
 
-If implicitly or explicitly defined jettyEnvXml represents a relative path, gretty tries 
+If implicitly or explicitly defined jettyEnvXmlFile represents a relative path, gretty tries 
 to find corresponding existing file in the following directories:
 
 - $project.projectDir
