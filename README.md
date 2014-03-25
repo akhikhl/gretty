@@ -37,6 +37,7 @@ All versions of gretty are available at jcenter and maven central under the grou
 * [Logging](#logging)
 * [jetty.xml support](#jettyxml-support)
 * [jetty-env.xml support](#jetty-envxml-support)
+* [Jetty Classpath](#jetty-classpath)
 * [JEE annotations support](#jee-annotations-support)
 * [Web fragments support](#web-fragments-support)
 * [Integration tests support](#integration-tests-support)
@@ -686,6 +687,20 @@ to find corresponding existing file in the following directories:
 Gretty sources contain example program demonstrating integration of "jetty-env.xml" at work:
 
 - [examples/testJettyEnvXml](https://github.com/akhikhl/gretty/tree/master/examples/testJettyEnvXml)
+
+## Jetty Classpath
+
+Gretty supports the ability to add dependencies to the Jetty classpath. 
+This can be used to add libraries, such as JDBC drivers, which may be needed when Jetty is starting up.
+You can add your dependencies using the `gretty` configuration:
+
+```groovy
+dependencies {
+  // ...
+  gretty 'org.hsqldb:hsqldb:+'
+  // ...
+}
+```
 
 ## JEE annotations support
 
