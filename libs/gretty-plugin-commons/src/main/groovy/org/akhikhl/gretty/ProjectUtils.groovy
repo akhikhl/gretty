@@ -23,6 +23,35 @@ final class ProjectUtils {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectUtils)
 
+  static List<File> collectFilesInOutput(Project project, Object filePattern, boolean searchOverlays = true) {
+    List<File> result = []
+    def collectIt
+    collectIt = { Project proj ->
+      proj.sourceSets.main.output.files.each { File sourceDir ->
+        def collectInDir
+        collectInDir = { File dir ->
+          dir.listFiles().each {
+            if(it.isFile()) {
+              String relPath = sourceDir.toPath().relativize(it.toPath())
+              boolean match = (filePattern instanceof java.util.regex.Pattern) ? (relPath =~ filePattern) : (relPath == filePattern)
+              if(match)
+                result.add(it)
+            }
+            else
+              collectInDir(it)
+          }
+        }
+        collectInDir(sourceDir)
+      }
+      if(searchOverlays && proj.extensions.findByName('gretty'))
+        for(String overlay in proj.gretty.overlays.reverse())
+          collectIt(proj.project(overlay))
+    }
+    collectIt(project)
+    log.debug 'findFileInOutput filePattern: {}, result: {}', filePattern, result
+    return result
+  }
+
   private static Set collectOverlayJars(Project project) {
     Set overlayJars = new HashSet()
     def addOverlayJars // separate declaration from init to enable recursion
@@ -41,40 +70,8 @@ final class ProjectUtils {
   }
 
   static File findFileInOutput(Project project, Object filePattern, boolean searchOverlays = true) {
-    def findInSourceDir = { File sourceDir ->
-      def findInDir
-      findInDir = { File dir ->
-        dir.listFiles().findResult {
-          if(it.isFile()) {
-            String relPath = sourceDir.toPath().relativize(it.toPath())
-            if(filePattern instanceof java.util.regex.Pattern)
-              relPath =~ filePattern ? it : null
-            else
-              relPath == filePattern ? it : null
-          }
-          else
-            findInDir(it)
-        }
-      }
-      findInDir(sourceDir)
-    }
-    def findIt
-    findIt = { Project proj ->
-      File result = proj.sourceSets.main.output.files.findResult(findInSourceDir)
-      if(result) {
-        log.debug 'findFileInOutput filePattern: {}, result: {}', filePattern, result
-        return result
-      }
-      if(searchOverlays && proj.extensions.findByName('gretty'))
-        for(String overlay in proj.gretty.overlays.reverse()) {
-          result = findIt(proj.project(overlay))
-          if(result) {
-            log.debug 'findFileInOutput filePattern: {}, result: {}', filePattern, result
-            return result
-          }
-        }
-    }
-    findIt(project)
+    List files = collectFilesInOutput(project, filePattern, searchOverlays)
+    return files.isEmpty() ? null : files[0]
   }
 
   static String getContextPath(Project project) {
@@ -183,19 +180,6 @@ final class ProjectUtils {
     return resolveFileProperty(project, 'jettyEnvXmlFile', 'jetty-env.xml')
   }
 
-  static void prepareInplaceWebAppFolder(Project project) {
-    // ATTENTION: overlay copy order is important!
-    for(String overlay in project.gretty.overlays)
-      project.copy {
-        from project.project(overlay).webAppDir
-        into "${project.buildDir}/inplaceWebapp"
-      }
-    project.copy {
-      from project.webAppDir
-      into "${project.buildDir}/inplaceWebapp"
-    }
-  }
-
   static void prepareExplodedWebAppFolder(Project project) {
     // ATTENTION: overlay copy order is important!
     for(String overlay in project.gretty.overlays) {
@@ -209,6 +193,42 @@ final class ProjectUtils {
       from project.zipTree(project.tasks.war.archivePath)
       into "${project.buildDir}/explodedWebapp"
     }
+  }
+
+  static void prepareInplaceWebAppFolder(Project project) {
+    // ATTENTION: overlay copy order is important!
+    for(String overlay in project.gretty.overlays) {
+      Project overlayProject = project.project(overlay)
+      prepareInplaceWebAppFolder(overlayProject)
+      project.copy {
+        from "${overlayProject.buildDir}/inplaceWebapp"
+        into "${project.buildDir}/inplaceWebapp"
+      }
+    }
+    project.copy {
+      from project.webAppDir
+      into "${project.buildDir}/inplaceWebapp"
+    }
+  }
+
+  private static List<File> resolveFile(Project project, file) {
+    if(!(file instanceof File))
+      file = new File(file)
+    if(file.isAbsolute())
+      return [ file.absoluteFile ]
+    List<File> list = []
+    File f = new File(project.projectDir, file.path)
+    if(f.exists())
+      list.add(f.absoluteFile)
+    f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
+    if(f.exists())
+      list.add(f.absoluteFile)
+    list.addAll(collectFilesInOutput(project, Pattern.compile(file.path), false))
+    for(def overlay in project.gretty.overlays.reverse())
+      list.addAll(resolveFile(project.project(overlay), file))
+    if(list.isEmpty())
+      log.warn 'Could not resolve file \'{}\' in {}', file, project
+    return list
   }
 
   private static String resolveFileProperty(Project project, String propertyName, defaultValue = null) {
@@ -233,9 +253,9 @@ final class ProjectUtils {
     for(def overlay in project.gretty.overlays.reverse()) {
       overlay = project.project(overlay)
       if(overlay.extensions.findByName('gretty')) {
-        File f = resolveFileProperty(overlay, propertyName, defaultValue)
-        if(f)
-          return file
+        String s = resolveFileProperty(overlay, propertyName, defaultValue)
+        if(s)
+          return s
       } else
         log.warn 'Project {} is not gretty-enabled, could not extract \'{}\'', overlay, propertyName
     }

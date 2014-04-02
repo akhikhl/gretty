@@ -36,6 +36,15 @@ class GrettyPluginExtension {
   String logDir = "${System.getProperty('user.home')}/logs"
   String integrationTestTask
   int integrationTestStatusPort = 9901
+  def fastReload = []
+
+  def fastReload(Object[] args) {
+    for(def arg in args)
+      if(arg instanceof Collection)
+        fastReload.addAll(arg)
+      else
+        fastReload.add(arg)
+  }
 
   def scanDir(String value) {
     scanDirs.add(new File(value))

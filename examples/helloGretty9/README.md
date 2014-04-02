@@ -13,5 +13,12 @@ gradle jettyRun
 - Open in browser:
 
 ```
-http://localhost:8080/helloGretty9/
+http://localhost:8080/helloGretty9/hello
 ```
+
+or:
+
+```
+http://localhost:8080/helloGretty9/test.html
+```
+
