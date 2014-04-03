@@ -3,3 +3,8 @@ apply plugin: 'gretty9'
 dependencies {
   compile 'commons-configuration:commons-configuration:1.9'
 }
+
+gretty {
+  scanInterval = 1
+  fastReload baseDir: project.webAppDir, pattern: /.*\.html/
+}

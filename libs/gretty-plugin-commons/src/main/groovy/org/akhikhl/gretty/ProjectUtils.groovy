@@ -211,27 +211,33 @@ final class ProjectUtils {
     }
   }
 
-  private static List<File> resolveFile(Project project, file) {
-    if(!(file instanceof File))
-      file = new File(file)
-    if(file.isAbsolute())
-      return [ file.absoluteFile ]
-    List<File> list = []
-    File f = new File(project.projectDir, file.path)
-    if(f.exists())
-      list.add(f.absoluteFile)
-    f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
-    if(f.exists())
-      list.add(f.absoluteFile)
-    list.addAll(collectFilesInOutput(project, Pattern.compile(file.path), false))
-    for(def overlay in project.gretty.overlays.reverse())
-      list.addAll(resolveFile(project.project(overlay), file))
-    if(list.isEmpty())
+  static List<File> resolveFile(Project project, file) {
+    List<File> result = []
+    resolveFile_(result, project, file)
+    if(result.isEmpty())
       log.warn 'Could not resolve file \'{}\' in {}', file, project
-    return list
+    return result
   }
 
-  private static String resolveFileProperty(Project project, String propertyName, defaultValue = null) {
+  private static void resolveFile_(List<File> result, Project project, file) {
+    if(!(file instanceof File))
+      file = new File(file)
+    if(file.isAbsolute()) {
+      result.add(file.absoluteFile)
+      return
+    }
+    File f = new File(project.projectDir, file.path)
+    if(f.exists())
+      result.add(f.absoluteFile)
+    f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
+    if(f.exists())
+      result.add(f.absoluteFile)
+    result.addAll(collectFilesInOutput(project, Pattern.compile(file.path), false))
+    for(def overlay in project.gretty.overlays.reverse())
+      resolveFile_(result, project.project(overlay), file)
+  }
+
+  static String resolveFileProperty(Project project, String propertyName, defaultValue = null) {
     def file = project.gretty[propertyName]
     if(file == null)
       file = defaultValue

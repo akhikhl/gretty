@@ -38,12 +38,16 @@ class GrettyPluginExtension {
   int integrationTestStatusPort = 9901
   def fastReload = []
 
-  def fastReload(Object[] args) {
-    for(def arg in args)
-      if(arg instanceof Collection)
-        fastReload.addAll(arg)
-      else
-        fastReload.add(arg)
+  def fastReload(String arg) {
+    fastReload.add(arg)
+  }
+
+  def fastReload(File arg) {
+    fastReload.add(arg)
+  }
+
+  def fastReload(Map map) {
+    fastReload.add(map)
   }
 
   def scanDir(String value) {
