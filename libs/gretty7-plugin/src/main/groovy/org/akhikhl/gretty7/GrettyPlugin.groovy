@@ -22,7 +22,7 @@ final class GrettyPlugin extends GrettyPluginBase {
   void injectDependencies(Project project) {
     project.dependencies {
       providedCompile 'javax.servlet:servlet-api:2.5'
-      grettyHelperConfig 'org.akhikhl.gretty:gretty7-helper:0.0.14'
+      grettyHelperConfig 'org.akhikhl.gretty:gretty7-helper:0.0.15'
     }
   }
 }

@@ -1,8 +1,14 @@
 # What's new in Gretty:
 
+### Version 0.0.15
+
+- Introduced [fastReload property](README.md#fast-reload) in plugin extension.
+
+- Fixed compatibility with JDK 8 issues.
+
 ### Version 0.0.14
 
-- Introduced [jvmArgs parameter](README.md#jvmargs) in plugin extension.
+- Introduced [jvmArgs property](README.md#jvmargs) in plugin extension.
 
 ### Version 0.0.13
 

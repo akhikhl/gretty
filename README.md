@@ -1,6 +1,6 @@
 ![logo](images/gretty_logo.png "gretty logo")
 
-[![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Latest Version](http://img.shields.io/badge/latest_version-0.0.14-blue.svg)](https://github.com/akhikhl/gretty/tree/v0.0.14) [![License](http://img.shields.io/badge/license-MIT-ff69b4.svg)](#copyright-and-license)
+[![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) [![Latest Version](http://img.shields.io/badge/latest_version-0.0.15-blue.svg)](https://github.com/akhikhl/gretty/tree/v0.0.15) [![License](http://img.shields.io/badge/license-MIT-ff69b4.svg)](#copyright-and-license)
 
 If you are new with gretty, good starting point would be learning [main features](#main-features).
 
@@ -33,6 +33,7 @@ All versions of gretty are available at jcenter and maven central under the grou
 * [WAR Overlays](#war-overlays)
 * [Security Realms](#security-realms)
 * [Hot deployment](#hot-deployment)
+* [Fast reload](#fast-reload)
 * [Debugger support](#debugger-support)
 * [Logging](#logging)
 * [jetty.xml support](#jettyxml-support)
@@ -54,6 +55,9 @@ All versions of gretty are available at jcenter and maven central under the grou
 * [Security Realms](#security-realms). Gretty supports jetty security realms.
 
 * [Hot deployment](#hot-deployment). Gretty accurately reloads your web-application, as soon as assets or compiled classes have changed.
+
+* [Fast reload](#fast-reload). You can specify that certain folders or files, when changed, should not cause webapp
+restart, but should be simply copied into running webapp.
 
 * [Debugger support](#debugger-support). Gretty integrates nicely with Java IDE debuggers.
 
@@ -91,13 +95,9 @@ or feel free copying (and modifying) the declarations from this script to your "
 
 ```groovy
 buildscript {
-
   repositories {
-    mavenLocal()
-    mavenCentral()
+    jcenter()
   }
-
-  apply plugin: 'maven'
   
   dependencies {
     classpath 'org.akhikhl.gretty:gretty-plugin:+'
@@ -105,8 +105,7 @@ buildscript {
 }
 
 repositories {
-  mavenLocal()
-  mavenCentral()
+  jcenter()
 }
 
 apply plugin: 'war'
@@ -416,6 +415,8 @@ gretty {
   onScanFilesChanged { fileList ->
     println "Files were changed: $fileList"
   }
+  fastReload true
+  fastReload baseDir: 'xyz', pattern: /.*\.html/, excludesPattern: /abc\.html/
   logbackConfigFile = 'xyz/logback.groovy'
   loggingLevel = 'INFO'
   consoleLogEnabled = true
@@ -463,6 +464,9 @@ as /web-app/servlet/init-param element in "web.xml". You can specify more than o
 "onScan" defines closure to be called on hot-deployment scan. See more information in chapter [Hot deployment](#hot-deployment).
 
 "onScanFilesChanged" defines closure to be called whenever hot-deployment detects that files or folders were changed. See more information in chapter [Hot deployment](#hot-deployment).
+
+"fastReload" defines which folders are to be fast-reloaded on change, i.e. copied to running webapp without restarting webapp.
+See more information in chapter [Fast reload](#fast-reload).
 
 "logbackConfigFile" defines the absolute or relative path to logback configuration file (.groovy or .xml). See more information in chapter [Logging](#logging).
 
@@ -548,6 +552,64 @@ Also you should not call scanDir for dependency jars or overlay WARs - all these
 "onScan" defines closure to be called on hot-deployment scan, i.e. each scanInterval seconds. The function is called unconditionally, regardless of whether hot deployment detects changed files or not.
 
 "onScanFilesChanged" defines closure to be called whenever hot-deployment detects that files or folders were changed. The closure receives List<File> as the parameter, which holds all changed files and folders.
+
+## Fast reload
+
+There are cases, when restart of the web-application on resource change is not optimal (too slow).
+Specifically for such cases Gretty implements "fast reload" feature.
+
+Gretty fast reload assumes the following defaults:
+
+* "fastReload" property is set to false, that means that fast reload feature is disabled. Effect: any resource changes
+will cause web-application to restart itself (as far as scanInterval is specified, see [Hot deployment](#hot-deployment)).
+
+* Fast reload always excludes the following files: \*.jar, \*.class, web.xml, web-fragment.xml, jetty.xml, jetty-env.xml, WEB-INF/lib/\*\*, WEB-INF/classes/\*\*.
+That means: these files, when changed, are always causing web-application restart.
+
+You can simply enable fast reload feature by setting fastReload property to true:
+
+```groovy
+gretty {
+  scanInterval = 1 // in seconds
+  fastReload = true
+}
+```
+
+Effect: webAppDir folder (which is typically src/main/webapp) is set as being fast-reloaded.
+That means: whenever some files are changed within webAppDir, these files are copied into running webapp without webapp restart.
+
+You can fine-tune fast reload by setting map properties for fastReload property:
+
+```groovy
+gretty {
+  scanInterval = 1 // in seconds
+  fastReload baseDir: 'xyz', pattern: /.*\.html/, excludesPattern: /abc\.html/
+}
+```
+
+- "baseDir" is required and should have type String or java.io.File. If baseDir represents a relative path, 
+  gretty tries  to find corresponding existing folder in the following directories:
+
+  - $project.projectDir
+
+  - $project.webAppDir
+
+  - $project.buildDir/classes/main
+
+  - $project.buildDir/resources/main
+  
+  each resolved subfolder within these folders is added to fast reload.
+  
+- "pattern" is optional and should have type String or java.util.regex.Pattern. If "pattern" is not specified,
+  then all files within baseDir are fast-reloaded. If "pattern" is specified, then only the files,
+  whose relative (to baseDir) paths satisfy "pattern", are fast-reloaded, other files are full-reloaded.
+  
+- "excludesPattern" is optional and should have type String or java.util.regex.Pattern. If "excludesPattern" is not specified,
+  then "pattern" fully defines which files are fast-reloaded. If "excludesPattern" is specified, then those files
+  whose relative (to baseDir) paths satisfy "excludesPattern", are not fast-reloaded. "excludesPattern" is always
+  applied after "pattern".
+  
+You can add more than one fastReload specification. In such case all specified folders are fast-reloaded.
 
 ## Debugger support
 
