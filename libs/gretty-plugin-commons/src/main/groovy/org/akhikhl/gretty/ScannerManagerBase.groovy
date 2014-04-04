@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import java.nio.file.Path
+import java.nio.file.Paths
 import org.gradle.api.Project
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -85,7 +86,7 @@ abstract class ScannerManagerBase {
   private void configureFastReload() {
     if(inplace) {
       List fastReloads = collectFastReloads(project)
-      log.warn 'fastReloads={}', fastReloads
+      log.debug 'fastReloads={}', fastReloads
       fastReloadDirs = []
       if(fastReloads.find { (it instanceof Boolean) && it })
         addDefaultFastReloadDirs(project)
@@ -96,9 +97,9 @@ abstract class ScannerManagerBase {
   protected void configureScanner() {
     scanner.reportExistingFilesOnStartup = false
     scanner.scanInterval = project.gretty.scanInterval
-    addScannerBulkListener { List<String> changedFiles ->
+    addScannerBulkListener { Collection<String> changedFiles ->
       for(def f in changedFiles)
-        log.warn 'changedFile={}', f
+        log.debug 'changedFile={}', f
       project.gretty.onScanFilesChanged*.call(changedFiles)
       if(inplace) {
         if(shouldFullReload(changedFiles)) {
@@ -150,22 +151,22 @@ abstract class ScannerManagerBase {
     return scanDirs
   }
 
-  private boolean shouldFullReload(List<String> changedFiles) {
+  protected boolean shouldFullReload(Collection<String> changedFiles) {
     for(String f in changedFiles) {
       if(f.endsWith('.jar')) {
-        log.warn 'file {} is jar, switching to fullReload', f
+        log.debug 'file {} is jar, switching to fullReload', f
         return true
       }
       if(f.endsWith('.class')) {
-        log.warn 'file {} is class, switching to fullReload', f
+        log.debug 'file {} is class, switching to fullReload', f
         return true
       }
       if(['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml'].find { f.endsWith(File.separator + it) }) {
-        log.warn 'file {} is configuration file, switching to fullReload', f
+        log.debug 'file {} is configuration file, switching to fullReload', f
         return true
       }
       if(f.startsWith(new File(project.webAppDir, 'WEB-INF/lib').absolutePath)) {
-        log.warn 'file {} is in WEB-INF/lib, switching to fullReload', f
+        log.debug 'file {} is in WEB-INF/lib, switching to fullReload', f
         return true
       }
       Path path = Paths.get(f)
@@ -173,7 +174,7 @@ abstract class ScannerManagerBase {
         String relPath = s.baseDir.toPath().relativize(path)
         f.startsWith(s.baseDir.absolutePath) && (s.pattern == null || relPath =~ s.pattern) && (s.excludesPattern == null || !(relPath =~ s.excludesPattern))
       }) {
-        log.warn 'file {} is not in fastReloadDirs, switching to fullReload', f
+        log.debug 'file {} is not in fastReloadDirs, switching to fullReload', f
         return true
       }
     }
@@ -191,7 +192,7 @@ abstract class ScannerManagerBase {
     scanner.scanDirs = getEffectiveScanDirs()
     configureFastReload()
     configureScanner()
-    log.info 'Starting scanner with interval of {} second(s)', project.gretty.scanInterval
+    log.warn 'Starting scanner with interval of {} second(s)', project.gretty.scanInterval
     scanner.start()
   }
 

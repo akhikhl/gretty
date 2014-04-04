@@ -6,5 +6,5 @@ dependencies {
 
 gretty {
   scanInterval = 1
-  fastReload baseDir: project.webAppDir, pattern: /.*\.html/
+  fastReload = true
 }
