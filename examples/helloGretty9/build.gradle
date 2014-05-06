@@ -1,6 +1,7 @@
 apply plugin: 'gretty9'
 
 dependencies {
+  // not needed by gretty itself, here just for an example
   compile 'commons-configuration:commons-configuration:1.9'
 }
 
