@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty
 
+import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 
@@ -22,9 +23,16 @@ class GrettySyncServiceTask extends GrettyServiceTask {
 
   @Override
   void action() {
-    Future stopped = ServiceControl.readMessage(executor, syncPort)
-    ServiceControl.send(project.gretty.servicePort, command)
+    Future stopped = ServiceControl.readMessage(executorService, syncPort)
+    ServiceControl.send(servicePort, command)
     stopped.get()
+  }
+
+  @Override
+  void setupProperties() {
+    super.setupProperties()
+    executorService = executorService ?: Executors.newSingleThreadExecutor()
+    requiredProperty syncPort
   }
 }
 

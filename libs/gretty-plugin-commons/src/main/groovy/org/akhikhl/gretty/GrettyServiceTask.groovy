@@ -7,23 +7,26 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.DefaultTask
 
 /**
  * Gradle task for control over jetty
  *
  * @author akhikhl
  */
-class GrettyServiceTask {
+class GrettyServiceTask extends GrettyBaseTask {
 
+  int servicePort
   String command
 
-  GrettyServiceTask() {
-    doLast {
-      action()
-    }
+  @Override
+  void action() {
+    ServiceControl.send(servicePort, command)
   }
 
-  void action() {
-    ServiceControl.send(project.gretty.servicePort, command)
+  @Override
+  void setupProperties() {
+    servicePort = servicePort ?: project.gretty.servicePort
+    requiredProperty 'command'
   }
 }

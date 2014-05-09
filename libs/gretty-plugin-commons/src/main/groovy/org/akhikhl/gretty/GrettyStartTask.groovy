@@ -15,50 +15,52 @@ import org.gradle.api.DefaultTask
  *
  * @author akhikhl
  */
-class GrettyStartTask extends DefaultTask {
+class GrettyStartTask extends GrettyBaseTask {
 
   boolean autoStart = true
   boolean inplace = true
   boolean interactive = true
   boolean debug = false
   boolean integrationTest = false
-  def logbackConfigFile
+  int port
+  int servicePort
+  String contextPath
+  String inplaceResourceBase
+  String warResourceBase
+  Map initParameters
+  ProjectUtils.RealmInfo realmInfo
+  String jettyXml
+  String jettyEnvXml
+  Collection<URL> classPath
+  List<String> jvmArgs
+  String logbackConfigFile
+  String loggingLevel
+  Boolean consoleLogEnabled
+  Boolean fileLogEnabled
+  String logFileName
+  String logDir
+  int integrationTestStatusPort
 
-  private effectiveLogbackConfigFile
-
-  GrettyStartTask() {
-    doFirst() {
-      autoConfigure()
-    }
-    doLast {
-      action()
-    }
-  }
-
+  @Override
   void action() {
-    // synchronously runs jetty with the desired parameters.
-    // can be implemented differently in descendant classes.
+    // Synchronously runs jetty with the desired parameters.
+    // Can be changed in descendant classes.
     run()
-  }
-
-  void autoConfigure() {
-    effectiveLogbackConfigFile = logbackConfigFile ?: project.gretty.logbackConfigFile
   }
 
   private File discoverLogbackConfigFile() {
     File result
-    if(effectiveLogbackConfigFile) {
-      if(effectiveLogbackConfigFile instanceof String)
-        result = new File(effectiveLogbackConfigFile)
-      if(!result || !result.isAbsolute()) {
-        result = new File(project.projectDir, effectiveLogbackConfigFile)
-        if(!result || !result.exists())
-          result = ProjectUtils.findFileInOutput(project, effectiveLogbackConfigFile)
+    if(logbackConfigFile) {
+      result = new File(logbackConfigFile)
+      if(!result.isAbsolute()) {
+        result = new File(project.projectDir, logbackConfigFile)
+        if(!result.exists())
+          result = ProjectUtils.findFileInOutput(project, logbackConfigFile)
       }
       if(!result || !result.exists())
-        project.logger.warn 'The specified logback config file "{}" does not exist, ignoring', effectiveLogbackConfigFile
+        project.logger.warn 'The specified logback config file "{}" does not exist, ignoring', logbackConfigFile
       else
-        project.logger.warn 'Using specified logback config file "{}"', effectiveLogbackConfigFile
+        project.logger.warn 'Using specified logback config file "{}"', logbackConfigFile
     } else {
       result = ProjectUtils.findFileInOutput(project, ~/logback\.(xml|groovy)/)
       if(result)
@@ -70,6 +72,7 @@ class GrettyStartTask extends DefaultTask {
   }
 
   private String prepareJson() {
+    File logbackConfigFile_ = discoverLogbackConfigFile()
     def json = new JsonBuilder()
     json {
       projectName project.name
@@ -77,25 +80,25 @@ class GrettyStartTask extends DefaultTask {
       inplace inplace
       interactive interactive
       integrationTest integrationTest
-      port project.gretty.port
-      servicePort project.gretty.servicePort
-      integrationTestStatusPort project.gretty.integrationTestStatusPort
-      contextPath ProjectUtils.getContextPath(project)
-      resourceBase (inplace ? "${project.buildDir}/inplaceWebapp" : ProjectUtils.getFinalWarPath(project).toString())
-      initParams ProjectUtils.getInitParameters(project)
-      realmInfo ProjectUtils.getRealmInfo(project)
-      jettyXml ProjectUtils.getJettyXml(project)
-      jettyEnvXml ProjectUtils.getJettyEnvXml(project)
-      projectClassPath ProjectUtils.getClassPath(project, inplace)
-      if(logbackConfigFile)
-        logbackConfig logbackConfigFile.absolutePath
+      port port
+      servicePort servicePort
+      integrationTestStatusPort integrationTestStatusPort
+      contextPath contextPath
+      resourceBase (inplace ? inplaceResourceBase : warResourceBase)
+      initParams initParameters
+      realmInfo realmInfo
+      jettyXml jettyXml
+      jettyEnvXml jettyEnvXml
+      projectClassPath classPath
+      if(logbackConfigFile_)
+        logbackConfig logbackConfigFile_.absolutePath
       else
         logging {
-          loggingLevel project.gretty.loggingLevel
-          consoleLogEnabled project.gretty.consoleLogEnabled
-          fileLogEnabled project.gretty.fileLogEnabled
-          logFileName project.gretty.logFileName ?: project.name
-          logDir project.gretty.logDir
+          loggingLevel loggingLevel
+          consoleLogEnabled consoleLogEnabled
+          fileLogEnabled fileLogEnabled
+          logFileName logFileName ?: project.name
+          logDir logDir
         }
     }
     return json.toString()
@@ -104,8 +107,6 @@ class GrettyStartTask extends DefaultTask {
   protected void run() {
 
     project.gretty.onStart*.call()
-
-    File logbackConfigFile = discoverLogbackConfigFile()
 
     String json = prepareJson()
     project.logger.info json
@@ -122,7 +123,7 @@ class GrettyStartTask extends DefaultTask {
         spec.classpath = project.configurations.gretty
         spec.main = 'org.akhikhl.gretty.Runner'
         spec.args = [json]
-        spec.jvmArgs = project.gretty.jvmArgs
+        spec.jvmArgs = jvmArgs
         spec.standardInput = System.in
         spec.debug = debug
       }
@@ -131,5 +132,27 @@ class GrettyStartTask extends DefaultTask {
     }
 
     project.gretty.onStop*.call()
+  }
+
+  @Override
+  void setupProperties() {
+    port = port ?: project.gretty.port
+    servicePort = servicePort ?: project.gretty.servicePort
+    contextPath = contextPath ?: ProjectUtils.getContextPath(project)
+    inplaceResourceBase = inplaceResourceBase ?: "${project.buildDir}/inplaceWebapp"
+    warResourceBase = warResourceBase ?: ProjectUtils.getFinalWarPath(project).toString()
+    initParameters = initParameters ?: ProjectUtils.getInitParameters(project)
+    realmInfo = realmInfo ?: ProjectUtils.getRealmInfo(project)
+    jettyXml = jettyXml ?: ProjectUtils.getJettyXml(project)
+    jettyEnvXml = jettyEnvXml ?: ProjectUtils.getJettyEnvXml(project)
+    classPath = classPath ?: ProjectUtils.getClassPath(project, inplace)
+    jvmArgs = jvmArgs ?: project.gretty.jvmArgs
+    logbackConfigFile = logbackConfigFile ?: project.gretty.logbackConfigFile
+    loggingLevel = loggingLevel ?: project.gretty.loggingLevel
+    consoleLogEnabled = consoleLogEnabled == null ?: project.gretty.consoleLogEnabled
+    fileLogEnabled = fileLogEnabled == null ?: project.gretty.fileLogEnabled
+    logFileName = logFileName ?: project.gretty.logFileName
+    logDir = logDir ?: project.gretty.logDir
+    integrationTestStatusPort = integrationTestStatusPort ?: project.gretty.integrationTestStatusPort
   }
 }
