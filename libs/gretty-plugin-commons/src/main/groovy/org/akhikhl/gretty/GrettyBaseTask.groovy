@@ -14,7 +14,7 @@ import org.gradle.api.GradleException
  *
  * @author akhikhl
  */
-class GrettyBaseTask extends DefaultTask {
+abstract class GrettyBaseTask extends DefaultTask {
 
   GrettyBaseTask() {
     doFirst() {
@@ -29,9 +29,9 @@ class GrettyBaseTask extends DefaultTask {
 
   protected final void requiredProperty(String propName) {
     if(!hasProperty(propName) || !properties[propName])
-      throw new Exception("Missing required property: ${getClass().getName()}.${propName}")
+      throw new GradleException("Missing required property: ${getClass().getName()}.${propName}")
   }
-  
+
   protected void setupProperties() {
   }
 }
