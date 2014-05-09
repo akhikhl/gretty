@@ -15,7 +15,6 @@ class GrettyPluginExtension {
   int port = 8080
   int servicePort = 9900
   String contextPath
-  List<String> jvmArgs = []
   Map initParameters = [:]
   String realm
   def realmConfigFile
@@ -28,6 +27,7 @@ class GrettyPluginExtension {
   List<Closure> onScanFilesChanged = []
   int scanInterval = 0 // scan interval in seconds. When zero, scanning is disabled.
   List scanDirs = [] // list of additional scan directories
+  def fastReload = []
   String logbackConfigFile
   String loggingLevel = 'INFO'
   boolean consoleLogEnabled = true
@@ -36,57 +36,61 @@ class GrettyPluginExtension {
   String logDir = "${System.getProperty('user.home')}/logs"
   String integrationTestTask
   int integrationTestStatusPort = 9901
-  def fastReload = []
+  List<String> jvmArgs = []
 
-  def fastReload(String arg) {
+  void fastReload(String arg) {
     fastReload.add(arg)
   }
 
-  def fastReload(File arg) {
+  void fastReload(File arg) {
     fastReload.add(arg)
   }
 
-  def fastReload(Map map) {
+  void fastReload(Map map) {
     fastReload.add(map)
   }
 
-  def scanDir(String value) {
-    scanDirs.add(new File(value))
-  }
-
-  def scanDir(File value) {
-    scanDirs.add(value)
-  }
-
-  def scanDir(Object[] args) {
-    for(def arg in args)
-      if(arg != null)
-        scanDirs.add(arg)
-  }
-
-  def initParameter(key, value) {
+  void initParameter(key, value) {
     initParameters[key] = value
   }
 
-  def overlay(def newValue) {
+  void overlay(def newValue) {
     if(!(newValue instanceof String))
       throw new GradleException("Overlay ${newValue?.toString()} should be a string")
     overlays.add newValue
   }
 
-  def onScan(Closure newValue) {
+  void onScan(Closure newValue) {
     onScan.add newValue
   }
 
-  def onScanFilesChanged(Closure newValue) {
+  void onScanFilesChanged(Closure newValue) {
     onScanFilesChanged.add newValue
   }
 
-  def onStart(Closure newValue) {
+  void onStart(Closure newValue) {
     onStart.add newValue
   }
 
-  def onStop(Closure newValue) {
+  void onStop(Closure newValue) {
     onStop.add newValue
+  }
+
+  void scanDir(String value) {
+    scanDirs.add(new File(value))
+  }
+
+  void scanDir(File value) {
+    scanDirs.add(value)
+  }
+
+  void scanDir(Object[] args) {
+    for(def arg in args)
+      if(arg != null)
+        scanDirs.add(arg)
+  }
+
+  void setFastReload(boolean newValue) {
+    fastReload = [ newValue ]
   }
 }

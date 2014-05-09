@@ -41,7 +41,7 @@ final class ScannerManager extends ScannerManagerBase {
     scanner.recursive = true
     addScannerScanCycleListener { started, cycle ->
       if(started)
-        project.gretty.onScan*.call(cycle)
+        startTask.onScan*.call(cycle)
     }
   }
 

@@ -18,14 +18,21 @@ import java.util.concurrent.Future
 class GrettySyncStartTask extends GrettyStartTask {
 
   ExecutorService executorService
-  int syncPort
+  Integer syncPort
 
   @Override
   void action() {
     Future started = ServiceControl.readMessage(executorService, syncPort)
     Thread.start {
-      run()
+      runJetty()
     }
     started.get()
+  }
+
+  @Override
+  void setupProperties() {
+    super.setupProperties()
+    if(executorService == null) executorService = Executors.newSingleThreadExecutor()
+    requiredProperty 'syncPort'
   }
 }

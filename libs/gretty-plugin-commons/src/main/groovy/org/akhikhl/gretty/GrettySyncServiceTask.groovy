@@ -19,7 +19,7 @@ import java.util.concurrent.Future
 class GrettySyncServiceTask extends GrettyServiceTask {
 
   ExecutorService executorService
-  int syncPort
+  Integer syncPort
 
   @Override
   void action() {
@@ -31,8 +31,8 @@ class GrettySyncServiceTask extends GrettyServiceTask {
   @Override
   void setupProperties() {
     super.setupProperties()
-    executorService = executorService ?: Executors.newSingleThreadExecutor()
-    requiredProperty syncPort
+    if(executorService == null) executorService = Executors.newSingleThreadExecutor()
+    requiredProperty 'syncPort'
   }
 }
 

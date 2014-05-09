@@ -16,12 +16,58 @@ import org.slf4j.LoggerFactory
 
 final class ProjectUtils {
 
-  static class RealmInfo {
-    String realm
-    String realmConfigFile
+  private static final Logger log = LoggerFactory.getLogger(ProjectUtils)
+
+  private static void addDefaultFastReloadDirs(List<FastReloadStruct> result, Project proj) {
+    result.add(new FastReloadStruct(baseDir: proj.webAppDir))
+    for(def overlay in proj.gretty.overlays)
+      addDefaultFastReloadDirs(result, proj.project(overlay))
   }
 
-  private static final Logger log = LoggerFactory.getLogger(ProjectUtils)
+  private static void addFastReloadDirs(List<FastReloadStruct> result, Project proj, List fastReloads) {
+    for(def f in fastReloads) {
+      if(f instanceof Boolean)
+        continue
+      File baseDir
+      def pattern
+      def excludesPattern
+      if(f instanceof String)
+        baseDir = new File(f)
+      else if(f instanceof File)
+        baseDir = f
+      else if(f instanceof Map) {
+        f.each { key, value ->
+          if(key == 'baseDir')
+            baseDir = value
+          else if(key == 'pattern')
+            pattern = value
+          else if(key == 'excludesPattern')
+            excludesPattern = value
+          else
+            log.warn 'Unknown fastReload property: {}', key
+        }
+        if(!baseDir) {
+          log.warn 'fastReload property baseDir is not specified'
+          continue
+        }
+      } else {
+        log.warn 'fastReload argument must be String, File or Map'
+        continue
+      }
+      resolveFile(proj, baseDir).each {
+        result.add(new FastReloadStruct(baseDir: it, pattern: pattern, excludesPattern: excludesPattern))
+      }
+    }
+  }
+
+  private static void collectFastReloads(List result, Project proj) {
+    result.addAll(proj.gretty.fastReload)
+    for(def overlay in proj.gretty.overlays.reverse()) {
+      overlay = proj.project(overlay)
+      if(overlay.extensions.findByName('gretty'))
+        collectFastReloads(result, overlay)
+    }
+  }
 
   static List<File> collectFilesInOutput(Project project, Object filePattern, boolean searchOverlays = true) {
     List<File> result = []
@@ -113,6 +159,19 @@ final class ProjectUtils {
     for(URL url in urls)
       log.debug 'classpath URL: {}', url
     return urls
+  }
+
+  static List<FastReloadStruct> getFastReload(Project project, List fastReloads = null) {
+    if(fastReloads == null) {
+      fastReloads = []
+      collectFastReloads(fastReloads, project)
+    }
+    log.debug 'fastReloads={}', fastReloads
+    List<FastReloadStruct> result = []
+    if(fastReloads.find { (it instanceof Boolean) && it })
+      addDefaultFastReloadDirs(result, project)
+    addFastReloadDirs(result, project, fastReloads)
+    return result
   }
 
   static File getFinalWarPath(Project project) {

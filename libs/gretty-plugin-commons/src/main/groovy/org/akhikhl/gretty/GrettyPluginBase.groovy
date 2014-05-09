@@ -35,6 +35,11 @@ abstract class GrettyPluginBase implements Plugin<Project> {
     project.task('run')
     project.task('debug')
 
+    def self = this
+    project.ext._createScannerManager = {
+      self.createScannerManager()
+    }
+
     project.afterEvaluate {
       for(String overlay in project.gretty.overlays)
         project.dependencies.add 'providedCompile', project.project(overlay)

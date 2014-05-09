@@ -11,6 +11,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 
 /**
+ * Base class for all gretty tasks
  *
  * @author akhikhl
  */
