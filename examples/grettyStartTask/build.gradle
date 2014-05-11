@@ -1,0 +1,21 @@
+apply plugin: 'gretty9'
+
+import org.akhikhl.gretty.*
+
+dependencies {
+  // not needed by gretty itself, used by example code in servlet
+  compile 'commons-configuration:commons-configuration:1.9'
+}
+
+/* Here is our gretty task. See documentation for complete list of task properties.
+ * Note how dependency on prepareInplaceWebApp is wrapped into closure -
+ * this is intentional. The point is that prepareInplaceWebApp task is defined
+ * in afterEvaluate and, therefore, undefined at the moment this script is evaluated.
+ * Closure wrapping allows to postpone task resolution until later moment.
+ */
+task('myJettyRun', type: GrettyStartTask) {
+  dependsOn { tasks.prepareInplaceWebApp }
+  debug = true
+  scanInterval = 1  
+  fastReload = true
+}
