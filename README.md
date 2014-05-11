@@ -29,6 +29,11 @@ All versions of gretty are available at jcenter and maven central under the grou
   * [jettyRestart](#jettyrestart)
   * [jettyBeforeIntegrationTest](#jettybeforeintegrationtest)
   * [jettyAfterIntegrationTest](#jettyafterintegrationtest)
+* [Task classes](#task-classes)
+  * [GrettyStartTask](#grettystarttask)
+  * [GrettySyncStartTask](#grettysyncstarttask)
+  * [GrettyServiceTask](#grettyservicetask)
+  * [GrettySyncServiceTask](#grettysyncservicetask)
 * [Configuration](#configuration)
 * [WAR Overlays](#war-overlays)
 * [Security Realms](#security-realms)
@@ -356,7 +361,7 @@ This task assumes that jetty was started with "jettyStart" task and listens for 
 
 Internal task, please, don't invoke it on command line!
 
-Gretty automatically defines and invokes this task, when you define "integrationTestTask" property.
+Gretty automatically defines and invokes this task, when you define ["integrationTestTask"](#integration-tests-support) property.
 
 **Effect:**
 
@@ -371,7 +376,7 @@ See also: [integration tests support](#integration-tests-support).
 
 Internal task, please, don't invoke it on command line!
 
-Gretty automatically defines and invokes this task, when you define "integrationTestTask" property.
+Gretty automatically defines and invokes this task, when you define ["integrationTestTask"](#integration-tests-support) property.
 
 **Effect:**
 
@@ -381,6 +386,69 @@ Gretty automatically defines and invokes this task, when you define "integration
 4. Gradle script continues normal execution of tasks.
 
 See also: [integration tests support](#integration-tests-support).
+
+## Task classes
+
+### GrettyStartTask
+
+Starts jetty in the specified mode with the specified parameters.
+
+**Syntax:**
+
+```groovy
+import org.akhikhl.gretty.GrettyStartTask
+// ...
+task('myJettyRun', type: GrettyStartTask) {
+  dependsOn { tasks.prepareInplaceWebApp }
+  autoStart = true
+  inplace = true
+  interactive = true
+  debug = false
+  integrationTest = false
+  port = 8080
+  servicePort = 9900
+  contextPath = '/myWebApp'
+  inplaceResourceBase = "${project.buildDir}/inplaceWebapp"
+  warResourceBase = project.tasks.war.archivePath
+  initParameters = [:]
+  realmInfo = null // RealmInfo class
+  jettyXml = 'jetty.xml'
+  jettyEnvXml = 'jetty-env.xml'
+  onStart {
+    println 'Jetty start'
+  }
+  onStop {
+    println 'Jetty stop'
+  }
+  scanInterval = 1 // in seconds
+  scanDir 'dir1'
+  scanDir 'dir2'
+  onScan {
+    println 'Scanning files for changes'
+  }
+  onScanFilesChanged { fileList ->
+    println "Files were changed: $fileList"
+  }
+  fastReload true
+  fastReload baseDir: 'xyz', pattern: /.*\.html/, excludesPattern: /abc\.html/
+  logbackConfigFile = 'xyz/logback.groovy'
+  loggingLevel = 'INFO'
+  consoleLogEnabled = true
+  fileLogEnabled = true
+  logFileName = project.name
+  logDir = "${System.getProperty('user.home')}/logs"
+  integrationTestStatusPort = 9901
+  jvmArgs = []
+  classPath = null // defaults to project's runtime classpath
+}
+```
+
+Attention: all task properties are optional. When some properties are not specified,
+they are borrowed from [gretty configuration](#configuration).
+
+GrettyStartTask workflow is represented by the following state diagram:
+
+![GrettyStartTask_StateDiagram.svg](images/GrettyStartTask_StateDiagram.svg "GrettyStartTask Diagram")
 
 ## Configuration
 
