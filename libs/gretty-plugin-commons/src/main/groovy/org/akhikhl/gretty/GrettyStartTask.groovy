@@ -7,6 +7,9 @@
  */
 package org.akhikhl.gretty
 
+import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 import groovy.json.JsonBuilder
 import org.gradle.api.DefaultTask
 import org.slf4j.Logger
@@ -21,13 +24,13 @@ class GrettyStartTask extends GrettyBaseTask {
 
   private static Logger log = LoggerFactory.getLogger(GrettyStartTask)
 
-  boolean autoStart = true
   boolean inplace = true
   boolean interactive = true
   boolean debug = false
   boolean integrationTest = false
   Integer port
   Integer servicePort
+  Integer statusPort
   String contextPath
   String inplaceResourceBase
   String warResourceBase
@@ -48,15 +51,31 @@ class GrettyStartTask extends GrettyBaseTask {
   Boolean fileLogEnabled
   String logFileName
   String logDir
-  Integer integrationTestStatusPort
   List<String> jvmArgs
   Collection<URL> classPath
+  ExecutorService executorService
 
   @Override
   void action() {
-    // Synchronously runs jetty with the specified parameters.
-    // Can be changed in descendant classes.
-    runJetty()
+    Future futureStatus = ServiceControl.readMessage(executorService, statusPort)
+    def runThread = Thread.start {
+      runJetty()
+    }
+    def status = futureStatus.get()
+    log.debug 'Got status: {}', status
+    if(!integrationTest) {
+      System.out.println 'Jetty server started.'
+      System.out.println 'You can see web-application in browser under the address:'
+      System.out.println "http://localhost:${port}${contextPath}"
+      if(interactive) {
+        System.out.println 'Press any key to stop the jetty server.'
+        System.in.read()
+        log.debug 'Sending command: {}', 'stop'
+        ServiceControl.send(servicePort, 'stop')
+      } else
+        System.out.println 'Run \'gradle jettyStop\' to stop the jetty server.'
+      runThread.join()
+    }
   }
 
   protected File discoverLogbackConfigFile() {
@@ -135,13 +154,10 @@ class GrettyStartTask extends GrettyBaseTask {
     def json = new JsonBuilder()
     json {
       projectName task.project.name
-      autoStart task.autoStart
       inplace task.inplace
-      interactive task.interactive
-      integrationTest task.integrationTest
       port task.port
       servicePort task.servicePort
-      integrationTestStatusPort task.integrationTestStatusPort
+      statusPort task.statusPort
       contextPath task.contextPath
       resourceBase (task.inplace ? task.inplaceResourceBase : task.warResourceBase)
       initParams task.initParameters
@@ -184,7 +200,6 @@ class GrettyStartTask extends GrettyBaseTask {
         spec.main = 'org.akhikhl.gretty.Runner'
         spec.args = [json]
         spec.jvmArgs = jvmArgs
-        spec.standardInput = System.in
         spec.debug = debug
       }
     } finally {
@@ -220,10 +235,17 @@ class GrettyStartTask extends GrettyBaseTask {
   }
 
   @Override
-  void setupProperties() {
+  protected void setupProperties() {
     if(port == null) port = project.gretty.port
     if(servicePort == null) servicePort = project.gretty.servicePort
-    if(contextPath == null) contextPath = project.gretty.contextPath
+    if(statusPort == null) statusPort = project.gretty.statusPort
+    if(contextPath == null) {
+      contextPath = project.gretty.contextPath
+      if(contextPath == null)
+        contextPath = '/' + project.name
+      else if(!contextPath.startsWith('/'))
+        contextPath = '/' + contextPath
+    }
     if(inplaceResourceBase == null) inplaceResourceBase = "${project.buildDir}/inplaceWebapp"
     if(warResourceBase == null) warResourceBase = ProjectUtils.getFinalWarPath(project).toString()
     if(initParameters == null) initParameters = ProjectUtils.getInitParameters(project)
@@ -242,8 +264,8 @@ class GrettyStartTask extends GrettyBaseTask {
     if(fileLogEnabled == null) fileLogEnabled = project.gretty.fileLogEnabled
     if(logFileName == null) logFileName = project.gretty.logFileName
     if(logDir == null) logDir = project.gretty.logDir
-    if(integrationTestStatusPort == null) integrationTestStatusPort = project.gretty.integrationTestStatusPort
     if(jvmArgs == null) jvmArgs = project.gretty.jvmArgs
     if(classPath == null) classPath = ProjectUtils.getClassPath(project, inplace)
+    if(executorService == null) executorService = project.ext.executorService ?: Executors.newSingleThreadExecutor()
   }
 }

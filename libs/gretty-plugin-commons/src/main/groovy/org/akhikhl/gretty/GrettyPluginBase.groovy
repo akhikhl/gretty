@@ -108,6 +108,8 @@ abstract class GrettyPluginBase implements Plugin<Project> {
           dependsOn project.tasks.war
       }
 
+      project.ext.executorService = Executors.newSingleThreadExecutor()
+
       project.task('jettyRun', type: GrettyStartTask, group: 'gretty') {
         description = 'Starts jetty server inplace, in interactive mode (keypress stops the server).'
         dependsOn project.tasks.prepareInplaceWebApp
@@ -176,25 +178,18 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
       if(project.gretty.integrationTestTask) {
 
-        ExecutorService executor = Executors.newSingleThreadExecutor()
-
-        project.task('jettyBeforeIntegrationTest', type: GrettySyncStartTask, group: 'gretty') {
+        project.task('jettyBeforeIntegrationTest', type: GrettyStartTask, group: 'gretty') {
           description = 'Starts jetty server before integration test.'
           dependsOn project.tasks.prepareInplaceWebApp
           dependsOn project.tasks.testClasses
           project.tasks[project.gretty.integrationTestTask].dependsOn it
-          interactive = false
           integrationTest = true
-          executorService = executor
-          syncPort = project.gretty.integrationTestStatusPort
         }
 
-        project.task('jettyAfterIntegrationTest', type: GrettySyncServiceTask, group: 'gretty') {
+        project.task('jettyAfterIntegrationTest', type: GrettyServiceTask, group: 'gretty') {
           description = 'Stops jetty server after integration test.'
           project.tasks[project.gretty.integrationTestTask].finalizedBy it
           command = 'stop'
-          executorService = executor
-          syncPort = project.gretty.integrationTestStatusPort
         }
       } // integrationTestTask
     } // afterEvaluate

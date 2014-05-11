@@ -11,7 +11,6 @@ abstract class RunnerBase {
 
   protected final Map params
   protected server
-  protected contextPath
 
   RunnerBase(Map params) {
     this.params = params
@@ -41,22 +40,11 @@ abstract class RunnerBase {
   protected abstract int getServerPort()
 
   final void run() {
-
     RunnerThread runnerThread = new RunnerThread(this)
     runnerThread.start()
     runnerThread.waitForRunning()
-
-    if(params.autoStart) {
-      ServiceControl.send(params.servicePort, 'start')
-      runnerThread.waitForStateChange()
-    }
-
-    if(params.interactive) {
-      System.in.read()
-      if(runnerThread.running)
-        ServiceControl.send(params.servicePort, 'stop')
-    }
-
+    ServiceControl.send(params.servicePort, 'start')
+    runnerThread.waitForStateChange()
     runnerThread.join()
   }
 
@@ -82,15 +70,7 @@ abstract class RunnerBase {
     applyContainerIncludeJarPattern(context)
     configureRealm(context)
 
-    if(params.contextPath == null) {
-      if(context.getContextPath() == '/')
-        context.setContextPath('/' + params.projectName)
-    } else if(params.contextPath.startsWith('/'))
-      context.setContextPath(params.contextPath)
-    else
-      context.setContextPath('/' + params.contextPath)
-
-    contextPath = context.getContextPath()
+    context.setContextPath(params.contextPath)
 
     params.initParams?.each { key, value ->
       context.setInitParameter(key, value)
@@ -107,24 +87,13 @@ abstract class RunnerBase {
     server.setHandler(context)
 
     server.start()
-
-    if(!params.integrationTest) {
-      System.out.println 'Jetty server started.'
-      System.out.println 'You can see web-application in browser under the address:'
-      System.out.println "http://localhost:${getServerPort()}${contextPath}"
-      if(params.interactive)
-        System.out.println 'Press any key to stop the jetty server.'
-      else
-        System.out.println 'Run \'gradle jettyStop\' to stop the jetty server.'
-      System.out.println()
-    }
   }
 
   final void stopServer() {
     if(server != null) {
       server.stop()
       server = null
-      if(!params.integrationTest)
+      if(!params.suppressConsoleOutput)
         System.out.println 'Jetty server stopped.'
     }
   }

@@ -35,7 +35,7 @@ class GrettyPluginExtension {
   String logFileName = null
   String logDir = "${System.getProperty('user.home')}/logs"
   String integrationTestTask
-  int integrationTestStatusPort = 9901
+  int statusPort = 9901
   List<String> jvmArgs = []
 
   void fastReload(String arg) {

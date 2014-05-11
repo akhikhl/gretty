@@ -10,6 +10,8 @@ package org.akhikhl.gretty
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 final class RunnerThread extends Thread {
 
@@ -61,16 +63,13 @@ final class RunnerThread extends Thread {
             synchronized(stateChangeSignal) {
               stateChangeSignal.notifyAll()
             }
-            if(runner.params.integrationTest)
-              ServiceControl.send(runner.params.integrationTestStatusPort, 'started')
+            ServiceControl.send(runner.params.statusPort, 'started')
           }
           else if(command == 'stop') {
             runner.stopServer()
             synchronized(stateChangeSignal) {
               stateChangeSignal.notifyAll()
             }
-            if(runner.params.integrationTest)
-              ServiceControl.send(runner.params.integrationTestStatusPort, 'stopped')
             break
           }
           else if(command == 'restart') {
