@@ -6,15 +6,15 @@ class RequestResponseIT extends GebReportingSpec {
 
   def 'should get expected response from servlet'() {
   when:
-    go 'http://localhost:8080/helloGretty9/hello'
+    go 'http://localhost:8080/grettyStartTask/hello'
   then:
-    $('h1').text() == /Hello, Gretty! It's fine weather today, isn't it?/
+    $('h1').text() == /Welcome to Gretty!/
   }
 
   def 'should get expected static page'() {
   when:
-    go 'http://localhost:8080/helloGretty9/test.html'
+    go 'http://localhost:8080/grettyStartTask/test.html'
   then:
-    $('div').text() == 'TODO write content'
+    $('h1').text() == /Welcome to Gretty!/
   }
 }
