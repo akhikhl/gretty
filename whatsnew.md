@@ -1,28 +1,40 @@
+[Gretty project home](.) | [Main features](../../wiki/Main-features) | [Wiki pages](../../wiki)
+
 # What's new in Gretty:
+
+### Version 0.0.16
+
+- Reimplemented Gretty tasks in two classes: [GrettyStartTask](../../wiki/GrettyStartTask) and [GrettyServiceTask](../../wiki/GrettyServiceTask).
+
+- Renamed integrationTestStatusPort to [statusPort](../../wiki/Configuration#statusPort).
+
+- Moved documentation from README.md to [wiki pages](../../wiki).
+
+- Updated documentation.
 
 ### Version 0.0.15
 
-- Introduced [fastReload property](README.md#fast-reload) in plugin extension.
+- Introduced configuration property [fastReload](../../wiki/Configuration#fastReload).
 
-- Fixed compatibility with JDK 8 issues.
+- Fixed JDK-8 compatibility issues.
 
 ### Version 0.0.14
 
-- Introduced [jvmArgs property](README.md#jvmargs) in plugin extension.
+- Introduced configuration property [jvmArgs](../../wiki/Configuration#jvmArgs).
 
 ### Version 0.0.13
 
-- Implemented [support of web fragments](README.md#web-fragments-support)
+- Implemented [support of web fragments](../../wiki/Web-fragments-support)
 - Implemented integration tests for most of the examples
 - Introduced bintray publishing configuration in build.gradle
 
 ### Version 0.0.12
 
-- Implemented [support of integration tests](README.md#integration-tests-support)
+- Implemented [support of integration tests](../../wiki/Integration-tests-support)
 
 ### Version 0.0.11
 
-- Introduced plugin extension property ["logbackConfigFile"](README.md#logbackconfigfile)
+- Introduced configuration property [logbackConfigFile](../../Configuration#logbackConfigFile)
   (in response to [issue #6](https://github.com/akhikhl/gretty/issues/6) "Possibility to provide custom logback.xml or logback.groovy configuration")
 
 ### Version 0.0.10
@@ -33,12 +45,12 @@
 
 ### Version 0.0.9
 
-- Implemented out-of-the-box [JEE annotations support](README.md#jee-annotations-support).
+- Implemented out-of-the-box [JEE annotations support](../../wiki/JEE-annotations-support).
 - Various bug-fixes.
 
 ### Version 0.0.8
 
-- Implemented support of [jetty.xml](#jettyxml-support) and [jetty-env.xml](README.md#jetty-envxml-support).
+- Implemented support of [jetty.xml](../../wiki/jetty.xml-support) and [jetty-env.xml](../../wiki/jetty-env.xml-support).
 
 ### Version 0.0.7
 
@@ -46,13 +58,13 @@
 
 ### Version 0.0.6
 
-- Implemented support of [multiple jetty versions and multiple servlet API versions](README.md#switching-between-jetty-and-servlet-api-versions).
+- Implemented support of [multiple jetty versions and multiple servlet API versions](../../wiki/Switching-between-jetty-and-servlet-API-versions).
 
 ### version 0.0.5
 
-- Implemented [debugger support](README.md#debugger-support) and [logging](README.md#logging).
+- Implemented [debugger support](../../wiki/Debugger-support) and [logging](../../wiki/Logging).
 
 ### Version 0.0.4
 
-- Implemented support of [hot deployment](README.md#hot-deployment).
+- Implemented support of [hot deployment](../../wiki/Hot-deployment).
 
