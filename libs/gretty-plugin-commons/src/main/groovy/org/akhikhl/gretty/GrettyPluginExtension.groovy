@@ -14,6 +14,7 @@ class GrettyPluginExtension {
 
   int port = 8080
   int servicePort = 9900
+  int statusPort = 9901
   String contextPath
   Map initParameters = [:]
   String realm
@@ -35,7 +36,6 @@ class GrettyPluginExtension {
   String logFileName = null
   String logDir = "${System.getProperty('user.home')}/logs"
   String integrationTestTask
-  int statusPort = 9901
   List<String> jvmArgs = []
 
   void fastReload(String arg) {
