@@ -24,7 +24,6 @@ class GrettyServiceTask extends GrettyBaseTask {
   private static Logger log = LoggerFactory.getLogger(GrettyServiceTask)
 
   Integer servicePort
-  Integer statusPort
   ExecutorService executorService
   String command
 
@@ -37,7 +36,6 @@ class GrettyServiceTask extends GrettyBaseTask {
   @Override
   protected void setupProperties() {
     if(servicePort == null) servicePort = project.gretty.servicePort
-    if(statusPort == null) statusPort = project.gretty.statusPort
     if(executorService == null) executorService = project.ext.executorService ?: Executors.newSingleThreadExecutor()
     requiredProperty 'command'
   }
