@@ -55,7 +55,7 @@
        <path fill="none" stroke="rgb(52,101,175)" d="M 4974,1763 C 4637,1763 4301,1572 4301,1381 4301,1190 4637,1000 4974,1000 L 7819,1000 C 8156,1000 8493,1190 8493,1381 8493,1572 8156,1763 7819,1763 L 4974,1763 Z"/>
        <path fill="none" stroke="rgb(52,101,175)" d="M 4301,1000 L 4301,1000 Z"/>
        <path fill="none" stroke="rgb(52,101,175)" d="M 8493,1763 L 8493,1763 Z"/>
-       <text class="TextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="353px" font-weight="400"><tspan class="TextPosition" x="4703" y="1504"><tspan fill="rgb(0,0,0)" stroke="none">GrettyStartTask starts</tspan></tspan></tspan></text>
+       <text class="TextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="353px" font-weight="400"><tspan class="TextPosition" x="5273" y="1504"><tspan fill="rgb(0,0,0)" stroke="none">jettyRun starts</tspan></tspan></tspan></text>
       </g>
      </g>
      <g class="com.sun.star.drawing.CustomShape">
@@ -280,7 +280,7 @@
        <path fill="none" stroke="rgb(52,101,175)" d="M 4756,21867 C 4338,21867 3920,21545 3920,21224 3920,20903 4338,20582 4756,20582 L 8291,20582 C 8709,20582 9128,20903 9128,21224 9128,21545 8709,21867 8291,21867 L 4756,21867 Z"/>
        <path fill="none" stroke="rgb(52,101,175)" d="M 3920,20582 L 3920,20582 Z"/>
        <path fill="none" stroke="rgb(52,101,175)" d="M 9128,21867 L 9128,21867 Z"/>
-       <text class="TextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="353px" font-weight="400"><tspan class="TextPosition" x="4610" y="20949"><tspan fill="rgb(0,0,0)" stroke="none">GrettyStartTask finished.</tspan></tspan><tspan class="TextPosition" x="5175" y="21347"><tspan fill="rgb(0,0,0)" stroke="none">Gradle proceeds </tspan></tspan><tspan class="TextPosition" x="5302" y="21745"><tspan fill="rgb(0,0,0)" stroke="none">with other tasks</tspan></tspan></tspan></text>
+       <text class="TextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="353px" font-weight="400"><tspan class="TextPosition" x="5180" y="20949"><tspan fill="rgb(0,0,0)" stroke="none">jettyRun finished.</tspan></tspan><tspan class="TextPosition" x="5175" y="21347"><tspan fill="rgb(0,0,0)" stroke="none">Gradle proceeds </tspan></tspan><tspan class="TextPosition" x="5302" y="21745"><tspan fill="rgb(0,0,0)" stroke="none">with other tasks</tspan></tspan></tspan></text>
       </g>
      </g>
      <g class="com.sun.star.drawing.ConnectorShape">
