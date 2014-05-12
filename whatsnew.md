@@ -1,4 +1,4 @@
-[Gretty project home](.) | [Main features](../../wiki/Main-features) | [Wiki pages](../../wiki)
+[Gretty project home](https://github.com/akhikhl/gretty) | [Main features](../../wiki/Main-features) | [Wiki pages](../../wiki)
 
 # What's new in Gretty:
 
