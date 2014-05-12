@@ -38,7 +38,7 @@ class GrettyServiceTask extends GrettyBaseTask {
   protected void setupProperties() {
     if(servicePort == null) servicePort = project.gretty.servicePort
     if(statusPort == null) statusPort = project.gretty.statusPort
-    if(executorService == null) executorService = Executors.newSingleThreadExecutor()
+    if(executorService == null) executorService = project.ext.executorService ?: Executors.newSingleThreadExecutor()
     requiredProperty 'command'
   }
 }
