@@ -35,7 +35,8 @@ class GrettyStartTask extends GrettyBaseTask {
   String inplaceResourceBase
   String warResourceBase
   Map initParameters
-  RealmInfo realmInfo
+  String realm
+  def realmConfigFile
   String jettyXml
   String jettyEnvXml
   List<Closure> onStart
@@ -54,6 +55,8 @@ class GrettyStartTask extends GrettyBaseTask {
   List<String> jvmArgs
   Collection<URL> classPath
   ExecutorService executorService
+
+  protected RealmInfo realmInfo
 
   @Override
   void action() {
@@ -249,7 +252,10 @@ class GrettyStartTask extends GrettyBaseTask {
     if(inplaceResourceBase == null) inplaceResourceBase = "${project.buildDir}/inplaceWebapp"
     if(warResourceBase == null) warResourceBase = ProjectUtils.getFinalWarPath(project).toString()
     if(initParameters == null) initParameters = ProjectUtils.getInitParameters(project)
-    if(realmInfo == null) realmInfo = ProjectUtils.getRealmInfo(project)
+    if(!realm || !realmConfigFile)
+      realmInfo = ProjectUtils.getRealmInfo(project)
+    else
+      realmInfo = new RealmInfo(realm: realm, realmConfigFile: realmConfigFile)
     if(jettyXml == null) jettyXml = ProjectUtils.getJettyXml(project)
     if(jettyEnvXml == null) jettyEnvXml = ProjectUtils.getJettyEnvXml(project)
     if(onStart == null) onStart = project.gretty.onStart
