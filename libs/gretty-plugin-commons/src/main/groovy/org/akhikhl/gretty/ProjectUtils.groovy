@@ -94,7 +94,7 @@ final class ProjectUtils {
           collectIt(proj.project(overlay))
     }
     collectIt(project)
-    log.debug 'findFileInOutput filePattern: {}, result: {}', filePattern, result
+    log.debug 'collectFilesInOutput filePattern: {}, result: {}', filePattern, result
     return result
   }
 
@@ -203,39 +203,40 @@ final class ProjectUtils {
 
   static RealmInfo getRealmInfo(Project project) {
     String realm = project.gretty.realm
-    String realmConfigFile = project.gretty.realmConfigFile
-    if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
-      realmConfigFile = "${project.webAppDir.absolutePath}/${realmConfigFile}"
-    if(!realm || !realmConfigFile)
-      for(def overlay in project.gretty.overlays.reverse()) {
-        overlay = project.project(overlay)
-        if(overlay.extensions.findByName('gretty')) {
-          if(overlay.gretty.realm && overlay.gretty.realmConfigFile) {
-            realm = overlay.gretty.realm
-            realmConfigFile = overlay.gretty.realmConfigFile
-            if(realmConfigFile && !new File(realmConfigFile).isAbsolute())
-              realmConfigFile = "${overlay.webAppDir.absolutePath}/${realmConfigFile}"
-            break
-          }
-        } else
-          log.warn 'Project {} is not gretty-enabled, could not extract it\'s realm', overlay
-      }
-    return new RealmInfo(realm: realm, realmConfigFile: realmConfigFile)
+    def realmConfigFile = project.gretty.realmConfigFile
+    if(realm && realmConfigFile) {
+      if(!(realmConfigFile instanceof File))
+        realmConfigFile = new File(realmConfigFile)
+      if(!realmConfigFile.isAbsolute())
+        realmConfigFile = new File(project.webAppDir, realmConfigFile.path)
+      return new RealmInfo(realm: realm, realmConfigFile: realmConfigFile.absolutePath)
+    }
+    for(def overlay in project.gretty.overlays.reverse()) {
+      overlay = project.project(overlay)
+      if(overlay.extensions.findByName('gretty')) {
+        RealmInfo info = getRealmInfo(overlay)
+        if(info != null)
+          return info
+      } else
+        log.warn 'Project {} is not gretty-enabled, could not extract jetty realm', overlay
+    }
   }
 
-  static String getJettyXml(Project project) {
+  static String getJettyXmlFile(Project project) {
+    String result = resolveFileProperty(project, 'jettyXmlFile', 'jetty.xml')
+    if(result != null)
+      return result
     String jettyHome = System.getenv('JETTY_HOME')
     if(!jettyHome)
       jettyHome = System.getProperty('jetty.home')
     if(jettyHome != null) {
       File file = new File(jettyHome, 'etc/jetty.xml')
       if(file.exists())
-        return file
+        return file.absolutePath
     }
-    return resolveFileProperty(project, 'jettyXmlFile', 'jetty.xml')
   }
 
-  static String getJettyEnvXml(Project project) {
+  static String getJettyEnvXmlFile(Project project) {
     return resolveFileProperty(project, 'jettyEnvXmlFile', 'jetty-env.xml')
   }
 
@@ -274,7 +275,7 @@ final class ProjectUtils {
     List<File> result = []
     resolveFile_(result, project, file)
     if(result.isEmpty())
-      log.warn 'Could not resolve file \'{}\' in {}', file, project
+      log.debug 'Could not resolve file \'{}\' in {}', file, project
     return result
   }
 
@@ -291,7 +292,7 @@ final class ProjectUtils {
     f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
     if(f.exists())
       result.add(f.absoluteFile)
-    result.addAll(collectFilesInOutput(project, Pattern.compile(file.path), false))
+    result.addAll(collectFilesInOutput(project, file.path, false))
     for(def overlay in project.gretty.overlays.reverse())
       resolveFile_(result, project.project(overlay), file)
   }
@@ -311,7 +312,7 @@ final class ProjectUtils {
       f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
       if(f.exists())
         return f.absolutePath
-      f = findFileInOutput(project, Pattern.compile(file.path), false)
+      f = findFileInOutput(project, file.path, false)
       if(f != null && f.exists())
         return f.absolutePath
     }
@@ -327,5 +328,10 @@ final class ProjectUtils {
     if(project.gretty[propertyName] != null && project.gretty[propertyName] != defaultValue)
       log.warn 'Could not find file \'{}\' specified in \'{}\'', file.path, propertyName
     return null
+  }
+
+  static File resolveSingleFile(Project project, file) {
+    List<File> list = resolveFile(project, file)
+    list ? list[0] : null
   }
 }

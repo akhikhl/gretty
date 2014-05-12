@@ -32,19 +32,17 @@ class GrettyStartTask extends GrettyBaseTask {
   Integer servicePort
   Integer statusPort
   String contextPath
-  String inplaceResourceBase
-  String warResourceBase
   Map initParameters
   String realm
   def realmConfigFile
-  String jettyXml
-  String jettyEnvXml
+  def jettyXmlFile
+  def jettyEnvXmlFile
   List<Closure> onStart
   List<Closure> onStop
-  List<Closure> onScan
-  List<Closure> onScanFilesChanged
   Integer scanInterval // scan interval in seconds. When zero, scanning is disabled.
   List scanDirs // list of additional scan directories
+  List<Closure> onScan
+  List<Closure> onScanFilesChanged
   def fastReload
   String logbackConfigFile
   String loggingLevel
@@ -54,6 +52,8 @@ class GrettyStartTask extends GrettyBaseTask {
   String logDir
   List<String> jvmArgs
   Collection<URL> classPath
+  String inplaceResourceBase
+  String warResourceBase
   ExecutorService executorService
 
   protected RealmInfo realmInfo
@@ -165,8 +165,8 @@ class GrettyStartTask extends GrettyBaseTask {
       resourceBase (task.inplace ? task.inplaceResourceBase : task.warResourceBase)
       initParams task.initParameters
       realmInfo task.realmInfo
-      jettyXml task.jettyXml
-      jettyEnvXml task.jettyEnvXml
+      jettyXml task.jettyXmlFile
+      jettyEnvXml task.jettyEnvXmlFile
       projectClassPath task.classPath
       if(logbackConfigFile)
         logbackConfig logbackConfigFile.absolutePath
@@ -249,15 +249,24 @@ class GrettyStartTask extends GrettyBaseTask {
       else if(!contextPath.startsWith('/'))
         contextPath = '/' + contextPath
     }
-    if(inplaceResourceBase == null) inplaceResourceBase = "${project.buildDir}/inplaceWebapp"
-    if(warResourceBase == null) warResourceBase = ProjectUtils.getFinalWarPath(project).toString()
     if(initParameters == null) initParameters = ProjectUtils.getInitParameters(project)
     if(!realm || !realmConfigFile)
       realmInfo = ProjectUtils.getRealmInfo(project)
+    else {
+      if(!(realmConfigFile instanceof File))
+        realmConfigFile = new File(realmConfigFile)
+      if(!realmConfigFile.isAbsolute())
+        realmConfigFile = new File(project.webAppDir, realmConfigFile.path)
+      realmInfo = new RealmInfo(realm: realm, realmConfigFile: realmConfigFile.absolutePath)
+    }
+    if(jettyXmlFile == null)
+      jettyXmlFile = ProjectUtils.getJettyXmlFile(project)
     else
-      realmInfo = new RealmInfo(realm: realm, realmConfigFile: realmConfigFile)
-    if(jettyXml == null) jettyXml = ProjectUtils.getJettyXml(project)
-    if(jettyEnvXml == null) jettyEnvXml = ProjectUtils.getJettyEnvXml(project)
+      jettyXmlFile = ProjectUtils.resolveSingleFile(project, jettyXmlFile)
+    if(jettyEnvXmlFile == null)
+      jettyEnvXmlFile = ProjectUtils.getJettyEnvXmlFile(project)
+    else
+      jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, jettyEnvXmlFile)
     if(onStart == null) onStart = project.gretty.onStart
     if(onStop == null) onStop = project.gretty.onStop
     if(onScan == null) onScan = project.gretty.onScan
@@ -272,6 +281,8 @@ class GrettyStartTask extends GrettyBaseTask {
     if(logDir == null) logDir = project.gretty.logDir
     if(jvmArgs == null) jvmArgs = project.gretty.jvmArgs
     if(classPath == null) classPath = ProjectUtils.getClassPath(project, inplace)
+    if(inplaceResourceBase == null) inplaceResourceBase = "${project.buildDir}/inplaceWebapp"
+    if(warResourceBase == null) warResourceBase = ProjectUtils.getFinalWarPath(project).toString()
     if(executorService == null) executorService = project.ext.executorService ?: Executors.newSingleThreadExecutor()
   }
 }
