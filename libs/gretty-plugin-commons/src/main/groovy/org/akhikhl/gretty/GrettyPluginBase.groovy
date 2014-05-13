@@ -15,6 +15,10 @@ import org.gradle.api.plugins.*
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.bundling.*
 
+/**
+ *
+ * @author akhikhl
+ */
 abstract class GrettyPluginBase implements Plugin<Project> {
 
   void apply(final Project project) {
