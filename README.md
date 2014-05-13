@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) 
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
-[![Latest Version](http://img.shields.io/badge/latest_version-0.0.16-blue.svg)](https://github.com/akhikhl/gretty/tree/v0.0.16) 
-[![License](http://img.shields.io/badge/license-MIT-ff69b4.svg)](#copyright-and-license)
+[![Latest Version](http://img.shields.io/badge/latest_version-0.0.16-949494.svg)](https://github.com/akhikhl/gretty/tree/v0.0.16) 
+[![License](http://img.shields.io/badge/license-MIT-949494.svg)](#copyright-and-license)
 
 #### Introduction
 
