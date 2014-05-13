@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory
  */
 class GrettyStartTask extends GrettyBaseTask {
 
-  private static Logger log = LoggerFactory.getLogger(GrettyStartTask)
+  protected static final Logger log = LoggerFactory.getLogger(GrettyStartTask)
 
   boolean inplace = true
   boolean interactive = true
@@ -195,6 +195,7 @@ class GrettyStartTask extends GrettyBaseTask {
     if(System.getProperty("os.name") =~ /(?i).*windows.*/)
       json = json.replace('"', '\\"')
 
+    def thisTask = this
     ScannerManagerBase scanman = project.ext._createScannerManager()
     scanman.startScanner(this, inplace)
     try {
@@ -202,8 +203,8 @@ class GrettyStartTask extends GrettyBaseTask {
         spec.classpath = project.configurations.gretty
         spec.main = 'org.akhikhl.gretty.Runner'
         spec.args = [json]
-        spec.jvmArgs = jvmArgs
-        spec.debug = debug
+        spec.jvmArgs = thisTask.jvmArgs
+        spec.debug = thisTask.debug
       }
     } finally {
       scanman.stopScanner()
