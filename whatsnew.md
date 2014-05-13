@@ -1,4 +1,4 @@
-[Gretty project home](https://github.com/akhikhl/gretty) | [Main features](../../wiki/Main-features) | [Wiki pages](../../wiki)
+[Project home](https://github.com/akhikhl/gretty) | [Main features](../../wiki/Main-features) | [Wiki pages](../../wiki)
 
 [![logo](http://akhikhl.github.io/gretty/media/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
 
