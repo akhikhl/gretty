@@ -42,9 +42,6 @@ abstract class RunnerBase {
   final void run() {
     RunnerThread runnerThread = new RunnerThread(this)
     runnerThread.start()
-    runnerThread.waitForRunning()
-    ServiceControl.send(params.servicePort, 'start')
-    runnerThread.waitForStateChange()
     runnerThread.join()
   }
 

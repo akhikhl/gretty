@@ -7,19 +7,12 @@
  */
 package org.akhikhl.gretty
 
-import java.util.concurrent.locks.Condition
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 final class RunnerThread extends Thread {
 
   private final RunnerBase runner
-  private final Object runningLock = new Object()
-  private boolean running = false
-  private final Object runningSignal = new Object()
-  private final Object stateChangeSignal = new Object()
 
   RunnerThread(RunnerBase runner) {
     this.runner = runner
@@ -27,28 +20,16 @@ final class RunnerThread extends Thread {
     name = 'RunnerThread'
   }
 
-  boolean getRunning() {
-    synchronized(runningLock) {
-      return running
-    }
-  }
-
   @Override
   void run() {
     try {
-      ServerSocket socket
+      ServerSocket socket = new ServerSocket(runner.params.servicePort, 1, InetAddress.getByName('127.0.0.1'))
       try {
-        socket = new ServerSocket(runner.params.servicePort, 1, InetAddress.getByName('127.0.0.1'))
-      } catch(Exception e) {
-        throw new RuntimeException(e)
-      }
-      synchronized(runningLock) {
-        running = true
-      }
-      synchronized(runningSignal) {
-        runningSignal.notifyAll()
-      }
-      try {
+        runner.startServer()
+        ServiceControl.send(runner.params.statusPort, 'started')
+        // Note that server is already in listening state.
+        // If client sends a command immediately after 'started' signal,
+        // the command is queued, so that socket.accept gets it anyway.
         while(true) {
           String command
           Socket accept = socket.accept()
@@ -58,46 +39,20 @@ final class RunnerThread extends Thread {
           } finally {
             accept.close()
           }
-          if(command == 'start') {
-            runner.startServer()
-            synchronized(stateChangeSignal) {
-              stateChangeSignal.notifyAll()
-            }
-            ServiceControl.send(runner.params.statusPort, 'started')
-          }
-          else if(command == 'stop') {
+          if(command == 'stop') {
             runner.stopServer()
-            synchronized(stateChangeSignal) {
-              stateChangeSignal.notifyAll()
-            }
             break
           }
           else if(command == 'restart') {
             runner.stopServer()
             runner.startServer()
           }
-          // more commands could be inserted here
         }
       } finally {
         socket.close()
-        synchronized(runningLock) {
-          running = false
-        }
       }
     } catch(Exception e) {
       throw new RuntimeException(e)
-    }
-  }
-
-  void waitForRunning() {
-    synchronized(runningSignal) {
-      runningSignal.wait()
-    }
-  }
-
-  void waitForStateChange() {
-    synchronized(stateChangeSignal) {
-      stateChangeSignal.wait()
     }
   }
 }
