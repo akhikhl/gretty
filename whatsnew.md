@@ -4,6 +4,10 @@
 
 ### What's new:
 
+### Version 0.0.17
+
+- fixed incorrect parameter passing to javaexec in GrettyStartTask, preventing debug mode.
+
 ### Version 0.0.16
 
 - Reimplemented Gretty tasks as two reusable classes: [GrettyStartTask](../../wiki/GrettyStartTask) and [GrettyServiceTask](../../wiki/GrettyServiceTask). Don't worry, all task instances are still valid (jettyRun, jettyRunDebug, ...).
