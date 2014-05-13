@@ -1,8 +1,8 @@
-[![logo](http://akhikhl.github.io/gretty/media/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
-
 [Gretty project home](https://github.com/akhikhl/gretty) | [Main features](../../wiki/Main-features) | [Wiki pages](../../wiki)
 
-# What's new in Gretty:
+[![logo](http://akhikhl.github.io/gretty/media/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
+
+### What's new:
 
 ### Version 0.0.16
 
