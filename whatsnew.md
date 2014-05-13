@@ -1,16 +1,18 @@
+[![logo](http://akhikhl.github.io/gretty/media/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
+
 [Gretty project home](https://github.com/akhikhl/gretty) | [Main features](../../wiki/Main-features) | [Wiki pages](../../wiki)
 
 # What's new in Gretty:
 
 ### Version 0.0.16
 
-- Reimplemented Gretty tasks in two classes: [GrettyStartTask](../../wiki/GrettyStartTask) and [GrettyServiceTask](../../wiki/GrettyServiceTask).
+- Reimplemented Gretty tasks as two reusable classes: [GrettyStartTask](../../wiki/GrettyStartTask) and [GrettyServiceTask](../../wiki/GrettyServiceTask). Don't worry, all task instances are still valid (jettyRun, jettyRunDebug, ...).
 
 - Renamed integrationTestStatusPort to [statusPort](../../wiki/Configuration#statusPort).
 
 - Moved documentation from README.md to [wiki pages](../../wiki).
 
-- Updated documentation.
+- Updated documentation, added **nice diagrams** to every task description. See more at [wiki pages](../../wiki).
 
 ### Version 0.0.15
 
