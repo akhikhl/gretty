@@ -8,7 +8,6 @@
 package org.akhikhl.gretty
 
 import java.util.concurrent.Executors
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import org.gradle.api.*
 import org.gradle.api.plugins.*
@@ -26,7 +25,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
     if (!project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin))
       project.apply(plugin: org.gradle.api.plugins.WarPlugin)
 
-    project.extensions.create('gretty', GrettyPluginExtension)
+    project.extensions.create('gretty', GrettyExtension)
 
     project.configurations {
       grettyHelperConfig
@@ -45,11 +44,15 @@ abstract class GrettyPluginBase implements Plugin<Project> {
     }
 
     project.afterEvaluate {
+
+      if(!project.hasProperty('executorService'))
+        project.rootProject.ext.executorService = Executors.newSingleThreadExecutor()
+
       for(String overlay in project.gretty.overlays)
         project.dependencies.add 'providedCompile', project.project(overlay)
 
       project.task('prepareInplaceWebAppFolder', group: 'gretty') {
-        description = 'Copies webAppDir of this web-application and all WAR-overlays (if any) to ${buildDir}/inplaceWebapp'
+        description = 'Copies webAppDir of this web-app and all WAR-overlays (if any) to ${buildDir}/inplaceWebapp'
         inputs.dir project.webAppDir
         outputs.dir "${project.buildDir}/inplaceWebapp"
         doLast {
@@ -58,14 +61,14 @@ abstract class GrettyPluginBase implements Plugin<Project> {
       }
 
       project.task('prepareInplaceWebAppClasses', group: 'gretty') {
-        description = 'Compiles classes of this web-application and all WAR-overlays (if any)'
+        description = 'Compiles classes of this web-app and all WAR-overlays (if any)'
         dependsOn project.tasks.classes
         for(String overlay in project.gretty.overlays)
           dependsOn "$overlay:prepareInplaceWebAppClasses"
       }
 
       project.task('prepareInplaceWebApp', group: 'gretty') {
-        description = 'Prepares inplace web-application'
+        description = 'Prepares inplace web-app'
         dependsOn project.tasks.prepareInplaceWebAppFolder
         dependsOn project.tasks.prepareInplaceWebAppClasses
       }
@@ -78,7 +81,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
         // 'explodeWebApps' task is only activated by 'overlayWar' task
         project.task('explodeWebApps', group: 'gretty') {
-          description = 'Explodes this web-application and all WAR-overlays (if any) to ${buildDir}/explodedWebapp'
+          description = 'Explodes this web-app and all WAR-overlays (if any) to ${buildDir}/explodedWebapp'
           for(String overlay in project.gretty.overlays)
             dependsOn "$overlay:assemble" as String
           dependsOn project.tasks.war
@@ -92,7 +95,7 @@ abstract class GrettyPluginBase implements Plugin<Project> {
         }
 
         project.task('overlayWar', group: 'gretty') {
-          description = 'Creates WAR from exploded web-application in ${buildDir}/explodedWebapp'
+          description = 'Creates WAR from exploded web-app in ${buildDir}/explodedWebapp'
           dependsOn project.tasks.explodeWebApps
           inputs.dir "${project.buildDir}/explodedWebapp"
           outputs.file project.ext.finalWarPath
@@ -105,24 +108,22 @@ abstract class GrettyPluginBase implements Plugin<Project> {
       } // overlays
 
       project.task('prepareWarWebApp', group: 'gretty') {
-        description = 'Prepares war web-application'
+        description = 'Prepares war web-app'
         if(project.gretty.overlays)
           dependsOn project.tasks.overlayWar
         else
           dependsOn project.tasks.war
       }
 
-      project.ext.executorService = Executors.newSingleThreadExecutor()
-
       project.task('jettyRun', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts jetty server inplace, in interactive mode (keypress stops the server).'
+        description = 'Starts web-app inplace, in interactive mode (keypress stops the server).'
         dependsOn project.tasks.prepareInplaceWebApp
       }
 
       project.tasks.run.dependsOn 'jettyRun'
 
       project.task('jettyRunDebug', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts jetty server inplace, in debug and interactive mode (keypress stops the server).'
+        description = 'Starts web-app inplace, in debug and interactive mode (keypress stops the server).'
         dependsOn project.tasks.prepareInplaceWebApp
         debug = true
       }
@@ -130,40 +131,40 @@ abstract class GrettyPluginBase implements Plugin<Project> {
       project.tasks.debug.dependsOn 'jettyRunDebug'
 
       project.task('jettyRunWar', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts jetty server on WAR-file, in interactive mode (keypress stops the server).'
+        description = 'Starts web-app on WAR-file, in interactive mode (keypress stops the server).'
         dependsOn project.tasks.prepareWarWebApp
         inplace = false
       }
 
       project.task('jettyRunWarDebug', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts jetty server on WAR-file, in debug and interactive mode (keypress stops the server).'
+        description = 'Starts web-app on WAR-file, in debug and interactive mode (keypress stops the server).'
         dependsOn project.tasks.prepareWarWebApp
         inplace = false
         debug = true
       }
 
       project.task('jettyStart', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts jetty server inplace, in batch mode (\'jettyStop\' stops the server).'
+        description = 'Starts web-app inplace, in batch mode (\'jettyStop\' stops the server).'
         dependsOn project.tasks.prepareInplaceWebApp
         interactive = false
       }
 
       project.task('jettyStartDebug', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts jetty server inplace, in debug and batch mode (\'jettyStop\' stops the server).'
+        description = 'Starts web-app inplace, in debug and batch mode (\'jettyStop\' stops the server).'
         dependsOn project.tasks.prepareInplaceWebApp
         interactive = false
         debug = true
       }
 
       project.task('jettyStartWar', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts jetty server on WAR-file, in batch mode (\'jettyStop\' stops the server).'
+        description = 'Starts web-app on WAR-file, in batch mode (\'jettyStop\' stops the server).'
         dependsOn project.tasks.prepareWarWebApp
         inplace = false
         interactive = false
       }
 
       project.task('jettyStartWarDebug', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts jetty server on WAR-file, in debug and batch mode (\'jettyStop\' stops the server).'
+        description = 'Starts web-app on WAR-file, in debug and batch mode (\'jettyStop\' stops the server).'
         dependsOn project.tasks.prepareWarWebApp
         inplace = false
         interactive = false

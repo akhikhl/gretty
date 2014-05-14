@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
+import org.gradle.api.Project
 import groovy.json.JsonBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,22 +27,10 @@ abstract class GrettyStartBaseTask extends GrettyBaseTask {
   boolean interactive = true
   boolean debug = false
   boolean integrationTest = false
-  List<String> jvmArgs
-  Integer port
-  Integer servicePort
-  Integer statusPort
-  def jettyXmlFile
-  Integer scanInterval // scan interval in seconds. When zero, scanning is disabled.
-  String logbackConfigFile
-  String loggingLevel
-  Boolean consoleLogEnabled
-  Boolean fileLogEnabled
-  String logFileName
-  String logDir
-  List<Closure> onStart
-  List<Closure> onStop
-  List<Closure> onScan
-  List<Closure> onScanFilesChanged
+
+  @Delegate
+  protected ServerRunConfig serverConfig = new ServerRunConfig()
+
   ExecutorService executorService
 
   @Override
@@ -54,7 +43,7 @@ abstract class GrettyStartBaseTask extends GrettyBaseTask {
     log.debug 'Got status: {}', status
     if(!integrationTest) {
       System.out.println 'Jetty server started.'
-      List<WebAppConfig> webapps = getWebApps()
+      List<WebAppRunConfig> webapps = getWebApps()
       if(webapps.size() == 1) {
         System.out.println 'Web-application runs at the address:'
         System.out.println "http://localhost:${port}${webapps[0].contextPath}"
@@ -98,31 +87,7 @@ abstract class GrettyStartBaseTask extends GrettyBaseTask {
     return result
   }
 
-  protected abstract List<WebAppConfig> getWebApps()
-
-  void onScan(Closure newValue) {
-    if(onScan == null)
-      onScan = []
-    onScan.add newValue
-  }
-
-  void onScanFilesChanged(Closure newValue) {
-    if(onScanFilesChanged == null)
-      onScanFilesChanged = []
-    onScanFilesChanged.add newValue
-  }
-
-  void onStart(Closure newValue) {
-    if(onStart == null)
-      onStart = []
-    onStart.add newValue
-  }
-
-  void onStop(Closure newValue) {
-    if(onStop == null)
-      onStop = []
-    onStop.add newValue
-  }
+  protected abstract List<WebAppRunConfig> getWebApps()
 
   private static prepareJson(GrettyStartBaseTask task) {
     File logbackConfigFile = task.discoverLogbackConfigFile()
@@ -130,12 +95,12 @@ abstract class GrettyStartBaseTask extends GrettyBaseTask {
     for(def webapp in task.getWebApps())
       webAppsJson.add {
         inplace webapp.inplace
+        webappClassPath webapp.classPath
         contextPath webapp.contextPath
-        resourceBase (webapp.inplace ? webapp.inplaceResourceBase : webapp.warResourceBase)
+        resourceBase webapp.resourceBase
         initParams webapp.initParameters
         realmInfo webapp.realmInfo
         jettyEnvXml webapp.jettyEnvXmlFile
-        webappClassPath webapp.classPath
       }
     def json = new JsonBuilder()
     json {
@@ -191,27 +156,6 @@ abstract class GrettyStartBaseTask extends GrettyBaseTask {
 
   @Override
   protected void setupProperties() {
-    if(jvmArgs == null) jvmArgs = project.gretty.jvmArgs
-    if(port == null) port = project.gretty.port
-    if(servicePort == null) servicePort = project.gretty.servicePort
-    if(statusPort == null) statusPort = project.gretty.statusPort
-    if(jettyXmlFile == null)
-      jettyXmlFile = ProjectUtils.getJettyXmlFile(project)
-    else
-      jettyXmlFile = ProjectUtils.resolveSingleFile(project, jettyXmlFile)
-    if(scanInterval == null) scanInterval = project.gretty.scanInterval
-    if(logbackConfigFile == null) logbackConfigFile = project.gretty.logbackConfigFile
-    if(loggingLevel == null) loggingLevel = project.gretty.loggingLevel
-    if(consoleLogEnabled == null) consoleLogEnabled = project.gretty.consoleLogEnabled
-    if(fileLogEnabled == null) fileLogEnabled = project.gretty.fileLogEnabled
-    if(logFileName == null) logFileName = project.gretty.logFileName
-    if(logDir == null) logDir = project.gretty.logDir
-    if(onStart == null) onStart = project.gretty.onStart
-    if(onStop == null) onStop = project.gretty.onStop
-    if(onScan == null) onScan = project.gretty.onScan
-    if(onScanFilesChanged == null) onScanFilesChanged = project.gretty.onScanFilesChanged
-    if(executorService == null) executorService = project.ext.executorService ?: Executors.newSingleThreadExecutor()
-    for(def webapp in getWebApps())
-      webapp.setupProperties(project)
+    if(executorService == null) executorService = project.executorService ?: Executors.newSingleThreadExecutor()
   }
 }

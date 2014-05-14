@@ -8,18 +8,23 @@
 package org.akhikhl.gretty
 
 /**
- * Gradle task for starting jetty
  *
  * @author akhikhl
  */
-class GrettyStartTask extends GrettyStartBaseTask {
+class GrettyStartFarmTask extends GrettyStartBaseTask {
 
-  @Delegate
-  protected WebAppRunConfig webAppConfig = new WebAppRunConfig()
+  List<WebAppRunConfig> webapps = []
 
   @Override
   List<WebAppRunConfig> getWebApps() {
-    [ webAppConfig ]
+    webapps
+  }
+
+  void webapp(Closure webAppConfigClosure) {
+    WebAppRunConfig webapp = new WebAppRunConfig()
+    webAppConfigClosure.delegate = webapp
+    webAppConfigClosure.resolveStrategy = Closure.DELEGATE_FIRST
+    webAppConfigClosure()
   }
 
   @Override
@@ -29,3 +34,4 @@ class GrettyStartTask extends GrettyStartBaseTask {
     super.setupProperties()
   }
 }
+
