@@ -14,7 +14,7 @@ import org.gradle.api.Project
  *
  * @author akhikhl
  */
-class GrettyAggregatorPluginBase implements Plugin<Project> {
+class GrettyFarmPluginBase implements Plugin<Project> {
 
   void apply(final Project project) {
   }
