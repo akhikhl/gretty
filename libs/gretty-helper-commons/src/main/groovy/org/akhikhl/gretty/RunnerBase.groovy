@@ -16,26 +16,20 @@ abstract class RunnerBase {
     this.params = params
   }
 
-  protected void addConfigurationClasses(webAppContext) {
+  protected void addConfigurationClasses(webAppContext, List<String> webappClassPath) {
   }
 
-  protected void addConfigurationClassesToServer() {
-  }
-
-  protected void applyContainerIncludeJarPattern(webAppContext) {
-  }
-
-  protected abstract void applyJettyEnvXml(webAppContext)
+  protected abstract void applyJettyEnvXml(webAppContext, jettyEnvXml)
 
   protected abstract void applyJettyXml()
 
   protected abstract void configureConnectors()
 
-  protected abstract void configureRealm(context)
+  protected abstract void configureRealm(context, realmInfo)
 
   protected abstract createServer()
 
-  protected abstract createWebAppContext(ClassLoader classLoader)
+  protected abstract createWebAppContext(List<String> webappClassPath)
 
   protected abstract int getServerPort()
 
@@ -45,10 +39,10 @@ abstract class RunnerBase {
     runnerThread.join()
   }
 
+  protected abstract void setHandlersToServer(List handlers)
+
   final void startServer() {
     assert server == null
-
-    Set<URL> classpathUrls = params.projectClassPath.collect { new URL(it) } as LinkedHashSet
 
     if(params.logging)
       LoggingUtils.configureLogging(params.logging)
@@ -57,31 +51,33 @@ abstract class RunnerBase {
 
     server = createServer()
     applyJettyXml()
-    addConfigurationClassesToServer()
     configureConnectors()
 
-    ClassLoader classLoader = new URLClassLoader(classpathUrls as URL[], this.getClass().getClassLoader())
-    def context = createWebAppContext(classLoader)
-    addConfigurationClasses(context)
-    applyJettyEnvXml(context)
-    applyContainerIncludeJarPattern(context)
-    configureRealm(context)
+    List handlers = []
 
-    context.setContextPath(params.contextPath)
+    for(def webapp in params.webapps) {
+      def context = createWebAppContext(webapp.webappClassPath)
+      addConfigurationClasses(context, webapp.webappClassPath)
+      applyJettyEnvXml(context, webapp.jettyEnvXml)
+      configureRealm(context, webapp.realmInfo)
 
-    params.initParams?.each { key, value ->
-      context.setInitParameter(key, value)
+      context.setContextPath(webapp.contextPath)
+
+      webapp.initParams?.each { key, value ->
+        context.setInitParameter(key, value)
+      }
+
+      if(webapp.resourceBase != null) {
+        if(webapp.inplace)
+          context.setResourceBase(webapp.resourceBase)
+        else
+          context.setWar(webapp.resourceBase)
+      }
+
+      handlers.add(context)
     }
 
-    if(params.resourceBase != null) {
-      if(params.inplace)
-        context.setResourceBase(params.resourceBase)
-      else
-        context.setWar(params.resourceBase)
-    }
-
-    context.setServer(server)
-    server.setHandler(context)
+    setHandlersToServer(handlers)
 
     server.start()
   }
@@ -90,8 +86,6 @@ abstract class RunnerBase {
     if(server != null) {
       server.stop()
       server = null
-      if(!params.suppressConsoleOutput)
-        System.out.println 'Jetty server stopped.'
     }
   }
 }

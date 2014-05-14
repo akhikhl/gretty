@@ -16,10 +16,12 @@ import org.eclipse.jetty.plus.webapp.PlusConfiguration
 import org.eclipse.jetty.security.HashLoginService
 import org.eclipse.jetty.security.LoginService
 import org.eclipse.jetty.server.Connector
+import org.eclipse.jetty.server.Handler
 import org.eclipse.jetty.server.HttpConnectionFactory
 import org.eclipse.jetty.server.NetworkConnector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
+import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.webapp.Configuration
 import org.eclipse.jetty.webapp.FragmentConfiguration
@@ -46,7 +48,7 @@ final class Runner extends RunnerBase {
   }
 
   @Override
-  protected void addConfigurationClasses(webAppContext) {
+  protected void addConfigurationClasses(webAppContext, List<String> webappClassPath) {
     webAppContext.setConfigurations([
       new WebInfConfiguration(),
       new WebXmlConfiguration(),
@@ -60,10 +62,10 @@ final class Runner extends RunnerBase {
   }
 
   @Override
-  protected void applyJettyEnvXml(webAppContext) {
-    if(params.jettyEnvXml != null) {
-      System.out.println "Configuring webAppContext from ${params.jettyEnvXml}"
-      XmlConfiguration xmlConfiguration = new XmlConfiguration(new File(params.jettyEnvXml).toURI().toURL())
+  protected void applyJettyEnvXml(webAppContext, jettyEnvXml) {
+    if(jettyEnvXml) {
+      System.out.println "Configuring webAppContext from ${jettyEnvXml}"
+      XmlConfiguration xmlConfiguration = new XmlConfiguration(new File(jettyEnvXml).toURI().toURL())
       xmlConfiguration.configure(webAppContext)
     }
   }
@@ -91,11 +93,10 @@ final class Runner extends RunnerBase {
   }
 
   @Override
-  protected void configureRealm(context) {
+  protected void configureRealm(context, realmInfo) {
     if(context.getSecurityHandler().getLoginService() != null)
       return
     System.out.println 'Auto-configuring login service'
-    Map realmInfo = params.realmInfo
     if(realmInfo?.realm && realmInfo?.realmConfigFile)
       context.getSecurityHandler().setLoginService(new HashLoginService(realmInfo.realm, realmInfo.realmConfigFile))
   }
@@ -106,9 +107,9 @@ final class Runner extends RunnerBase {
   }
 
   @Override
-  protected createWebAppContext(ClassLoader classLoader) {
+  protected createWebAppContext(List<String> webappClassPath) {
     WebAppContext context = new WebAppContext()
-    context.setExtraClasspath(params.projectClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !(it =~ /.*javax\.servlet-api.*\.jar/) }.join(';'))
+    context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !(it =~ /.*javax\.servlet-api.*\.jar/) }.join(';'))
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
@@ -121,5 +122,12 @@ final class Runner extends RunnerBase {
         if(conn instanceof NetworkConnector)
           return conn.getLocalPort()
     return params.port
+  }
+
+  @Override
+  protected void setHandlersToServer(List handlers) {
+    ContextHandlerCollection contexts = new ContextHandlerCollection()
+    contexts.setHandlers(handlers as Handler[])
+    server.setHandler(contexts)
   }
 }
