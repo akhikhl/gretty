@@ -25,15 +25,11 @@ class GrettyFarmPluginBase implements Plugin<Project> {
 
     project.afterEvaluate {
 
-      farmsMap.each { farmName_, farm_ ->
+      farmsMap.keySet().each { fname ->
 
-        task('jettyRunFarm' + farmName_, type: GrettyStartFarmTask, group: 'gretty') { thisTask ->
+        task('jettyRunFarm' + fname, type: GrettyStartFarmTask, group: 'gretty') { thisTask ->
           description = 'Starts web-apps farm inplace, in interactive mode (keypress stops the server).'
-          farm_.webapps.each { webapp ->
-            thisTask.dependsOn { project.project(webapp).tasks.prepareInplaceWebApp }
-          }
-          farmName = farmName_
-          farm = farm_
+          farmName = fname
         }
       }
     }
