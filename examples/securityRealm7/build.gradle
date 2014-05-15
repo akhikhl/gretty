@@ -14,7 +14,6 @@ apply plugin: 'gretty7'
 gretty {
   contextPath 'securityRealm7'
   realm 'auth'
-  realmConfigFile 'WEB-INF/jetty-realm.properties'
   onStart {
     println 'Enter user name "test" and password "test123" for logon.'
   }
