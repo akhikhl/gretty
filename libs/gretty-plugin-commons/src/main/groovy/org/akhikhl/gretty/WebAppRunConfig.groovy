@@ -15,9 +15,11 @@ import org.gradle.api.Project
  */
 class WebAppRunConfig extends WebAppConfig {
 
+  Project project
   boolean inplace = true
 
   protected void setupProperties(Project project, WebAppConfig sourceConfig) {
+    this.project = project
     if(contextPath == null) {
       contextPath = sourceConfig.contextPath
       if(contextPath == null)

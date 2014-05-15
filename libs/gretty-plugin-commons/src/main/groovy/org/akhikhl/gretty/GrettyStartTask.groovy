@@ -15,10 +15,15 @@ package org.akhikhl.gretty
 class GrettyStartTask extends GrettyStartBaseTask {
 
   @Delegate
-  private ServerRunConfig serverConfig = new ServerRunConfig()
+  private ServerConfig serverConfig = new ServerConfig()
 
   @Delegate
   private WebAppRunConfig webAppConfig = new WebAppRunConfig()
+
+  @Override
+  protected ServerConfig getServerConfig() {
+    serverConfig
+  }
 
   @Override
   protected List<WebAppRunConfig> getWebApps() {

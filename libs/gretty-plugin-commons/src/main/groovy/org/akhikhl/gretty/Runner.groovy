@@ -23,18 +23,24 @@ final class Runner {
 
   protected final ServerConfig sconfig
   protected final List<WebAppRunConfig> webapps
-  protected final ExecutorService executorService
   protected final boolean interactive
   protected final boolean debug
   protected final boolean integrationTest
+  protected final javaExecClasspath
+  protected final ScannerManagerFactory scannerManagerFactory
+  protected final ExecutorService executorService
+  protected final IJavaExec javaexec
 
-  Runner(ServerConfig sconfig, List<WebAppRunConfig> webapps, ExecutorService executorService, boolean interactive, boolean debug, boolean integrationTest) {
+  Runner(ServerConfig sconfig, List<WebAppRunConfig> webapps, boolean interactive, boolean debug, boolean integrationTest, javaExecClasspath, ScannerManagerFactory scannerManagerFactory, ExecutorService executorService, IJavaExec javaexec) {
     this.sconfig = sconfig
     this.webapps = webapps
-    this.executorService = executorService
     this.interactive = interactive
     this.debug = debug
     this.integrationTest = integrationTest
+    this.javaExecClasspath = javaExecClasspath
+    this.scannerManagerFactory = scannerManagerFactory
+    this.executorService = executorService
+    this.javaexec = javaexec
   }
 
   void run() {
@@ -118,13 +124,13 @@ final class Runner {
     if(System.getProperty("os.name") =~ /(?i).*windows.*/)
       json = json.replace('"', '\\"')
 
-    ScannerManagerBase scanman = project.ext._createScannerManager()
-    scanman.startScanner(this, inplace)
+    ScannerManagerBase scanman = scannerManagerFactory.createScannerManager()
+    scanman.startScanner(sconfig, webapps)
     try {
-      project.javaexec { spec ->
-        spec.classpath = project.configurations.gretty
+      javaexec.javaexec { spec ->
+        spec.classpath = javaExecClasspath
         spec.main = 'org.akhikhl.gretty.Runner'
-        spec.args = [json]
+        spec.args = [ json ]
         spec.jvmArgs = sconfig.jvmArgs
         spec.debug = sconfig.debug
       }

@@ -17,110 +17,134 @@ abstract class ScannerManagerBase {
 
   private static final Logger log = LoggerFactory.getLogger(ScannerManagerBase)
 
-  protected GrettyStartTask startTask
-  protected Project project
-  protected boolean inplace
+  protected ServerConfig sconfig
+  protected List<WebAppRunConfig> webapps
+  //protected boolean inplace
   protected scanner
-  protected List<FastReloadStruct> fastReloadDirs = []
+  protected Map fastReload
 
   protected abstract void addScannerBulkListener(Closure listener)
 
   private void configureFastReload() {
-    if(inplace)
-      fastReloadDirs = ProjectUtils.getFastReload(project, startTask.fastReload)
+    fastReload = [:]
+    for(WebAppRunConfig webapp in webapps)
+      if(webapp.inplace)
+        fastReload[webapp.project.path] = ProjectUtils.getFastReload(webapp.project, webapp.fastReload)
   }
 
   protected void configureScanner() {
     scanner.reportExistingFilesOnStartup = false
-    scanner.scanInterval = startTask.scanInterval
+    scanner.scanInterval = sconfig.scanInterval
     addScannerBulkListener { Collection<String> changedFiles ->
-      for(def f in changedFiles)
-        log.debug 'changedFile={}', f
-      startTask.onScanFilesChanged*.call(changedFiles)
-      if(inplace) {
-        if(shouldFullReload(changedFiles)) {
-          log.warn 'performing fullReload'
-          ProjectUtils.prepareInplaceWebAppFolder(project)
-          ServiceControl.send(startTask.servicePort, 'restart')
-        } else {
-          log.warn 'performing fastReload'
-          ProjectUtils.prepareInplaceWebAppFolder(project)
-        }
-      }
-      else if(project.gretty.overlays) {
-        ProjectUtils.prepareExplodedWebAppFolder(project)
-        project.ant.zip destfile: project.ext.finalWarPath,  basedir: "${project.buildDir}/explodedWebapp"
-        ServiceControl.send(startTask.servicePort, 'restart')
-      }
-      else {
-        project.tasks.war.execute()
-        ServiceControl.send(startTask.servicePort, 'restart')
-      }
+      scanFilesChanged(changedFiles)
     }
+  }
+
+  private static void collectScanDirs(List<File> scanDirs, boolean inplace, Project proj) {
+    if(inplace) {
+      scanDirs.addAll(proj.sourceSets.main.runtimeClasspath.files)
+      scanDirs.add(proj.webAppDir)
+    } else {
+      scanDirs.add(proj.tasks.war.archivePath)
+      scanDirs.add(ProjectUtils.getFinalWarPath(proj))
+    }
+    for(def overlay in proj.gretty.overlays)
+      collectScanDirs(scanDirs, inplace, proj.project(overlay))
   }
 
   protected abstract createScanner()
 
-  private void collectScanDirs(List<File> scanDirs, Project proj) {
-    if(inplace) {
-      scanDirs.addAll proj.sourceSets.main.runtimeClasspath.files
-      scanDirs.add proj.webAppDir
-    } else {
-      scanDirs.add proj.tasks.war.archivePath
-      scanDirs.add ProjectUtils.getFinalWarPath(proj)
-    }
-    for(def overlay in proj.gretty.overlays)
-      collectScanDirs(scanDirs, proj.project(overlay))
-  }
-
   private List<File> getEffectiveScanDirs() {
     List<File> scanDirs = []
-    collectScanDirs(scanDirs, project)
-    for(def dir in startTask.scanDirs) {
-      if(!(dir instanceof File))
-        dir = project.file(dir.toString())
-      scanDirs.add dir
+    for(WebAppRunConfig webapp in webapps) {
+      collectScanDirs(scanDirs, webapp.inplace, webapp.project)
+      for(def dir in webapp.scanDirs) {
+        if(!(dir instanceof File))
+          dir = project.file(dir.toString())
+        scanDirs.add(dir)
+      }
     }
     for(File f in scanDirs)
       log.debug 'scanDir: {}', f
     return scanDirs
   }
 
-  protected boolean shouldFullReload(Collection<String> changedFiles) {
+  protected void scanFilesChanged(Collection<String> changedFiles) {
+
+    for(def f in changedFiles)
+      log.warn 'changedFile={}', f
+
+    sconfig.onScanFilesChanged*.call(changedFiles)
+
+    List<WebAppRunConfig> changedWebApps = []
+    boolean fastReload = true
+
     for(String f in changedFiles) {
       if(f.endsWith('.jar')) {
-        log.debug 'file {} is jar, switching to fullReload', f
-        return true
+        List<WebAppRunConfig> dependantWebApps = webapps.findAll { it.project.configurations.compile.dependencies.find { it.absolutePath == f } }
+        if(dependantWebApps) {
+          log.warn 'file {} is dependency of {}, switching to fullReload', f, dependantWebApps[0].project
+          fastReload = false
+        }
+       log.warn 'changed file {} affects projects {}', (dependantWebApps.collect { it.project.name })
+        changedWebApps += dependantWebApps
+        continue
       }
-      if(f.endsWith('.class')) {
-        log.debug 'file {} is class, switching to fullReload', f
-        return true
-      }
-      if(['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml'].find { f.endsWith(File.separator + it) }) {
-        log.debug 'file {} is configuration file, switching to fullReload', f
-        return true
-      }
-      if(f.startsWith(new File(project.webAppDir, 'WEB-INF/lib').absolutePath)) {
-        log.debug 'file {} is in WEB-INF/lib, switching to fullReload', f
-        return true
-      }
-      Path path = Paths.get(f)
-      if(!fastReloadDirs.find { FastReloadStruct s ->
-        String relPath = s.baseDir.toPath().relativize(path)
-        f.startsWith(s.baseDir.absolutePath) && (s.pattern == null || relPath =~ s.pattern) && (s.excludesPattern == null || !(relPath =~ s.excludesPattern))
-      }) {
-        log.debug 'file {} is not in fastReloadDirs, switching to fullReload', f
-        return true
+      WebAppRunConfig webapp = webapps.find { f.startsWith(it.project.projectDir.absolutePath) }
+      if(webapp != null) {
+        log.warn 'changed file {} affects project {}', webapp.project.name
+        changedWebApps.add(webapp)
+        if(f.endsWith('.class')) {
+          log.warn 'file {} is class, switching to fullReload', f
+          fastReload = false
+        }
+        else if(['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml'].find { it == new File(f).name }) {
+          log.warn 'file {} is configuration file, switching to fullReload', f
+          fastReload = false
+        }
+        else if(f.startsWith(new File(webapp.project.webAppDir, 'WEB-INF/lib').absolutePath)) {
+          log.warn 'file {} is in WEB-INF/lib, switching to fullReload', f
+          fastReload = false
+        } else {
+          List<FastReloadStruct> fastReloadDirs = fastReload[webapp.project.path]
+          if(!fastReloadDirs?.find { FastReloadStruct s ->
+            String relPath = s.baseDir.toPath().relativize(Paths.get(f))
+            f.startsWith(s.baseDir.absolutePath) && (s.pattern == null || relPath =~ s.pattern) && (s.excludesPattern == null || !(relPath =~ s.excludesPattern))
+          }) {
+            log.warn 'file {} is not in fastReload directories, switching to fullReload', f
+            fastReload = false
+          }
+        }
       }
     }
-    return false
+
+    if(fastReload) {
+      log.warn 'performing fastReload'
+      for(WebAppRunConfig webapp in changedWebApps)
+        ProjectUtils.prepareInplaceWebAppFolder(webapp.project)
+    } else {
+      log.warn 'performing fullReload'
+      for(WebAppRunConfig webapp in changedWebApps) {
+        if(webapp.inplace)
+          ProjectUtils.prepareInplaceWebAppFolder(webapp.project)
+        else if(webapp.project.gretty.overlays) {
+          // TODO: check how it works
+          ProjectUtils.prepareExplodedWebAppFolder(webapp.project)
+          webapp.project.ant.zip destfile: webapp.project.ext.finalWarPath,  basedir: "${webapp.project.buildDir}/explodedWebapp"
+        }
+        else {
+          // TODO: check how it works
+          webapp.project.tasks.war.execute()
+        }
+      }
+      ServiceControl.send(sconfig.servicePort, 'restart')
+    }
   }
 
-  final void startScanner(GrettyStartTask startTask, boolean inplace) {
-    this.startTask = startTask
-    this.project = startTask.project
-    this.inplace = inplace
-    if(startTask.scanInterval == 0) {
+  final void startScanner(ServerConfig sconfig, List<WebAppRunConfig> webapps) {
+    this.sconfig = sconfig
+    this.webapps = webapps
+    if(sconfig.scanInterval == 0) {
       log.warn 'scanInterval not specified (or zero), scanning disabled'
       return
     }
@@ -128,7 +152,7 @@ abstract class ScannerManagerBase {
     scanner.scanDirs = getEffectiveScanDirs()
     configureFastReload()
     configureScanner()
-    log.warn 'Starting scanner with interval of {} second(s)', startTask.scanInterval
+    log.warn 'Starting scanner with interval of {} second(s)', sconfig.scanInterval
     scanner.start()
   }
 

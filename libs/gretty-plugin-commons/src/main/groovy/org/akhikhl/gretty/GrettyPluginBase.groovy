@@ -38,15 +38,15 @@ abstract class GrettyPluginBase implements Plugin<Project> {
     project.task('run')
     project.task('debug')
 
-    def self = this
-    project.ext._createScannerManager = {
-      self.createScannerManager()
+    if(!project.hasProperty('scannerManagerFactory')) {
+      def self = this
+      project.rootProject.ext.scannerManagerFactory = { self.createScannerManager() } as ScannerManagerFactory
     }
 
-    project.afterEvaluate {
+    if(!project.hasProperty('executorService'))
+      project.rootProject.ext.executorService = Executors.newSingleThreadExecutor()
 
-      if(!project.hasProperty('executorService'))
-        project.rootProject.ext.executorService = Executors.newSingleThreadExecutor()
+    project.afterEvaluate {
 
       for(String overlay in project.gretty.overlays)
         project.dependencies.add 'providedCompile', project.project(overlay)
