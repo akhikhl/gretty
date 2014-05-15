@@ -21,27 +21,37 @@ class GrettyStartFarmTask extends GrettyStartBaseTask {
   @Delegate
   protected Farm farm = new Farm()
 
+  private List<WebAppConfig> webAppConfigs
+
   @Override
   protected ServerConfig getServerConfig() {
     farm.serverConfig
   }
 
   @Override
-  protected List<WebAppRunConfig> getWebApps() {
-    farm.webapps.collect { w ->
-      def proj = (w instanceof Project ? w : project.project(w))
-      if(!proj)
-        throw new GradleException("Could not resolve project ${w} referenced in farm definition")
-      if(!proj.extensions.findByName('gretty'))
-        throw new GradleException("${proj} does not contain gretty extension. Please make sure that 'gretty-plugin' is applied to it.")
-      proj.gretty.webAppConfig
-    }
+  protected List<WebAppConfig> getWebApps() {
+    webAppConfigs
   }
 
   @Override
   protected void setupProperties() {
-    serverConfig.setupProperties(project, project.gretty.serverConfig)
-    webAppConfig.setupProperties(project, project.gretty.webAppConfig)
+    def sourceFarm = project.farms[farmName]
+    if(!sourceFarm)
+      throw new GradleException("Farm '${farmName}' referenced in GrettyStartFarmTask is not defined in project farms")
+    ConfigUtils.complementProperties(farm.serverConfig, sourceFarm.serverConfig, ServerConfig.getDefault(project))
+    farm.serverConfig.resolve(project)
+    farm.webapps += sourceFarm.webapps
+    for(def w in farm.webapps) {
+      def proj = (w instanceof Project ? w : project.project(w))
+      if(!proj)
+        throw new GradleException("Could not resolve project '${w}' referenced in ${farmName ? 'farm ' + farmName : 'default farm'}")
+      if(!proj.extensions.findByName('gretty'))
+        throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
+      WebAppConfig webapp = new WebAppConfig()
+      ConfigUtils.complementProperties(webapp, proj.gretty.webAppConfig, WebAppConfig.getDefault(proj))
+      webapp.resolve(proj)
+      webAppConfigs.add(webapp)
+    }
     super.setupProperties()
   }
 }

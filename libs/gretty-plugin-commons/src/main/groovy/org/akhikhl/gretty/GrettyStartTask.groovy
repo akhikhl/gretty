@@ -18,7 +18,7 @@ class GrettyStartTask extends GrettyStartBaseTask {
   private ServerConfig serverConfig = new ServerConfig()
 
   @Delegate
-  private WebAppRunConfig webAppConfig = new WebAppRunConfig()
+  private WebAppConfig webAppConfig = new WebAppConfig()
 
   @Override
   protected ServerConfig getServerConfig() {
@@ -26,14 +26,16 @@ class GrettyStartTask extends GrettyStartBaseTask {
   }
 
   @Override
-  protected List<WebAppRunConfig> getWebApps() {
+  protected List<WebAppConfig> getWebApps() {
     [ webAppConfig ]
   }
 
   @Override
   protected void setupProperties() {
-    serverConfig.setupProperties(project, project.gretty.serverConfig)
-    webAppConfig.setupProperties(project, project.gretty.webAppConfig)
+    ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
+    serverConfig.resolve(project)
+    ConfigUtils.complementProperties(webAppConfig, project.gretty.webAppConfig, WebAppConfig.getDefault(project))
+    webAppConfig.resolve(project)
     super.setupProperties()
   }
 }

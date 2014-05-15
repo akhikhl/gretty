@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 import groovy.json.JsonBuilder
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
+import org.gradle.api.Project
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -21,30 +22,24 @@ final class Runner {
 
   protected static final Logger log = LoggerFactory.getLogger(Runner)
 
+  protected final Project project
   protected final ServerConfig sconfig
-  protected final List<WebAppRunConfig> webapps
+  protected final List<WebAppConfig> webapps
   protected final boolean interactive
   protected final boolean debug
   protected final boolean integrationTest
-  protected final javaExecClasspath
-  protected final ScannerManagerFactory scannerManagerFactory
-  protected final ExecutorService executorService
-  protected final IJavaExec javaexec
 
-  Runner(ServerConfig sconfig, List<WebAppRunConfig> webapps, boolean interactive, boolean debug, boolean integrationTest, javaExecClasspath, ScannerManagerFactory scannerManagerFactory, ExecutorService executorService, IJavaExec javaexec) {
+  Runner(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean interactive, boolean debug, boolean integrationTest) {
+    this.project = project
     this.sconfig = sconfig
     this.webapps = webapps
     this.interactive = interactive
     this.debug = debug
     this.integrationTest = integrationTest
-    this.javaExecClasspath = javaExecClasspath
-    this.scannerManagerFactory = scannerManagerFactory
-    this.executorService = executorService
-    this.javaexec = javaexec
   }
 
   void run() {
-    Future futureStatus = ServiceControl.readMessage(executorService, sconfig.statusPort)
+    Future futureStatus = ServiceControl.readMessage(project._executorService, sconfig.statusPort)
     def runThread = Thread.start {
       runJetty()
     }
@@ -57,7 +52,7 @@ final class Runner {
         System.out.println "http://localhost:${sconfig.port}${webapps[0].contextPath}"
       } else if(webapps.size() > 1) {
         System.out.println 'Web-applications run at the addresses:'
-        for(WebAppRunConfig webapp in webapps)
+        for(WebAppConfig webapp in webapps)
           System.out.println "http://localhost:${sconfig.port}${webapp.contextPath}"
       }
       if(interactive) {
@@ -73,14 +68,13 @@ final class Runner {
   }
 
   private prepareJson() {
-    File logbackConfigFile = discoverLogbackConfigFile()
     def webAppsJson = []
-    for(WebAppRunConfig webapp in webapps)
+    for(WebAppConfig webapp in webapps)
       webAppsJson.add {
         inplace webapp.inplace
         webappClassPath webapp.classPath
         contextPath webapp.contextPath
-        resourceBase webapp.resourceBase
+        resourceBase (webapp.inplace ? webapp.inplaceResourceBase : webapp.warResourceBase)
         initParams webapp.initParameters
         if(webapp.realm && webapp.realmConfigFile) {
           realm webapp.realm
@@ -124,15 +118,16 @@ final class Runner {
     if(System.getProperty("os.name") =~ /(?i).*windows.*/)
       json = json.replace('"', '\\"')
 
-    ScannerManagerBase scanman = scannerManagerFactory.createScannerManager()
-    scanman.startScanner(sconfig, webapps)
+    ScannerManagerBase scanman = project._createScannerManager()
+    scanman.startScanner(project, sconfig, webapps)
+    Runner self = this
     try {
-      javaexec.javaexec { spec ->
-        spec.classpath = javaExecClasspath
+      project.javaexec { spec ->
+        spec.classpath = project.configurations.gretty
         spec.main = 'org.akhikhl.gretty.Runner'
         spec.args = [ json ]
         spec.jvmArgs = sconfig.jvmArgs
-        spec.debug = sconfig.debug
+        spec.debug = self.debug
       }
     } finally {
       scanman.stopScanner()
@@ -141,4 +136,3 @@ final class Runner {
     sconfig.onStop*.call()
   }
 }
-

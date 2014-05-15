@@ -61,7 +61,8 @@ final class ProjectUtils {
   }
 
   private static void collectFastReloads(List result, Project proj) {
-    result.addAll(proj.gretty.fastReload)
+    if(proj.gretty.fastReload != null)
+      result.addAll(proj.gretty.fastReload)
     for(def overlay in proj.gretty.overlays.reverse()) {
       overlay = proj.project(overlay)
       if(overlay.extensions.findByName('gretty'))

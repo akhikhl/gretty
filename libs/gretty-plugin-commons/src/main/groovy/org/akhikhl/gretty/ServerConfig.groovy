@@ -32,6 +32,20 @@ class ServerConfig {
   List<Closure> onScan
   List<Closure> onScanFilesChanged
 
+  protected static ServerConfig getDefault(Project project) {
+    ServerConfig result = new ServerConfig()
+    result.jvmArgs = []
+    result.port = 8080
+    result.servicePort = 9900
+    result.statusPort = 9901
+    result.jettyXmlFile = 'jetty.xml'
+    result.scanInterval = 0
+    result.loggingLevel = 'INFO'
+    result.logFileName = project.name
+    result.logDir = "${System.getProperty('user.home')}/logs" as String
+    return result
+  }
+
   void onScan(Closure newValue) {
     if(onScan == null)
       onScan = []
@@ -56,49 +70,30 @@ class ServerConfig {
     onStop.add newValue
   }
 
-  private static File resolveJettyXmlFile(Project project, jettyXmlFile) {
-    def file = ProjectUtils.resolveSingleFile(project, jettyXmlFile)
-    if(file == null) {
-      file = jettyXmlFile
-      if(!(file instanceof File))
-        file = new File(file)
-      if(!file.isAbsolute()) {
+  protected void resolve(Project project) {
+    def f = ProjectUtils.resolveSingleFile(project, jettyXmlFile)
+    if(f == null) {
+      def f2 = jettyXmlFile
+      if(!(f2 instanceof File))
+        f2 = new File(f2)
+      if(!f2.isAbsolute()) {
         String jettyHome = System.getenv('JETTY_HOME')
         if(!jettyHome)
           jettyHome = System.getProperty('jetty.home')
         if(jettyHome != null) {
-          File f = new File(new File(jettyHome, 'etc'), file.path)
-          if(f.exists())
-            file = f
+          File f3 = new File(new File(jettyHome, 'etc'), f2.path)
+          if(f3.exists())
+            f = f3
         }
       }
     }
-    file
-  }
-
-  protected void setupProperties(Project project, ServerConfig sourceConfig) {
-    if(jvmArgs == null) jvmArgs = sourceConfig.jvmArgs
-    if(port == null) port = sourceConfig.port ?: 8080
-    if(servicePort == null) servicePort = sourceConfig.servicePort ?: 9900
-    if(statusPort == null) statusPort = sourceConfig.statusPort ?: 9901
-    if(jettyXmlFile == null) jettyXmlFile = sourceConfig.jettyXmlFile ?: 'jetty.xml'
-    jettyXmlFile = resolveJettyXmlFile(project, jettyXmlFile)
-    if(scanInterval == null) scanInterval = sourceConfig.scanInterval
-    if(logbackConfigFile == null) logbackConfigFile = sourceConfig.logbackConfigFile
-    def f = ProjectUtils.resolveSingleFile(project, logbackConfigFile)
+    jettyXmlFile = f
+    f = ProjectUtils.resolveSingleFile(project, logbackConfigFile)
     if(f == null && logbackConfigFile != 'logback.groovy')
       f = ProjectUtils.resolveSingleFile(project, 'logback.groovy')
     if(f == null && logbackConfigFile != 'logback.xml')
       f = ProjectUtils.resolveSingleFile(project, 'logback.xml')
     logbackConfigFile = f
-    if(loggingLevel == null) loggingLevel = sourceConfig.loggingLevel ?: 'INFO'
-    if(consoleLogEnabled == null) consoleLogEnabled = (sourceConfig.consoleLogEnabled == null ? true : sourceConfig.consoleLogEnabled)
-    if(fileLogEnabled == null) fileLogEnabled = (sourceConfig.fileLogEnabled == null ? true : sourceConfig.fileLogEnabled)
-    if(logFileName == null) logFileName = sourceConfig.logFileName ?: project.name
-    if(logDir == null) logDir = sourceConfig.logDir ?: "${System.getProperty('user.home')}/logs"
-    if(onStart == null) onStart = sourceConfig.onStart
-    if(onStop == null) onStop = sourceConfig.onStop
-    if(onScan == null) onScan = sourceConfig.onScan
-    if(onScanFilesChanged == null) onScanFilesChanged = sourceConfig.onScanFilesChanged
+
   }
 }

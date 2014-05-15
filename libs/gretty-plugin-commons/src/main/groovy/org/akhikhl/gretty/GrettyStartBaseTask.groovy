@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory
  */
 abstract class GrettyStartBaseTask extends GrettyBaseTask {
 
-  protected static final Logger log = LoggerFactory.getLogger(GrettyStartBaseTask)
-
   boolean interactive = true
   boolean debug = false
   boolean integrationTest = false
@@ -28,12 +26,11 @@ abstract class GrettyStartBaseTask extends GrettyBaseTask {
   @Override
   void action() {
     ServerConfig sconfig = getServerConfig()
-    def javaexec = { Closure closure -> project.javaexec closure } as IJavaExec
-    def runner = new Runner(getServerConfig(), getWebApps(), interactive, debug, integrationTest, project.configurations.gretty, project.scannerManagerFactory, project.executorService, javaexec)
+    def runner = new Runner(project, getServerConfig(), getWebApps(), interactive, debug, integrationTest)
     runner.run()
   }
 
   protected abstract ServerConfig getServerConfig()
 
-  protected abstract List<WebAppRunConfig> getWebApps()
+  protected abstract List<WebAppConfig> getWebApps()
 }

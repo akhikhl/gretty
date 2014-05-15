@@ -31,6 +31,11 @@ class GrettyServiceTask extends GrettyBaseTask {
   @Override
   protected void setupProperties() {
     requireProperty 'command'
-    if(servicePort == null) servicePort = project.gretty.servicePort
+    if(servicePort == null) {
+      ServerConfig serverConfig = new ServerConfig()
+      ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
+      serverConfig.resolve(project)
+      servicePort = serverConfig.servicePort
+    }
   }
 }

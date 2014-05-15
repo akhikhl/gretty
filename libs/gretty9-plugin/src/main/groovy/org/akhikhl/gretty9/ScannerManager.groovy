@@ -41,7 +41,7 @@ final class ScannerManager extends ScannerManagerBase {
     scanner.recursive = true
     addScannerScanCycleListener { started, cycle ->
       if(started)
-        startTask.onScan*.call(cycle)
+        sconfig.onScan*.call(cycle)
     }
   }
 

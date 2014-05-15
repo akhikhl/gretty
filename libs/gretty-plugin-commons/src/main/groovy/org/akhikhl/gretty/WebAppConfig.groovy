@@ -7,6 +7,8 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.Project
+
 /**
  *
  * @author akhikhl
@@ -23,6 +25,9 @@ class WebAppConfig {
   String inplaceResourceBase
   String warResourceBase
   Collection<URL> classPath
+
+  String projectPath
+  Boolean inplace
 
   void fastReload(String arg) {
     if(fastReload == null)
@@ -42,10 +47,39 @@ class WebAppConfig {
     fastReload.add(map)
   }
 
+  protected static WebAppConfig getDefault(Project project) {
+    WebAppConfig result = new WebAppConfig()
+    result.contextPath = '/' + project.name
+    result.jettyEnvXmlFile = 'jetty-env.xml'
+    result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp" as String
+    result.warResourceBase = ProjectUtils.getFinalWarPath(project).toString()
+    result.projectPath = project.path
+    result.inplace = true
+    return result
+  }
+
   void initParameter(key, value) {
     if(initParameters == null)
       initParameters = [:]
     initParameters[key] = value
+  }
+
+  protected void resolve(Project project) {
+    if(contextPath != null && !contextPath.startsWith('/'))
+      contextPath = '/' + contextPath
+    if(initParameters) {
+      def initParams = [:]
+      for(def e in initParameters) {
+        def paramValue = e.value
+        if(paramValue instanceof Closure)
+          paramValue = paramValue()
+        initParams[e.key] = paramValue
+      }
+      initParameters = initParams
+    }
+    realmConfigFile = ProjectUtils.resolveSingleFile(project, realmConfigFile)
+    jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, jettyEnvXmlFile)
+    classPath = ProjectUtils.getClassPath(project, inplace)
   }
 
   void scanDir(String value) {
