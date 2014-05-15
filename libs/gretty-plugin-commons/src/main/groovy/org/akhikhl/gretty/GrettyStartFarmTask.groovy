@@ -7,24 +7,21 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.GradleException
+
 /**
  *
  * @author akhikhl
  */
 class GrettyStartFarmTask extends GrettyStartBaseTask {
 
-  List<WebAppRunConfig> webapps = []
+  String farmName = ''
+
+  @Delegate
+  protected Farm farm = new Farm()
 
   @Override
-  List<WebAppRunConfig> getWebApps() {
-    webapps
-  }
-
-  void webapp(Closure webAppConfigClosure) {
-    WebAppRunConfig webapp = new WebAppRunConfig()
-    webAppConfigClosure.delegate = webapp
-    webAppConfigClosure.resolveStrategy = Closure.DELEGATE_FIRST
-    webAppConfigClosure()
+  protected List<WebAppRunConfig> getWebApps() {
   }
 
   @Override
@@ -34,4 +31,3 @@ class GrettyStartFarmTask extends GrettyStartBaseTask {
     super.setupProperties()
   }
 }
-

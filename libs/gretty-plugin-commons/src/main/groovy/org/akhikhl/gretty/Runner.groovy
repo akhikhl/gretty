@@ -7,44 +7,51 @@
  */
 package org.akhikhl.gretty
 
+import groovy.json.JsonBuilder
 import java.util.concurrent.ExecutorService
-import org.gradle.api.Project
+import java.util.concurrent.Future
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * Base task for starting jetty
  *
  * @author akhikhl
  */
-abstract class GrettyStartBaseTask extends GrettyBaseTask {
+final class Runner {
 
-  protected static final Logger log = LoggerFactory.getLogger(GrettyStartBaseTask)
+  protected static final Logger log = LoggerFactory.getLogger(Runner)
 
-  boolean interactive = true
-  boolean debug = false
-  boolean integrationTest = false
+  protected final ServerConfig sconfig
+  protected final List<WebAppRunConfig> webapps
+  protected final ExecutorService executorService
+  protected final boolean interactive
+  protected final boolean debug
+  protected final boolean integrationTest
 
-  ExecutorService executorService
+  Runner(ServerConfig sconfig, List<WebAppRunConfig> webapps, ExecutorService executorService, boolean interactive, boolean debug, boolean integrationTest) {
+    this.sconfig = sconfig
+    this.webapps = webapps
+    this.executorService = executorService
+    this.interactive = interactive
+    this.debug = debug
+    this.integrationTest = integrationTest
+  }
 
-  @Override
-  void action() {
-    ServerConfig sconfig = getServerConfig()
+  void run() {
     Future futureStatus = ServiceControl.readMessage(executorService, sconfig.statusPort)
     def runThread = Thread.start {
-      runJetty(sconfig)
+      runJetty()
     }
     def status = futureStatus.get()
     log.debug 'Got status: {}', status
     if(!integrationTest) {
       System.out.println 'Jetty server started.'
-      List<WebAppRunConfig> webapps = getWebApps()
       if(webapps.size() == 1) {
         System.out.println 'Web-application runs at the address:'
         System.out.println "http://localhost:${sconfig.port}${webapps[0].contextPath}"
       } else if(webapps.size() > 1) {
         System.out.println 'Web-applications run at the addresses:'
-        for(def webapp in webapps)
+        for(WebAppRunConfig webapp in webapps)
           System.out.println "http://localhost:${sconfig.port}${webapp.contextPath}"
       }
       if(interactive) {
@@ -59,73 +66,51 @@ abstract class GrettyStartBaseTask extends GrettyBaseTask {
     }
   }
 
-  protected File discoverLogbackConfigFile() {
-    File result
-    if(logbackConfigFile) {
-      result = new File(logbackConfigFile)
-      if(!result.isAbsolute()) {
-        result = new File(project.projectDir, logbackConfigFile)
-        if(!result.exists())
-          result = ProjectUtils.findFileInOutput(project, logbackConfigFile)
-      }
-      if(!result || !result.exists())
-        project.logger.warn 'The specified logback config file "{}" does not exist, ignoring', logbackConfigFile
-      else
-        project.logger.warn 'Using specified logback config file "{}"', logbackConfigFile
-    } else {
-      result = ProjectUtils.findFileInOutput(project, ~/logback\.(xml|groovy)/)
-      if(result)
-        project.logger.warn 'Using discovered logback config file "{}"', result
-      else
-        project.logger.warn 'Auto-configuring logback'
-    }
-    return result
-  }
-
-  protected abstract ServerConfig getServerConfig()
-
-  protected abstract List<WebAppRunConfig> getWebApps()
-
-  private static prepareJson(ServerConfig sconfig) {
-    File logbackConfigFile = discoverLogbackConfigFile(sconfig)
+  private prepareJson() {
+    File logbackConfigFile = discoverLogbackConfigFile()
     def webAppsJson = []
-    for(def webapp in task.getWebApps())
+    for(WebAppRunConfig webapp in webapps)
       webAppsJson.add {
         inplace webapp.inplace
         webappClassPath webapp.classPath
         contextPath webapp.contextPath
         resourceBase webapp.resourceBase
         initParams webapp.initParameters
-        realmInfo webapp.realmInfo
-        jettyEnvXml webapp.jettyEnvXmlFile
+        if(webapp.realm && webapp.realmConfigFile) {
+          realm webapp.realm
+          realmConfigFile webapp.realmConfigFile.absolutePath
+        }
+        if(webapp.jettyEnvXmlFile)
+          jettyEnvXml webapp.jettyEnvXmlFile.absolutePath
       }
     def json = new JsonBuilder()
     json {
-      port task.port
-      servicePort task.servicePort
-      statusPort task.statusPort
-      jettyXml task.jettyXmlFile
-      if(logbackConfigFile)
-        logbackConfig logbackConfigFile.absolutePath
+      port sconfig.port
+      servicePort sconfig.servicePort
+      statusPort sconfig.statusPort
+      if(sconfig.jettyXmlFile)
+        jettyXml sconfig.jettyXmlFile.absolutePath
+      if(sconfig.logbackConfigFile)
+        logbackConfig sconfig.logbackConfigFile.absolutePath
       else
         logging {
-          loggingLevel task.loggingLevel
-          consoleLogEnabled task.consoleLogEnabled
-          fileLogEnabled task.fileLogEnabled
-          logFileName task.logFileName ?: task.project.name
-          logDir task.logDir
+          loggingLevel sconfig.loggingLevel
+          consoleLogEnabled sconfig.consoleLogEnabled
+          fileLogEnabled sconfig.fileLogEnabled
+          logFileName sconfig.logFileName
+          logDir sconfig.logDir
         }
       webapps webAppsJson
     }
     return json
   }
 
-  protected void runJetty(ServerConfig sconfig) {
+  protected void runJetty() {
 
     sconfig.onStart*.call()
 
-    def json = prepareJson(sconfig)
-    project.logger.info json.toPrettyString()
+    def json = prepareJson()
+    log.info json.toPrettyString()
     json = json.toString()
 
     // we are going to pass json as argument to java process.
@@ -149,9 +134,5 @@ abstract class GrettyStartBaseTask extends GrettyBaseTask {
 
     sconfig.onStop*.call()
   }
-
-  @Override
-  protected void setupProperties() {
-    if(executorService == null) executorService = project.executorService ?: Executors.newSingleThreadExecutor()
-  }
 }
+

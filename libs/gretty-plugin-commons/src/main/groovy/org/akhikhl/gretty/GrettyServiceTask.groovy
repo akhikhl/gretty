@@ -30,7 +30,7 @@ class GrettyServiceTask extends GrettyBaseTask {
 
   @Override
   protected void setupProperties() {
-    requiredProperty 'command'
+    requireProperty 'command'
     if(servicePort == null) servicePort = project.gretty.servicePort
   }
 }

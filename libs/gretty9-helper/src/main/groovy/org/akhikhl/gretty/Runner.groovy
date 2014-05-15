@@ -93,12 +93,13 @@ final class Runner extends RunnerBase {
   }
 
   @Override
-  protected void configureRealm(context, realmInfo) {
-    if(context.getSecurityHandler().getLoginService() != null)
-      return
-    System.out.println 'Auto-configuring login service'
-    if(realmInfo?.realm && realmInfo?.realmConfigFile)
-      context.getSecurityHandler().setLoginService(new HashLoginService(realmInfo.realm, realmInfo.realmConfigFile))
+  protected void configureRealm(context, String realm, String realmConfigFile) {
+    if(realm && realmConfigFile) {
+      if(context.getSecurityHandler().getLoginService() != null)
+        return
+      System.out.println 'Auto-configuring login service'
+      context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
+    }
   }
 
   @Override

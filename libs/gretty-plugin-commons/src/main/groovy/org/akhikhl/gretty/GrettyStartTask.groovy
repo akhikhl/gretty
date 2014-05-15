@@ -15,16 +15,19 @@ package org.akhikhl.gretty
 class GrettyStartTask extends GrettyStartBaseTask {
 
   @Delegate
-  protected WebAppRunConfig webAppConfig = new WebAppRunConfig()
+  private ServerRunConfig serverConfig = new ServerRunConfig()
+
+  @Delegate
+  private WebAppRunConfig webAppConfig = new WebAppRunConfig()
 
   @Override
-  List<WebAppRunConfig> getWebApps() {
+  protected List<WebAppRunConfig> getWebApps() {
     [ webAppConfig ]
   }
 
   @Override
   protected void setupProperties() {
-    serverConfig.setupProperties([project], project.gretty.serverConfig)
+    serverConfig.setupProperties(project, project.gretty.serverConfig)
     webAppConfig.setupProperties(project, project.gretty.webAppConfig)
     super.setupProperties()
   }

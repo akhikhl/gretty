@@ -25,7 +25,7 @@ abstract class RunnerBase {
 
   protected abstract void configureConnectors()
 
-  protected abstract void configureRealm(context, realmInfo)
+  protected abstract void configureRealm(context, String realm, String realmConfigFile)
 
   protected abstract createServer()
 
@@ -59,7 +59,7 @@ abstract class RunnerBase {
       def context = createWebAppContext(webapp.webappClassPath)
       addConfigurationClasses(context, webapp.webappClassPath)
       applyJettyEnvXml(context, webapp.jettyEnvXml)
-      configureRealm(context, webapp.realmInfo)
+      configureRealm(context, webapp.realm, webapp.realmConfigFile)
 
       context.setContextPath(webapp.contextPath)
 

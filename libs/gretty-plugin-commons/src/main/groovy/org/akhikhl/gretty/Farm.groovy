@@ -13,10 +13,12 @@ package org.akhikhl.gretty
  */
 final class Farm {
 
+  @Delegate
+  protected ServerConfig serverConfig = new ServerConfig()
+
   List webapps = []
 
   void webapp(w) {
     webapps.add(w)
   }
 }
-

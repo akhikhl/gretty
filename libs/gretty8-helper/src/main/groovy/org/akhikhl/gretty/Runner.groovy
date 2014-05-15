@@ -43,6 +43,7 @@ final class Runner extends RunnerBase {
     super(params)
   }
 
+  @Override
   protected void addConfigurationClasses(webAppContext, List<String> webappClassPath) {
     webAppContext.setConfigurations([
       new WebInfConfigurationEx(),
@@ -56,6 +57,7 @@ final class Runner extends RunnerBase {
     ] as Configuration[])
   }
 
+  @Override
   protected void applyJettyEnvXml(webAppContext, jettyEnvXml) {
     if(jettyEnvXml) {
       System.out.println "Configuring webAppContext from ${jettyEnvXml}"
@@ -64,6 +66,7 @@ final class Runner extends RunnerBase {
     }
   }
 
+  @Override
   protected void applyJettyXml() {
     if(params.jettyXml != null) {
       System.out.println "Configuring server from ${params.jettyXml}"
@@ -72,6 +75,7 @@ final class Runner extends RunnerBase {
     }
   }
 
+  @Override
   protected void configureConnectors() {
     if(server.getConnectors() != null && server.getConnectors().length != 0)
       return
@@ -84,18 +88,22 @@ final class Runner extends RunnerBase {
     server.setConnectors([ connector ] as Connector[])
   }
 
-  protected void configureRealm(context, realmInfo) {
-    if(context.getSecurityHandler().getLoginService() != null)
-      return
-    System.out.println 'Auto-configuring login service'
-    if(realmInfo?.realm && realmInfo?.realmConfigFile)
-      context.getSecurityHandler().setLoginService(new HashLoginService(realmInfo.realm, realmInfo.realmConfigFile))
+  @Override
+  protected void configureRealm(context, String realm, String realmConfigFile) {
+    if(realm && realmConfigFile) {
+      if(context.getSecurityHandler().getLoginService() != null)
+        return
+      System.out.println 'Auto-configuring login service'
+      context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
+    }
   }
 
+  @Override
   protected createServer() {
     return new Server()
   }
 
+  @Override
   protected createWebAppContext(List<String> webappClassPath) {
     WebAppContext context = new WebAppContext()
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !(it =~ /.*javax\.servlet-api.*\.jar/) }.join(';'))
@@ -104,6 +112,7 @@ final class Runner extends RunnerBase {
     return context
   }
 
+  @Override
   protected int getServerPort() {
     if(server.getConnectors() != null)
       for(Connector conn in server.getConnectors())

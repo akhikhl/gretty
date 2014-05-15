@@ -28,9 +28,17 @@ abstract class GrettyBaseTask extends DefaultTask {
 
   abstract protected void action()
 
-  protected final void requiredProperty(String propName) {
+  protected final void requireAnyProperty(String... propNames) {
+    for(String propName in propNames) {
+      if(hasProperty(propName) && properties[propName])
+        return
+    }
+    throw new GradleException("Missing at least one of the required properties ${propNames} in ${getClass().getName()}")
+  }
+
+  protected final void requireProperty(String propName) {
     if(!hasProperty(propName) || !properties[propName])
-      throw new GradleException("Missing required property: ${getClass().getName()}.${propName}")
+      throw new GradleException("Missing required property '${propName}' in ${getClass().getName()}")
   }
 
   protected void setupProperties() {
