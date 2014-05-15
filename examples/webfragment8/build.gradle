@@ -1,5 +1,9 @@
 apply plugin: 'java'
 
+ext {
+  jetty8_servlet_api_version = '3.0.1'
+}
+
 dependencies {
   compile "javax.servlet:javax.servlet-api:$jetty8_servlet_api_version"
 }

@@ -1,8 +1,18 @@
 apply plugin: 'groovy'
 
+configurations {
+  compileOnly
+}
+
 dependencies {
   compile project(':libs:gretty-plugin-commons')
   compile "org.eclipse.jetty:jetty-util:$jetty8_version"
   compile gradleApi()
+  compileOnly 'org.kordamp.gipsy:gipsy:0.4.0'
 }
 
+sourceSets {
+  main {
+    compileClasspath += configurations.compileOnly
+  }
+}

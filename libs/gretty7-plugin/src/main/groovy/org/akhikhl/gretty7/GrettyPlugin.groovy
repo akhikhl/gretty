@@ -9,14 +9,8 @@ package org.akhikhl.gretty7
 
 import org.gradle.api.Project
 import org.akhikhl.gretty.GrettyPluginBase
-import org.akhikhl.gretty.ScannerManagerBase
 
 final class GrettyPlugin extends GrettyPluginBase {
-
-  @Override
-  ScannerManagerBase createScannerManager() {
-    return new ScannerManager()
-  }
 
   @Override
   void injectDependencies(Project project) {

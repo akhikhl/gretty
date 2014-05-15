@@ -38,11 +38,6 @@ abstract class GrettyPluginBase implements Plugin<Project> {
     project.task('run')
     project.task('debug')
 
-    if(!project.hasProperty('_createScannerManager')) {
-      def self = this
-      project.rootProject.ext._createScannerManager = { self.createScannerManager() }
-    }
-
     if(!project.hasProperty('_executorService'))
       project.rootProject.ext._executorService = Executors.newSingleThreadExecutor()
 
@@ -199,8 +194,6 @@ abstract class GrettyPluginBase implements Plugin<Project> {
       } // integrationTestTask
     } // afterEvaluate
   } // apply
-
-  abstract ScannerManagerBase createScannerManager()
 
   abstract void injectDependencies(Project project)
 

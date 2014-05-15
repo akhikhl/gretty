@@ -17,9 +17,9 @@ ext {
   jetty9_version = '9.1.0.v20131115'
   jetty9_servlet_api_version = '3.1.0'
   asm_version = '5.0.1'
-  groovy_version = '2.2.2'
+  groovy_version = '2.3.0'
   spock_version = '0.7-groovy-2.0'
-  logback_version = '1.1.1'
+  logback_version = '1.1.2'
   slf4j_version = '1.7.6'
 }
 
