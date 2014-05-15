@@ -50,6 +50,7 @@ class WebAppConfig {
   protected static WebAppConfig getDefault(Project project) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + project.name
+    result.realmConfigFile = 'jetty-realm.properties'
     result.jettyEnvXmlFile = 'jetty-env.xml'
     result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp" as String
     result.warResourceBase = ProjectUtils.getFinalWarPath(project).toString()
