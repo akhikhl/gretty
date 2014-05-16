@@ -37,11 +37,12 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
     project.extensions.create('gretty', GrettyExtension)
 
-    project.configurations {
-      grettyHelperConfig
-      grettyLoggingConfig
-	    gretty.extendsFrom(grettyHelperConfig)
-    }
+    if(!project.configurations.findByName('grettyHelperConfig'))
+      project.configurations {
+        grettyHelperConfig
+        grettyLoggingConfig
+        gretty.extendsFrom(grettyHelperConfig)
+      }
 
     injectDependencies(project)
 
@@ -49,6 +50,13 @@ abstract class GrettyPluginBase implements Plugin<Project> {
     project.task('debug')
 
     project.afterEvaluate {
+
+      if(!project.repositories)
+        project.repositories {
+          mavenLocal()
+          jcenter()
+          mavenCentral()
+        }
 
       for(String overlay in project.gretty.overlays)
         project.dependencies.add 'providedCompile', project.project(overlay)

@@ -34,7 +34,7 @@ class GrettyStartFarmTask extends GrettyStartBaseTask {
   }
 
   @Override
-  protected void setupProperties() {
+  protected void resolveProperties() {
     def sourceFarm = project.farms.farmsMap[farmName]
     if(!sourceFarm)
       throw new GradleException("Farm '${farmName}' referenced in GrettyStartFarmTask is not defined in project farms")
@@ -54,6 +54,6 @@ class GrettyStartFarmTask extends GrettyStartBaseTask {
       webapp.resolve(proj)
       webAppConfigs.add(webapp)
     }
-    super.setupProperties()
+    super.resolveProperties()
   }
 }

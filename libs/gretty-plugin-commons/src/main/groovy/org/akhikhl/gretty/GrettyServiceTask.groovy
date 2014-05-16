@@ -29,7 +29,7 @@ class GrettyServiceTask extends GrettyBaseTask {
   }
 
   @Override
-  protected void setupProperties() {
+  protected void resolveProperties() {
     requireProperty 'command'
     if(servicePort == null) {
       ServerConfig serverConfig = new ServerConfig()

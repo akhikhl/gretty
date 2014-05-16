@@ -35,13 +35,36 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
     project.extensions.create('farms', Farms)
     project.farms.farmsMap[''] = project.farm
 
+    if(!project.configurations.findByName('grettyHelperConfig'))
+      project.configurations {
+        grettyHelperConfig
+        grettyLoggingConfig
+        gretty.extendsFrom(grettyHelperConfig)
+      }
+
+    injectDependencies(project)
+
     project.afterEvaluate {
+
+      if(!project.repositories)
+        project.repositories {
+          mavenLocal()
+          jcenter()
+          mavenCentral()
+        }
 
       project.farms.farmsMap.keySet().each { fname ->
 
         project.task('jettyRunFarm' + fname, type: GrettyStartFarmTask, group: 'gretty') {
           description = 'Starts web-apps farm inplace, in interactive mode (keypress stops the server).'
           farmName = fname
+          dependsOn {
+            resolveProperties()
+            webApps.collect {
+              def proj = project.project(it.projectPath)
+              (it.inplace == null || it.inplace) ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
+            }
+          }
         }
       }
     }
@@ -52,4 +75,6 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
   abstract String getPluginName()
 
   abstract ScannerManagerFactory getScannerManagerFactory()
+
+  abstract void injectDependencies(Project project)
 }

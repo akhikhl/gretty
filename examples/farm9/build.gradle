@@ -10,3 +10,7 @@ buildscript {
 }
 
 apply plugin: 'gretty9-farm'
+
+farm {
+  scanInterval = 1
+}

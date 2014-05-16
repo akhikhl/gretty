@@ -9,6 +9,7 @@ package org.akhikhl.gretty8
 
 import org.akhikhl.gretty.GrettyFarmPluginBase
 import org.akhikhl.gretty.ScannerManagerFactory
+import org.gradle.api.Project
 
 /**
  *
@@ -29,6 +30,13 @@ class GrettyFarmPlugin extends GrettyFarmPluginBase {
   @Override
   ScannerManagerFactory getScannerManagerFactory() {
     ScannerManagerFactoryImpl.instance
+  }
+
+  @Override
+  void injectDependencies(Project project) {
+    project.dependencies {
+      grettyHelperConfig 'org.akhikhl.gretty:gretty8-helper:0.0.17'
+    }
   }
 }
 

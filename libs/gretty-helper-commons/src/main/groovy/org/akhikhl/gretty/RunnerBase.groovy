@@ -55,7 +55,7 @@ abstract class RunnerBase {
 
     List handlers = []
 
-    for(def webapp in params.webapps) {
+    for(def webapp in params.webApps) {
       def context = createWebAppContext(webapp.webappClassPath)
       addConfigurationClasses(context, webapp.webappClassPath)
       applyJettyEnvXml(context, webapp.jettyEnvXml)

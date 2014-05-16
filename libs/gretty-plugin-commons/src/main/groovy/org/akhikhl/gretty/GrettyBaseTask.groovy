@@ -17,9 +17,12 @@ import org.gradle.api.GradleException
  */
 abstract class GrettyBaseTask extends DefaultTask {
 
+  protected propertiesResolved = false
+
   GrettyBaseTask() {
     doFirst() {
-      setupProperties()
+      if(!propertiesResolved)
+        resolveProperties()
     }
     doLast {
       action()
@@ -41,6 +44,7 @@ abstract class GrettyBaseTask extends DefaultTask {
       throw new GradleException("Missing required property '${propName}' in ${getClass().getName()}")
   }
 
-  protected void setupProperties() {
+  protected void resolveProperties() {
+    propertiesResolved = true
   }
 }

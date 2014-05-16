@@ -72,21 +72,6 @@ final class Runner {
   }
 
   private prepareJson() {
-    def webAppsJson = []
-    for(WebAppConfig webapp in webapps)
-      webAppsJson.add {
-        inplace webapp.inplace
-        webappClassPath webapp.classPath
-        contextPath webapp.contextPath
-        resourceBase (webapp.inplace ? webapp.inplaceResourceBase : webapp.warResourceBase)
-        initParams webapp.initParameters
-        if(webapp.realm && webapp.realmConfigFile) {
-          realm webapp.realm
-          realmConfigFile webapp.realmConfigFile.absolutePath
-        }
-        if(webapp.jettyEnvXmlFile)
-          jettyEnvXml webapp.jettyEnvXmlFile.absolutePath
-      }
     def json = new JsonBuilder()
     json {
       port sconfig.port
@@ -104,7 +89,22 @@ final class Runner {
           logFileName sconfig.logFileName
           logDir sconfig.logDir
         }
-      webapps webAppsJson
+      webApps webapps.collect { WebAppConfig webapp ->
+        { ->
+          inplace webapp.inplace
+          webappClassPath webapp.classPath
+          contextPath webapp.contextPath
+          resourceBase (webapp.inplace ? webapp.inplaceResourceBase : webapp.warResourceBase)
+          if(webapp.initParameters)
+            initParams webapp.initParameters
+          if(webapp.realm && webapp.realmConfigFile) {
+            realm webapp.realm
+            realmConfigFile webapp.realmConfigFile.absolutePath
+          }
+          if(webapp.jettyEnvXmlFile)
+            jettyEnvXml webapp.jettyEnvXmlFile.absolutePath
+        }
+      }
     }
     return json
   }
@@ -114,7 +114,7 @@ final class Runner {
     sconfig.onStart*.call()
 
     def json = prepareJson()
-    log.info json.toPrettyString()
+    log.debug json.toPrettyString()
     json = json.toString()
 
     // we are going to pass json as argument to java process.

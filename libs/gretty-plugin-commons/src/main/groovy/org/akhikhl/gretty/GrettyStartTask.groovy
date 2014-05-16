@@ -31,11 +31,11 @@ class GrettyStartTask extends GrettyStartBaseTask {
   }
 
   @Override
-  protected void setupProperties() {
+  protected void resolveProperties() {
     ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
     serverConfig.resolve(project)
     ConfigUtils.complementProperties(webAppConfig, project.gretty.webAppConfig, WebAppConfig.getDefault(project))
     webAppConfig.resolve(project)
-    super.setupProperties()
+    super.resolveProperties()
   }
 }

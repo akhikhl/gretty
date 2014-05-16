@@ -3,10 +3,10 @@ jQuery.noConflict();
 jQuery(function($) {
   try {
   $('#sendRequest').click(function() {
-    $.post('/MyWebService/getdate').done(function(data) {
-      alert('done: ' + data);
+    $.ajax({ type: 'POST', url: '/MyWebService/getdate', dataType: 'json' }).done(function(data) {
+      $('#result').removeClass('hide bg-danger').addClass('bg-success').text('Got from server: ' + data);
     }).fail(function(jqXHR, textStatus, errorThrown) {
-      $('#result').addClass('bg-danger').text('error: ' + errorThrown);
+      $('#result').removeClass('hide bg-success').addClass('bg-danger').text('error: ' + errorThrown);
     });
   });
   } catch(e) {
