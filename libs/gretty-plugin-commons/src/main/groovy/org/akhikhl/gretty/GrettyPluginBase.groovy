@@ -9,12 +9,16 @@ package org.akhikhl.gretty
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
  * @author akhikhl
  */
 abstract class GrettyPluginBase implements Plugin<Project> {
+
+  private static final Logger log = LoggerFactory.getLogger(GrettyPluginBase)
 
   void apply(final Project project) {
 
