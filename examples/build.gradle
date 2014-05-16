@@ -13,6 +13,12 @@ subprojects {
     return
     
   apply plugin: 'groovy'
+  
+  repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+  }
 
   afterEvaluate {
     if(extensions.findByName('gretty')) {
