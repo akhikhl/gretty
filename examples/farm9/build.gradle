@@ -1,0 +1,12 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty9-plugin:0.0.17'
+  }
+}
+
+apply plugin: 'gretty9-farm'

@@ -7,5 +7,11 @@
  */
 package org.akhikhl.gretty
 
-class GrettyPlugin extends org.akhikhl.gretty9.GrettyPlugin {
+/**
+ *
+ * @author ahi
+ */
+class GrettyFarmPlugin extends org.akhikhl.gretty9.GrettyFarmPlugin {
+
 }
+

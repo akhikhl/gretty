@@ -9,6 +9,9 @@ ext {
 }
 
 subprojects {
+  if(project.subprojects.size() != 0)
+    return
+    
   apply plugin: 'groovy'
 
   repositories {

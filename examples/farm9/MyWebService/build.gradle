@@ -1,0 +1,7 @@
+apply plugin: 'gretty9'
+
+gretty {
+  scanInterval = 1
+  fastReload = true
+}
+

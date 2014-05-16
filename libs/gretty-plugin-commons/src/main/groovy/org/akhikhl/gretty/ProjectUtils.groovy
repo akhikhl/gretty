@@ -74,22 +74,23 @@ final class ProjectUtils {
     List<File> result = []
     def collectIt
     collectIt = { Project proj ->
-      proj.sourceSets.main.output.files.each { File sourceDir ->
-        def collectInDir
-        collectInDir = { File dir ->
-          dir.listFiles().each {
-            if(it.isFile()) {
-              String relPath = sourceDir.toPath().relativize(it.toPath())
-              boolean match = (filePattern instanceof java.util.regex.Pattern) ? (relPath =~ filePattern) : (relPath == filePattern)
-              if(match)
-                result.add(it)
+      if(proj.hasProperty('sourceSets'))
+        proj.sourceSets.main.output.files.each { File sourceDir ->
+          def collectInDir
+          collectInDir = { File dir ->
+            dir.listFiles().each {
+              if(it.isFile()) {
+                String relPath = sourceDir.toPath().relativize(it.toPath())
+                boolean match = (filePattern instanceof java.util.regex.Pattern) ? (relPath =~ filePattern) : (relPath == filePattern)
+                if(match)
+                  result.add(it)
+              }
+              else
+                collectInDir(it)
             }
-            else
-              collectInDir(it)
           }
+          collectInDir(sourceDir)
         }
-        collectInDir(sourceDir)
-      }
       if(searchOverlays && proj.extensions.findByName('gretty'))
         for(String overlay in proj.gretty.overlays.reverse())
           collectIt(proj.project(overlay))
@@ -230,12 +231,15 @@ final class ProjectUtils {
     File f = new File(project.projectDir, file.path)
     if(f.exists())
       result.add(f.absoluteFile)
-    f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
-    if(f.exists())
-      result.add(f.absoluteFile)
+    if(project.hasProperty('webAppDir')) {
+      f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
+      if(f.exists())
+        result.add(f.absoluteFile)
+    }
     result.addAll(collectFilesInOutput(project, file.path, false))
-    for(def overlay in project.gretty.overlays.reverse())
-      resolveFile_(result, project.project(overlay), file)
+    if(project.extensions.findByName('gretty'))
+      for(def overlay in project.gretty.overlays.reverse())
+        resolveFile_(result, project.project(overlay), file)
   }
 
   static File resolveSingleFile(Project project, file) {

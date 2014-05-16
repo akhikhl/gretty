@@ -14,12 +14,21 @@ import org.gradle.api.Project
  *
  * @author akhikhl
  */
-class GrettyFarmPlugin implements Plugin<Project> {
+abstract class GrettyFarmPluginBase implements Plugin<Project> {
 
   void apply(final Project project) {
 
-    if(project.extensions.findByName('farm'))
+    if(project.ext.has('grettyFarmPluginName')) {
+      log.warn 'You already applied {} to the project {}, so {} is ignored', project.ext.grettyFarmPluginName, project.name, getPluginName()
       return // plugin is already applied
+    }
+
+    // TODO: check for jetty versions
+
+    project.ext.grettyFarmPluginName = getPluginName()
+    project.ext.jettyVersion = getJettyVersion()
+
+    project.ext.scannerManagerFactory = getScannerManagerFactory()
 
     project.extensions.create('farm', Farm)
 
@@ -37,4 +46,10 @@ class GrettyFarmPlugin implements Plugin<Project> {
       }
     }
   }
+
+  abstract String getJettyVersion()
+
+  abstract String getPluginName()
+
+  abstract ScannerManagerFactory getScannerManagerFactory()
 }

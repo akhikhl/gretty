@@ -42,7 +42,7 @@ class GrettyStartFarmTask extends GrettyStartBaseTask {
     farm.serverConfig.resolve(project)
     farm.webapps += sourceFarm.webapps
     if(!farm.webapps)
-      farm.webapps = project.rootProject.allprojects.findAll { it.extensions.findByName('gretty') }.collect { it.path }
+      farm.webapps = project.subprojects.findAll { it.extensions.findByName('gretty') }.collect { it.path }
     for(def w in farm.webapps) {
       def proj = (w instanceof Project ? w : project.project(w))
       if(!proj)
