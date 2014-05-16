@@ -12,5 +12,12 @@ buildscript {
 apply plugin: 'gretty8'
 
 dependencies {
-  compile 'commons-configuration:commons-configuration:1.9'
+  // not needed by gretty, we used it for template processing within webapp
+  compile 'org.apache.velocity:velocity:1.7'
 }
+
+gretty {
+  scanInterval = 1
+  fastReload = true
+}
+

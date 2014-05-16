@@ -11,8 +11,18 @@ buildscript {
 
 apply plugin: 'gretty9'
 
+dependencies {
+  // not needed by gretty, we used it for template processing within webapp
+  compile 'org.apache.velocity:velocity:1.7'
+}
+
 gretty {
+  scanInterval = 1
+  fastReload = true
   realm 'auth'
+  // realmConfigFile is optional. When omitted, 'jetty-realm.properties' is assumed.
+  // If path is relative, the file will be searched in projectDir, build/resources/main and src/main/webapp/WEB-INF.
+  // realmConfigFile 'jetty-realm.properties'
   onStart {
     println 'Enter user name "test" and password "test123" for logon.'
   }

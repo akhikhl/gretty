@@ -6,14 +6,18 @@
   <servlet>
     <display-name>ExampleServlet</display-name>
     <servlet-name>ExampleServlet</servlet-name>
-    <servlet-class>securityrealm.ExampleServlet</servlet-class>
+    <servlet-class>hellogretty.ExampleServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
  
   <servlet-mapping>
     <servlet-name>ExampleServlet</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/dynamic</url-pattern>
   </servlet-mapping>
+
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
   
   <security-constraint>
     <web-resource-collection>

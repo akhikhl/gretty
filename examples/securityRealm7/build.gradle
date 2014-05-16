@@ -11,10 +11,17 @@ buildscript {
 
 apply plugin: 'gretty7'
 
+dependencies {
+  // not needed by gretty, we used it for template processing within webapp
+  compile 'org.apache.velocity:velocity:1.7'
+}
+
 gretty {
-  contextPath 'securityRealm7'
+  scanInterval = 1
+  fastReload = true
   realm 'auth'
   onStart {
     println 'Enter user name "test" and password "test123" for logon.'
   }
 }
+
