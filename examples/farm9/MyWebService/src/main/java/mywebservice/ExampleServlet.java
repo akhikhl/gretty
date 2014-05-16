@@ -15,7 +15,7 @@ public class ExampleServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try (PrintWriter out = response.getWriter()) {
-      out.println("{ 'date': '" + new Date() + "' }");
+      out.println("{ \"date\": \"" + new Date() + "\" }");
     }
   }
 }
