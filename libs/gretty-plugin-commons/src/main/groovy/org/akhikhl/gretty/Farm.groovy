@@ -11,7 +11,7 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-final class Farm {
+class Farm {
 
   @Delegate
   protected ServerConfig serverConfig = new ServerConfig()

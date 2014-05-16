@@ -14,8 +14,9 @@ import org.akhikhl.gretty.ScannerManagerFactory
  *
  * @author akhikhl
  */
-@org.kordamp.jipsy.ServiceProviderFor(ScannerManagerFactory)
 class ScannerManagerFactoryImpl implements ScannerManagerFactory {
+
+  static final ScannerManagerFactory instance = new ScannerManagerFactoryImpl()
 
   ScannerManagerBase createScannerManager() {
     new ScannerManager()

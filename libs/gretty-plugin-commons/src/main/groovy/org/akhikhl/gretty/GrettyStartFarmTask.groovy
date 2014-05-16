@@ -21,7 +21,7 @@ class GrettyStartFarmTask extends GrettyStartBaseTask {
   @Delegate
   protected Farm farm = new Farm()
 
-  private List<WebAppConfig> webAppConfigs
+  private List<WebAppConfig> webAppConfigs = []
 
   @Override
   protected ServerConfig getServerConfig() {
@@ -35,12 +35,14 @@ class GrettyStartFarmTask extends GrettyStartBaseTask {
 
   @Override
   protected void setupProperties() {
-    def sourceFarm = project.farms[farmName]
+    def sourceFarm = project.farms.farmsMap[farmName]
     if(!sourceFarm)
       throw new GradleException("Farm '${farmName}' referenced in GrettyStartFarmTask is not defined in project farms")
     ConfigUtils.complementProperties(farm.serverConfig, sourceFarm.serverConfig, ServerConfig.getDefault(project))
     farm.serverConfig.resolve(project)
     farm.webapps += sourceFarm.webapps
+    if(!farm.webapps)
+      farm.webapps = project.rootProject.allprojects.findAll { it.extensions.findByName('gretty') }.collect { it.path }
     for(def w in farm.webapps) {
       def proj = (w instanceof Project ? w : project.project(w))
       if(!proj)

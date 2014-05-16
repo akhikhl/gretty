@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonBuilder
+import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import org.gradle.api.GradleException
@@ -21,8 +22,6 @@ import org.slf4j.LoggerFactory
  */
 final class Runner {
 
-  private static ServiceLoader<ScannerManagerFactory> scannerManagerFactoryLoader = ServiceLoader.load(ScannerManagerFactory.class)
-
   protected static final Logger log = LoggerFactory.getLogger(Runner)
 
   protected final Project project
@@ -31,6 +30,7 @@ final class Runner {
   protected final boolean interactive
   protected final boolean debug
   protected final boolean integrationTest
+  private ExecutorService executorService
 
   Runner(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean interactive, boolean debug, boolean integrationTest) {
     this.project = project
@@ -39,17 +39,18 @@ final class Runner {
     this.interactive = interactive
     this.debug = debug
     this.integrationTest = integrationTest
+    executorService = Executors.newSingleThreadExecutor()
   }
 
   void run() {
-    Future futureStatus = ServiceControl.readMessage(project._executorService, sconfig.statusPort)
+    Future futureStatus = ServiceControl.readMessage(executorService, sconfig.statusPort)
     def runThread = Thread.start {
       runJetty()
     }
     def status = futureStatus.get()
     log.debug 'Got status: {}', status
     if(!integrationTest) {
-      System.out.println 'Jetty server started.'
+      System.out.println "Jetty server ${project.ext.jettyVersion} started."
       if(webapps.size() == 1) {
         System.out.println 'Web-application runs at the address:'
         System.out.println "http://localhost:${sconfig.port}${webapps[0].contextPath}"
@@ -121,12 +122,7 @@ final class Runner {
     if(System.getProperty("os.name") =~ /(?i).*windows.*/)
       json = json.replace('"', '\\"')
 
-    if(scannerManagerFactoryLoader.iterator().size() == 0)
-      throw new GradleException('Implementation of ScannerManagerFactory class is not available. Please check that gretty-plugin is properly loaded.')
-    if(scannerManagerFactoryLoader.iterator().size() > 1)
-      throw new GradleException('There is more than one implementation of ScannerManagerFactory. Please check that there are no multiple versions of gretty-plugin on the classpath.')
-
-    ScannerManagerBase scanman = scannerManagerFactoryLoader.iterator().next().createScannerManager()
+    ScannerManagerBase scanman = project.ext.scannerManagerFactory.createScannerManager()
     scanman.startScanner(project, sconfig, webapps)
     Runner self = this
     try {

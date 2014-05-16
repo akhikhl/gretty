@@ -7,12 +7,8 @@
  */
 package org.akhikhl.gretty
 
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import org.gradle.api.*
-import org.gradle.api.plugins.*
-import org.gradle.api.tasks.*
-import org.gradle.api.tasks.bundling.*
+import org.gradle.api.Plugin
+import org.gradle.api.Project
 
 /**
  *
@@ -22,8 +18,18 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
   void apply(final Project project) {
 
+    if(project.ext.has('grettyPluginName')) {
+      log.warn 'You already applied {} to the project {}, so {} is ignored', project.ext.grettyPluginName, project.name, getPluginName()
+      return // plugin is already applied
+    }
+
+    project.ext.grettyPluginName = getPluginName()
+    project.ext.jettyVersion = getJettyVersion()
+
     if (!project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin))
       project.apply(plugin: org.gradle.api.plugins.WarPlugin)
+
+    project.ext.scannerManagerFactory = getScannerManagerFactory()
 
     project.extensions.create('gretty', GrettyExtension)
 
@@ -37,9 +43,6 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
     project.task('run')
     project.task('debug')
-
-    if(!project.hasProperty('_executorService'))
-      project.rootProject.ext._executorService = Executors.newSingleThreadExecutor()
 
     project.afterEvaluate {
 
@@ -194,6 +197,12 @@ abstract class GrettyPluginBase implements Plugin<Project> {
       } // integrationTestTask
     } // afterEvaluate
   } // apply
+
+  abstract String getJettyVersion()
+
+  abstract String getPluginName()
+
+  abstract ScannerManagerFactory getScannerManagerFactory()
 
   abstract void injectDependencies(Project project)
 

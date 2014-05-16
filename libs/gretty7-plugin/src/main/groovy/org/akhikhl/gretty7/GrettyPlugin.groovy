@@ -9,8 +9,25 @@ package org.akhikhl.gretty7
 
 import org.gradle.api.Project
 import org.akhikhl.gretty.GrettyPluginBase
+import org.akhikhl.gretty.ScannerManagerFactory
+import org.akhikhl.gretty7.Messages
 
 final class GrettyPlugin extends GrettyPluginBase {
+
+  @Override
+  String getJettyVersion() {
+    Messages.getString('jettyVersion')
+  }
+
+  @Override
+  String getPluginName() {
+    Messages.getString('pluginName')
+  }
+
+  @Override
+  ScannerManagerFactory getScannerManagerFactory() {
+    ScannerManagerFactoryImpl.instance
+  }
 
   @Override
   void injectDependencies(Project project) {

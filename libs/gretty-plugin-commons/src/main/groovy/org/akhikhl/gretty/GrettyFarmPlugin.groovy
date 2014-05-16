@@ -14,20 +14,23 @@ import org.gradle.api.Project
  *
  * @author akhikhl
  */
-class GrettyFarmPluginBase implements Plugin<Project> {
+class GrettyFarmPlugin implements Plugin<Project> {
 
   void apply(final Project project) {
+
+    if(project.extensions.findByName('farm'))
+      return // plugin is already applied
 
     project.extensions.create('farm', Farm)
 
     project.extensions.create('farms', Farms)
-    projects.farms.farmsMap[''] = project.farm
+    project.farms.farmsMap[''] = project.farm
 
     project.afterEvaluate {
 
-      farmsMap.keySet().each { fname ->
+      project.farms.farmsMap.keySet().each { fname ->
 
-        task('jettyRunFarm' + fname, type: GrettyStartFarmTask, group: 'gretty') { thisTask ->
+        project.task('jettyRunFarm' + fname, type: GrettyStartFarmTask, group: 'gretty') {
           description = 'Starts web-apps farm inplace, in interactive mode (keypress stops the server).'
           farmName = fname
         }
@@ -35,4 +38,3 @@ class GrettyFarmPluginBase implements Plugin<Project> {
     }
   }
 }
-
