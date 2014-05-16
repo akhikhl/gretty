@@ -49,6 +49,8 @@ class GrettyStartFarmTask extends GrettyStartBaseTask {
         throw new GradleException("Could not resolve project '${w}' referenced in ${farmName ? 'farm ' + farmName : 'default farm'}")
       if(!proj.extensions.findByName('gretty'))
         throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
+      if(proj.ext.grettyPluginJettyVersion != project.ext.grettyFarmPluginJettyVersion)
+        throw new GradleException("${proj} uses jetty version ${proj.ext.grettyPluginJettyVersion} different from version ${project.ext.grettyFarmPluginJettyVersion} used by farm.")
       WebAppConfig webapp = new WebAppConfig()
       ConfigUtils.complementProperties(webapp, proj.gretty.webAppConfig, WebAppConfig.getDefault(proj))
       webapp.resolve(proj)

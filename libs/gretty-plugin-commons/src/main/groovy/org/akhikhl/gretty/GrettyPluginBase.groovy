@@ -24,14 +24,14 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
     if(project.ext.has('grettyPluginName')) {
       log.warn 'You already applied {} to the project {}, so {} is ignored', project.ext.grettyPluginName, project.name, getPluginName()
-      return // plugin is already applied
+      return
     }
 
     if (!project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin))
       project.apply(plugin: org.gradle.api.plugins.WarPlugin)
 
     project.ext.grettyPluginName = getPluginName()
-    project.ext.jettyVersion = getJettyVersion()
+    project.ext.jettyVersion = project.ext.grettyPluginJettyVersion = getJettyVersion()
 
     project.ext.scannerManagerFactory = getScannerManagerFactory()
 

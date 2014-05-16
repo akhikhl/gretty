@@ -20,13 +20,13 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
 
     if(project.ext.has('grettyFarmPluginName')) {
       log.warn 'You already applied {} to the project {}, so {} is ignored', project.ext.grettyFarmPluginName, project.name, getPluginName()
-      return // plugin is already applied
+      return
     }
 
     // TODO: check for jetty versions
 
     project.ext.grettyFarmPluginName = getPluginName()
-    project.ext.jettyVersion = getJettyVersion()
+    project.ext.jettyVersion = project.ext.grettyFarmPluginJettyVersion = getJettyVersion()
 
     project.ext.scannerManagerFactory = getScannerManagerFactory()
 
