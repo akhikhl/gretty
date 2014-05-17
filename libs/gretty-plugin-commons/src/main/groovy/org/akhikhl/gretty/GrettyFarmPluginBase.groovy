@@ -77,6 +77,7 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
             doFirst {
               GradleUtils.disableTaskOnOtherProjects(project, 'run')
               GradleUtils.disableTaskOnOtherProjects(project, 'jettyRun')
+              GradleUtils.disableTaskOnOtherProjects(project, 'farmRun')
             }
         }
 
@@ -98,6 +99,7 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
             doFirst {
               GradleUtils.disableTaskOnOtherProjects(project, 'debug')
               GradleUtils.disableTaskOnOtherProjects(project, 'jettyRunDebug')
+              GradleUtils.disableTaskOnOtherProjects(project, 'farmRunDebug')
             }
         }
 
