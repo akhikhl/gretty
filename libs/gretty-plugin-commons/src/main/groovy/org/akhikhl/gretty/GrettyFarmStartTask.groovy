@@ -9,12 +9,16 @@ package org.akhikhl.gretty
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
  * @author akhikhl
  */
 class GrettyFarmStartTask extends GrettyStartBaseTask {
+
+  private static final Logger log = LoggerFactory.getLogger(GrettyFarmStartTask)
 
   String farmName = ''
 
@@ -37,6 +41,7 @@ class GrettyFarmStartTask extends GrettyStartBaseTask {
 
   @Override
   protected void resolveProperties() {
+    String farmDescr = farmName ? 'farm ' + farmName : 'default farm'
     def sourceFarm = project.farms.farmsMap[farmName]
     if(!sourceFarm)
       throw new GradleException("Farm '${farmName}' referenced in GrettyFarmStartTask is not defined in project farms")
@@ -54,17 +59,32 @@ class GrettyFarmStartTask extends GrettyStartBaseTask {
         map
       }
     farm.webapps.each { w, options ->
-      def proj = project.findProject(w)
-      if(!proj)
-        throw new GradleException("Could not resolve project '${w}' referenced in ${farmName ? 'farm ' + farmName : 'default farm'}")
-      if(!proj.extensions.findByName('gretty'))
-        throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
-      if(proj.ext.grettyPluginJettyVersion != project.ext.grettyFarmPluginJettyVersion)
-        throw new GradleException("${proj} uses jetty version ${proj.ext.grettyPluginJettyVersion} different from version ${project.ext.grettyFarmPluginJettyVersion} used by farm.")
       WebAppConfig webappConfig = new WebAppConfig()
-      ConfigUtils.complementProperties(webappConfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefault(proj))
-      // individual webapp may override task-wide inplace
-      if(webappConfig.inplace == null) webappConfig.inplace = inplace
+      def proj = project.findProject(w)
+      if(proj == null) {
+        log.warn '{}: {} is not an existing project, treating it as a maven dependency', farmDescr, w
+        def gav = w.split(':')
+        proj = project.rootProject.allprojects.find {
+          it.group == gav[0] && it.name == gav[1]
+        }
+        if(proj)
+          log.warn '{}: {} actually comes from project {}, so using project instead', farmDescr, w, proj.path
+      }
+      if(proj) {
+        if(!proj.extensions.findByName('gretty'))
+          throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
+        if(proj.ext.grettyPluginJettyVersion != project.ext.grettyFarmPluginJettyVersion)
+          throw new GradleException("${proj} uses jetty version ${proj.ext.grettyPluginJettyVersion} different from version ${project.ext.grettyFarmPluginJettyVersion} used by farm.")
+        ConfigUtils.complementProperties(webappConfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefault(proj))
+        // individual webapp may override task-wide inplace
+        if(webappConfig.inplace == null) webappConfig.inplace = inplace
+      } else {
+        project.configurations.maybeCreate('farm')
+        project.dependencies.add 'farm', w
+        ConfigUtils.complementProperties(webappConfig, options, WebAppConfig.getDefaultForDependency(project, w))
+        // maven dependency is always war-based
+        webappConfig.inplace = false
+      }
       webappConfig.resolve(proj)
       webAppConfigs.add(webappConfig)
     }

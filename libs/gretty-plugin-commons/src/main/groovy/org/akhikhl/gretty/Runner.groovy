@@ -45,6 +45,8 @@ final class Runner {
   }
 
   void run() {
+    for(WebAppConfig webapp in webapps)
+      webapp.prepareToRun()
     Future futureStatus = ServiceControl.readMessage(executorService, sconfig.statusPort)
     def runThread = Thread.start {
       runJetty()

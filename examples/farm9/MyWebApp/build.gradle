@@ -6,12 +6,19 @@ gretty {
   fastReload = true
 }
 
-farm {  
+// This is unnamed (default) farm.
+// It gets farm-specific tasks, for example farmRun, farmStart, farmStop.
+farm {
   scanInterval = 1
-  webapp ':farm9:MyWebService'
   webapp project
+  webapp ':farm9:MyWebService'
+  //webapp 'org.akhikhl.gretty.examples:MyWebService:1.0'
 }
 
+// You can define multiple farms, using "farms" configuration.
+// Each farm should get unique name, in the example below - 'A'.
+// Each farm gets farm-specific tasks, for example farmRunA, farmStartA, farmStopA.
+/*
 farms {
   farm 'A', {
     port = 8090
@@ -21,3 +28,4 @@ farms {
     webapp project
   }
 }
+*/

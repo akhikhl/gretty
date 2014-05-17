@@ -1,4 +1,8 @@
 apply plugin: 'gretty9'
+apply plugin: 'maven'
+
+group = 'org.akhikhl.gretty.examples'
+version = '1.0'
 
 gretty {
   scanInterval = 1

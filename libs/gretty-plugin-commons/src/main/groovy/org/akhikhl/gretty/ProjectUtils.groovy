@@ -140,7 +140,7 @@ final class ProjectUtils {
 
   static Set<URL> getClassPath(Project project, boolean inplace) {
     Set<URL> urls = new LinkedHashSet()
-    if(inplace) {
+    if(project != null && inplace) {
       def addProjectClassPath
       addProjectClassPath = { Project proj ->
         urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
@@ -228,18 +228,20 @@ final class ProjectUtils {
       result.add(file.absoluteFile)
       return
     }
-    File f = new File(project.projectDir, file.path)
-    if(f.exists())
-      result.add(f.absoluteFile)
-    if(project.hasProperty('webAppDir')) {
-      f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
+    if(project != null) {
+      File f = new File(project.projectDir, file.path)
       if(f.exists())
         result.add(f.absoluteFile)
+      if(project.hasProperty('webAppDir')) {
+        f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
+        if(f.exists())
+          result.add(f.absoluteFile)
+      }
+      result.addAll(collectFilesInOutput(project, file.path, false))
+      if(project.extensions.findByName('gretty'))
+        for(def overlay in project.gretty.overlays.reverse())
+          resolveFile_(result, project.project(overlay), file)
     }
-    result.addAll(collectFilesInOutput(project, file.path, false))
-    if(project.extensions.findByName('gretty'))
-      for(def overlay in project.gretty.overlays.reverse())
-        resolveFile_(result, project.project(overlay), file)
   }
 
   static File resolveSingleFile(Project project, file) {

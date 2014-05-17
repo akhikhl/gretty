@@ -15,16 +15,16 @@ import org.gradle.api.Project
  */
 class WebAppConfig {
 
-  String contextPath
-  Map initParameters
-  String realm
+  def contextPath
+  def initParameters
+  def realm
   def realmConfigFile
   def jettyEnvXmlFile
-  List scanDirs
+  def scanDirs
   def fastReload
-  String inplaceResourceBase
-  String warResourceBase
-  Collection<URL> classPath
+  def inplaceResourceBase
+  def warResourceBase
+  def classPath
 
   String projectPath
   Boolean inplace
@@ -58,25 +58,31 @@ class WebAppConfig {
     return result
   }
 
+  protected static WebAppConfig getDefaultForDependency(Project project, String dependency) {
+    WebAppConfig result = new WebAppConfig()
+    result.contextPath = '/' + dependency.split(':')[1]
+    result.warResourceBase = {
+      def gav = dependency.split(':')
+      def artifact = project.configurations.farm.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1] }
+      artifact.file.absolutePath
+    }
+    return result
+  }
+
   void initParameter(key, value) {
     if(initParameters == null)
       initParameters = [:]
     initParameters[key] = value
   }
 
-  protected void resolve(Project project) {
-    if(contextPath != null && !contextPath.startsWith('/'))
+  protected void prepareToRun() {
+    ConfigUtils.resolveClosures(this)
+    if(contextPath instanceof String && !contextPath.startsWith('/'))
       contextPath = '/' + contextPath
-    if(initParameters) {
-      def initParams = [:]
-      for(def e in initParameters) {
-        def paramValue = e.value
-        if(paramValue instanceof Closure)
-          paramValue = paramValue()
-        initParams[e.key] = paramValue
-      }
-      initParameters = initParams
-    }
+    ConfigUtils.resolveClosures(initParameters)
+  }
+
+  protected void resolve(Project project) {
     realmConfigFile = ProjectUtils.resolveSingleFile(project, realmConfigFile)
     jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, jettyEnvXmlFile)
     classPath = ProjectUtils.getClassPath(project, inplace)

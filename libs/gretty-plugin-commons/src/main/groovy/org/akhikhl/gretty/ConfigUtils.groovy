@@ -29,4 +29,17 @@ class ConfigUtils {
     }
     dst
   }
+
+  public static resolveClosures(Object obj) {
+    if(obj == null)
+      return
+    def props
+    if(obj instanceof Map)
+      props = [] + obj.keySet()
+    else
+      props = obj.metaClass.properties.collect { it.name } - ['class']
+    for(String propName in props)
+      if(obj[propName] instanceof Closure)
+        obj[propName] = obj[propName]()
+  }
 }

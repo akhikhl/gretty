@@ -52,6 +52,14 @@ abstract class GrettyPluginBase implements Plugin<Project> {
     if(!project.tasks.findByName('debug'))
       project.task('debug')
 
+    // add trivial dependencies to GrettyStartTask
+    project.tasks.whenObjectAdded { task ->
+      if(task instanceof GrettyStartTask)
+        task.dependsOn {
+          task.inplace ? project.tasks.prepareInplaceWebApp : project.tasks.prepareWarWebApp
+        }
+    }
+
     project.afterEvaluate {
 
       if(!project.repositories)
@@ -130,9 +138,9 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
       project.task('jettyRun', type: GrettyStartTask, group: 'gretty') {
         description = 'Starts web-app inplace, in interactive mode.'
-        dependsOn project.tasks.prepareInplaceWebApp
         doFirst {
           GradleUtils.disableTaskOnOtherProjects(project, 'run')
+          GradleUtils.disableTaskOnOtherProjects(project, 'jettyRun')
         }
       }
 
@@ -142,10 +150,10 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
       project.task('jettyRunDebug', type: GrettyStartTask, group: 'gretty') {
         description = 'Starts web-app inplace, in debug and interactive mode.'
-        dependsOn project.tasks.prepareInplaceWebApp
         debug = true
         doFirst {
           GradleUtils.disableTaskOnOtherProjects(project, 'debug')
+          GradleUtils.disableTaskOnOtherProjects(project, 'jettyRunDebug')
         }
       }
 
@@ -155,40 +163,34 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
       project.task('jettyRunWar', type: GrettyStartTask, group: 'gretty') {
         description = 'Starts web-app on WAR-file, in interactive mode.'
-        dependsOn project.tasks.prepareWarWebApp
         inplace = false
       }
 
       project.task('jettyRunWarDebug', type: GrettyStartTask, group: 'gretty') {
         description = 'Starts web-app on WAR-file, in debug and interactive mode.'
-        dependsOn project.tasks.prepareWarWebApp
         inplace = false
         debug = true
       }
 
       project.task('jettyStart', type: GrettyStartTask, group: 'gretty') {
         description = 'Starts web-app inplace (stopped by \'jettyStop\').'
-        dependsOn project.tasks.prepareInplaceWebApp
         interactive = false
       }
 
       project.task('jettyStartDebug', type: GrettyStartTask, group: 'gretty') {
         description = 'Starts web-app inplace, in debug mode (stopped by \'jettyStop\').'
-        dependsOn project.tasks.prepareInplaceWebApp
         interactive = false
         debug = true
       }
 
       project.task('jettyStartWar', type: GrettyStartTask, group: 'gretty') {
         description = 'Starts web-app on WAR-file (stopped by \'jettyStop\').'
-        dependsOn project.tasks.prepareWarWebApp
         inplace = false
         interactive = false
       }
 
       project.task('jettyStartWarDebug', type: GrettyStartTask, group: 'gretty') {
         description = 'Starts web-app on WAR-file, in debug mode (stopped by \'jettyStop\').'
-        dependsOn project.tasks.prepareWarWebApp
         inplace = false
         interactive = false
         debug = true
@@ -208,7 +210,6 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
         project.task('jettyBeforeIntegrationTest', type: GrettyStartTask, group: 'gretty') {
           description = 'Starts jetty server before integration test.'
-          dependsOn project.tasks.prepareInplaceWebApp
           dependsOn project.tasks.testClasses
           project.tasks[project.gretty.integrationTestTask].dependsOn it
           integrationTest = true

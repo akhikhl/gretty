@@ -9,12 +9,16 @@ package org.akhikhl.gretty
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
  * @author akhikhl
  */
 abstract class GrettyFarmPluginBase implements Plugin<Project> {
+
+  private static final Logger log = LoggerFactory.getLogger(GrettyFarmPluginBase)
 
   void apply(final Project project) {
 
@@ -50,6 +54,19 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
     if(!project.tasks.findByName('debug'))
       project.task('debug')
 
+    // add trivial dependencies to GrettyFarmStartTask
+    project.tasks.whenObjectAdded { task ->
+      if(task instanceof GrettyFarmStartTask)
+        task.dependsOn {
+          task.resolveProperties()
+          task.webApps.findAll { it.projectPath }.collect {
+            def proj = project.project(it.projectPath)
+            boolean inplace = it.inplace == null ? task.inplace : it.inplace
+            inplace ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
+          }
+        }
+    }
+
     project.afterEvaluate {
 
       if(!project.repositories)
@@ -65,13 +82,6 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
 
         project.task('farmRun' + fname, type: GrettyFarmStartTask, group: 'gretty') {
           description = "Starts ${farmDescr} inplace, in interactive mode."
-          dependsOn {
-            resolveProperties()
-            webApps.collect {
-              def proj = project.project(it.projectPath)
-              (it.inplace == null || it.inplace) ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
-            }
-          }
           farmName = fname
           if(!fname)
             doFirst {
@@ -86,13 +96,6 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
 
         project.task('farmRunDebug' + fname, type: GrettyFarmStartTask, group: 'gretty') {
           description = "Starts ${farmDescr} inplace, in debug and in interactive mode."
-          dependsOn {
-            resolveProperties()
-            webApps.collect {
-              def proj = project.project(it.projectPath)
-              (it.inplace == null || it.inplace) ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
-            }
-          }
           farmName = fname
           debug = true
           if(!fname)
@@ -108,26 +111,12 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
 
         project.task('farmRunWar' + fname, type: GrettyFarmStartTask, group: 'gretty') {
           description = "Starts ${farmDescr} on WAR-files, in interactive mode."
-          dependsOn {
-            resolveProperties()
-            webApps.collect {
-              def proj = project.project(it.projectPath)
-              (it.inplace == null || it.inplace) ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
-            }
-          }
           farmName = fname
           inplace = false
         }
 
         project.task('farmRunWarDebug' + fname, type: GrettyFarmStartTask, group: 'gretty') {
           description = "Starts ${farmDescr} on WAR-files, in debug and in interactive mode."
-          dependsOn {
-            resolveProperties()
-            webApps.collect {
-              def proj = project.project(it.projectPath)
-              (it.inplace == null || it.inplace) ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
-            }
-          }
           farmName = fname
           debug = true
           inplace = false
@@ -135,13 +124,6 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
 
         project.task('farmStart' + fname, type: GrettyFarmStartTask, group: 'gretty') {
           description = "Starts ${farmDescr} inplace (stopped by 'farmStop')."
-          dependsOn {
-            resolveProperties()
-            webApps.collect {
-              def proj = project.project(it.projectPath)
-              (it.inplace == null || it.inplace) ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
-            }
-          }
           farmName = fname
           interactive = false
           stopTask = 'farmStop' + fname
@@ -149,13 +131,6 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
 
         project.task('farmStartDebug' + fname, type: GrettyFarmStartTask, group: 'gretty') {
           description = "Starts ${farmDescr} inplace, in debug mode (stopped by 'farmStop')."
-          dependsOn {
-            resolveProperties()
-            webApps.collect {
-              def proj = project.project(it.projectPath)
-              (it.inplace == null || it.inplace) ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
-            }
-          }
           farmName = fname
           interactive = false
           debug = true
@@ -164,13 +139,6 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
 
         project.task('farmStartWar' + fname, type: GrettyFarmStartTask, group: 'gretty') {
           description = "Starts ${farmDescr} on WAR-files (stopped by 'farmStop')."
-          dependsOn {
-            resolveProperties()
-            webApps.collect {
-              def proj = project.project(it.projectPath)
-              (it.inplace == null || it.inplace) ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
-            }
-          }
           farmName = fname
           interactive = false
           inplace = false
@@ -179,13 +147,6 @@ abstract class GrettyFarmPluginBase implements Plugin<Project> {
 
         project.task('farmStartWarDebug' + fname, type: GrettyFarmStartTask, group: 'gretty') {
           description = "Starts ${farmDescr} on WAR-files, in debug (stopped by 'farmStop')."
-          dependsOn {
-            resolveProperties()
-            webApps.collect {
-              def proj = project.project(it.projectPath)
-              (it.inplace == null || it.inplace) ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
-            }
-          }
           farmName = fname
           interactive = false
           debug = true
