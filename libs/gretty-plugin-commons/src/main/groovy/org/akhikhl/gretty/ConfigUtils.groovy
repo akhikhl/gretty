@@ -15,11 +15,18 @@ class ConfigUtils {
 
   public static complementProperties(Object dst, Object... srcs) {
     List dstProps = dst.metaClass.properties.collect { it.name } - ['class']
-    for(def src in srcs)
-      for(String propName in dstProps)
-        if(dst[propName] == null && src.metaClass.properties.find { it.name == propName } && src[propName] != null) {
-          dst[propName] = src[propName]
-        }
+    for(def src in srcs) {
+      if(src instanceof Map) {
+        for(String propName in dstProps)
+          if(dst[propName] == null && src[propName] != null)
+            dst[propName] = src[propName]
+      }
+      else {
+        for(String propName in dstProps)
+          if(dst[propName] == null && src.metaClass.properties.find { it.name == propName } && src[propName] != null)
+            dst[propName] = src[propName]
+      }
+    }
     dst
   }
 }

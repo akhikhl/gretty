@@ -31,14 +31,16 @@ final class Runner {
   protected final boolean debug
   protected final boolean integrationTest
   private ExecutorService executorService
+  private String stopTask
 
-  Runner(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean interactive, boolean debug, boolean integrationTest) {
+  Runner(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean interactive, boolean debug, boolean integrationTest, String stopTask) {
     this.project = project
     this.sconfig = sconfig
     this.webapps = webapps
     this.interactive = interactive
     this.debug = debug
     this.integrationTest = integrationTest
+    this.stopTask = stopTask
     executorService = Executors.newSingleThreadExecutor()
   }
 
@@ -51,21 +53,18 @@ final class Runner {
     log.debug 'Got status: {}', status
     if(!integrationTest) {
       System.out.println "Jetty server ${project.ext.jettyVersion} started."
-      if(webapps.size() == 1) {
-        System.out.println 'Web-application runs at the address:'
-        System.out.println "http://localhost:${sconfig.port}${webapps[0].contextPath}"
-      } else if(webapps.size() > 1) {
-        System.out.println 'Web-applications run at the addresses:'
-        for(WebAppConfig webapp in webapps)
-          System.out.println "http://localhost:${sconfig.port}${webapp.contextPath}"
+      for(WebAppConfig webapp in webapps) {
+        String webappName = webapp.inplace ? webapp.projectPath : new File(webapp.warResourceBase).name
+        System.out.println "${webappName} runs at the address http://localhost:${sconfig.port}${webapp.contextPath}"
       }
+      System.out.println "servicePort: ${sconfig.servicePort}, statusPort: ${sconfig.statusPort}"
       if(interactive) {
         System.out.println 'Press any key to stop the jetty server.'
         System.in.read()
         log.debug 'Sending command: {}', 'stop'
         ServiceControl.send(sconfig.servicePort, 'stop')
       } else
-        System.out.println 'Run \'gradle jettyStop\' to stop the jetty server.'
+        System.out.println "Run 'gradle ${stopTask}' to stop the jetty server."
       runThread.join()
       System.out.println 'Jetty server stopped.'
     }

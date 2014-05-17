@@ -46,8 +46,11 @@ abstract class GrettyPluginBase implements Plugin<Project> {
 
     injectDependencies(project)
 
-    project.task('run')
-    project.task('debug')
+    if(!project.tasks.findByName('run'))
+      project.task('run')
+
+    if(!project.tasks.findByName('debug'))
+      project.task('debug')
 
     project.afterEvaluate {
 
@@ -126,55 +129,65 @@ abstract class GrettyPluginBase implements Plugin<Project> {
       }
 
       project.task('jettyRun', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts web-app inplace, in interactive mode (keypress stops the server).'
+        description = 'Starts web-app inplace, in interactive mode.'
         dependsOn project.tasks.prepareInplaceWebApp
+        doFirst {
+          GradleUtils.disableTaskOnOtherProjects(project, 'run')
+        }
       }
 
-      project.tasks.run.dependsOn 'jettyRun'
+      // As soon as farm plugin applies to the same project, it takes over run task.
+      if(!project.ext.has('grettyFarmPluginName'))
+        project.tasks.run.dependsOn 'jettyRun'
 
       project.task('jettyRunDebug', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts web-app inplace, in debug and interactive mode (keypress stops the server).'
+        description = 'Starts web-app inplace, in debug and interactive mode.'
         dependsOn project.tasks.prepareInplaceWebApp
         debug = true
+        doFirst {
+          GradleUtils.disableTaskOnOtherProjects(project, 'debug')
+        }
       }
 
-      project.tasks.debug.dependsOn 'jettyRunDebug'
+      // As soon as farm plugin applies to the same project, it takes over debug task.
+      if(!project.ext.has('grettyFarmPluginName'))
+        project.tasks.debug.dependsOn 'jettyRunDebug'
 
       project.task('jettyRunWar', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in interactive mode (keypress stops the server).'
+        description = 'Starts web-app on WAR-file, in interactive mode.'
         dependsOn project.tasks.prepareWarWebApp
         inplace = false
       }
 
       project.task('jettyRunWarDebug', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug and interactive mode (keypress stops the server).'
+        description = 'Starts web-app on WAR-file, in debug and interactive mode.'
         dependsOn project.tasks.prepareWarWebApp
         inplace = false
         debug = true
       }
 
       project.task('jettyStart', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts web-app inplace, in batch mode (\'jettyStop\' stops the server).'
+        description = 'Starts web-app inplace (stopped by \'jettyStop\').'
         dependsOn project.tasks.prepareInplaceWebApp
         interactive = false
       }
 
       project.task('jettyStartDebug', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts web-app inplace, in debug and batch mode (\'jettyStop\' stops the server).'
+        description = 'Starts web-app inplace, in debug mode (stopped by \'jettyStop\').'
         dependsOn project.tasks.prepareInplaceWebApp
         interactive = false
         debug = true
       }
 
       project.task('jettyStartWar', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in batch mode (\'jettyStop\' stops the server).'
+        description = 'Starts web-app on WAR-file (stopped by \'jettyStop\').'
         dependsOn project.tasks.prepareWarWebApp
         inplace = false
         interactive = false
       }
 
       project.task('jettyStartWarDebug', type: GrettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug and batch mode (\'jettyStop\' stops the server).'
+        description = 'Starts web-app on WAR-file, in debug mode (stopped by \'jettyStop\').'
         dependsOn project.tasks.prepareWarWebApp
         inplace = false
         interactive = false

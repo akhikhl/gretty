@@ -35,6 +35,7 @@ class GrettyStartTask extends GrettyStartBaseTask {
     ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
     serverConfig.resolve(project)
     ConfigUtils.complementProperties(webAppConfig, project.gretty.webAppConfig, WebAppConfig.getDefault(project))
+    if(webAppConfig.inplace == null) webAppConfig.inplace = true
     webAppConfig.resolve(project)
     super.resolveProperties()
   }

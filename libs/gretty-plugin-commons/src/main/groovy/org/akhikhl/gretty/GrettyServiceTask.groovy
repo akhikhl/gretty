@@ -24,7 +24,7 @@ class GrettyServiceTask extends GrettyBaseTask {
 
   @Override
   void action() {
-    log.debug 'Sending command: {}', command
+    log.debug 'Sending command {} to port {}', command, servicePort
     ServiceControl.send(servicePort, command)
   }
 

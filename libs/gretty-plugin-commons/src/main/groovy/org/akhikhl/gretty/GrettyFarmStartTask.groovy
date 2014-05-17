@@ -14,14 +14,16 @@ import org.gradle.api.Project
  *
  * @author akhikhl
  */
-class GrettyStartFarmTask extends GrettyStartBaseTask {
+class GrettyFarmStartTask extends GrettyStartBaseTask {
 
   String farmName = ''
 
   @Delegate
   protected Farm farm = new Farm()
 
-  private List<WebAppConfig> webAppConfigs = []
+  protected List<WebAppConfig> webAppConfigs = []
+
+  protected boolean inplace = true
 
   @Override
   protected ServerConfig getServerConfig() {
@@ -37,24 +39,34 @@ class GrettyStartFarmTask extends GrettyStartBaseTask {
   protected void resolveProperties() {
     def sourceFarm = project.farms.farmsMap[farmName]
     if(!sourceFarm)
-      throw new GradleException("Farm '${farmName}' referenced in GrettyStartFarmTask is not defined in project farms")
+      throw new GradleException("Farm '${farmName}' referenced in GrettyFarmStartTask is not defined in project farms")
     ConfigUtils.complementProperties(farm.serverConfig, sourceFarm.serverConfig, ServerConfig.getDefault(project))
     farm.serverConfig.resolve(project)
-    farm.webapps += sourceFarm.webapps
+    sourceFarm.webapps.each { w, options ->
+      def existingOptions = farm.webapps[w]
+      if(existingOptions == null)
+        existingOptions = farm.webapps[w] = [:]
+      existingOptions << options
+    }
     if(!farm.webapps)
-      farm.webapps = project.subprojects.findAll { it.extensions.findByName('gretty') }.collect { it.path }
-    for(def w in farm.webapps) {
-      def proj = (w instanceof Project ? w : project.project(w))
+      farm.webapps = project.subprojects.findAll { it.extensions.findByName('gretty') }.inject [:], { map, p ->
+        map[p.path] = [:]
+        map
+      }
+    farm.webapps.each { w, options ->
+      def proj = project.findProject(w)
       if(!proj)
         throw new GradleException("Could not resolve project '${w}' referenced in ${farmName ? 'farm ' + farmName : 'default farm'}")
       if(!proj.extensions.findByName('gretty'))
         throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
       if(proj.ext.grettyPluginJettyVersion != project.ext.grettyFarmPluginJettyVersion)
         throw new GradleException("${proj} uses jetty version ${proj.ext.grettyPluginJettyVersion} different from version ${project.ext.grettyFarmPluginJettyVersion} used by farm.")
-      WebAppConfig webapp = new WebAppConfig()
-      ConfigUtils.complementProperties(webapp, proj.gretty.webAppConfig, WebAppConfig.getDefault(proj))
-      webapp.resolve(proj)
-      webAppConfigs.add(webapp)
+      WebAppConfig webappConfig = new WebAppConfig()
+      ConfigUtils.complementProperties(webappConfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefault(proj))
+      // individual webapp may override task-wide inplace
+      if(webappConfig.inplace == null) webappConfig.inplace = inplace
+      webappConfig.resolve(proj)
+      webAppConfigs.add(webappConfig)
     }
     super.resolveProperties()
   }

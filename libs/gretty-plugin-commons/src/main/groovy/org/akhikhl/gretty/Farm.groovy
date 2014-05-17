@@ -7,6 +7,8 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.Project
+
 /**
  *
  * @author akhikhl
@@ -16,9 +18,12 @@ class Farm {
   @Delegate
   protected ServerConfig serverConfig = new ServerConfig()
 
-  List webapps = []
+  // key is project path or war path, value is options
+  Map<String, Map> webapps = [:]
 
-  void webapp(w) {
-    webapps.add(w)
+  void webapp(Map options = [:], w) {
+    if(w instanceof Project)
+      w = w.path
+    webapps[w] = options
   }
 }

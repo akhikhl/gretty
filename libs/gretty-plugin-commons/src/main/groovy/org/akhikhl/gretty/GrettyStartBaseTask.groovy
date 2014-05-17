@@ -22,11 +22,12 @@ abstract class GrettyStartBaseTask extends GrettyBaseTask {
   boolean interactive = true
   boolean debug = false
   boolean integrationTest = false
+  String stopTask = 'jettyStop'
 
   @Override
   void action() {
     ServerConfig sconfig = getServerConfig()
-    def runner = new Runner(project, getServerConfig(), getWebApps(), interactive, debug, integrationTest)
+    def runner = new Runner(project, getServerConfig(), getWebApps(), interactive, debug, integrationTest, stopTask)
     runner.run()
   }
 
