@@ -48,7 +48,7 @@ class WebAppConfig {
     fastReload.add(map)
   }
 
-  protected static WebAppConfig getDefault(Project project) {
+  protected static WebAppConfig getDefaultForProject(Project project) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + project.name
     result.realmConfigFile = 'jetty-realm.properties'
@@ -56,10 +56,11 @@ class WebAppConfig {
     result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp" as String
     result.warResourceBase = ProjectUtils.getFinalWarPath(project).toString()
     result.projectPath = project.path
+    result.inplace = true
     return result
   }
 
-  protected static WebAppConfig getDefaultForDependency(Project project, String dependency) {
+  protected static WebAppConfig getDefaultForMavenDependency(Project project, String dependency) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + dependency.split(':')[1]
     result.warResourceBase = {

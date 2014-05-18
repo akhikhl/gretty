@@ -2,6 +2,7 @@ package mywebservice;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,7 +16,8 @@ public class ExampleServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try (PrintWriter out = response.getWriter()) {
-      out.println("{ \"date\": \"" + new Date() + "\" }");
+      SimpleDateFormat format = new SimpleDateFormat("EEE, d MMM yyyy");
+      out.println("{ \"date\": \"" + format.format(new Date()) + "\" }");
     }
   }
 }

@@ -72,7 +72,7 @@ class ServerConfig {
 
   protected void resolve(Project project) {
     def f = ProjectUtils.resolveSingleFile(project, jettyXmlFile)
-    if(f == null) {
+    if(f == null && jettyXmlFile) {
       def f2 = jettyXmlFile
       if(!(f2 instanceof File))
         f2 = new File(f2)

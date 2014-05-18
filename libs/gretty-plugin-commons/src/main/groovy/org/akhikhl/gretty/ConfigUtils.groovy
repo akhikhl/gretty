@@ -7,13 +7,23 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.GradleException
+
 /**
  *
  * @author akhikhl
  */
 class ConfigUtils {
 
-  public static complementProperties(Object dst, Object... srcs) {
+  static complementProperties(Object dst, Iterable srcs) {
+    complementProperties_(dst, srcs)
+  }
+
+  static complementProperties(Object dst, Object... srcs) {
+    complementProperties_(dst, srcs)
+  }
+
+  private static complementProperties_(Object dst, Object srcs) {
     List dstProps = dst.metaClass.properties.collect { it.name } - ['class']
     for(def src in srcs) {
       if(src instanceof Map) {
@@ -30,7 +40,32 @@ class ConfigUtils {
     dst
   }
 
-  public static resolveClosures(Object obj) {
+  static void requireAnyProperty(Object obj, String... propNames) {
+    if(obj instanceof Map) {
+      for(String propName in propNames) {
+        if(obj[propName] != null)
+          return
+      }
+    } else {
+      for(String propName in propNames) {
+        if(obj.hasProperty(propName) && obj.properties[propName] != null)
+          return
+      }
+    }
+    throw new GradleException("Missing at least one of the required properties ${propNames} in ${obj.getClass().getName()}")
+  }
+
+  static void requireProperty(Object obj, String propName) {
+    if(obj instanceof Map) {
+      if(obj[propName] == null)
+        throw new GradleException("Missing required property '${propName}' in ${obj.getClass().getName()}")
+    } else {
+      if(!obj.hasProperty(propName) || obj.properties[propName] == null)
+        throw new GradleException("Missing required property '${propName}' in ${obj.getClass().getName()}")
+    }
+  }
+
+  static resolveClosures(Object obj) {
     if(obj == null)
       return
     def props

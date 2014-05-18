@@ -19,11 +19,13 @@ class Farm {
   protected ServerConfig serverConfig = new ServerConfig()
 
   // key is project path or war path, value is options
-  Map<String, Map> webapps = [:]
+  Map webAppRefs = [:]
+
+  String integrationTestTask
 
   void webapp(Map options = [:], w) {
     if(w instanceof Project)
       w = w.path
-    webapps[w] = options
+    webAppRefs[w] = options
   }
 }

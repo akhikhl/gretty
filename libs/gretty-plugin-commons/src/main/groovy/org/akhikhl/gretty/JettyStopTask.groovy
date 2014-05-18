@@ -9,9 +9,11 @@ package org.akhikhl.gretty
 
 /**
  *
- * @author ahi
+ * @author akhikhl
  */
-class FarmPlugin extends org.akhikhl.gretty9.FarmPlugin {
+class JettyStopTask extends JettyServiceTask {
 
+  String getCommand() {
+    'stop'
+  }
 }
-

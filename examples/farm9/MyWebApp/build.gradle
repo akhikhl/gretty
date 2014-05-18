@@ -9,36 +9,38 @@ gretty {
 /*
   This is unnamed (default) farm.
   It provides farm-specific tasks, for example farmRun, farmStart, farmStop.
-  If you completely omit farm specification, gretty automatically generates farm 
+  If you completely omit farm specification, gretty automatically generates farm
   for all subprojects of current project.
 */
 farm {
   scanInterval = 1
-  
+
+  integrationTestTask = 'integrationTest'
+
   // can specify web-app as this project
   webapp project
-  
+
   // can specify web-app as another project in the same project tree
   webapp ':farm9:MyWebService'
-  
+
   // same as before
   // webapp project(':farm9:MyWebService')
-  
+
   // can override any gretty properties by passing them as hashmap parameters
   //webapp ':farm9:MyWebService2', contextPath: '/specialContextPath'
-  
+
   // can specify web-app as maven artifact
   // webapp 'org.akhikhl.gretty.examples:MyWebService:1.0'
-  
+
   // can specify web-app as absolute path to war-file
   //webapp '/home/user/someDir/MyWebService-1.0.war'
-  
+
   // can specify web-app as absolute file to war-file
   //webapp new File('/home/user/someDir/MyWebService-1.0.war')
-  
+
   // can specify web-app as relative (to this project) path to war-file
   //webapp 'someDir/MyWebService-1.0.war'
-  
+
   // can specify web-app as relative (to this project) file to war-file
   //webapp new File('someDir/MyWebService-1.0.war')
 }
@@ -47,10 +49,10 @@ farm {
   You can define multiple farms, using "farms" configuration.
   Each farm should get unique name, in the example below - two farms with names 'A' and 'B'.
   Each farm gets farm-specific tasks, for example farmRunA, farmStartA, farmStopA.
-  Multiple farms can run on the same project tree in parallel, 
+  Multiple farms can run on the same project tree in parallel,
   provided that they have non-conflicting triads port/servicePort/statusPort.
 */
-/*
+
 farms {
   farm 'A', {
     port = 8090
@@ -58,10 +60,10 @@ farms {
     statusPort = 8092
     scanInterval = 1
     webapp project
-    webapp 'wars/MyWebService-1.0.war'
+    webapp 'org.akhikhl.gretty.examples:MyWebService:1.0', suppressMavenToProjectResolution: true
   }
   farm 'B', {
     // ...
   }
 }
-*/
+

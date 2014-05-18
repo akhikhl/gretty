@@ -9,9 +9,12 @@ package org.akhikhl.gretty
 
 /**
  *
- * @author ahi
+ * @author akhikhl
  */
-class FarmPlugin extends org.akhikhl.gretty9.FarmPlugin {
+class FarmRestartTask extends FarmServiceTask {
 
+  @Override
+  String getCommand() {
+    'restart'
+  }
 }
-

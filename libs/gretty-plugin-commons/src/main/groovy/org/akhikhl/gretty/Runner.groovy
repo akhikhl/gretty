@@ -26,17 +26,17 @@ final class Runner {
 
   protected final Project project
   protected final ServerConfig sconfig
-  protected final List<WebAppConfig> webapps
+  protected final Iterable<WebAppConfig> webAppConfigs
   protected final boolean interactive
   protected final boolean debug
   protected final boolean integrationTest
   private ExecutorService executorService
   private String stopTask
 
-  Runner(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean interactive, boolean debug, boolean integrationTest, String stopTask) {
+  Runner(Project project, RunConfig runConfig, boolean interactive, boolean debug, boolean integrationTest, String stopTask) {
     this.project = project
-    this.sconfig = sconfig
-    this.webapps = webapps
+    this.sconfig = runConfig.getServerConfig()
+    this.webAppConfigs = runConfig.getWebAppConfigs()
     this.interactive = interactive
     this.debug = debug
     this.integrationTest = integrationTest
@@ -45,8 +45,8 @@ final class Runner {
   }
 
   void run() {
-    for(WebAppConfig webapp in webapps)
-      webapp.prepareToRun()
+    for(WebAppConfig webAppConfig in webAppConfigs)
+      webAppConfig.prepareToRun()
     Future futureStatus = ServiceControl.readMessage(executorService, sconfig.statusPort)
     def runThread = Thread.start {
       runJetty()
@@ -55,9 +55,9 @@ final class Runner {
     log.debug 'Got status: {}', status
     if(!integrationTest) {
       System.out.println "Jetty server ${project.ext.jettyVersion} started."
-      for(WebAppConfig webapp in webapps) {
-        String webappName = webapp.inplace ? webapp.projectPath : new File(webapp.warResourceBase).name
-        System.out.println "${webappName} runs at the address http://localhost:${sconfig.port}${webapp.contextPath}"
+      for(WebAppConfig webAppConfig in webAppConfigs) {
+        String webappName = webAppConfig.inplace ? webAppConfig.projectPath : new File(webAppConfig.warResourceBase).name
+        System.out.println "${webappName} runs at the address http://localhost:${sconfig.port}${webAppConfig.contextPath}"
       }
       System.out.println "servicePort: ${sconfig.servicePort}, statusPort: ${sconfig.statusPort}"
       if(interactive) {
@@ -90,20 +90,20 @@ final class Runner {
           logFileName sconfig.logFileName
           logDir sconfig.logDir
         }
-      webApps webapps.collect { WebAppConfig webapp ->
+      webApps webAppConfigs.collect { WebAppConfig webAppConfig ->
         { ->
-          inplace webapp.inplace
-          webappClassPath webapp.classPath
-          contextPath webapp.contextPath
-          resourceBase (webapp.inplace ? webapp.inplaceResourceBase : webapp.warResourceBase)
-          if(webapp.initParameters)
-            initParams webapp.initParameters
-          if(webapp.realm && webapp.realmConfigFile) {
-            realm webapp.realm
-            realmConfigFile webapp.realmConfigFile.absolutePath
+          inplace webAppConfig.inplace
+          webappClassPath webAppConfig.classPath
+          contextPath webAppConfig.contextPath
+          resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase)
+          if(webAppConfig.initParameters)
+            initParams webAppConfig.initParameters
+          if(webAppConfig.realm && webAppConfig.realmConfigFile) {
+            realm webAppConfig.realm
+            realmConfigFile webAppConfig.realmConfigFile.absolutePath
           }
-          if(webapp.jettyEnvXmlFile)
-            jettyEnvXml webapp.jettyEnvXmlFile.absolutePath
+          if(webAppConfig.jettyEnvXmlFile)
+            jettyEnvXml webAppConfig.jettyEnvXmlFile.absolutePath
         }
       }
     }
@@ -124,7 +124,7 @@ final class Runner {
       json = json.replace('"', '\\"')
 
     ScannerManagerBase scanman = project.ext.scannerManagerFactory.createScannerManager()
-    scanman.startScanner(project, sconfig, webapps)
+    scanman.startScanner(project, sconfig, webAppConfigs)
     Runner self = this
     try {
       project.javaexec { spec ->

@@ -7,5 +7,5 @@
  */
 package org.akhikhl.gretty
 
-class GrettyPlugin extends org.akhikhl.gretty9.GrettyPlugin {
+class JettyPlugin extends org.akhikhl.gretty9.JettyPlugin {
 }
