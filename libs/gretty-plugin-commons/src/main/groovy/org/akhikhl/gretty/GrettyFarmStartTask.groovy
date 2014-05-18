@@ -60,15 +60,31 @@ class GrettyFarmStartTask extends GrettyStartBaseTask {
       }
     farm.webapps.each { w, options ->
       WebAppConfig webappConfig = new WebAppConfig()
-      def proj = project.findProject(w)
+      def proj
+      if(w instanceof Project)
+        proj = w
+      else if(w instanceof String || w instanceof GString)
+        proj = project.findProject(w)
+      def warFile
       if(proj == null) {
-        log.warn '{}: {} is not an existing project, treating it as a maven dependency', farmDescr, w
-        def gav = w.split(':')
-        proj = project.rootProject.allprojects.find {
-          it.group == gav[0] && it.name == gav[1]
+        warFile = w instanceof File ? w : new File(w.toString())
+        if(!warFile.isFile() && !warFile.isAbsolute())
+          warFile = new File(project.projectDir, warFile.path)
+        if(warFile.isFile())
+          warFile = warFile.absoluteFile
+        else {
+          warFile = null
+          w = w.toString()
+          def gav = w.split(':')
+          if(gav.length != 3)
+            throw new GradleException("${farmDescr}: '${w}' is not an existing project or file or maven dependency.")
+          log.warn '{}: {} is not an existing project, treating it as a maven dependency', farmDescr, w
+          proj = project.rootProject.allprojects.find {
+            it.group == gav[0] && it.name == gav[1]
+          }
+          if(proj)
+            log.warn '{}: {} actually comes from project {}, so using project instead', farmDescr, w, proj.path
         }
-        if(proj)
-          log.warn '{}: {} actually comes from project {}, so using project instead', farmDescr, w, proj.path
       }
       if(proj) {
         if(!proj.extensions.findByName('gretty'))
@@ -76,14 +92,16 @@ class GrettyFarmStartTask extends GrettyStartBaseTask {
         if(proj.ext.grettyPluginJettyVersion != project.ext.grettyFarmPluginJettyVersion)
           throw new GradleException("${proj} uses jetty version ${proj.ext.grettyPluginJettyVersion} different from version ${project.ext.grettyFarmPluginJettyVersion} used by farm.")
         ConfigUtils.complementProperties(webappConfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefault(proj))
-        // individual webapp may override task-wide inplace
+        // apply task-wide inplace only if individual webapp does not define it
         if(webappConfig.inplace == null) webappConfig.inplace = inplace
+      } else if (warFile) {
+        ConfigUtils.complementProperties(webappConfig, options, WebAppConfig.getDefaultForWarFile(project, warFile))
+        webappConfig.inplace = false // always war-file, ignore options.inplace
       } else {
         project.configurations.maybeCreate('farm')
         project.dependencies.add 'farm', w
         ConfigUtils.complementProperties(webappConfig, options, WebAppConfig.getDefaultForDependency(project, w))
-        // maven dependency is always war-based
-        webappConfig.inplace = false
+        webappConfig.inplace = false // always war-file, ignore options.inplace
       }
       webappConfig.resolve(proj)
       webAppConfigs.add(webappConfig)

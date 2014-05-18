@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Project
 
 /**
@@ -66,6 +67,18 @@ class WebAppConfig {
       def artifact = project.configurations.farm.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1] }
       artifact.file.absolutePath
     }
+    result.inplace = false
+    return result
+  }
+
+  protected static WebAppConfig getDefaultForWarFile(Project project, File warFile) {
+    WebAppConfig result = new WebAppConfig()
+    String baseName = FilenameUtils.getBaseName(warFile.name)
+    // remove version suffix
+    baseName = baseName.replaceAll(/([\da-zA-Z_.-]+?)-((\d+\.)+[\da-zA-Z_.-]*)/, '$1')
+    result.contextPath = '/' + baseName
+    result.warResourceBase = warFile.absolutePath
+    result.inplace = false
     return result
   }
 
