@@ -115,7 +115,7 @@ final class Runner {
     sconfig.onStart*.call()
 
     def json = prepareJson()
-    log.debug json.toPrettyString()
+    log.warn json.toPrettyString()
     json = json.toString()
 
     // we are going to pass json as argument to java process.

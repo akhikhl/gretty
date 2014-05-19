@@ -41,6 +41,8 @@ class ServerConfig {
     result.jettyXmlFile = 'jetty.xml'
     result.scanInterval = 0
     result.loggingLevel = 'INFO'
+    result.consoleLogEnabled = true
+    result.fileLogEnabled = true
     result.logFileName = project.name
     result.logDir = "${System.getProperty('user.home')}/logs" as String
     return result
