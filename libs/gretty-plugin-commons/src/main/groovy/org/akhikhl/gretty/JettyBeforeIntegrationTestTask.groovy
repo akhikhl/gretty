@@ -20,14 +20,14 @@ class JettyBeforeIntegrationTestTask extends JettyStartTask {
     true
   }
 
-  String getIntegrationTestTask() {
+  String getEffectiveIntegrationTestTask() {
     integrationTestTask ?: project.gretty.integrationTestTask
   }
 
   void setupIntegrationTestTaskDependencies() {
     def thisTask = this
     project.tasks.all { t ->
-      if(t.name == thisTask.integrationTestTask) {
+      if(t.name == thisTask.effectiveIntegrationTestTask) {
         t.dependsOn thisTask
         thisTask.dependsOn project.tasks.testClasses
       }

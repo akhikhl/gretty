@@ -56,7 +56,6 @@ class WebAppConfig {
     result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp" as String
     result.warResourceBase = ProjectUtils.getFinalWarPath(project).toString()
     result.projectPath = project.path
-    result.inplace = true
     return result
   }
 

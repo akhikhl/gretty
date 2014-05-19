@@ -20,6 +20,15 @@ class JettyStartTask extends StartBaseTask {
   @Delegate
   private WebAppConfig webAppConfig = new WebAppConfig()
 
+  boolean getEffectiveInplace() {
+    if(webAppConfig.inplace != null)
+      webAppConfig.inplace
+    else if(project.gretty.webAppConfig.inplace != null)
+      project.gretty.webAppConfig.inplace
+    else
+      true
+  }
+
   @Override
   protected RunConfig getRunConfig() {
 

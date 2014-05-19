@@ -65,9 +65,8 @@ class FarmConfigurer {
       throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
     if(proj.ext.grettyPluginJettyVersion != project.ext.grettyFarmPluginJettyVersion)
       throw new GradleException("${proj} uses jetty version ${proj.ext.grettyPluginJettyVersion} different from version ${project.ext.grettyFarmPluginJettyVersion} used by farm.")
-    ConfigUtils.complementProperties(webappConfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefaultForProject(proj))
+    ConfigUtils.complementProperties(webappConfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefaultForProject(proj), new WebAppConfig(inplace: inplace))
     webappConfig.resolve(proj)
-    if(webappConfig.inplace == null) webappConfig.inplace = inplace
     webappConfig
   }
 
@@ -81,7 +80,8 @@ class FarmConfigurer {
 
   Iterable<WebAppConfig> getWebAppConfigsForProjects(Map wrefs, Boolean inplace = null) {
     wrefs.findResults { wref, options ->
-      inplace = options.inplace == null ? inplace : options.inplace
+      if(options.inplace != null)
+        inplace = options.inplace
       def proj = resolveWebAppRefToProject(wref)
       proj ? getWebAppConfigForProject(options, proj, inplace) : null
     }
@@ -105,7 +105,8 @@ class FarmConfigurer {
   // attention: this method may modify project configurations and dependencies.
   void resolveWebAppRefs(Map wrefs, Collection<WebAppConfig> destWebAppConfigs, Boolean inplace = null) {
     wrefs.each { wref, options ->
-      inplace = options.inplace == null ? inplace : options.inplace
+      if(options.inplace != null)
+        inplace = options.inplace
       def proj = resolveWebAppRefToProject(wref)
       def warFile
       if(!proj) {

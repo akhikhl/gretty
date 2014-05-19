@@ -15,14 +15,14 @@ class JettyAfterIntegrationTestTask extends JettyStopTask {
 
   String integrationTestTask
 
-  String getIntegrationTestTask() {
+  String getEffectiveIntegrationTestTask() {
     integrationTestTask ?: project.gretty.integrationTestTask
   }
 
   void setupIntegrationTestTaskDependencies() {
     def thisTask = this
     project.tasks.all { t ->
-      if(t.name == thisTask.integrationTestTask)
+      if(t.name == thisTask.effectiveIntegrationTestTask)
         t.finalizedBy thisTask
     }
   }

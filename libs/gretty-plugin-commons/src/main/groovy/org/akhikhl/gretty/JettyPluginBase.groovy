@@ -56,7 +56,7 @@ abstract class JettyPluginBase implements Plugin<Project> {
     project.tasks.whenObjectAdded { task ->
       if(task instanceof JettyStartTask)
         task.dependsOn {
-          task.inplace ? project.tasks.prepareInplaceWebApp : project.tasks.prepareWarWebApp
+          task.effectiveInplace ? project.tasks.prepareInplaceWebApp : project.tasks.prepareWarWebApp
         }
     }
 
