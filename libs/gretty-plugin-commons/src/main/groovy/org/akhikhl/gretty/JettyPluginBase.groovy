@@ -35,7 +35,6 @@ abstract class JettyPluginBase implements Plugin<Project> {
 
     project.ext.scannerManagerFactory = getScannerManagerFactory()
 
-    println "DBG creating gretty extension on ${project}"
     project.extensions.create('gretty', GrettyExtension)
 
     if(!project.configurations.findByName('grettyHelperConfig'))

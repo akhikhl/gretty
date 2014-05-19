@@ -35,8 +35,6 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
 
   void setupIntegrationTestTaskDependencies() {
     def thisTask = this
-    println "DBG ${thisTask.name}: effectiveIntegrationTestTask=${thisTask.effectiveIntegrationTestTask}"
-    println "DBG ${thisTask.name}: webAppProjects=${getWebAppProjects()}"
     getWebAppProjects().each { proj ->
       proj.tasks.all { t ->
         if(t.name == thisTask.effectiveIntegrationTestTask) {
