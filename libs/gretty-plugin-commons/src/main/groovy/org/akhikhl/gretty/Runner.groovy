@@ -45,9 +45,6 @@ final class Runner {
   }
 
   void run() {
-    System.setProperty('gretty.port', sconfig.port.toString())
-    System.setProperty('gretty.servicePort', sconfig.servicePort.toString())
-    System.setProperty('gretty.statusPort', sconfig.statusPort.toString())
     for(WebAppConfig webAppConfig in webAppConfigs)
       webAppConfig.prepareToRun()
     Future futureStatus = ServiceControl.readMessage(executorService, sconfig.statusPort)
@@ -56,15 +53,15 @@ final class Runner {
     }
     def status = futureStatus.get()
     log.debug 'Got status: {}', status
+    System.out.println "Jetty server ${project.ext.jettyVersion} started."
+    for(WebAppConfig webAppConfig in webAppConfigs) {
+      String webappName = webAppConfig.inplace ? webAppConfig.projectPath : new File(webAppConfig.warResourceBase).name
+      System.out.println "${webappName} runs at the address http://localhost:${sconfig.port}${webAppConfig.contextPath}"
+    }
+    System.out.println "servicePort: ${sconfig.servicePort}, statusPort: ${sconfig.statusPort}"
     if(integrationTest)
       project.ext.grettyRunnerThread = runThread
     else {
-      System.out.println "Jetty server ${project.ext.jettyVersion} started."
-      for(WebAppConfig webAppConfig in webAppConfigs) {
-        String webappName = webAppConfig.inplace ? webAppConfig.projectPath : new File(webAppConfig.warResourceBase).name
-        System.out.println "${webappName} runs at the address http://localhost:${sconfig.port}${webAppConfig.contextPath}"
-      }
-      System.out.println "servicePort: ${sconfig.servicePort}, statusPort: ${sconfig.statusPort}"
       if(interactive) {
         System.out.println 'Press any key to stop the jetty server.'
         System.in.read()

@@ -8,9 +8,11 @@ import static groovyx.net.http.Method.*
 class RequestResponseIT extends Specification {
 
   private static int grettyPort
+  private static String contextPath
 
   void setupSpec() {
     grettyPort = System.getProperty('gretty.port') as int
+    contextPath = System.getProperty('gretty.contextPath')
   }
 
   def http
@@ -22,7 +24,7 @@ class RequestResponseIT extends Specification {
   def 'should get expected response'() {
   when:
     def result = http.request(POST, JSON) {
-      uri.path = '/MyWebService/getdate'
+      uri.path = "${contextPath}/getdate"
       response.success = { resp, json ->
         json.date
       }

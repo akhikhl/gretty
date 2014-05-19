@@ -24,6 +24,7 @@ class JettyAfterIntegrationTestTask extends JettyStopTask {
       project.ext.grettyRunnerThread.join()
       project.ext.grettyRunnerThread = null
     }
+    System.out.println 'Jetty server stopped.'
   }
 
   String getEffectiveIntegrationTestTask() {

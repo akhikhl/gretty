@@ -8,6 +8,8 @@
 package org.akhikhl.gretty
 
 import org.gradle.process.JavaForkOptions
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
@@ -37,15 +39,31 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
 
   void setupIntegrationTestTaskDependencies() {
     def thisTask = this
+    FarmConfigurer configurer
+    Farm tempFarm
     getWebAppProjects().each { proj ->
       proj.tasks.all { t ->
         if(t.name == thisTask.effectiveIntegrationTestTask) {
           t.mustRunAfter thisTask
           thisTask.mustRunAfter proj.tasks.testClasses
-          if(t instanceof JavaForkOptions && !t.ext.has('setGrettyPort')) {
-            t.ext.setGrettyPort = true
+          if(t instanceof JavaForkOptions) {
             t.doFirst {
-              systemProperty 'gretty.port', System.getProperty('gretty.port')
+              if(thisTask.didWork) {
+                if(!configurer) {
+                  configurer = new FarmConfigurer(thisTask.project)
+                  tempFarm = new Farm()
+                  configurer.configureFarm(tempFarm, farm, configurer.getProjectFarm(farmName))
+                }
+                def port = tempFarm.serverConfig.port
+                systemProperty 'gretty.port', port
+                def options = tempFarm.webAppRefs.find { key, value -> configurer.resolveWebAppRefToProject(key) == proj }.value
+                def webappConfig = configurer.getWebAppConfigForProject(options, proj, thisTask.inplace)
+                webappConfig.prepareToRun()
+                def contextPath = webappConfig.contextPath
+                systemProperty 'gretty.contextPath', contextPath
+                systemProperty 'gretty.baseURI', "http://localhost:${port}${contextPath}"
+                systemProperty 'gretty.farm', (farmName ?: 'default')
+              }
             }
           }
         } else if(t instanceof JettyBeforeIntegrationTestTask)

@@ -4,15 +4,15 @@ import geb.spock.GebReportingSpec
 
 class RequestResponseIT extends GebReportingSpec {
 
-  private static int grettyPort
+  private static String baseURI
 
   void setupSpec() {
-    grettyPort = System.getProperty('gretty.port') as int
+    baseURI = System.getProperty('gretty.baseURI')
   }
 
   def 'should get expected response from the server'() {
   when:
-    go "http://localhost:${grettyPort}/testAnnotationsOverlay9/annotations/whatever"
+    go "${baseURI}/annotations/whatever"
   then:
     $('h1').text() == /Hello, Gretty! This is a message from overlayed web-application!/
   }
