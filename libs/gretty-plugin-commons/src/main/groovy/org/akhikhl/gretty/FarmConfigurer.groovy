@@ -83,8 +83,13 @@ class FarmConfigurer {
     wrefs.findResults { wref, options ->
       inplace = options.inplace == null ? inplace : options.inplace
       def proj = resolveWebAppRefToProject(wref)
-      println "DBG resolve ${wref} -> ${proj} -> ${proj ? getWebAppConfigForProject(options, proj, inplace) : null}"
       proj ? getWebAppConfigForProject(options, proj, inplace) : null
+    }
+  }
+
+  Iterable<Project> getWebAppProjects(Map wrefs) {
+    wrefs.findResults { wref, options ->
+      resolveWebAppRefToProject(wref)
     }
   }
 

@@ -23,22 +23,22 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     integrationTestTask ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
   }
 
-  Iterable<WebAppConfig> getWebAppConfigsForProjects() {
+  Iterable<Project> getWebAppProjects() {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Map wrefs = [:]
     FarmConfigurer.mergeWebAppRefMaps(wrefs, webAppRefs)
     FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).webAppRefs)
     if(!wrefs)
       wrefs = configurer.getDefaultWebAppRefMap()
-    configurer.getWebAppConfigsForProjects(wrefs)
+    configurer.getWebAppProjects(wrefs)
   }
 
   void setupIntegrationTestTaskDependencies() {
     def thisTask = this
     println "DBG ${thisTask.name}: effectiveIntegrationTestTask=${thisTask.effectiveIntegrationTestTask}"
-    println "DBG ${thisTask.name}: webAppProjects=${getWebAppConfigsForProjects().collect { project.project(it.projectPath) }}"
-    getWebAppConfigsForProjects().each {
-      project.project(it.projectPath).tasks.all { t ->
+    println "DBG ${thisTask.name}: webAppProjects=${getWebAppProjects()}"
+    getWebAppProjects().each {
+      it.tasks.all { t ->
         if(t.name == thisTask.effectiveIntegrationTestTask)
           thisTask.mustRunAfter t
         else if(t instanceof JettyAfterIntegrationTestTask)

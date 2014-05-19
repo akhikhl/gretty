@@ -15,9 +15,8 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
 
   FarmBeforeIntegrationTestTask() {
     doFirst {
-      getWebAppConfigsForProjects().each { webAppConfig ->
-        def proj = project.project(it.projectPath)
-        proj.tasks.each { t ->
+      getWebAppProjects().each {
+        it.tasks.each { t ->
           if(t instanceof JettyBeforeIntegrationTestTask || t instanceof JettyAfterIntegrationTestTask)
             t.enabled = false
         }
@@ -37,9 +36,8 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
   void setupIntegrationTestTaskDependencies() {
     def thisTask = this
     println "DBG ${thisTask.name}: effectiveIntegrationTestTask=${thisTask.effectiveIntegrationTestTask}"
-    println "DBG ${thisTask.name}: webAppProjects=${getWebAppConfigsForProjects().collect { project.project(it.projectPath) }}"
-    getWebAppConfigsForProjects().each { webAppConfig ->
-      def proj = project.project(it.projectPath)
+    println "DBG ${thisTask.name}: webAppProjects=${getWebAppProjects()}"
+    getWebAppProjects().each { proj ->
       proj.tasks.all { t ->
         if(t.name == thisTask.effectiveIntegrationTestTask) {
           t.mustRunAfter thisTask

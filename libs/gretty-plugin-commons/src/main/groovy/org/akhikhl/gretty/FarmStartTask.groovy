@@ -54,4 +54,14 @@ class FarmStartTask extends StartBaseTask {
       wrefs = configurer.getDefaultWebAppRefMap()
     configurer.getWebAppConfigsForProjects(wrefs, inplace)
   }
+
+  Iterable<Project> getWebAppProjects() {
+    FarmConfigurer configurer = new FarmConfigurer(project)
+    Map wrefs = [:]
+    FarmConfigurer.mergeWebAppRefMaps(wrefs, farm.webAppRefs)
+    FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).webAppRefs)
+    if(!wrefs)
+      wrefs = configurer.getDefaultWebAppRefMap()
+    configurer.getWebAppProjects(wrefs)
+  }
 }
