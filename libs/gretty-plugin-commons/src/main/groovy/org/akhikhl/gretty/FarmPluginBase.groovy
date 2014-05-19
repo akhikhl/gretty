@@ -33,6 +33,7 @@ abstract class FarmPluginBase implements Plugin<Project> {
     project.ext.scannerManagerFactory = getScannerManagerFactory()
 
     project.extensions.create('farm', Farm)
+    project.farm.integrationTestTask = 'integrationTest'
 
     project.extensions.create('farms', Farms)
     project.farms.farmsMap[''] = project.farm
@@ -160,28 +161,25 @@ abstract class FarmPluginBase implements Plugin<Project> {
           farmName = fname
         }
 
-        if(farm.integrationTestTask) {
+        project.task('farmBeforeIntegrationTest' + fname, type: FarmBeforeIntegrationTestTask, group: 'gretty') {
+          description = "Starts ${farmDescr} before integration test."
+          farmName = fname
+          setupIntegrationTestTaskDependencies()
+        }
 
-          project.task('farmBeforeIntegrationTest' + fname, type: FarmBeforeIntegrationTestTask, group: 'gretty') {
-            description = "Starts ${farmDescr} before integration test."
-            farmName = fname
-            setupIntegrationTestTaskDependencies()
-          }
+        project.task('farmIntegrationTest' + fname, type: FarmIntegrationTestTask, group: 'gretty') {
+          description = "Runs integration tests on farm web-apps."
+          farmName = fname
+          dependsOn 'farmBeforeIntegrationTest' + fname
+          finalizedBy 'farmAfterIntegrationTest' + fname
+          setupIntegrationTestTaskDependencies()
+        }
 
-          project.task('farmIntegrationTest' + fname, type: FarmIntegrationTestTask, group: 'gretty') {
-            description = "Runs integration tests on farm web-apps."
-            farmName = fname
-            dependsOn 'farmBeforeIntegrationTest' + fname
-            finalizedBy 'farmAfterIntegrationTest' + fname
-            setupIntegrationTestTaskDependencies()
-          }
-
-          project.task('farmAfterIntegrationTest' + fname, type: FarmAfterIntegrationTestTask, group: 'gretty') {
-            description = "Stops ${farmDescr} after integration test."
-            farmName = fname
-            setupIntegrationTestTaskDependencies()
-          }
-        } // integrationTestTask
+        project.task('farmAfterIntegrationTest' + fname, type: FarmAfterIntegrationTestTask, group: 'gretty') {
+          description = "Stops ${farmDescr} after integration test."
+          farmName = fname
+          setupIntegrationTestTaskDependencies()
+        }
 
       } // farmsMap
     } // afterEvaluate

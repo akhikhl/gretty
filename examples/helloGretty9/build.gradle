@@ -14,6 +14,7 @@ apply plugin: 'gretty9'
 dependencies {
   // not needed by gretty, we used it for template processing within webapp
   compile 'org.apache.velocity:velocity:1.7'
+  testCompile 'ch.qos.logback:logback-classic:1.1.2'
 }
 
 gretty {

@@ -45,6 +45,9 @@ final class Runner {
   }
 
   void run() {
+    System.setProperty('gretty.port', sconfig.port.toString())
+    System.setProperty('gretty.servicePort', sconfig.servicePort.toString())
+    System.setProperty('gretty.statusPort', sconfig.statusPort.toString())
     for(WebAppConfig webAppConfig in webAppConfigs)
       webAppConfig.prepareToRun()
     Future futureStatus = ServiceControl.readMessage(executorService, sconfig.statusPort)
@@ -53,7 +56,9 @@ final class Runner {
     }
     def status = futureStatus.get()
     log.debug 'Got status: {}', status
-    if(!integrationTest) {
+    if(integrationTest)
+      project.ext.grettyRunnerThread = runThread
+    else {
       System.out.println "Jetty server ${project.ext.jettyVersion} started."
       for(WebAppConfig webAppConfig in webAppConfigs) {
         String webappName = webAppConfig.inplace ? webAppConfig.projectPath : new File(webAppConfig.warResourceBase).name

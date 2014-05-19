@@ -19,8 +19,10 @@ class Farms {
     if(name == null)
       name = ''
     def f = farmsMap[name]
-    if(f == null)
+    if(f == null) {
       f = farmsMap[name] = new Farm()
+      f.integrationTestTask = 'integrationTest'
+    }
     closure.delegate = f
     closure.resolveStrategy = Closure.DELEGATE_FIRST
     closure()

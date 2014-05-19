@@ -7,6 +7,8 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.tasks.TaskAction
+
 /**
  *
  * @author akhikhl
@@ -14,6 +16,15 @@ package org.akhikhl.gretty
 class JettyAfterIntegrationTestTask extends JettyStopTask {
 
   String integrationTestTask
+
+  @TaskAction
+  void action() {
+    super.action()
+    if(project.ext.has('grettyRunnerThread') && project.ext.grettyRunnerThread != null) {
+      project.ext.grettyRunnerThread.join()
+      project.ext.grettyRunnerThread = null
+    }
+  }
 
   String getEffectiveIntegrationTestTask() {
     integrationTestTask ?: project.gretty.integrationTestTask

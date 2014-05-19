@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskAction
 
 /**
  *
@@ -18,6 +19,15 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
   String integrationTestTask
 
   protected Map webAppRefs = [:]
+
+  @TaskAction
+  void action() {
+    super.action()
+    if(project.ext.has('grettyRunnerThread') && project.ext.grettyRunnerThread != null) {
+      project.ext.grettyRunnerThread.join()
+      project.ext.grettyRunnerThread = null
+    }
+  }
 
   String getEffectiveIntegrationTestTask() {
     integrationTestTask ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask

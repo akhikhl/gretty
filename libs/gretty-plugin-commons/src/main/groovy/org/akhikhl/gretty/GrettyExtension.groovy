@@ -20,7 +20,7 @@ class GrettyExtension {
 
   protected List overlays = []
 
-  String integrationTestTask
+  String integrationTestTask = 'integrationTest'
 
   void overlay(def newValue) {
     if(!(newValue instanceof String))

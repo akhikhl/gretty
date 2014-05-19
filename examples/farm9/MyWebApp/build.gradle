@@ -15,8 +15,6 @@ gretty {
 farm {
   scanInterval = 1
 
-  integrationTestTask = 'integrationTest'
-
   // can specify web-app as this project
   webapp project
 
@@ -49,7 +47,7 @@ farm {
   You can define multiple farms, using "farms" configuration.
   Each farm should get unique name, in the example below - two farms with names 'A' and 'B'.
   Each farm gets farm-specific tasks, for example farmRunA, farmStartA, farmStopA.
-  Multiple farms can run on the same project tree in parallel,
+  You can even run multiple farms on the same project tree in parallel,
   provided that they have non-conflicting triads port/servicePort/statusPort.
 */
 

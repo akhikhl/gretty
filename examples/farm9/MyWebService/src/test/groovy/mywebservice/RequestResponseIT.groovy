@@ -7,10 +7,16 @@ import static groovyx.net.http.Method.*
 
 class RequestResponseIT extends Specification {
 
+  private static int grettyPort
+
+  void setupSpec() {
+    grettyPort = System.getProperty('gretty.port') as int
+  }
+
   def http
 
   def setup() {
-    http = new HTTPBuilder('http://localhost:8080')
+    http = new HTTPBuilder("http://localhost:${grettyPort}")
   }
 
   def 'should get expected response'() {

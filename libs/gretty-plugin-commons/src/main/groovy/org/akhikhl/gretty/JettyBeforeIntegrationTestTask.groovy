@@ -7,6 +7,8 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.process.JavaForkOptions
+
 /**
  *
  * @author akhikhl
@@ -30,6 +32,12 @@ class JettyBeforeIntegrationTestTask extends JettyStartTask {
       if(t.name == thisTask.effectiveIntegrationTestTask) {
         t.dependsOn thisTask
         thisTask.dependsOn project.tasks.testClasses
+        if(t instanceof JavaForkOptions && !t.ext.has('setGrettyPort')) {
+          t.ext.setGrettyPort = true
+          t.doFirst {
+            systemProperty 'gretty.port', System.getProperty('gretty.port')
+          }
+        }
       }
     }
   }

@@ -9,6 +9,7 @@ package org.akhikhl.gretty
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -52,7 +53,6 @@ abstract class JettyPluginBase implements Plugin<Project> {
     if(!project.tasks.findByName('debug'))
       project.task('debug')
 
-    // add trivial dependencies to JettyStartTask
     project.tasks.whenObjectAdded { task ->
       if(task instanceof JettyStartTask)
         task.dependsOn {
@@ -196,18 +196,15 @@ abstract class JettyPluginBase implements Plugin<Project> {
         description = 'Sends \'restart\' command to running jetty server.'
       }
 
-      if(project.gretty.integrationTestTask) {
+      project.task('jettyBeforeIntegrationTest', type: JettyBeforeIntegrationTestTask, group: 'gretty') {
+        description = 'Starts jetty server before integration test.'
+        setupIntegrationTestTaskDependencies()
+      }
 
-        project.task('jettyBeforeIntegrationTest', type: JettyBeforeIntegrationTestTask, group: 'gretty') {
-          description = 'Starts jetty server before integration test.'
-          setupIntegrationTestTaskDependencies()
-        }
-
-        project.task('jettyAfterIntegrationTest', type: JettyAfterIntegrationTestTask, group: 'gretty') {
-          description = 'Stops jetty server after integration test.'
-          setupIntegrationTestTaskDependencies()
-        }
-      } // integrationTestTask
+      project.task('jettyAfterIntegrationTest', type: JettyAfterIntegrationTestTask, group: 'gretty') {
+        description = 'Stops jetty server after integration test.'
+        setupIntegrationTestTaskDependencies()
+      }
     } // afterEvaluate
   } // apply
 

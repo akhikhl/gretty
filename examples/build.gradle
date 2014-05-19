@@ -40,11 +40,9 @@ subprojects {
       task integrationTest(type: Test, dependsOn: 'test') {
         outputs.upToDateWhen { false }
         include '**/*IT.*'
-        systemProperty 'geb.build.reportsDir', reporting.file('geb')
-      }
-
-      gretty {
-        integrationTestTask = 'integrationTest'
+        doFirst {
+          systemProperty 'geb.build.reportsDir', reporting.file('geb')
+        }
       }
     }
   }
