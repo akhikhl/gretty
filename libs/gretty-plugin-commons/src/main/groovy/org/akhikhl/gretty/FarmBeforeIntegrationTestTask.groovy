@@ -25,6 +25,10 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     }
   }
 
+  String getEffectiveIntegrationTestTask() {
+    farm.integrationTestTask ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
+  }
+
   @Override
   protected boolean getIntegrationTest() {
     true
@@ -32,12 +36,14 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
 
   void setupIntegrationTestTaskDependencies() {
     def thisTask = this
+    println "DBG ${thisTask.name}: effectiveIntegrationTestTask=${thisTask.effectiveIntegrationTestTask}"
+    println "DBG ${thisTask.name}: webAppProjects=${getWebAppConfigsForProjects().collect { project.project(it.projectPath) }}"
     getWebAppConfigsForProjects().each { webAppConfig ->
       def proj = project.project(it.projectPath)
       proj.tasks.all { t ->
-        if(t.name == thisTask.integrationTestTask) {
-          t.dependsOn thisTask
-          thisTask.dependsOn proj.tasks.testClasses
+        if(t.name == thisTask.effectiveIntegrationTestTask) {
+          t.mustRunAfter thisTask
+          thisTask.mustRunAfter proj.tasks.testClasses
         } else if(t instanceof JettyBeforeIntegrationTestTask)
           t.mustRunAfter thisTask
       }

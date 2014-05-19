@@ -7,13 +7,16 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 
 /**
  *
  * @author akhikhl
  */
-class FarmAfterIntegrationTestTask extends FarmStopTask {
+class FarmIntegrationTestTask extends DefaultTask {
+
+  String farmName = ''
 
   String integrationTestTask
 
@@ -28,8 +31,11 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     Map wrefs = [:]
     FarmConfigurer.mergeWebAppRefMaps(wrefs, webAppRefs)
     FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).webAppRefs)
-    if(!wrefs)
+    println "DBG 1 wrefs=$wrefs"
+    if(!wrefs) {
       wrefs = configurer.getDefaultWebAppRefMap()
+      println "DBG 2 wrefs=$wrefs"
+    }
     configurer.getWebAppConfigsForProjects(wrefs)
   }
 
@@ -40,9 +46,7 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     getWebAppConfigsForProjects().each {
       project.project(it.projectPath).tasks.all { t ->
         if(t.name == thisTask.effectiveIntegrationTestTask)
-          thisTask.mustRunAfter t
-        else if(t instanceof JettyAfterIntegrationTestTask)
-          thisTask.mustRunAfter t
+          thisTask.dependsOn t
       }
     }
   }
@@ -53,3 +57,4 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     webAppRefs[w] = options
   }
 }
+

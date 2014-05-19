@@ -168,6 +168,14 @@ abstract class FarmPluginBase implements Plugin<Project> {
             setupIntegrationTestTaskDependencies()
           }
 
+          project.task('farmIntegrationTest' + fname, type: FarmIntegrationTestTask, group: 'gretty') {
+            description = "Runs integration tests on farm web-apps."
+            farmName = fname
+            dependsOn 'farmBeforeIntegrationTest' + fname
+            finalizedBy 'farmAfterIntegrationTest' + fname
+            setupIntegrationTestTaskDependencies()
+          }
+
           project.task('farmAfterIntegrationTest' + fname, type: FarmAfterIntegrationTestTask, group: 'gretty') {
             description = "Stops ${farmDescr} after integration test."
             farmName = fname

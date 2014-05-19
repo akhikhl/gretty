@@ -79,10 +79,12 @@ class FarmConfigurer {
     webappConfig
   }
 
-  Iterable<WebAppConfig> getWebAppConfigsForProjects(Map webAppRefs, Boolean inplace = null) {
-    webAppRefs.findResults { webAppRef ->
-      def proj = resolveWebAppRefToProject(webAppRef)
-      proj ? getWebAppConfigForProject(proj, inplace) : null
+  Iterable<WebAppConfig> getWebAppConfigsForProjects(Map wrefs, Boolean inplace = null) {
+    wrefs.findResults { wref, options ->
+      inplace = options.inplace == null ? inplace : options.inplace
+      def proj = resolveWebAppRefToProject(wref)
+      println "DBG resolve ${wref} -> ${proj} -> ${proj ? getWebAppConfigForProject(options, proj, inplace) : null}"
+      proj ? getWebAppConfigForProject(options, proj, inplace) : null
     }
   }
 
@@ -96,22 +98,23 @@ class FarmConfigurer {
   }
 
   // attention: this method may modify project configurations and dependencies.
-  void resolveWebAppRefs(Map sourceWebAppRefs, Collection<WebAppConfig> destWebAppConfigs, Boolean inplace = null) {
-    sourceWebAppRefs.each { webAppRef, options ->
-      def proj = resolveWebAppRefToProject(webAppRef)
+  void resolveWebAppRefs(Map wrefs, Collection<WebAppConfig> destWebAppConfigs, Boolean inplace = null) {
+    wrefs.each { wref, options ->
+      inplace = options.inplace == null ? inplace : options.inplace
+      def proj = resolveWebAppRefToProject(wref)
       def warFile
       if(!proj) {
-        warFile = resolveWebAppRefToWarFile(webAppRef)
+        warFile = resolveWebAppRefToWarFile(wref)
         if(!warFile) {
-          webAppRef = webAppRef.toString()
-          def gav = webAppRef.split(':')
+          wref = wref.toString()
+          def gav = wref.split(':')
           if(gav.length != 3)
-            throw new GradleException("'${webAppRef}' is not an existing project or file or maven dependency.")
-          log.warn '{} is not an existing project or war-file, treating it as a maven dependency', webAppRef
+            throw new GradleException("'${wref}' is not an existing project or file or maven dependency.")
+          log.warn '{} is not an existing project or war-file, treating it as a maven dependency', wref
           if(!options.suppressMavenToProjectResolution) {
             proj = project.rootProject.allprojects.find { it.group == gav[0] && it.name == gav[1] }
             if(proj)
-              log.warn '{} comes from project {}, so using project instead of maven dependency', webAppRef, proj.path
+              log.warn '{} comes from project {}, so using project instead of maven dependency', wref, proj.path
           }
         }
       }
@@ -122,8 +125,8 @@ class FarmConfigurer {
         webappConfig = getWebAppConfigForWarFile(options, warFile)
       else {
         project.configurations.maybeCreate('farm')
-        project.dependencies.add 'farm', webAppRef
-        webappConfig = getWebAppConfigForMavenDependency(options, webAppRef)
+        project.dependencies.add 'farm', wref
+        webappConfig = getWebAppConfigForMavenDependency(options, wref)
       }
       destWebAppConfigs.add(webappConfig)
     }
