@@ -32,15 +32,17 @@ class JettyBeforeIntegrationTestTask extends JettyStartTask {
       if(t.name == thisTask.effectiveIntegrationTestTask) {
         t.dependsOn thisTask
         thisTask.dependsOn project.tasks.testClasses
+        if(t.name != 'test' && project.tasks.findByName('test'))
+          thisTask.mustRunAfter project.tasks.test
         if(t instanceof JavaForkOptions) {
           t.doFirst {
             if(thisTask.didWork) {
               def runConfig = thisTask.getRunConfig()
               def port = runConfig.serverConfig.port
               def contextPath = runConfig.webAppConfigs[0].contextPath
-              systemProperty 'gretty.port', port
-              systemProperty 'gretty.contextPath', contextPath
-              systemProperty 'gretty.baseURI', "http://localhost:${port}${contextPath}"
+              t.systemProperty 'gretty.port', port
+              t.systemProperty 'gretty.contextPath', contextPath
+              t.systemProperty 'gretty.baseURI', "http://localhost:${port}${contextPath}"
             }
           }
         }
