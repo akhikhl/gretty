@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory
  */
 class FarmBeforeIntegrationTestTask extends FarmStartTask {
 
+  String integrationTestTask
+
   FarmBeforeIntegrationTestTask() {
     doFirst {
       getWebAppProjects().each {
@@ -29,7 +31,7 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
   }
 
   String getEffectiveIntegrationTestTask() {
-    farm.integrationTestTask ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
+    integrationTestTask ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
   }
 
   @Override
@@ -54,7 +56,7 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
                 if(!configurer) {
                   configurer = new FarmConfigurer(thisTask.project)
                   tempFarm = new Farm()
-                  configurer.configureFarm(tempFarm, farm, configurer.getProjectFarm(farmName))
+                  configurer.configureFarm(tempFarm, new Farm(serverConfig: thisTask.serverConfig, webAppRefs: thisTask.webAppRefs), configurer.getProjectFarm(farmName))
                 }
                 def port = tempFarm.serverConfig.port
                 t.systemProperty 'gretty.port', port
