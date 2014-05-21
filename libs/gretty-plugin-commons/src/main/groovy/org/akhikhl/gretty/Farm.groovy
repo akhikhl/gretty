@@ -23,6 +23,12 @@ class Farm {
 
   String integrationTestTask
 
+  protected afterEvaluate = []
+
+  void afterEvaluate(Closure closure) {
+    afterEvaluate.add(closure)
+  }
+
   void webapp(Map options = [:], w) {
     if(w instanceof Project)
       w = w.path

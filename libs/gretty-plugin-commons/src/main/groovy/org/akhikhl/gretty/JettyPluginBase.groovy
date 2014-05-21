@@ -205,6 +205,12 @@ abstract class JettyPluginBase implements Plugin<Project> {
         description = 'Stops jetty server after integration test.'
         setupIntegrationTestTaskDependencies()
       }
+
+      for(Closure afterEvaluateClosure in project.gretty.afterEvaluate) {
+        afterEvaluateClosure.delegate = project.gretty
+        afterEvaluateClosure.resolveStrategy = Closure.DELEGATE_FIRST
+        afterEvaluateClosure()
+      }
     } // afterEvaluate
   } // apply
 

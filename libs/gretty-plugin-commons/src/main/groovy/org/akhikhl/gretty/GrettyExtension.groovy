@@ -22,6 +22,12 @@ class GrettyExtension {
 
   String integrationTestTask = 'integrationTest'
 
+  protected afterEvaluate = []
+
+  void afterEvaluate(Closure closure) {
+    afterEvaluate.add(closure)
+  }
+
   void overlay(def newValue) {
     if(!(newValue instanceof String))
       throw new GradleException("Overlay ${newValue?.toString()} should be a string")

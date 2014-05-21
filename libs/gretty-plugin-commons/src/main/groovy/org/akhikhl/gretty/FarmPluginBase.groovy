@@ -177,6 +177,12 @@ abstract class FarmPluginBase implements Plugin<Project> {
           setupIntegrationTestTaskDependencies()
         }
 
+        for(Closure afterEvaluateClosure in farm.afterEvaluate) {
+          afterEvaluateClosure.delegate = farm
+          afterEvaluateClosure.resolveStrategy = Closure.DELEGATE_FIRST
+          afterEvaluateClosure()
+        }
+
       } // farmsMap
     } // afterEvaluate
   } // apply
