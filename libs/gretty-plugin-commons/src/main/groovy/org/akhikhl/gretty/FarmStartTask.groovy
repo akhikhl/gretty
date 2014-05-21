@@ -45,6 +45,11 @@ class FarmStartTask extends StartBaseTask {
     }
   }
 
+  @Override
+  protected String getStopTaskName() {
+    'farmStop' + farmName
+  }
+
   Iterable<WebAppConfig> getWebAppConfigsForProjects() {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Map wrefs = [:]

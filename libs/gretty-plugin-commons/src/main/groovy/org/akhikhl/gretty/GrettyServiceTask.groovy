@@ -8,7 +8,7 @@
 package org.akhikhl.gretty
 
 /**
- * This class is deprecated, please use JettyServiceTask instead.
+ * This class is deprecated, please use JettyStopTask and JettyRestartTask instead.
  *
  * @author akhikhl
  */

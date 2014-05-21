@@ -120,35 +120,31 @@ abstract class FarmPluginBase implements Plugin<Project> {
         }
 
         project.task('farmStart' + fname, type: FarmStartTask, group: 'gretty') {
-          description = "Starts ${farmDescr} inplace (stopped by 'farmStop')."
+          description = "Starts ${farmDescr} inplace (stopped by 'farmStop${fname}')."
           farmName = fname
           interactive = false
-          stopTask = 'farmStop' + fname
         }
 
         project.task('farmStartDebug' + fname, type: FarmStartTask, group: 'gretty') {
-          description = "Starts ${farmDescr} inplace, in debug mode (stopped by 'farmStop')."
+          description = "Starts ${farmDescr} inplace, in debug mode (stopped by 'farmStop${fname}')."
           farmName = fname
           interactive = false
           debug = true
-          stopTask = 'farmStop' + fname
         }
 
         project.task('farmStartWar' + fname, type: FarmStartTask, group: 'gretty') {
-          description = "Starts ${farmDescr} on WAR-files (stopped by 'farmStop')."
+          description = "Starts ${farmDescr} on WAR-files (stopped by 'farmStop${fname}')."
           farmName = fname
           interactive = false
           inplace = false
-          stopTask = 'farmStop' + fname
         }
 
         project.task('farmStartWarDebug' + fname, type: FarmStartTask, group: 'gretty') {
-          description = "Starts ${farmDescr} on WAR-files, in debug (stopped by 'farmStop')."
+          description = "Starts ${farmDescr} on WAR-files, in debug (stopped by 'farmStop${fname}')."
           farmName = fname
           interactive = false
           debug = true
           inplace = false
-          stopTask = 'farmStop' + fname
         }
 
         project.task('farmStop' + fname, type: FarmStopTask, group: 'gretty') {

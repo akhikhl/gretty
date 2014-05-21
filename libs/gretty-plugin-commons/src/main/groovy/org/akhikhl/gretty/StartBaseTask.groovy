@@ -23,11 +23,10 @@ abstract class StartBaseTask extends DefaultTask {
 
   boolean interactive = true
   boolean debug = false
-  String stopTask = 'jettyStop'
 
   @TaskAction
   void action() {
-    def runner = new Runner(project, getRunConfig(), interactive, debug, getIntegrationTest(), stopTask)
+    def runner = new Runner(project, getRunConfig(), interactive, debug, getIntegrationTest(), getStopTaskName())
     runner.run()
   }
 
@@ -36,4 +35,6 @@ abstract class StartBaseTask extends DefaultTask {
   }
 
   protected abstract RunConfig getRunConfig()
+
+  protected abstract String getStopTaskName()
 }
