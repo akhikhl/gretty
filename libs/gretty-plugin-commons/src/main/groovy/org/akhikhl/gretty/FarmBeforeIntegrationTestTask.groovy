@@ -46,6 +46,8 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
         if(t.name == thisTask.effectiveIntegrationTestTask) {
           t.mustRunAfter thisTask
           thisTask.mustRunAfter proj.tasks.testClasses
+          if(t.name != 'test' && project.tasks.findByName('test'))
+            thisTask.mustRunAfter project.tasks.test
           if(t instanceof JavaForkOptions) {
             t.doFirst {
               if(thisTask.didWork) {
@@ -55,14 +57,14 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
                   configurer.configureFarm(tempFarm, farm, configurer.getProjectFarm(farmName))
                 }
                 def port = tempFarm.serverConfig.port
-                systemProperty 'gretty.port', port
+                t.systemProperty 'gretty.port', port
                 def options = tempFarm.webAppRefs.find { key, value -> configurer.resolveWebAppRefToProject(key) == proj }.value
                 def webappConfig = configurer.getWebAppConfigForProject(options, proj, thisTask.inplace)
                 webappConfig.prepareToRun()
                 def contextPath = webappConfig.contextPath
-                systemProperty 'gretty.contextPath', contextPath
-                systemProperty 'gretty.baseURI', "http://localhost:${port}${contextPath}"
-                systemProperty 'gretty.farm', (farmName ?: 'default')
+                t.systemProperty 'gretty.contextPath', contextPath
+                t.systemProperty 'gretty.baseURI', "http://localhost:${port}${contextPath}"
+                t.systemProperty 'gretty.farm', (farmName ?: 'default')
               }
             }
           }
