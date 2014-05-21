@@ -1,7 +1,13 @@
 apply plugin: 'java'
+apply from: rootProject.file('integrationTests.gradle')
 
 ext {
   jetty9_servlet_api_version = '3.1.0'
+}
+
+repositories {
+  mavenLocal()
+  jcenter()
 }
 
 dependencies {

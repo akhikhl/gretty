@@ -1,15 +1,5 @@
-buildscript {
-  repositories {
-    mavenLocal()
-    jcenter()
-  }
-
-  dependencies {
-    classpath 'org.akhikhl.gretty:gretty7-plugin:0.0.17'
-  }
-}
-
 apply plugin: 'gretty7'
+apply from: rootProject.file('integrationTests.gradle')
 
 dependencies {
   compile 'commons-configuration:commons-configuration:1.9'

@@ -1,15 +1,5 @@
-buildscript {
-  repositories {
-    mavenLocal()
-    jcenter()
-  }
-
-  dependencies {
-    classpath 'org.akhikhl.gretty:gretty8-plugin:0.0.17'
-  }
-}
-
 apply plugin: 'gretty8'
+apply from: rootProject.file('integrationTests.gradle')
 
 gretty {
   overlay ':testAnnotations8'

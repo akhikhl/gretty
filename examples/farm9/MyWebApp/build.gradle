@@ -1,5 +1,6 @@
 apply plugin: 'gretty9'
 apply plugin: 'gretty9-farm'
+apply from: rootProject.file('integrationTests.gradle')
 
 gretty {
   scanInterval = 1
@@ -7,18 +8,18 @@ gretty {
 }
 
 /*
-  This is unnamed (default) farm.
+  This is default farm.
   It provides farm-specific tasks, for example farmRun, farmStart, farmStop.
-  If you completely omit farm specification, gretty automatically generates farm
-  for all subprojects of current project.
+  If you completely omit farm specification, gretty automatically includes
+  all subprojects of current project into farm.
 */
 farm {
   scanInterval = 1
 
-  // can specify web-app as this project
+  // can add this project
   webapp project
 
-  // can specify web-app as another project in the same project tree
+  // can add another project in the same project tree
   webapp ':farm9:MyWebService'
 
   // same as before
@@ -27,19 +28,19 @@ farm {
   // can override any gretty properties by passing them as hashmap parameters
   //webapp ':farm9:MyWebService2', contextPath: '/specialContextPath'
 
-  // can specify web-app as maven artifact
+  // can add maven artifact
   // webapp 'org.akhikhl.gretty.examples:MyWebService:1.0'
 
-  // can specify web-app as absolute path to war-file
+  // can add absolute path to war-file
   //webapp '/home/user/someDir/MyWebService-1.0.war'
 
-  // can specify web-app as absolute file to war-file
+  // can add absolute file to war-file
   //webapp new File('/home/user/someDir/MyWebService-1.0.war')
 
-  // can specify web-app as relative (to this project) path to war-file
+  // can add relative (to this project) path to war-file
   //webapp 'someDir/MyWebService-1.0.war'
 
-  // can specify web-app as relative (to this project) file to war-file
+  // can add relative (to this project) file to war-file
   //webapp new File('someDir/MyWebService-1.0.war')
 }
 
