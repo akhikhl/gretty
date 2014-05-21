@@ -42,11 +42,6 @@ farm {
 
   // can add relative (to this project) file to war-file
   //webapp new File('someDir/MyWebService-1.0.war')
-  
-  afterEvaluate {
-    println tasks.farmRun.properties.keySet()
-    tasks.farmRun.port = 5050
-  }
 }
 
 /*
