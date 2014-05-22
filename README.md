@@ -25,7 +25,7 @@ You can systematically learn all about Gretty in [wiki pages](../../wiki).
 
 #### System requirements
 
-Gretty reequires JDK7 or JDK8 and Gradle 1.11 and newer.
+Gretty reequires JDK7 or JDK8 and Gradle 1.11 or newer.
 
 Support of JDK6 is coming soon.
 
