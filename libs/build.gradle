@@ -1,0 +1,23 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.3'
+  }
+}
+
+ext {
+  jetty7_version = '7.6.14.v20131031'
+  jetty7_servlet_api_version = '2.5'
+  jetty8_version = '8.1.8.v20121106'
+  jetty8_servlet_api_version = '3.0.1'
+  jetty9_version = '9.1.0.v20131115'
+  jetty9_servlet_api_version = '3.1.0'
+  asm_version = '5.0.1'
+  groovy_version = '1.8.6' // this is groovy version supported by gradle 1.1.2
+  spock_version = '0.7-groovy-2.0'
+  logback_version = '1.1.2'
+  slf4j_version = '1.7.6'  
+}
+

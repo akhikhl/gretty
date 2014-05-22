@@ -1,6 +1,7 @@
-import org.apache.tools.ant.filters.*
+apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('libs/publish.gradle')
 
-apply plugin: 'groovy'
+import org.apache.tools.ant.filters.*
 
 dependencies {
   compile project(':libs:gretty-plugin-commons')

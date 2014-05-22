@@ -1,4 +1,5 @@
-apply plugin: 'groovy'
+apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
   compile "ch.qos.logback:logback-classic:$logback_version"

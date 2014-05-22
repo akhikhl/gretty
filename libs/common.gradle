@@ -1,0 +1,46 @@
+// include this file in subprojects:
+// apply from: rootProject.file('libs/common.gradle')
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven' // need this for installing artifacts locally
+
+repositories {
+  jcenter()
+}
+  
+group = rootProject.group
+version = rootProject.version
+
+dependencies {
+  compile "org.codehaus.groovy:groovy-all:${groovy_version}"
+  testCompile "org.spockframework:spock-core:${spock_version}"
+}
+
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+
+// lib projects should be always installed into "$HOME/.m2"
+project.tasks.build.finalizedBy project.tasks.install
+rootProject.tasks.buildExamples.dependsOn project.tasks.build
+rootProject.tasks.buildExamples.dependsOn project.tasks.install
+
+task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, description: 'Creates javadoc jar') {
+  dependsOn javadoc
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+  if(tasks.findByName('groovydoc')) {
+    dependsOn groovydoc
+    from groovydoc.destinationDir
+  }
+}
+
+artifacts {
+  archives sourcesJar, javadocJar
+}
+
