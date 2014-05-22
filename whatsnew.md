@@ -4,6 +4,10 @@
 
 ### What's new:
 
+### Version 0.0.19
+
+- Fixed compatibility issue: gretty would not start on JDK7, when taken from maven (not compiled from sources).
+
 ### Version 0.0.18
 
 - implemented [multiple web-apps feature](../../wiki/Multiple-web-aps-introduction).
