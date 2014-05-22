@@ -23,6 +23,12 @@ All versions of gretty are available at jcenter and maven central under the grou
 
 You can systematically learn all about Gretty in [wiki pages](../../wiki).
 
+#### System requirements
+
+Gretty reequires JDK7 or JDK8 and Gradle 1.11 and newer.
+
+Support of JDK6 is coming soon.
+
 #### Copyright and License
 
 Copyright 2013-2014 (c) Andrey Hihlovskiy
