@@ -5,18 +5,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty8-plugin:0.0.18'
-  }
-}
-
-buildscript {
-  repositories {
-    mavenLocal()
-    jcenter()
-  }
-
-  dependencies {
-    classpath 'org.akhikhl.gretty:gretty8-plugin:0.0.18'
+    classpath 'org.akhikhl.gretty:gretty8-plugin:0.0.19'
   }
 }
 
