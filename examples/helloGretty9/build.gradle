@@ -1,5 +1,16 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty9-plugin:0.0.18'
+  }
+}
+
 apply plugin: 'gretty9'
-apply from: rootProject.file('integrationTests.gradle')
+apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 dependencies {
   // not needed by gretty, we used it for template processing within webapp

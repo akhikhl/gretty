@@ -1,8 +1,24 @@
-[Project home](https://github.com/akhikhl/gretty) | [Main features](../../wiki/Main-features) | [Wiki pages](../../wiki)
+[Project home](https://github.com/akhikhl/gretty) | [Wiki home](../../wiki) | [Feature overview](../../wiki/Feature-overview)
 
 [![logo](http://akhikhl.github.io/gretty/media/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
 
 ### What's new:
+
+### Version 0.0.18
+
+- implemented [multiple web-apps feature](../../wiki/Multiple-web-aps-introduction).
+
+- implemented [debugger support for multiple web-apps](../../wiki/Debugging-a-farm).
+
+- implemented [integration tests support for multiple web-apps](../../wiki/Farm-integration-tests).
+
+- implemented gretty.afterEvaluate and farm.afterEvaluate closures for easy configuration of gretty tasks.
+
+- implemented highly customizable [gretty task classes](../../wiki/Gretty-task-classes) and [farm task classes](../../wiki/Farm-task-classes).
+
+- improved security of realmConfigFile: now it uses "${webAppDir}/WEB-INF" as a base folder, if you specify relative path.
+
+- completely rewritten documentation.
 
 ### Version 0.0.17
 
@@ -10,7 +26,7 @@
 
 ### Version 0.0.16
 
-- Reimplemented Gretty tasks as two reusable classes: [GrettyStartTask](../../wiki/GrettyStartTask) and [GrettyServiceTask](../../wiki/GrettyServiceTask). Don't worry, all task instances are still valid (jettyRun, jettyRunDebug, ...).
+- Reimplemented Gretty tasks as reusable classes.
 
 - Renamed integrationTestStatusPort to [statusPort](../../wiki/Configuration#statusPort).
 
@@ -40,7 +56,7 @@
 
 ### Version 0.0.11
 
-- Introduced configuration property [logbackConfigFile](../../Configuration#logbackConfigFile)
+- Introduced configuration property [logbackConfigFile](../../wiki/Gretty-Configuration#logbackConfigFile)
   (in response to [issue #6](https://github.com/akhikhl/gretty/issues/6) "Possibility to provide custom logback.xml or logback.groovy configuration")
 
 ### Version 0.0.10

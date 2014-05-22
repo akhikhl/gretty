@@ -1,3 +1,14 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty7-plugin:0.0.18'
+  }
+}
+
 apply plugin: 'gretty7'
 
 dependencies {
