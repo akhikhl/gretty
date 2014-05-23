@@ -4,6 +4,10 @@
 
 ### What's new:
 
+### Version 0.0.20
+
+- Fixed issue [No such property: absolutePath for class: java.lang.String error is thrown on jetty* build](https://github.com/akhikhl/gretty/issues/23)
+
 ### Version 0.0.19
 
 - Fixed compatibility issue: gretty would not start on JDK7, when taken from maven (not compiled from sources).
