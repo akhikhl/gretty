@@ -11,7 +11,11 @@ Gretty is a feature-rich gradle plugin for running web-apps on Jetty.
 It supports multiple Jetty versions (7, 8 and 9) out-of-the-box.
 It wraps many Jetty functions as convenient Gradle tasks and configuration DSL.
 
-:star: New and hot: since version 0.0.18 Gretty supports [multiple web-apps](../../wiki/Multiple-web-aps-introduction).
+#### :star: What's new and hot
+
+- [Multiple web-apps support](../../wiki/Multiple-web-aps-introduction)
+- [Integration tests support](../../wiki/Integration-tests-support)
+- Improvement of hot-deployment: [automatic recompilation of running web-app on source change](../../wiki/Hot-deployment)
 
 #### Where to start
 
