@@ -75,7 +75,7 @@ final class Runner {
           inplace webAppConfig.inplace
           webappClassPath webAppConfig.classPath
           contextPath webAppConfig.contextPath
-          resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase)
+          resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase ?: webAppConfig.warResourceBase.toString() ?: '')
           if(webAppConfig.initParameters)
             initParams webAppConfig.initParameters
           if(webAppConfig.realm && webAppConfig.realmConfigFile) {
@@ -111,7 +111,15 @@ final class Runner {
 
     System.out.println "Jetty server ${project.ext.jettyVersion} started."
     for(WebAppConfig webAppConfig in webAppConfigs) {
-      String webappName = webAppConfig.inplace ? webAppConfig.projectPath : new File(webAppConfig.warResourceBase).name
+      String webappName
+      if(webAppConfig.inplace)
+        webappName = webAppConfig.projectPath
+      else {
+        def warFile = webAppConfig.warResourceBase
+        if(!(warFile instanceof File))
+          warFile = new File(warFile.toString())
+        webappName = warFile.name
+      }
       System.out.println "${webappName} runs at the address http://localhost:${sconfig.port}${webAppConfig.contextPath}"
     }
     System.out.println "servicePort: ${sconfig.servicePort}, statusPort: ${sconfig.statusPort}"
