@@ -4,15 +4,23 @@
 
 ### What's new:
 
-### Version 0.0.20
+#### Version 0.0.21
+
+- Fixed issue [gretty-farm plugin throws IllegalStateException: zip file closed](https://github.com/akhikhl/gretty/issues/24)
+
+- Fixed issue [gretty-farm plugin throws ExecException (jdk1.7.0_55)](https://github.com/akhikhl/gretty/issues/25)
+
+- Fixed bug: stack-overflow exception when warResourceBase is assigned to java.io.File
+
+#### Version 0.0.20
 
 - Fixed issue [No such property: absolutePath for class: java.lang.String error is thrown on jetty* build](https://github.com/akhikhl/gretty/issues/23)
 
-### Version 0.0.19
+#### Version 0.0.19
 
 - Fixed compatibility issue: gretty would not start on JDK7, when taken from maven (not compiled from sources).
 
-### Version 0.0.18
+#### Version 0.0.18
 
 - implemented [multiple web-apps feature](../../wiki/Multiple-web-aps-introduction).
 
@@ -28,11 +36,11 @@
 
 - completely rewritten documentation.
 
-### Version 0.0.17
+#### Version 0.0.17
 
 - fixed incorrect parameter passing to javaexec in GrettyStartTask, preventing debug mode.
 
-### Version 0.0.16
+#### Version 0.0.16
 
 - Reimplemented Gretty tasks as reusable classes.
 
@@ -42,51 +50,51 @@
 
 - Updated documentation, added **nice diagrams** to every task description. See more at [wiki pages](../../wiki).
 
-### Version 0.0.15
+#### Version 0.0.15
 
 - Introduced configuration property [fastReload](../../wiki/Configuration#fastReload).
 
 - Fixed JDK-8 compatibility issues.
 
-### Version 0.0.14
+#### Version 0.0.14
 
 - Introduced configuration property [jvmArgs](../../wiki/Configuration#jvmArgs).
 
-### Version 0.0.13
+#### Version 0.0.13
 
 - Implemented [support of web fragments](../../wiki/Web-fragments-support)
 - Implemented integration tests for most of the examples
 - Introduced bintray publishing configuration in build.gradle
 
-### Version 0.0.12
+#### Version 0.0.12
 
 - Implemented [support of integration tests](../../wiki/Integration-tests-support)
 
-### Version 0.0.11
+#### Version 0.0.11
 
 - Introduced configuration property [logbackConfigFile](../../wiki/Gretty-Configuration#logbackConfigFile)
   (in response to [issue #6](https://github.com/akhikhl/gretty/issues/6) "Possibility to provide custom logback.xml or logback.groovy configuration")
 
-### Version 0.0.10
+#### Version 0.0.10
 
 - Fixed overlay WAR generation.
 - Upgraded to logback version 1.1.1 and slf4j version 1.7.6.
 - Updated documentation.
 
-### Version 0.0.9
+#### Version 0.0.9
 
 - Implemented out-of-the-box [JEE annotations support](../../wiki/JEE-annotations-support).
 - Various bug-fixes.
 
-### Version 0.0.8
+#### Version 0.0.8
 
 - Implemented support of [jetty.xml](../../wiki/jetty.xml-support) and [jetty-env.xml](../../wiki/jetty-env.xml-support).
 
-### Version 0.0.7
+#### Version 0.0.7
 
 - Implemented accurate re-configuration of logback loggers and appenders on hot-deployment.
 
-### Version 0.0.6
+#### Version 0.0.6
 
 - Implemented support of [multiple jetty versions and multiple servlet API versions](../../wiki/Switching-between-jetty-and-servlet-API-versions).
 
@@ -94,7 +102,7 @@
 
 - Implemented [debugger support](../../wiki/Debugger-support) and [logging](../../wiki/Logging).
 
-### Version 0.0.4
+#### Version 0.0.4
 
 - Implemented support of [hot deployment](../../wiki/Hot-deployment).
 
