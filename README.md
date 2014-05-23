@@ -13,7 +13,7 @@ It wraps many Jetty functions as convenient Gradle tasks and configuration DSL.
 
 #### :star: What's new and hot
 
-- [Multiple web-apps support](../../wiki/Multiple-web-aps-introduction)
+- [Multiple web-apps support](../../wiki/Multiple-web-apps-introduction)
 - [Integration tests support](../../wiki/Integration-tests-support)
 - Improvement of hot-deployment: [automatic recompilation of running web-app on source change](../../wiki/Hot-deployment)
 
