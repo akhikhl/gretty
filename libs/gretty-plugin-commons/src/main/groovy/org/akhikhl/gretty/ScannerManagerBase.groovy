@@ -146,7 +146,7 @@ abstract class ScannerManagerBase {
           connection.close()
         }
       }
-      ServiceControl.send(sconfig.servicePort, 'restart')
+      ServiceProtocol.send(sconfig.servicePort, 'restart')
     }
   }
 

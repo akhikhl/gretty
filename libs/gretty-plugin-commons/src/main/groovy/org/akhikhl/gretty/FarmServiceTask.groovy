@@ -30,7 +30,7 @@ abstract class FarmServiceTask extends DefaultTask {
     Farm farm = new Farm(servicePort: servicePort)
     configurer.configureFarm(farm, configurer.getProjectFarm(farmName))
     log.debug 'Sending command {} to port {}', command, farm.servicePort
-    ServiceControl.send(farm.servicePort, command)
+    ServiceProtocol.send(farm.servicePort, command)
   }
 
   abstract String getCommand()

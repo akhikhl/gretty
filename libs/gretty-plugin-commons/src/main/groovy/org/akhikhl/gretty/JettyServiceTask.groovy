@@ -29,7 +29,7 @@ abstract class JettyServiceTask extends DefaultTask {
     ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
     serverConfig.resolve(project)
     log.debug 'Sending command {} to port {}', command, serverConfig.servicePort
-    ServiceControl.send(serverConfig.servicePort, command)
+    ServiceProtocol.send(serverConfig.servicePort, command)
   }
 
   abstract String getCommand()

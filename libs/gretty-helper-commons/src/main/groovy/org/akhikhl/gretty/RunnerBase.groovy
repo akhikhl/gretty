@@ -7,9 +7,12 @@
  */
 package org.akhikhl.gretty
 
+import groovy.json.JsonSlurper
+
 abstract class RunnerBase {
 
   protected final Map params
+  protected boolean paramsLoaded = false
   protected server
 
   RunnerBase(Map params) {
@@ -34,9 +37,37 @@ abstract class RunnerBase {
   protected abstract int getServerPort()
 
   final void run() {
-    RunnerThread runnerThread = new RunnerThread(this)
-    runnerThread.start()
-    runnerThread.join()
+    try {
+      ServerSocket socket = new ServerSocket(params.servicePort, 1, InetAddress.getByName('127.0.0.1'))
+      try {
+        ServiceProtocol.send(params.statusPort, 'init')
+        while(true) {
+          def data = ServiceProtocol.readMessageFromServerSocket(socket)
+          if(!paramsLoaded) {
+            params << new JsonSlurper().parseText(data)
+            paramsLoaded = true
+            startServer()
+            ServiceProtocol.send(params.statusPort, 'started')
+            // Note that server is already in listening state.
+            // If client sends a command immediately after 'started' signal,
+            // the command is queued, so that socket.accept gets it anyway.
+            continue
+          }
+          if(data == 'stop') {
+            stopServer()
+            break
+          }
+          else if(data == 'restart') {
+            stopServer()
+            startServer()
+          }
+        }
+      } finally {
+        socket.close()
+      }
+    } catch(Exception e) {
+      throw new RuntimeException(e)
+    }
   }
 
   protected abstract void setHandlersToServer(List handlers)

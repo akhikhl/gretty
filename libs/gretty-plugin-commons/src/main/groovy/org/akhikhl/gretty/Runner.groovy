@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonBuilder
+import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
@@ -44,42 +45,19 @@ final class Runner {
     executorService = Executors.newSingleThreadExecutor()
   }
 
-  void run() {
-    for(WebAppConfig webAppConfig in webAppConfigs)
-      webAppConfig.prepareToRun()
-    Future futureStatus = ServiceControl.readMessage(executorService, sconfig.statusPort)
-    def runThread = Thread.start {
-      runJetty()
+  private getCommandLineJson() {
+    def json = new JsonBuilder()
+    json {
+      servicePort sconfig.servicePort
+      statusPort sconfig.statusPort
     }
-    def status = futureStatus.get()
-    log.debug 'Got status: {}', status
-    System.out.println "Jetty server ${project.ext.jettyVersion} started."
-    for(WebAppConfig webAppConfig in webAppConfigs) {
-      String webappName = webAppConfig.inplace ? webAppConfig.projectPath : new File(webAppConfig.warResourceBase).name
-      System.out.println "${webappName} runs at the address http://localhost:${sconfig.port}${webAppConfig.contextPath}"
-    }
-    System.out.println "servicePort: ${sconfig.servicePort}, statusPort: ${sconfig.statusPort}"
-    if(integrationTest)
-      project.ext.grettyRunnerThread = runThread
-    else {
-      if(interactive) {
-        System.out.println 'Press any key to stop the jetty server.'
-        System.in.read()
-        log.debug 'Sending command: {}', 'stop'
-        ServiceControl.send(sconfig.servicePort, 'stop')
-      } else
-        System.out.println "Run 'gradle ${stopTask}' to stop the jetty server."
-      runThread.join()
-      System.out.println 'Jetty server stopped.'
-    }
+    json
   }
 
-  private prepareJson() {
+  private getRunConfigJson() {
     def json = new JsonBuilder()
     json {
       port sconfig.port
-      servicePort sconfig.servicePort
-      statusPort sconfig.statusPort
       if(sconfig.jettyXmlFile)
         jettyXml sconfig.jettyXmlFile.absolutePath
       if(sconfig.logbackConfigFile)
@@ -109,21 +87,62 @@ final class Runner {
         }
       }
     }
-    return json
+    json
+  }
+
+  void run() {
+    for(WebAppConfig webAppConfig in webAppConfigs)
+      webAppConfig.prepareToRun()
+
+    Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
+    def runThread = Thread.start {
+      runJetty()
+    }
+    def status = futureStatus.get()
+    log.warn 'Got init status: {}', status
+
+    futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
+    def runConfigJson = getRunConfigJson()
+    log.warn 'Sending parameters to port {}', sconfig.servicePort
+    log.warn runConfigJson.toPrettyString()
+    ServiceProtocol.send(sconfig.servicePort, runConfigJson.toString())
+    status = futureStatus.get()
+    log.warn 'Got start status: {}', status
+
+    System.out.println "Jetty server ${project.ext.jettyVersion} started."
+    for(WebAppConfig webAppConfig in webAppConfigs) {
+      String webappName = webAppConfig.inplace ? webAppConfig.projectPath : new File(webAppConfig.warResourceBase).name
+      System.out.println "${webappName} runs at the address http://localhost:${sconfig.port}${webAppConfig.contextPath}"
+    }
+    System.out.println "servicePort: ${sconfig.servicePort}, statusPort: ${sconfig.statusPort}"
+
+    if(integrationTest)
+      project.ext.grettyRunnerThread = runThread
+    else {
+      if(interactive) {
+        System.out.println 'Press any key to stop the jetty server.'
+        System.in.read()
+        log.debug 'Sending command: {}', 'stop'
+        ServiceProtocol.send(sconfig.servicePort, 'stop')
+      } else
+        System.out.println "Run 'gradle ${stopTask}' to stop the jetty server."
+      runThread.join()
+      System.out.println 'Jetty server stopped.'
+    }
   }
 
   protected void runJetty() {
 
     sconfig.onStart*.call()
 
-    def json = prepareJson()
-    log.debug json.toPrettyString()
-    json = json.toString()
+    def cmdLineJson = getCommandLineJson()
+    log.debug 'Command-line json: {}', cmdLineJson.toPrettyString()
+    cmdLineJson = cmdLineJson.toString()
 
     // we are going to pass json as argument to java process.
     // under windows we must escape double quotes in process parameters.
     if(System.getProperty("os.name") =~ /(?i).*windows.*/)
-      json = json.replace('"', '\\"')
+      cmdLineJson = cmdLineJson.replace('"', '\\"')
 
     ScannerManagerBase scanman = project.ext.scannerManagerFactory.createScannerManager()
     scanman.startScanner(project, sconfig, webAppConfigs)
@@ -132,7 +151,7 @@ final class Runner {
       project.javaexec { spec ->
         spec.classpath = project.configurations.gretty
         spec.main = 'org.akhikhl.gretty.Runner'
-        spec.args = [ json ]
+        spec.args = [ cmdLineJson ]
         spec.jvmArgs = sconfig.jvmArgs
         spec.debug = self.debug
       }
