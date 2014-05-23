@@ -21,12 +21,12 @@ class ServerConfig {
   Integer statusPort
   def jettyXmlFile
   Integer scanInterval
-  String logbackConfigFile
+  def logbackConfigFile
   String loggingLevel
   Boolean consoleLogEnabled
   Boolean fileLogEnabled
-  String logFileName
-  String logDir
+  def logFileName
+  def logDir
   List<Closure> onStart
   List<Closure> onStop
   List<Closure> onScan
