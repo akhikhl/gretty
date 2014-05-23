@@ -99,15 +99,15 @@ final class Runner {
       runJetty()
     }
     def status = futureStatus.get()
-    log.warn 'Got init status: {}', status
+    log.debug 'Got init status: {}', status
 
     futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
     def runConfigJson = getRunConfigJson()
-    log.warn 'Sending parameters to port {}', sconfig.servicePort
-    log.warn runConfigJson.toPrettyString()
+    log.debug 'Sending parameters to port {}', sconfig.servicePort
+    log.debug runConfigJson.toPrettyString()
     ServiceProtocol.send(sconfig.servicePort, runConfigJson.toString())
     status = futureStatus.get()
-    log.warn 'Got start status: {}', status
+    log.debug 'Got start status: {}', status
 
     System.out.println "Jetty server ${project.ext.jettyVersion} started."
     for(WebAppConfig webAppConfig in webAppConfigs) {
