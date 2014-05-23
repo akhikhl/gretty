@@ -19,9 +19,9 @@ If you are new with gretty, good starting points would be [getting started](../.
 
 If you already use gretty, it is always a good idea to look in [what's new](whatsnew.md) section.
 
-All versions of gretty are available at jcenter and maven central under the group 'org.akhikhl.gretty'. See more in [usage](../../wiki/Usage) section.
-
 You can systematically learn all about Gretty in [wiki pages](../../wiki).
+
+All versions of gretty are available at [jcenter](https://bintray.com/akhikhl/maven/gretty/view) and [maven central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22) under the group 'org.akhikhl.gretty'.
 
 #### System requirements
 
