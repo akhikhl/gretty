@@ -1,0 +1,88 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty9-plugin:0.0.21'
+  }
+}
+
+apply plugin: 'gretty9'
+apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+apply plugin: 'jacoco'
+
+dependencies {
+  // not needed by gretty, we used it for template processing within webapp
+  compile 'org.apache.velocity:velocity:1.7'
+  testCompile 'ch.qos.logback:logback-classic:1.1.2'
+}
+
+gretty {
+  scanInterval = 1
+  fastReload = true
+  
+  // gretty.afterEvaluate is executed, when standard gretty tasks are already created
+  afterEvaluate {
+
+    // "jacoco" extension is created automatically for all JettyBeforeIntegrationTest tasks
+    // and has type org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+    tasks.jettyBeforeIntegrationTest.jacoco {
+      append = false
+      destinationFile = new File(project.buildDir, 'jacoco/integrationTest_server.exec')
+      // excludes.add 'hellogretty.ExampleServlet'
+    }
+    
+    // reports should be generated only after integration tests
+    tasks.jettyAfterIntegrationTest {
+      finalizedBy tasks.integrationTestClientReport
+      finalizedBy tasks.integrationTestServerReport
+    }
+  }
+}
+
+// "jacoco" extension is created automatically for all Test tasks
+// and has type org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+tasks.integrationTest.jacoco {
+  append = false
+  destinationFile = new File(project.buildDir, 'jacoco/integrationTest_client.exec')
+  // excludes.add 'hellogretty.RequestResponseIT'
+}
+
+task('integrationTestClientReport', type: JacocoReport) {
+
+  executionData project.tasks.integrationTest
+  
+  sourceDirectories = project.files(project.sourceSets.test.allSource.srcDirs)
+  classDirectories = project.sourceSets.test.output
+  
+  def reportDir = project.reporting.file("jacoco/integrationTest_client/html")
+  reports {
+    html.destination = reportDir
+  }
+  doLast {
+    System.out.println "Jacoco report for client created: file://${reportDir.toURI().path}"
+  }  
+}
+
+task('integrationTestServerReport', type: JacocoReport) {
+
+  // executionData must be closure, because jettyBeforeIntegrationTest is not defined yet.
+  // We must pass jacoco.destinationFile, not jettyBeforeIntegrationTest itself,
+  // because otherwise JacocoReport would translate task argument to closure and project.files
+  // (which is used internally by executionData) is not able to resolve recursive closures.
+  executionData { tasks.jettyBeforeIntegrationTest.jacoco.destinationFile }
+  
+  sourceDirectories = project.files(project.sourceSets.main.allSource.srcDirs)
+  classDirectories = project.sourceSets.main.output
+  
+  def reportDir = project.reporting.file("jacoco/integrationTest_server/html")
+  reports {
+    html.destination = reportDir
+  }
+  doLast {
+    System.out.println "Jacoco report for server created: file://${reportDir.toURI().path}"
+  }  
+}
+

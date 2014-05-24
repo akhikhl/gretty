@@ -25,23 +25,18 @@ final class Runner {
 
   protected static final Logger log = LoggerFactory.getLogger(Runner)
 
+  protected final StartBaseTask startTask
   protected final Project project
-  protected final ServerConfig sconfig
-  protected final Iterable<WebAppConfig> webAppConfigs
-  protected final boolean interactive
-  protected final boolean debug
-  protected final boolean integrationTest
-  private ExecutorService executorService
-  private String stopTask
+  protected ServerConfig sconfig
+  protected Iterable<WebAppConfig> webAppConfigs
+  protected final ExecutorService executorService
 
-  Runner(Project project, RunConfig runConfig, boolean interactive, boolean debug, boolean integrationTest, String stopTask) {
-    this.project = project
-    this.sconfig = runConfig.getServerConfig()
-    this.webAppConfigs = runConfig.getWebAppConfigs()
-    this.interactive = interactive
-    this.debug = debug
-    this.integrationTest = integrationTest
-    this.stopTask = stopTask
+  Runner(StartBaseTask startTask) {
+    this.startTask = startTask
+    project = startTask.project
+    RunConfig runConfig = startTask.getRunConfig()
+    sconfig = runConfig.getServerConfig()
+    webAppConfigs = runConfig.getWebAppConfigs()
     executorService = Executors.newSingleThreadExecutor()
   }
 
@@ -124,16 +119,16 @@ final class Runner {
     }
     System.out.println "servicePort: ${sconfig.servicePort}, statusPort: ${sconfig.statusPort}"
 
-    if(integrationTest)
+    if(startTask.getIntegrationTest())
       project.ext.grettyRunnerThread = runThread
     else {
-      if(interactive) {
+      if(startTask.interactive) {
         System.out.println 'Press any key to stop the jetty server.'
         System.in.read()
         log.debug 'Sending command: {}', 'stop'
         ServiceProtocol.send(sconfig.servicePort, 'stop')
       } else
-        System.out.println "Run 'gradle ${stopTask}' to stop the jetty server."
+        System.out.println "Run 'gradle ${startTask.getStopTaskName()}' to stop the jetty server."
       runThread.join()
       System.out.println 'Jetty server stopped.'
     }
@@ -160,10 +155,13 @@ final class Runner {
         spec.classpath = project.configurations.gretty
         spec.main = 'org.akhikhl.gretty.Runner'
         spec.args = [ cmdLineJson ]
-        spec.debug = self.debug
+        spec.debug = startTask.debug
         spec.jvmArgs sconfig.jvmArgs
-        if(project.extensions.findByName('jacoco'))
-          project.jacoco.applyTo(new JacocoJavaForkOptionsWrapper(project, spec))
+        if(startTask.jacoco) {
+          String jarg = startTask.jacoco.getAsJvmArg()
+          log.debug 'jacoco jvmArgs: {}', jarg
+          spec.jvmArgs jarg
+        }
       }
     } finally {
       scanman.stopScanner()

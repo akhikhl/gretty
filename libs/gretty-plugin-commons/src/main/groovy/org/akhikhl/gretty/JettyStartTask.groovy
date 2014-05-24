@@ -30,7 +30,7 @@ class JettyStartTask extends StartBaseTask {
   }
 
   @Override
-  protected RunConfig getRunConfig() {
+  RunConfig getRunConfig() {
 
     ServerConfig sconfig = new ServerConfig()
     ConfigUtils.complementProperties(sconfig, serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))

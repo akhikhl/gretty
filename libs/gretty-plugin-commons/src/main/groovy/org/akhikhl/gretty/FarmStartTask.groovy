@@ -26,7 +26,7 @@ class FarmStartTask extends StartBaseTask {
   boolean inplace = true
 
   @Override
-  protected RunConfig getRunConfig() {
+  RunConfig getRunConfig() {
 
     FarmConfigurer configurer = new FarmConfigurer(project)
 

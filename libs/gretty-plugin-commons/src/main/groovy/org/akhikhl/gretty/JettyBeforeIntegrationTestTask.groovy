@@ -8,7 +8,6 @@
 package org.akhikhl.gretty
 
 import org.gradle.process.JavaForkOptions
-import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -22,6 +21,11 @@ class JettyBeforeIntegrationTestTask extends JettyStartTask {
 
   private String integrationTestTask_
   private boolean integrationTestTaskAssigned
+
+  @Override
+  protected boolean getDefaultJacocoEnabled() {
+    true
+  }
 
   @Override
   protected boolean getIntegrationTest() {
@@ -54,8 +58,6 @@ class JettyBeforeIntegrationTestTask extends JettyStartTask {
             if(thisTask.didWork)
               passSystemPropertiesToIntegrationTask(t)
           }
-          if(project.extensions.findByName('jacoco') && !t.extensions.findByName('jacoco'))
-            project.jacoco.applyTo t
         }
       }
     }
