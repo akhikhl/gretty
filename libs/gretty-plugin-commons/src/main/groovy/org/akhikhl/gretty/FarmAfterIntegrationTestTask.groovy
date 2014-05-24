@@ -9,6 +9,8 @@ package org.akhikhl.gretty
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
@@ -16,7 +18,10 @@ import org.gradle.api.tasks.TaskAction
  */
 class FarmAfterIntegrationTestTask extends FarmStopTask {
 
-  String integrationTestTask
+  private static final Logger log = LoggerFactory.getLogger(FarmBeforeIntegrationTestTask)
+
+  private String integrationTestTask_
+  private boolean integrationTestTaskAssigned
 
   protected Map webAppRefs = [:]
 
@@ -30,8 +35,12 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     System.out.println 'Jetty server stopped.'
   }
 
-  String getEffectiveIntegrationTestTask() {
-    integrationTestTask ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
+  String getIntegrationTestTask() {
+    integrationTestTask_ ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
+  }
+
+  boolean getIntegrationTestTaskAssigned() {
+    integrationTestTaskAssigned
   }
 
   Iterable<Project> getWebAppProjects() {
@@ -44,16 +53,22 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     configurer.getWebAppProjects(wrefs)
   }
 
-  void setupIntegrationTestTaskDependencies() {
+  void integrationTestTask(String integrationTestTask) {
+    if(integrationTestTaskAssigned) {
+      log.warn '{}.integrationTestTask is already set to "{}", so "{}" is ignored', name, getIntegrationTestTask(), integrationTestTask
+      return
+    }
+    integrationTestTask_ = integrationTestTask
     def thisTask = this
     getWebAppProjects().each {
       it.tasks.all { t ->
-        if(t.name == thisTask.effectiveIntegrationTestTask)
+        if(t.name == thisTask.integrationTestTask)
           thisTask.mustRunAfter t
         else if(t instanceof JettyAfterIntegrationTestTask)
           thisTask.mustRunAfter t
       }
     }
+    integrationTestTaskAssigned = true
   }
 
   void webapp(Map options = [:], w) {

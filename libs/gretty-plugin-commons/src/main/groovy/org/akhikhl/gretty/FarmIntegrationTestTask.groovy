@@ -18,12 +18,17 @@ class FarmIntegrationTestTask extends DefaultTask {
 
   String farmName = ''
 
-  String integrationTestTask
+  private String integrationTestTask_
+  private boolean integrationTestTaskAssigned
 
   protected Map webAppRefs = [:]
 
-  String getEffectiveIntegrationTestTask() {
-    integrationTestTask ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
+  String getIntegrationTestTask() {
+    integrationTestTask_ ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
+  }
+
+  boolean getIntegrationTestTaskAssigned() {
+    integrationTestTaskAssigned
   }
 
   Iterable<Project> getWebAppProjects() {
@@ -36,14 +41,20 @@ class FarmIntegrationTestTask extends DefaultTask {
     configurer.getWebAppProjects(wrefs)
   }
 
-  void setupIntegrationTestTaskDependencies() {
+  void integrationTestTask(String integrationTestTask) {
+    if(integrationTestTaskAssigned) {
+      log.warn '{}.integrationTestTask is already set to "{}", so "{}" is ignored', name, getIntegrationTestTask(), integrationTestTask
+      return
+    }
+    integrationTestTask_ = integrationTestTask
     def thisTask = this
     getWebAppProjects().each {
       it.tasks.all { t ->
-        if(t.name == thisTask.effectiveIntegrationTestTask)
+        if(t.name == thisTask.integrationTestTask)
           thisTask.dependsOn t
       }
     }
+    integrationTestTaskAssigned = true
   }
 
   void webapp(Map options = [:], w) {
@@ -52,4 +63,3 @@ class FarmIntegrationTestTask extends DefaultTask {
     webAppRefs[w] = options
   }
 }
-

@@ -198,12 +198,10 @@ abstract class JettyPluginBase implements Plugin<Project> {
 
       project.task('jettyBeforeIntegrationTest', type: JettyBeforeIntegrationTestTask, group: 'gretty') {
         description = 'Starts jetty server before integration test.'
-        setupIntegrationTestTaskDependencies()
       }
 
       project.task('jettyAfterIntegrationTest', type: JettyAfterIntegrationTestTask, group: 'gretty') {
         description = 'Stops jetty server after integration test.'
-        setupIntegrationTestTaskDependencies()
       }
 
       for(Closure afterEvaluateClosure in project.gretty.afterEvaluate) {
@@ -211,6 +209,13 @@ abstract class JettyPluginBase implements Plugin<Project> {
         afterEvaluateClosure.resolveStrategy = Closure.DELEGATE_FIRST
         afterEvaluateClosure()
       }
+
+      if(!project.tasks.jettyBeforeIntegrationTest.integrationTestTaskAssigned)
+        project.tasks.jettyBeforeIntegrationTest.integrationTestTask null // default binding
+
+      if(!project.tasks.jettyAfterIntegrationTest.integrationTestTaskAssigned)
+        project.tasks.jettyAfterIntegrationTest.integrationTestTask null // default binding
+
     } // afterEvaluate
   } // apply
 

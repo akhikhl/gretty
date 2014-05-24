@@ -160,7 +160,6 @@ abstract class FarmPluginBase implements Plugin<Project> {
         project.task('farmBeforeIntegrationTest' + fname, type: FarmBeforeIntegrationTestTask, group: 'gretty') {
           description = "Starts ${farmDescr} before integration test."
           farmName = fname
-          setupIntegrationTestTaskDependencies()
         }
 
         project.task('farmIntegrationTest' + fname, type: FarmIntegrationTestTask, group: 'gretty') {
@@ -168,13 +167,11 @@ abstract class FarmPluginBase implements Plugin<Project> {
           farmName = fname
           dependsOn 'farmBeforeIntegrationTest' + fname
           finalizedBy 'farmAfterIntegrationTest' + fname
-          setupIntegrationTestTaskDependencies()
         }
 
         project.task('farmAfterIntegrationTest' + fname, type: FarmAfterIntegrationTestTask, group: 'gretty') {
           description = "Stops ${farmDescr} after integration test."
           farmName = fname
-          setupIntegrationTestTaskDependencies()
         }
 
         for(Closure afterEvaluateClosure in farm.afterEvaluate) {
@@ -182,6 +179,15 @@ abstract class FarmPluginBase implements Plugin<Project> {
           afterEvaluateClosure.resolveStrategy = Closure.DELEGATE_FIRST
           afterEvaluateClosure()
         }
+
+        if(!project.tasks.farmBeforeIntegrationTest.integrationTestTaskAssigned)
+          project.tasks.farmBeforeIntegrationTest.integrationTestTask null // default binding
+
+        if(!project.tasks.farmIntegrationTest.integrationTestTaskAssigned)
+          project.tasks.farmIntegrationTest.integrationTestTask null // default binding
+
+        if(!project.tasks.farmAfterIntegrationTest.integrationTestTaskAssigned)
+          project.tasks.farmAfterIntegrationTest.integrationTestTask null // default binding
 
       } // farmsMap
     } // afterEvaluate

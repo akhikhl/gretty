@@ -21,7 +21,7 @@ class Farm {
   // key is project path or war path, value is options
   Map webAppRefs = [:]
 
-  String integrationTestTask
+  String integrationTestTask = 'integrationTest'
 
   protected afterEvaluate = []
 

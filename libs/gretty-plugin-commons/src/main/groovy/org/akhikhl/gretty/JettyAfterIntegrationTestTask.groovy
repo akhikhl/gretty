@@ -8,6 +8,8 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.tasks.TaskAction
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
@@ -15,7 +17,10 @@ import org.gradle.api.tasks.TaskAction
  */
 class JettyAfterIntegrationTestTask extends JettyStopTask {
 
-  String integrationTestTask
+  private static final Logger log = LoggerFactory.getLogger(JettyAfterIntegrationTestTask)
+
+  private String integrationTestTask_
+  private boolean integrationTestTaskAssigned
 
   @TaskAction
   void action() {
@@ -27,15 +32,25 @@ class JettyAfterIntegrationTestTask extends JettyStopTask {
     System.out.println 'Jetty server stopped.'
   }
 
-  String getEffectiveIntegrationTestTask() {
-    integrationTestTask ?: project.gretty.integrationTestTask
+  String getIntegrationTestTask() {
+    integrationTestTask_ ?: project.gretty.integrationTestTask
   }
 
-  void setupIntegrationTestTaskDependencies() {
+  boolean getIntegrationTestTaskAssigned() {
+    integrationTestTaskAssigned
+  }
+
+  void integrationTestTask(String integrationTestTask) {
+    if(integrationTestTaskAssigned) {
+      log.warn '{}.integrationTestTask is already set to "{}", so "{}" is ignored', name, getIntegrationTestTask(), integrationTestTask
+      return
+    }
+    integrationTestTask_ = integrationTestTask
     def thisTask = this
     project.tasks.all { t ->
-      if(t.name == thisTask.effectiveIntegrationTestTask)
+      if(t.name == thisTask.integrationTestTask)
         t.finalizedBy thisTask
     }
+    integrationTestTaskAssigned = true
   }
 }
