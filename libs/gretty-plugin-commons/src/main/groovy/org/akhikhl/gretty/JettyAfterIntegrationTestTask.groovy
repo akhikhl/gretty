@@ -7,7 +7,11 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.Task
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.JavaForkOptions
+import org.gradle.testing.jacoco.plugins.JacocoPlugin
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -48,9 +52,36 @@ class JettyAfterIntegrationTestTask extends JettyStopTask {
     integrationTestTask_ = integrationTestTask
     def thisTask = this
     project.tasks.all { t ->
-      if(t.name == thisTask.integrationTestTask)
+      if(t.name == thisTask.integrationTestTask) {
         t.finalizedBy thisTask
+        if(t instanceof JavaForkOptions && project.plugins.findPlugin(JacocoPlugin))
+          setupJacocoClientCoverageReportTask(t)
+      }
     }
     integrationTestTaskAssigned = true
+  }
+
+  protected void setupJacocoClientCoverageReportTask(Task integrationTestTask) {
+    String reportTaskName = integrationTestTask.name + 'ClientCoverageReport'
+    if(!project.tasks.findByName(reportTaskName)) {
+      def reportDir = project.reporting.file("jacoco/$reportTaskName/client/html")
+      project.task(reportTaskName, type: JacocoReport) { reportTask ->
+        executionData integrationTestTask
+        sourceDirectories = project.sourceSets.main.allSource
+        classDirectories = project.sourceSets.main.output
+        project.sourceSets.each { sourceSet ->
+          def srcDirs = project.files(sourceSet.allSource.srcDirs)
+          reportTask.sourceDirectories = reportTask.sourceDirectories == null ? srcDirs : reportTask.sourceDirectories + srcDirs
+          reportTask.classDirectories = reportTask.classDirectories == null ? sourceSet.output : reportTask.sourceDirectories + sourceSet.output
+        }
+        reports {
+          html.destination = reportDir
+        }
+        doLast {
+          System.out.println "Jacoco report for client created: file://${reportDir.toURI().path}"
+        }
+      }
+      this.finalizedBy project.tasks[reportTaskName]
+    }
   }
 }

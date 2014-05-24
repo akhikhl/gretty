@@ -160,8 +160,10 @@ final class Runner {
         spec.classpath = project.configurations.gretty
         spec.main = 'org.akhikhl.gretty.Runner'
         spec.args = [ cmdLineJson ]
-        spec.jvmArgs = sconfig.jvmArgs
         spec.debug = self.debug
+        spec.jvmArgs sconfig.jvmArgs
+        if(project.extensions.findByName('jacoco'))
+          project.jacoco.applyTo(new JacocoJavaForkOptionsWrapper(project, spec))
       }
     } finally {
       scanman.stopScanner()
