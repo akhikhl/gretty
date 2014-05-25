@@ -1,5 +1,9 @@
-apply plugin: 'gretty9'
-apply plugin: 'maven'
+apply plugin: 'gretty'
+
+// this is for installing war-file into local maven repository
+// and consequent testing of maven-dependency webapp in farm
+apply plugin: 'maven' 
+
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 group = 'org.akhikhl.gretty.examples'

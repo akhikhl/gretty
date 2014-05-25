@@ -34,17 +34,22 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     }
   }
 
+  @Override
+  protected boolean getDefaultJacocoEnabled() {
+    true
+  }
+
+  @Override
+  protected boolean getIntegrationTest() {
+    true
+  }
+
   String getIntegrationTestTask() {
     integrationTestTask_ ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
   }
 
   boolean getIntegrationTestTaskAssigned() {
     integrationTestTaskAssigned
-  }
-
-  @Override
-  protected boolean getIntegrationTest() {
-    true
   }
 
   void integrationTestTask(String integrationTestTask) {

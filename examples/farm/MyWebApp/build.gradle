@@ -1,5 +1,5 @@
-apply plugin: 'gretty9'
-apply plugin: 'gretty9-farm'
+apply plugin: 'gretty'
+apply plugin: 'gretty-farm'
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 gretty {
@@ -20,15 +20,15 @@ farm {
   webapp project
 
   // can add another project in the same project tree
-  webapp ':farm9:MyWebService'
+  webapp ':farm:MyWebService'
 
   // same as before
-  // webapp project(':farm9:MyWebService')
+  // webapp project(':farm:MyWebService')
 
   // can override any gretty properties by passing them as hashmap parameters
-  //webapp ':farm9:MyWebService2', contextPath: '/specialContextPath'
+  //webapp ':farm:MyWebService2', contextPath: '/specialContextPath'
 
-  // can add maven artifact
+  // can add maven dependency
   // webapp 'org.akhikhl.gretty.examples:MyWebService:1.0'
 
   // can add absolute path to war-file

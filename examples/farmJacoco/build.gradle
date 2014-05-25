@@ -1,0 +1,11 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.21'
+  }
+}
+
