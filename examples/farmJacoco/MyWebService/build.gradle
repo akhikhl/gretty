@@ -11,6 +11,10 @@ apply from: rootProject.file('integrationTests.gradle') // remove this to disabl
 group = 'org.akhikhl.gretty.examples'
 version = '1.0'
 
+jacoco {
+  toolVersion = '+'
+}
+
 gretty {
   scanInterval = 1
   fastReload = true
@@ -20,13 +24,13 @@ dependencies {
   testCompile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 }
 
-// trivial client-side exec-file
+// client-side exec-file, not related to gretty
 tasks.integrationTest.jacoco {
   append = false
   destinationFile = new File(project.buildDir, 'jacoco/integrationTest_client.exec')
 }
 
-// trivial client-side report
+// client-side report, not related to gretty
 task('integrationTestClientReport', type: JacocoReport) {
 
   tasks.integrationTest.finalizedBy it

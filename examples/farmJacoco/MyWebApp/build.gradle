@@ -5,6 +5,10 @@ apply from: rootProject.file('integrationTests.gradle') // remove this to disabl
 
 apply plugin: 'jacoco'
 
+jacoco {
+  toolVersion = '+'
+}
+
 gretty {
   scanInterval = 1
   fastReload = true
@@ -35,10 +39,10 @@ farm {
       classDirectories = project.sourceSets.main.output
       
       doFirst {
-        // This must be done in execution phase, not configuration phase.
+        // Other webapp projects should be added in execution phase, not configuration phase.
         // When accessing webapp projects in configuration phase, 
         // their properties (including sourceSets) are yet undefined.
-        for(Project webappProject in tasks.farmBeforeIntegrationTest.getWebAppProjects()) {
+        for(Project webappProject in tasks.farmBeforeIntegrationTest.webAppProjects) {
           if(webappProject != project) {
             additionalSourceDirs webappProject.files(webappProject.sourceSets.main.allSource.srcDirs)
             additionalClassDirs webappProject.sourceSets.main.output
@@ -58,13 +62,13 @@ farm {
   } // afterEvaluate
 } // farm
 
-// trivial client-side exec-file
+// client-side exec-file, not related to gretty
 tasks.integrationTest.jacoco {
   append = false
   destinationFile = new File(project.buildDir, 'jacoco/integrationTest_client.exec')
 }
 
-// trivial client-side report
+// client-side report, not related to gretty
 task('integrationTestClientReport', type: JacocoReport) {
 
   tasks.integrationTest.finalizedBy it
