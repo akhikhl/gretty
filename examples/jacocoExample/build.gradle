@@ -40,7 +40,6 @@ gretty {
     
     // reports should be generated only after integration tests
     tasks.jettyAfterIntegrationTest {
-      finalizedBy tasks.integrationTestClientReport
       finalizedBy tasks.integrationTestServerReport
     }
   }
@@ -55,6 +54,8 @@ tasks.integrationTest.jacoco {
 }
 
 task('integrationTestClientReport', type: JacocoReport) {
+  
+  tasks.integrationTest.finalizedBy it
 
   executionData project.tasks.integrationTest
   
