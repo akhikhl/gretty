@@ -22,7 +22,7 @@ It wraps many Jetty functions as convenient Gradle tasks and configuration DSL.
 
 If you are new with gretty, good starting points would be [getting started](../../wiki/Getting-started) and [feature overview](../../wiki/Feature-overview).
 
-If you already use gretty, it is always a good idea to look in [what's new](whatsnew.md) section.
+If you already use gretty, it is always a good idea to look in complete [what's new](whatsnew.md) section.
 
 You can systematically learn all about Gretty in [wiki pages](../../wiki).
 
