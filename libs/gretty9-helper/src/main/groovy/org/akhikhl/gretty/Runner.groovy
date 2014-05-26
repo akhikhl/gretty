@@ -17,12 +17,16 @@ import org.eclipse.jetty.security.HashLoginService
 import org.eclipse.jetty.security.LoginService
 import org.eclipse.jetty.server.Connector
 import org.eclipse.jetty.server.Handler
+import org.eclipse.jetty.server.HttpConfiguration
 import org.eclipse.jetty.server.HttpConnectionFactory
 import org.eclipse.jetty.server.NetworkConnector
+import org.eclipse.jetty.server.SecureRequestCustomizer
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
+import org.eclipse.jetty.server.SslConnectionFactory
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.util.resource.Resource
+import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.webapp.Configuration
 import org.eclipse.jetty.webapp.FragmentConfiguration
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
@@ -84,12 +88,35 @@ final class Runner extends RunnerBase {
     if(server.getConnectors() != null && server.getConnectors().length != 0)
       return
     System.out.println 'Auto-configuring server connectors'
-    ServerConnector conn = new ServerConnector(server)
-    conn.setIdleTimeout(1000 * 60 * 60)
-    conn.setSoLingerTime(-1)
-    conn.setPort(params.port)
-    conn.setConnectionFactories([ new HttpConnectionFactory() ])
-    server.addConnector(conn)
+
+    HttpConfiguration http_config = new HttpConfiguration()
+    http_config.setSecureScheme('https')
+    http_config.setSecurePort(8443)
+    http_config.setOutputBufferSize(32768)
+
+    ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config))
+    http.setHost('localhost')
+    http.setPort(params.port)
+    http.setIdleTimeout(1000 * 60 * 60)
+    http.setSoLingerTime(-1)
+    server.addConnector(http)
+
+    SslContextFactory sslContextFactory = new SslContextFactory()
+    sslContextFactory.setKeyStorePath('/home/ahi/temp/keystore')
+    sslContextFactory.setKeyStorePassword('ahi123')
+    sslContextFactory.setKeyManagerPassword('ahi123')
+    sslContextFactory.setTrustStorePath('/home/ahi/temp/keystore')
+    sslContextFactory.setTrustStorePassword('ahi123')
+
+    HttpConfiguration https_config = new HttpConfiguration(http_config)
+    https_config.addCustomizer(new SecureRequestCustomizer())
+
+    ServerConnector sslConnector = new ServerConnector(server,
+      new SslConnectionFactory(sslContextFactory, 'http/1.1'),
+      new HttpConnectionFactory(https_config))
+    sslConnector.setHost('localhost')
+    sslConnector.setPort(8443)
+    server.addConnector(sslConnector)
   }
 
   @Override
