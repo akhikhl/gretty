@@ -4,6 +4,10 @@
 
 ### What's new:
 
+#### Version 0.0.22
+
+- Implemented [Jacoco code coverage support](../../wiki/Code-coverage-support) - both server-side and client-side.
+
 #### Version 0.0.21
 
 - Fixed issue [gretty-farm plugin throws IllegalStateException: zip file closed](https://github.com/akhikhl/gretty/issues/24)
