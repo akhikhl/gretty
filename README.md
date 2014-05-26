@@ -15,6 +15,7 @@ It wraps many Jetty functions as convenient Gradle tasks and configuration DSL.
 
 - [Multiple web-apps support](../../wiki/Multiple-web-apps-introduction)
 - [Integration tests support](../../wiki/Integration-tests-support)
+- [Jacoco code coverage support](../../wiki/Code-coverage-support) - both client-side and server-side
 - Improvement of hot-deployment: [automatic recompilation of running web-app on source change](../../wiki/Hot-deployment)
 
 #### Where to start
