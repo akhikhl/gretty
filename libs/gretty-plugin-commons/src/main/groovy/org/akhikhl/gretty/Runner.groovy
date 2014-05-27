@@ -62,20 +62,21 @@ final class Runner {
     String sslKeyManagerPassword
     if(!keystoreFile.exists() || !certFile.exists() || !propertiesFile.exists()) {
       dir.mkdirs()
-      def keyPairGenerator = KeyPairGenerator.getInstance('RSA')
-      keyPairGenerator.initialize(1024)
+      def keyPairGenerator = KeyPairGenerator.getInstance('RSA', 'BC')
+      keyPairGenerator.initialize(1024, new SecureRandom())
       def KPair = keyPairGenerator.generateKeyPair()
-      log.info 'Generating self-signed certificate'
+      log.warn 'Generating cryptographic key and self-signed certificate'
       def certGen = new X509V3CertificateGenerator()
       certGen.setSerialNumber(BigInteger.valueOf(new SecureRandom().nextInt(Integer.MAX_VALUE)))
-      certGen.setIssuerDN(new X509Principal("CN=${sconfig.host}, OU=None, O=None L=None, C=None"))
+      String userName = System.getProperty('user.name')
+      certGen.setIssuerDN(new X509Principal("CN=gretty-issuer, OU=None, O=Gretty, L=None, C=None"))
       certGen.setNotBefore(new Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 30))
       certGen.setNotAfter(new Date(System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 365*10)))
-      certGen.setSubjectDN(new X509Principal("CN=${sconfig.host}, OU=None, O=None L=None, C=None"))
+      certGen.setSubjectDN(new X509Principal("CN=${sconfig.host}, OU=None, O=${project.name}, L=None, C=None"))
       certGen.setPublicKey(KPair.getPublic())
-      certGen.setSignatureAlgorithm('MD5WithRSAEncryption')
-      def PKCertificate = certGen.generateX509Certificate(KPair.getPrivate())
-      log.info 'Writing self-signed certificate to {}', certFile.absolutePath
+      certGen.setSignatureAlgorithm('SHA256WithRSA') // MD5WithRSAEncryption
+      def PKCertificate = certGen.generateX509Certificate(KPair.getPrivate(), 'BC')
+      log.warn 'Writing self-signed certificate to {}', certFile.absolutePath - project.projectDir.absolutePath - '/'
       certFile.withOutputStream { stm ->
         stm.write(PKCertificate.getEncoded())
       }
@@ -84,11 +85,11 @@ final class Runner {
       sslKeyManagerPassword = RandomStringUtils.randomAlphanumeric(128)
       ks.load(null, sslKeyStorePassword.toCharArray());
       ks.setKeyEntry('jetty', KPair.getPrivate(), sslKeyManagerPassword.toCharArray(), [ PKCertificate ] as Certificate[]);
-      log.info 'Writing keystore to {}', keystoreFile.absolutePath
+      log.warn 'Writing cryptographic key to {}', keystoreFile.absolutePath - project.projectDir.absolutePath - '/'
       keystoreFile.withOutputStream { stm ->
         ks.store(stm, sslKeyStorePassword.toCharArray());
       }
-      log.info 'Saving keystore passwords to {}', propertiesFile.absolutePath
+      log.warn 'Writing keystore passwords to {}', propertiesFile.absolutePath - project.projectDir.absolutePath - '/'
       new Properties().with { prop ->
         prop.setProperty('sslKeyStorePassword', sslKeyStorePassword)
         prop.setProperty('sslKeyManagerPassword', sslKeyManagerPassword)
@@ -97,9 +98,8 @@ final class Runner {
         }
       }
     } else {
-      log.info 'Using self-signed certificate'
-      log.info 'Keystore: {}', keystoreFile.absolutePath
-      log.info 'Reading keystore passwords from {}', propertiesFile.absolutePath
+      log.warn 'Using cryptographic key and self-signed certificate from {}', keystoreFile.absolutePath - project.projectDir.absolutePath
+      log.warn 'Reading keystore passwords from {}', propertiesFile.absolutePath - project.projectDir.absolutePath - '/'
       new Properties().with { prop ->
         propertiesFile.withInputStream { stm ->
           prop.load(stm)
@@ -108,7 +108,7 @@ final class Runner {
         sslKeyManagerPassword = prop.getProperty('sslKeyManagerPassword')
       }
     }
-    sconfig.sslKeyStorePath = keystoreFile.absolutePath
+    sconfig.sslKeyStorePath = keystoreFile
     sconfig.sslKeyStorePassword = sslKeyStorePassword
     sconfig.sslKeyManagerPassword = sslKeyManagerPassword
   }
@@ -137,13 +137,13 @@ final class Runner {
         if(sconfig.httpsIdleTimeout)
           httpsIdleTimeout sconfig.httpsIdleTimeout
         if(sconfig.sslKeyStorePath)
-          sslKeyStorePath sconfig.sslKeyStorePath
+          sslKeyStorePath sconfig.sslKeyStorePath.absolutePath
         if(sconfig.sslKeyStorePassword)
           sslKeyStorePassword sconfig.sslKeyStorePassword
         if(sconfig.sslKeyManagerPassword)
           sslKeyManagerPassword sconfig.sslKeyManagerPassword
         if(sconfig.sslTrustStorePath)
-          sslTrustStorePath sconfig.sslTrustStorePath
+          sslTrustStorePath sconfig.sslTrustStorePath.absolutePath
         if(sconfig.sslTrustStorePassword)
           sslTrustStorePassword sconfig.sslTrustStorePassword
       }
@@ -184,8 +184,12 @@ final class Runner {
     for(WebAppConfig webAppConfig in webAppConfigs)
       webAppConfig.prepareToRun()
 
-    if(sconfig.httpsEnabled && !sconfig.sslKeyStorePath)
-      generateAndUseSelfSignedCertificate()
+    if(sconfig.httpsEnabled) {
+      if(sconfig.sslKeyStorePath)
+        log.warn 'Using cryptographic key and certificate from: {}', sconfig.sslKeyStorePath
+      else
+        generateAndUseSelfSignedCertificate()
+    }
 
     Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
     def runThread = Thread.start {

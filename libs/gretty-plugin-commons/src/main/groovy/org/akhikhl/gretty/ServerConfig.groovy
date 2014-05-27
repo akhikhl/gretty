@@ -23,10 +23,10 @@ class ServerConfig {
   Boolean httpsEnabled
   Integer httpsPort
   Integer httpsIdleTimeout
-  String sslKeyStorePath
+  def sslKeyStorePath
   String sslKeyStorePassword
   String sslKeyManagerPassword
-  String sslTrustStorePath
+  def sslTrustStorePath
   String sslTrustStorePassword
   Integer servicePort
   Integer statusPort
@@ -94,6 +94,9 @@ class ServerConfig {
   }
 
   protected void resolve(Project project) {
+    sslKeyStorePath = ProjectUtils.resolveSingleFile(project, sslKeyStorePath)
+    sslTrustStorePath = ProjectUtils.resolveSingleFile(project, sslTrustStorePath)
+
     def f = ProjectUtils.resolveSingleFile(project, jettyXmlFile)
     if(f == null && jettyXmlFile) {
       def f2 = jettyXmlFile
@@ -111,13 +114,13 @@ class ServerConfig {
       }
     }
     jettyXmlFile = f
+
     f = ProjectUtils.resolveSingleFile(project, logbackConfigFile)
     if(f == null && logbackConfigFile != 'logback.groovy')
       f = ProjectUtils.resolveSingleFile(project, 'logback.groovy')
     if(f == null && logbackConfigFile != 'logback.xml')
       f = ProjectUtils.resolveSingleFile(project, 'logback.xml')
     logbackConfigFile = f
-
   }
 
   void setPort(Integer newValue) {
