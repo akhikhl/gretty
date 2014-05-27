@@ -65,6 +65,7 @@ final class Runner {
       def keyPairGenerator = KeyPairGenerator.getInstance('RSA')
       keyPairGenerator.initialize(1024)
       def KPair = keyPairGenerator.generateKeyPair()
+      log.info 'Generating self-signed certificate'
       def certGen = new X509V3CertificateGenerator()
       certGen.setSerialNumber(BigInteger.valueOf(new SecureRandom().nextInt(Integer.MAX_VALUE)))
       certGen.setIssuerDN(new X509Principal("CN=${sconfig.host}, OU=None, O=None L=None, C=None"))
@@ -74,6 +75,7 @@ final class Runner {
       certGen.setPublicKey(KPair.getPublic())
       certGen.setSignatureAlgorithm('MD5WithRSAEncryption')
       def PKCertificate = certGen.generateX509Certificate(KPair.getPrivate())
+      log.info 'Writing self-signed certificate to {}', certFile.absolutePath
       certFile.withOutputStream { stm ->
         stm.write(PKCertificate.getEncoded())
       }
@@ -82,9 +84,11 @@ final class Runner {
       sslKeyManagerPassword = RandomStringUtils.randomAlphanumeric(128)
       ks.load(null, sslKeyStorePassword.toCharArray());
       ks.setKeyEntry('jetty', KPair.getPrivate(), sslKeyManagerPassword.toCharArray(), [ PKCertificate ] as Certificate[]);
-      new File(dir, 'keystore').withOutputStream { stm ->
+      log.info 'Writing keystore to {}', keystoreFile.absolutePath
+      keystoreFile.withOutputStream { stm ->
         ks.store(stm, sslKeyStorePassword.toCharArray());
       }
+      log.info 'Saving keystore passwords to {}', propertiesFile.absolutePath
       new Properties().with { prop ->
         prop.setProperty('sslKeyStorePassword', sslKeyStorePassword)
         prop.setProperty('sslKeyManagerPassword', sslKeyManagerPassword)
@@ -93,6 +97,9 @@ final class Runner {
         }
       }
     } else {
+      log.info 'Using self-signed certificate'
+      log.info 'Keystore: {}', keystoreFile.absolutePath
+      log.info 'Reading keystore passwords from {}', propertiesFile.absolutePath
       new Properties().with { prop ->
         propertiesFile.withInputStream { stm ->
           prop.load(stm)
