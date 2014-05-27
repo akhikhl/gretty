@@ -16,7 +16,13 @@ import org.gradle.api.Project
 class ServerConfig {
 
   List<String> jvmArgs
-  Integer port
+  String host
+  Boolean httpEnabled
+  Integer httpPort
+  Integer httpIdleTimeout
+  Boolean httpsEnabled
+  Integer httpsPort
+  Integer httpsIdleTimeout
   Integer servicePort
   Integer statusPort
   def jettyXmlFile
@@ -35,17 +41,27 @@ class ServerConfig {
   protected static ServerConfig getDefault(Project project) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
-    result.port = 8080
+    result.host = 'localhost'
+    result.httpEnabled = true
+    result.httpPort = 8080
+    // httpIdleTimeout defaults to null. That means: no idle timeout is set for http protocol.
+    result.httpsEnabled = false
+    result.httpsPort = 8443
+    // httpsIdleTimeout defaults to null. That means: no idle timeout is set for https protocol.
     result.servicePort = 9900
     result.statusPort = 9901
     result.jettyXmlFile = 'jetty.xml'
     result.scanInterval = 0
-    result.loggingLevel = 'INFO'
+    result.loggingLevel = 'WARN'
     result.consoleLogEnabled = true
     result.fileLogEnabled = true
     result.logFileName = project.name
     result.logDir = "${System.getProperty('user.home')}/logs" as String
     return result
+  }
+
+  Integer getPort() {
+    httpPort
   }
 
   void onScan(Closure newValue) {
@@ -97,5 +113,9 @@ class ServerConfig {
       f = ProjectUtils.resolveSingleFile(project, 'logback.xml')
     logbackConfigFile = f
 
+  }
+
+  void setPort(Integer newValue) {
+    httpPort = newValue
   }
 }

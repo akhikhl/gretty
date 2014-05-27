@@ -83,14 +83,30 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Farm tempFarm = new Farm()
     configurer.configureFarm(tempFarm, new Farm(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
-    def port = tempFarm.serverConfig.port
     def options = tempFarm.webAppRefs.find { key, value -> configurer.resolveWebAppRefToProject(key) == webappProject }.value
     def webappConfig = configurer.getWebAppConfigForProject(options, webappProject, inplace)
     webappConfig.prepareToRun()
+
+    def host = tempFarm.serverConfig.host
+
     def contextPath = webappConfig.contextPath
-    task.systemProperty 'gretty.port', port
     task.systemProperty 'gretty.contextPath', contextPath
-    task.systemProperty 'gretty.baseURI', "http://localhost:${port}${contextPath}"
+
+    def httpPort = tempFarm.serverConfig.httpPort
+    if(httpPort && tempFarm.serverConfig.httpEnabled) {
+      task.systemProperty 'gretty.port', httpPort
+      task.systemProperty 'gretty.httpPort', httpPort
+      def baseURI = "http://${host}:${httpPort}${contextPath}"
+      task.systemProperty 'gretty.baseURI', baseURI
+      task.systemProperty 'gretty.httpBaseURI', baseURI
+    }
+
+    def httpsPort = tempFarm.serverConfig.httpsPort
+    if(httpsPort && tempFarm.serverConfig.httpsEnabled) {
+      task.systemProperty 'gretty.httpsPort', httpsPort
+      task.systemProperty 'gretty.httpsBaseURI', "https://${host}:${httpsPort}${contextPath}"
+    }
+
     task.systemProperty 'gretty.farm', (farmName ?: 'default')
   }
 }

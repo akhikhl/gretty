@@ -36,10 +36,14 @@ import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.webapp.WebInfConfiguration
 import org.eclipse.jetty.webapp.WebXmlConfiguration
 import org.eclipse.jetty.xml.XmlConfiguration
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.servlet.DispatcherType
 
 final class Runner extends RunnerBase {
+
+  private static final Logger log = LoggerFactory.getLogger(Runner)
 
   static void main(String[] args) {
     assert args.length != 0
@@ -68,7 +72,7 @@ final class Runner extends RunnerBase {
   @Override
   protected void applyJettyEnvXml(webAppContext, jettyEnvXml) {
     if(jettyEnvXml) {
-      System.out.println "Configuring webAppContext from ${jettyEnvXml}"
+      log.info 'Configuring webAppContext from {}', jettyEnvXml
       XmlConfiguration xmlConfiguration = new XmlConfiguration(new File(jettyEnvXml).toURI().toURL())
       xmlConfiguration.configure(webAppContext)
     }
@@ -77,7 +81,7 @@ final class Runner extends RunnerBase {
   @Override
   protected void applyJettyXml() {
     if(params.jettyXml != null) {
-      System.out.println "Configuring server from ${params.jettyXml}"
+      log.info 'Configuring server from {}', params.jettyXml
       XmlConfiguration xmlConfiguration = new XmlConfiguration(new File(params.jettyXml).toURI().toURL())
       xmlConfiguration.configure(server)
     }
@@ -87,36 +91,46 @@ final class Runner extends RunnerBase {
   protected void configureConnectors() {
     if(server.getConnectors() != null && server.getConnectors().length != 0)
       return
-    System.out.println 'Auto-configuring server connectors'
+    log.info 'Auto-configuring server connectors'
 
     HttpConfiguration http_config = new HttpConfiguration()
-    http_config.setSecureScheme('https')
-    http_config.setSecurePort(8443)
-    http_config.setOutputBufferSize(32768)
+    if(params.httpsPort) {
+      http_config.setSecureScheme('https')
+      http_config.setSecurePort(params.httpsPort)
+    }
 
-    ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config))
-    http.setHost('localhost')
-    http.setPort(params.port)
-    http.setIdleTimeout(1000 * 60 * 60)
-    http.setSoLingerTime(-1)
-    server.addConnector(http)
+    if(params.httpPort) {
+      ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config))
+      if(params.host)
+        http.setHost(params.host)
+      http.setPort(params.httpPort)
+      if(params.httpIdleTimeout)
+        http.setIdleTimeout(params.httpIdleTimeout)
+      http.setSoLingerTime(-1)
+      server.addConnector(http)
+    }
 
-    SslContextFactory sslContextFactory = new SslContextFactory()
-    sslContextFactory.setKeyStorePath('/home/ahi/temp/keystore')
-    sslContextFactory.setKeyStorePassword('ahi123')
-    sslContextFactory.setKeyManagerPassword('ahi123')
-    sslContextFactory.setTrustStorePath('/home/ahi/temp/keystore')
-    sslContextFactory.setTrustStorePassword('ahi123')
+    if(params.httpsPort) {
+      SslContextFactory sslContextFactory = new SslContextFactory()
+      sslContextFactory.setKeyStorePath('/home/ahi/temp/keystore')
+      sslContextFactory.setKeyStorePassword('ahi123')
+      sslContextFactory.setKeyManagerPassword('ahi123')
+      sslContextFactory.setTrustStorePath('/home/ahi/temp/keystore')
+      sslContextFactory.setTrustStorePassword('ahi123')
 
-    HttpConfiguration https_config = new HttpConfiguration(http_config)
-    https_config.addCustomizer(new SecureRequestCustomizer())
+      HttpConfiguration https_config = new HttpConfiguration(http_config)
+      https_config.addCustomizer(new SecureRequestCustomizer())
 
-    ServerConnector sslConnector = new ServerConnector(server,
-      new SslConnectionFactory(sslContextFactory, 'http/1.1'),
-      new HttpConnectionFactory(https_config))
-    sslConnector.setHost('localhost')
-    sslConnector.setPort(8443)
-    server.addConnector(sslConnector)
+      ServerConnector https = new ServerConnector(server,
+        new SslConnectionFactory(sslContextFactory, 'http/1.1'),
+        new HttpConnectionFactory(https_config))
+      if(params.host)
+        https.setHost(params.host)
+      https.setPort(params.httpsPort)
+      if(params.httpsIdleTimeout)
+        https.setIdleTimeout(params.httpsIdleTimeout)
+      server.addConnector(https)
+    }
   }
 
   @Override
@@ -124,7 +138,7 @@ final class Runner extends RunnerBase {
     if(realm && realmConfigFile) {
       if(context.getSecurityHandler().getLoginService() != null)
         return
-      System.out.println 'Auto-configuring login service'
+      log.info 'Auto-configuring login service'
       context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
     }
   }

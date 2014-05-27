@@ -52,7 +52,18 @@ final class Runner {
   private getRunConfigJson() {
     def json = new JsonBuilder()
     json {
-      port sconfig.port
+      if(sconfig.host)
+        host sconfig.host
+      if(sconfig.httpEnabled) {
+        httpPort sconfig.httpPort
+        if(sconfig.httpIdleTimeout)
+          httpIdleTimeout sconfig.httpIdleTimeout
+      }
+      if(sconfig.httpsEnabled) {
+        httpsPort sconfig.httpsPort
+        if(sconfig.httpsIdleTimeout)
+          httpsIdleTimeout sconfig.httpsIdleTimeout
+      }
       if(sconfig.jettyXmlFile)
         jettyXml sconfig.jettyXmlFile.absolutePath
       if(sconfig.logbackConfigFile)
@@ -68,7 +79,8 @@ final class Runner {
       webApps webAppConfigs.collect { WebAppConfig webAppConfig ->
         { ->
           inplace webAppConfig.inplace
-          webappClassPath webAppConfig.classPath
+          if(webAppConfig.classPath)
+            webappClassPath webAppConfig.classPath
           contextPath webAppConfig.contextPath
           resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase ?: webAppConfig.warResourceBase.toString() ?: '')
           if(webAppConfig.initParameters)
@@ -104,7 +116,7 @@ final class Runner {
     status = futureStatus.get()
     log.debug 'Got start status: {}', status
 
-    System.out.println "Jetty server ${project.ext.jettyVersion} started."
+    log.warn 'Jetty server {} started.', project.ext.jettyVersion
     for(WebAppConfig webAppConfig in webAppConfigs) {
       String webappName
       if(webAppConfig.inplace)
@@ -115,9 +127,17 @@ final class Runner {
           warFile = new File(warFile.toString())
         webappName = warFile.name
       }
-      System.out.println "${webappName} runs at the address http://localhost:${sconfig.port}${webAppConfig.contextPath}"
+      if(sconfig.httpEnabled && sconfig.httpsEnabled) {
+        log.warn '{} runs at the addresses:', webappName
+        log.warn '  http://{}:{}{}', sconfig.host, sconfig.httpPort, webAppConfig.contextPath
+        log.warn '  https://{}:{}{}', sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
+      }
+      else if(sconfig.httpEnabled)
+        log.warn '{} runs at the address http://{}:{}{}', webappName, sconfig.host, sconfig.httpPort, webAppConfig.contextPath
+      else if(sconfig.httpsEnabled)
+        log.warn '{} runs at the address https://{}:{}{}', webappName, sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
     }
-    System.out.println "servicePort: ${sconfig.servicePort}, statusPort: ${sconfig.statusPort}"
+    log.info 'servicePort: {}, statusPort: {}', sconfig.servicePort, sconfig.statusPort
 
     if(startTask.getIntegrationTest())
       project.ext.grettyRunnerThread = runThread
@@ -130,7 +150,7 @@ final class Runner {
       } else
         System.out.println "Run 'gradle ${startTask.getStopTaskName()}' to stop the jetty server."
       runThread.join()
-      System.out.println 'Jetty server stopped.'
+      log.warn 'Jetty server stopped.'
     }
   }
 

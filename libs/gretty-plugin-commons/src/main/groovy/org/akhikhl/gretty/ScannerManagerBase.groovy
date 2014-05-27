@@ -155,14 +155,14 @@ abstract class ScannerManagerBase {
     this.sconfig = sconfig
     this.webapps = webapps
     if(sconfig.scanInterval == 0) {
-      log.warn 'scanInterval not specified (or zero), scanning disabled'
+      log.info 'scanInterval not specified (or zero), scanning disabled'
       return
     }
     scanner = createScanner()
     scanner.scanDirs = getEffectiveScanDirs()
     configureFastReload()
     configureScanner()
-    log.warn 'Starting scanner with interval of {} second(s)', sconfig.scanInterval
+    log.info 'Starting scanner with interval of {} second(s)', sconfig.scanInterval
     scanner.start()
   }
 
