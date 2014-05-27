@@ -23,6 +23,11 @@ class ServerConfig {
   Boolean httpsEnabled
   Integer httpsPort
   Integer httpsIdleTimeout
+  String sslKeyStorePath
+  String sslKeyStorePassword
+  String sslKeyManagerPassword
+  String sslTrustStorePath
+  String sslTrustStorePassword
   Integer servicePort
   Integer statusPort
   def jettyXmlFile
@@ -44,14 +49,14 @@ class ServerConfig {
     result.host = 'localhost'
     result.httpEnabled = true
     result.httpPort = 8080
-    // httpIdleTimeout defaults to null. That means: no idle timeout is set for http protocol.
+    // httpIdleTimeout defaults to null. This means: no idle timeout is set for http protocol.
     result.httpsEnabled = false
     result.httpsPort = 8443
-    // httpsIdleTimeout defaults to null. That means: no idle timeout is set for https protocol.
+    // httpsIdleTimeout defaults to null. This means: no idle timeout is set for https protocol.
     result.servicePort = 9900
     result.statusPort = 9901
     result.jettyXmlFile = 'jetty.xml'
-    result.scanInterval = 0
+    // scanInterval defaults to null. This means: hot deployment is disabled.
     result.loggingLevel = 'WARN'
     result.consoleLogEnabled = true
     result.fileLogEnabled = true

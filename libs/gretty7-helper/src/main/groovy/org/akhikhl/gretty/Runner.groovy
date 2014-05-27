@@ -17,6 +17,8 @@ import org.eclipse.jetty.server.Handler
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
+import org.eclipse.jetty.server.ssl.SslSocketConnector
+import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.webapp.WebInfConfiguration
@@ -59,7 +61,7 @@ final class Runner extends RunnerBase {
   @Override
   protected void applyJettyEnvXml(webAppContext, jettyEnvXml) {
     if(jettyEnvXml) {
-      System.out.println "Configuring webAppContext from ${jettyEnvXml}"
+      log.warn 'Configuring webAppContext with {}', jettyEnvXml
       XmlConfiguration xmlConfiguration = new XmlConfiguration(new File(jettyEnvXml).toURI().toURL())
       xmlConfiguration.configure(webAppContext)
     }
@@ -78,13 +80,40 @@ final class Runner extends RunnerBase {
   protected void configureConnectors() {
     if(server.getConnectors() != null && server.getConnectors().length != 0)
       return
-    System.out.println 'Auto-configuring server connectors'
-    SocketConnector connector = new SocketConnector()
-    // Set some timeout options to make debugging easier.
-    connector.setMaxIdleTime(1000 * 60 * 60)
-    connector.setSoLingerTime(-1)
-    connector.setPort(params.port)
-    server.setConnectors([ connector ] as Connector[])
+    log.info 'Auto-configuring server connectors'
+
+    if(params.httpPort) {
+      SocketConnector http = new SocketConnector()
+      if(params.host)
+        http.setHost(params.host)
+      http.setPort(params.httpPort)
+      if(params.httpIdleTimeout)
+        http.setMaxIdleTime(params.httpIdleTimeout)
+      http.setSoLingerTime(-1)
+      server.addConnector(http)
+    }
+
+    if(params.httpsPort) {
+      SslContextFactory sslContextFactory = new SslContextFactory()
+      if(params.sslKeyStorePath)
+        sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
+      if(params.sslKeyStorePassword)
+        sslContextFactory.setKeyStorePassword(params.sslKeyStorePassword)
+      if(params.sslKeyManagerPassword)
+        sslContextFactory.setKeyManagerPassword(params.sslKeyManagerPassword)
+      if(params.sslTrustStorePath)
+        sslContextFactory.setTrustStorePath(params.sslTrustStorePath)
+      if(params.sslTrustStorePassword)
+        sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
+
+      SslSocketConnector https = new SslSocketConnector(sslContextFactory)
+      if(params.host)
+        https.setHost(params.host)
+      https.setPort(params.httpsPort)
+      if(params.httpsIdleTimeout)
+        https.setMaxIdleTime(params.httpsIdleTimeout)
+      server.addConnector(https)
+    }
   }
 
   @Override
@@ -92,7 +121,7 @@ final class Runner extends RunnerBase {
     if(realm && realmConfigFile) {
       if(context.getSecurityHandler().getLoginService() != null)
         return
-      System.out.println 'Auto-configuring login service'
+      log.warn 'Configuring login service with realm \'{}\' and config {}', realm, realmConfigFile
       context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
     }
   }
@@ -113,14 +142,6 @@ final class Runner extends RunnerBase {
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
-  }
-
-  @Override
-  protected int getServerPort() {
-    if(server.getConnectors() != null)
-      for(Connector conn in server.getConnectors())
-        return conn.getLocalPort()
-    return params.port
   }
 
   @Override

@@ -8,12 +8,16 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonSlurper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 abstract class RunnerBase {
 
   protected final Map params
   protected boolean paramsLoaded = false
   protected server
+
+  protected Logger log
 
   RunnerBase(Map params) {
     this.params = params
@@ -33,8 +37,6 @@ abstract class RunnerBase {
   protected abstract createServer()
 
   protected abstract createWebAppContext(List<String> webappClassPath)
-
-  protected abstract int getServerPort()
 
   final void run() {
     try {
@@ -80,6 +82,8 @@ abstract class RunnerBase {
     else if(params.logbackConfig)
       LoggingUtils.useConfig(params.logbackConfig)
 
+    log = LoggerFactory.getLogger(this.getClass())
+
     server = createServer()
     applyJettyXml()
     configureConnectors()
@@ -117,6 +121,7 @@ abstract class RunnerBase {
     if(server != null) {
       server.stop()
       server = null
+      log = null
     }
   }
 }

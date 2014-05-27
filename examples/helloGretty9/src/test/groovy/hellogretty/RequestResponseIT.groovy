@@ -1,8 +1,6 @@
 package hellogretty
 
 import geb.spock.GebReportingSpec
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class RequestResponseIT extends GebReportingSpec {
 

@@ -154,15 +154,18 @@ abstract class ScannerManagerBase {
     this.project = project
     this.sconfig = sconfig
     this.webapps = webapps
-    if(sconfig.scanInterval == 0) {
-      log.info 'scanInterval not specified (or zero), scanning disabled'
+    if(!sconfig.scanInterval) {
+      if(sconfig.scanInterval == null)
+        log.warn 'scanInterval not specified, hot deployment disabled'
+      else if(sconfig.scanInterval == 0)
+        log.warn 'scanInterval is zero, hot deployment disabled'
       return
     }
     scanner = createScanner()
     scanner.scanDirs = getEffectiveScanDirs()
     configureFastReload()
     configureScanner()
-    log.info 'Starting scanner with interval of {} second(s)', sconfig.scanInterval
+    log.warn 'Enabling hot deployment with interval of {} second(s)', sconfig.scanInterval
     scanner.start()
   }
 

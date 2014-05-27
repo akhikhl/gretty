@@ -20,5 +20,8 @@ dependencies {
 gretty {
   scanInterval = 1
   fastReload = true
+  httpsEnabled = true
+  sslKeyStorePath = '/home/ahi/temp/keystore'
+  sslKeyStorePassword = 'ahi123'
 }
 

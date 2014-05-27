@@ -63,6 +63,16 @@ final class Runner {
         httpsPort sconfig.httpsPort
         if(sconfig.httpsIdleTimeout)
           httpsIdleTimeout sconfig.httpsIdleTimeout
+        if(sconfig.sslKeyStorePath)
+          sslKeyStorePath sconfig.sslKeyStorePath
+        if(sconfig.sslKeyStorePassword)
+          sslKeyStorePassword sconfig.sslKeyStorePassword
+        if(sconfig.sslKeyManagerPassword)
+          sslKeyManagerPassword sconfig.sslKeyManagerPassword
+        if(sconfig.sslTrustStorePath)
+          sslTrustStorePath sconfig.sslTrustStorePath
+        if(sconfig.sslTrustStorePassword)
+          sslTrustStorePassword sconfig.sslTrustStorePassword
       }
       if(sconfig.jettyXmlFile)
         jettyXml sconfig.jettyXmlFile.absolutePath
@@ -116,6 +126,7 @@ final class Runner {
     status = futureStatus.get()
     log.debug 'Got start status: {}', status
 
+    System.out.println()
     log.warn 'Jetty server {} started.', project.ext.jettyVersion
     for(WebAppConfig webAppConfig in webAppConfigs) {
       String webappName

@@ -36,14 +36,10 @@ import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.webapp.WebInfConfiguration
 import org.eclipse.jetty.webapp.WebXmlConfiguration
 import org.eclipse.jetty.xml.XmlConfiguration
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import javax.servlet.DispatcherType
 
 final class Runner extends RunnerBase {
-
-  private static final Logger log = LoggerFactory.getLogger(Runner)
 
   static void main(String[] args) {
     assert args.length != 0
@@ -72,7 +68,7 @@ final class Runner extends RunnerBase {
   @Override
   protected void applyJettyEnvXml(webAppContext, jettyEnvXml) {
     if(jettyEnvXml) {
-      log.info 'Configuring webAppContext from {}', jettyEnvXml
+      log.warn 'Configuring webAppContext with {}', jettyEnvXml
       XmlConfiguration xmlConfiguration = new XmlConfiguration(new File(jettyEnvXml).toURI().toURL())
       xmlConfiguration.configure(webAppContext)
     }
@@ -81,7 +77,7 @@ final class Runner extends RunnerBase {
   @Override
   protected void applyJettyXml() {
     if(params.jettyXml != null) {
-      log.info 'Configuring server from {}', params.jettyXml
+      log.warn 'Configuring server with {}', params.jettyXml
       XmlConfiguration xmlConfiguration = new XmlConfiguration(new File(params.jettyXml).toURI().toURL())
       xmlConfiguration.configure(server)
     }
@@ -112,11 +108,16 @@ final class Runner extends RunnerBase {
 
     if(params.httpsPort) {
       SslContextFactory sslContextFactory = new SslContextFactory()
-      sslContextFactory.setKeyStorePath('/home/ahi/temp/keystore')
-      sslContextFactory.setKeyStorePassword('ahi123')
-      sslContextFactory.setKeyManagerPassword('ahi123')
-      sslContextFactory.setTrustStorePath('/home/ahi/temp/keystore')
-      sslContextFactory.setTrustStorePassword('ahi123')
+      if(params.sslKeyStorePath)
+        sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
+      if(params.sslKeyStorePassword)
+        sslContextFactory.setKeyStorePassword(params.sslKeyStorePassword)
+      if(params.sslKeyManagerPassword)
+        sslContextFactory.setKeyManagerPassword(params.sslKeyManagerPassword)
+      if(params.sslTrustStorePath)
+        sslContextFactory.setTrustStorePath(params.sslTrustStorePath)
+      if(params.sslTrustStorePassword)
+        sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
 
       HttpConfiguration https_config = new HttpConfiguration(http_config)
       https_config.addCustomizer(new SecureRequestCustomizer())
@@ -138,7 +139,7 @@ final class Runner extends RunnerBase {
     if(realm && realmConfigFile) {
       if(context.getSecurityHandler().getLoginService() != null)
         return
-      log.info 'Auto-configuring login service'
+      log.warn 'Configuring login service with realm \'{}\' and config {}', realm, realmConfigFile
       context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
     }
   }
@@ -157,15 +158,6 @@ final class Runner extends RunnerBase {
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
-  }
-
-  @Override
-  protected int getServerPort() {
-    if(server.getConnectors() != null)
-      for(Connector conn in server.getConnectors())
-        if(conn instanceof NetworkConnector)
-          return conn.getLocalPort()
-    return params.port
   }
 
   @Override
