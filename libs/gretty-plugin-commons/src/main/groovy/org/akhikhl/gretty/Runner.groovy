@@ -16,6 +16,7 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
+import org.apache.commons.lang3.RandomStringUtils
 import org.bouncycastle.jce.X509Principal
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.provider.asymmetric.ec.KeyPairGenerator
@@ -55,11 +56,14 @@ final class Runner {
   private void generateAndUseSelfSignedCertificate() {
     File dir = new File(project.buildDir, 'selfSignedCertificate')
     File keystoreFile = new File(dir, 'keystore')
-    File certFile = new File(dir, 'jetty.cert')
-    if(!keystoreFile.exists() || !certFile.exists()) {
+    File certFile = new File(dir, 'cert')
+    File propertiesFile = new File(dir, 'properties')
+    String sslKeyStorePassword
+    String sslKeyManagerPassword
+    if(!keystoreFile.exists() || !certFile.exists() || !propertiesFile.exists()) {
       dir.mkdirs()
       def keyPairGenerator = KeyPairGenerator.getInstance('RSA')
-      keyPairGenerator.initialize(1024)
+      keyPairGenerator.initialize(1600)
       def KPair = keyPairGenerator.generateKeyPair()
       def certGen = new X509V3CertificateGenerator()
       certGen.setSerialNumber(BigInteger.valueOf(new SecureRandom().nextInt(Integer.MAX_VALUE)))
@@ -74,14 +78,32 @@ final class Runner {
         stm.write(PKCertificate.getEncoded())
       }
       def ks = KeyStore.getInstance('JKS')
-      ks.load(null, 'ahi123'.toCharArray());
-      ks.setKeyEntry('jetty', KPair.getPrivate(), 'ahi123'.toCharArray(), [ PKCertificate ] as Certificate[]);
+      sslKeyStorePassword = RandomStringUtils.randomAlphanumeric(128)
+      sslKeyManagerPassword = RandomStringUtils.randomAlphanumeric(128)
+      ks.load(null, sslKeyStorePassword.toCharArray());
+      ks.setKeyEntry('jetty', KPair.getPrivate(), sslKeyManagerPassword.toCharArray(), [ PKCertificate ] as Certificate[]);
       new File(dir, 'keystore').withOutputStream { stm ->
-        ks.store(stm, 'ahi123'.toCharArray());
+        ks.store(stm, sslKeyStorePassword.toCharArray());
+      }
+      new Properties().with { prop ->
+        prop.setProperty('sslKeyStorePassword', sslKeyStorePassword)
+        prop.setProperty('sslKeyManagerPassword', sslKeyManagerPassword)
+        propertiesFile.withOutputStream { stm ->
+          prop.store(stm, null)
+        }
+      }
+    } else {
+      new Properties().with { prop ->
+        propertiesFile.withInputStream { stm ->
+          prop.load(stm)
+        }
+        sslKeyStorePassword = prop.getProperty('sslKeyStorePassword')
+        sslKeyManagerPassword = prop.getProperty('sslKeyManagerPassword')
       }
     }
     sconfig.sslKeyStorePath = keystoreFile.absolutePath
-    sconfig.sslKeyStorePassword = 'ahi123'
+    sconfig.sslKeyStorePassword = sslKeyStorePassword
+    sconfig.sslKeyManagerPassword = sslKeyManagerPassword
   }
 
   private getCommandLineJson() {

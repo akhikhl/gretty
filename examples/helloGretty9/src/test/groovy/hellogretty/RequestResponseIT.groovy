@@ -4,8 +4,6 @@ import geb.spock.GebReportingSpec
 
 class RequestResponseIT extends GebReportingSpec {
 
-  private static final Logger log = LoggerFactory.getLogger(RequestResponseIT)
-
   private static String baseURI
 
   void setupSpec() {
