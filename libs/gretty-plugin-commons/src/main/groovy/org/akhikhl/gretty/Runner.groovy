@@ -8,10 +8,18 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonBuilder
+import java.security.KeyStore
+import java.security.Security
+import java.security.SecureRandom
+import java.security.cert.Certificate
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
+import org.bouncycastle.jce.X509Principal
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.jce.provider.asymmetric.ec.KeyPairGenerator
+import org.bouncycastle.x509.X509V3CertificateGenerator
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.slf4j.Logger
@@ -31,6 +39,10 @@ final class Runner {
   protected Iterable<WebAppConfig> webAppConfigs
   protected final ExecutorService executorService
 
+  static {
+    Security.addProvider(new BouncyCastleProvider());
+  }
+
   Runner(StartBaseTask startTask) {
     this.startTask = startTask
     project = startTask.project
@@ -38,6 +50,38 @@ final class Runner {
     sconfig = runConfig.getServerConfig()
     webAppConfigs = runConfig.getWebAppConfigs()
     executorService = Executors.newSingleThreadExecutor()
+  }
+
+  private void generateAndUseSelfSignedCertificate() {
+    File dir = new File(project.buildDir, 'selfSignedCertificate')
+    File keystoreFile = new File(dir, 'keystore')
+    File certFile = new File(dir, 'jetty.cert')
+    if(!keystoreFile.exists() || !certFile.exists()) {
+      dir.mkdirs()
+      def keyPairGenerator = KeyPairGenerator.getInstance('RSA')
+      keyPairGenerator.initialize(1024)
+      def KPair = keyPairGenerator.generateKeyPair()
+      def certGen = new X509V3CertificateGenerator()
+      certGen.setSerialNumber(BigInteger.valueOf(new SecureRandom().nextInt(Integer.MAX_VALUE)))
+      certGen.setIssuerDN(new X509Principal("CN=${sconfig.host}, OU=None, O=None L=None, C=None"))
+      certGen.setNotBefore(new Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 30))
+      certGen.setNotAfter(new Date(System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 365*10)))
+      certGen.setSubjectDN(new X509Principal("CN=${sconfig.host}, OU=None, O=None L=None, C=None"))
+      certGen.setPublicKey(KPair.getPublic())
+      certGen.setSignatureAlgorithm('MD5WithRSAEncryption')
+      def PKCertificate = certGen.generateX509Certificate(KPair.getPrivate())
+      certFile.withOutputStream { stm ->
+        stm.write(PKCertificate.getEncoded())
+      }
+      def ks = KeyStore.getInstance('JKS')
+      ks.load(null, 'ahi123'.toCharArray());
+      ks.setKeyEntry('jetty', KPair.getPrivate(), 'ahi123'.toCharArray(), [ PKCertificate ] as Certificate[]);
+      new File(dir, 'keystore').withOutputStream { stm ->
+        ks.store(stm, 'ahi123'.toCharArray());
+      }
+    }
+    sconfig.sslKeyStorePath = keystoreFile.absolutePath
+    sconfig.sslKeyStorePassword = 'ahi123'
   }
 
   private getCommandLineJson() {
@@ -110,6 +154,9 @@ final class Runner {
   void run() {
     for(WebAppConfig webAppConfig in webAppConfigs)
       webAppConfig.prepareToRun()
+
+    if(sconfig.httpsEnabled && !sconfig.sslKeyStorePath)
+      generateAndUseSelfSignedCertificate()
 
     Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
     def runThread = Thread.start {
