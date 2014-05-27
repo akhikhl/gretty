@@ -63,7 +63,7 @@ final class Runner {
     if(!keystoreFile.exists() || !certFile.exists() || !propertiesFile.exists()) {
       dir.mkdirs()
       def keyPairGenerator = KeyPairGenerator.getInstance('RSA')
-      keyPairGenerator.initialize(1600)
+      keyPairGenerator.initialize(1024)
       def KPair = keyPairGenerator.generateKeyPair()
       def certGen = new X509V3CertificateGenerator()
       certGen.setSerialNumber(BigInteger.valueOf(new SecureRandom().nextInt(Integer.MAX_VALUE)))
