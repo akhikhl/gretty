@@ -25,10 +25,21 @@ class WebAppConfig {
   def fastReload
   def inplaceResourceBase
   def warResourceBase
-  def classPath
+  Set<URL> classPath
 
   String projectPath
   Boolean inplace
+
+  void classPath(Object... args) {
+    if(args) {
+      if(classPath == null)
+        classPath = new LinkedHashSet<URL>()
+      for(def arg in args) {
+        if(arg != null)
+          classPath.add(arg)
+      }
+    }
+  }
 
   void fastReload(String arg) {
     if(fastReload == null)
@@ -98,7 +109,44 @@ class WebAppConfig {
   protected void resolve(Project project) {
     realmConfigFile = ProjectUtils.resolveSingleFile(project, realmConfigFile)
     jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, jettyEnvXmlFile)
-    classPath = ProjectUtils.getClassPath(project, inplace)
+
+    def resolvedClassPath = new LinkedHashSet<URL>()
+    resolvedClassPath.addAll(ProjectUtils.getClassPath(project, inplace))
+    if(classPath != null)
+      for(def elem in classPath) {
+        while(elem instanceof Closure)
+          elem = elem()
+        if(elem != null) {
+          if(elem instanceof File) {
+            if(!elem.isAbsolute()) {
+              if(project == null)
+                elem = new File(System.getProperty('user.home'), elem.path).absolutePath
+              else
+                elem = new File(project.projectDir, elem.path)
+            }
+            elem = elem.toURI().toURL()
+          }
+          else if(elem instanceof URI)
+            elem = elem.toURL()
+          else if(!(elem instanceof URL)) {
+            elem = elem.toString()
+            if(!(elem =~ /.{2,}\:.+/)) { // no schema?
+              if(!new File(elem).isAbsolute()) {
+                if(project == null)
+                  elem = new File(System.getProperty('user.home'), elem).absolutePath
+                else
+                  elem = new File(project.projectDir, elem).absolutePath
+              }
+              if(!elem.startsWith('/'))
+                elem = '/' + elem
+              elem = 'file://' + elem
+            }
+            elem = new URL(elem.toString())
+          }
+          resolvedClassPath.add(elem)
+        }
+      }
+    classPath = resolvedClassPath
   }
 
   void scanDir(String value) {

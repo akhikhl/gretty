@@ -69,6 +69,22 @@ class ServerConfig {
     httpPort
   }
 
+  void jvmArg(Object... args) {
+    if(args) {
+      if(jvmArgs == null)
+        jvmArgs = []
+      jvmArgs.addAll(args)
+    }
+  }
+
+  void jvmArgs(Object... args) {
+    if(args) {
+      if(jvmArgs == null)
+        jvmArgs = []
+      jvmArgs.addAll(args)
+    }
+  }
+
   void onScan(Closure newValue) {
     if(onScan == null)
       onScan = []
@@ -94,6 +110,16 @@ class ServerConfig {
   }
 
   protected void resolve(Project project) {
+
+    def resolvedJvmArgs = []
+    for(def arg in jvmArgs) {
+      while(arg instanceof Closure)
+        arg = arg()
+      if(arg != null)
+        resolvedJvmArgs.add(arg.toString())
+    }
+    jvmArgs = resolvedJvmArgs
+
     sslKeyStorePath = ProjectUtils.resolveSingleFile(project, sslKeyStorePath)
     sslTrustStorePath = ProjectUtils.resolveSingleFile(project, sslTrustStorePath)
 

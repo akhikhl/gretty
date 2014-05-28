@@ -268,6 +268,7 @@ final class Runner {
         spec.main = 'org.akhikhl.gretty.Runner'
         spec.args = [ cmdLineJson ]
         spec.debug = startTask.debug
+        log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs
         spec.jvmArgs sconfig.jvmArgs
         if(startTask.jacoco) {
           String jarg = startTask.jacoco.getAsJvmArg()
