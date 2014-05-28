@@ -1,5 +1,5 @@
 group = 'org.akhikhl.gretty'
-version = '0.0.22'
+version = '0.0.23'
 
 ext {
   project_id = 'gretty'

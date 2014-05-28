@@ -4,6 +4,14 @@
 
 ### What's new:
 
+#### Version 0.0.23
+
+- Implemented [HTTPS support](../../wiki/HTTPS-support).
+
+- Introduced new properties in [Gretty configuration](../../wiki/Gretty-configuration) and [Farm configuration](../../wiki/Farm-server-specific-properties), related to HTTPS protocol.
+
+- Introduced convenience functions ServerConfig.jvmArgs, ServerConfig.jvmArg to simplify adding JVM arguments.
+
 #### Version 0.0.22
 
 - Implemented [Jacoco code coverage support](../../wiki/Code-coverage-support) - both server-side and client-side.
