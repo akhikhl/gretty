@@ -24,18 +24,28 @@ class ConfigUtils {
   }
 
   private static complementProperties_(Object dst, Object srcs) {
-    List dstProps = dst.metaClass.properties.collect { it.name } - ['class']
+    List dstProps = dst.metaClass.properties.findAll { it.name != 'class' && it.name != 'metaClass' }
     for(def src in srcs) {
-      if(src instanceof Map) {
-        for(String propName in dstProps)
-          if(dst[propName] == null && src[propName] != null)
-            dst[propName] = src[propName]
-      }
-      else {
-        for(String propName in dstProps)
-          if(dst[propName] == null && src.metaClass.properties.find { it.name == propName } && src[propName] != null)
-            dst[propName] = src[propName]
-      }
+      if(src instanceof Map)
+        for(def prop in dstProps) {
+          def propName = prop.name
+          if(src[propName] != null) {
+            if(dst[propName] == null)
+              dst[propName] = src[propName]
+            else if(Collection.class.isAssignableFrom(prop.type))
+              dst[propName].addAll(src[propName])
+          }
+        }
+      else
+        for(def prop in dstProps) {
+          def propName = prop.name
+          if(src.metaClass.properties.find { it.name == propName } && src[propName] != null) {
+            if(dst[propName] == null)
+              dst[propName] = src[propName]
+            else if(Collection.class.isAssignableFrom(prop.type))
+              dst[propName].addAll(src[propName])
+          }
+        }
     }
     dst
   }
