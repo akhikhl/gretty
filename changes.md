@@ -1,20 +1,20 @@
-[Project home](https://github.com/akhikhl/gretty) | [Wiki home](../../wiki) | [Feature overview](../../wiki/Feature-overview)
+[Project home](https://github.com/akhikhl/gretty) | [Documentation](http://akhikhl.github.io/gretty-doc/) | [Feature overview](http://akhikhl.github.io/gretty-doc/Feature-overview.html)
 
-[![logo](http://akhikhl.github.io/gretty/media/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
+[![logo](http://akhikhl.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
 
 ### What's new:
 
 #### Version 0.0.23
 
-- Implemented [HTTPS support](../../wiki/HTTPS-support).
+- Implemented [HTTPS support](http://akhikhl.github.io/gretty-doc/HTTPS-support.html).
 
-- Introduced new properties in [Gretty configuration](../../wiki/Gretty-configuration) and [Farm configuration](../../wiki/Farm-server-specific-properties), related to HTTPS protocol.
+- Introduced new properties in [Gretty configuration](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html) and [Farm configuration](http://akhikhl.github.io/gretty-doc//Farm-server-specific-properties.html), related to HTTPS protocol.
 
 - Introduced convenience functions ServerConfig.jvmArgs, ServerConfig.jvmArg to simplify adding JVM arguments.
 
 #### Version 0.0.22
 
-- Implemented [Jacoco code coverage support](../../wiki/Code-coverage-support) - both server-side and client-side.
+- Implemented [Jacoco code coverage support](http://akhikhl.github.io/gretty-doc/Code-coverage-support.html) - both server-side and client-side.
 
 #### Version 0.0.21
 
@@ -34,15 +34,15 @@
 
 #### Version 0.0.18
 
-- implemented [multiple web-apps feature](../../wiki/Multiple-web-aps-introduction).
+- implemented [multiple web-apps feature](http://akhikhl.github.io/gretty-doc/Multiple-web-aps-introduction.html).
 
-- implemented [debugger support for multiple web-apps](../../wiki/Debugging-a-farm).
+- implemented [debugger support for multiple web-apps](http://akhikhl.github.io/gretty-doc/Debugging-a-farm.html).
 
-- implemented [integration tests support for multiple web-apps](../../wiki/Farm-integration-tests).
+- implemented [integration tests support for multiple web-apps](http://akhikhl.github.io/gretty-doc/Farm-integration-tests.html).
 
 - implemented gretty.afterEvaluate and farm.afterEvaluate closures for easy configuration of gretty tasks.
 
-- implemented highly customizable [gretty task classes](../../wiki/Gretty-task-classes) and [farm task classes](../../wiki/Farm-task-classes).
+- implemented highly customizable [gretty task classes](http://akhikhl.github.io/gretty-doc/Gretty-task-classes.html) and [farm task classes](http://akhikhl.github.io/gretty-doc/Farm-task-classes.html).
 
 - improved security of realmConfigFile: now it uses "${webAppDir}/WEB-INF" as a base folder, if you specify relative path.
 
@@ -56,35 +56,35 @@
 
 - Reimplemented Gretty tasks as reusable classes.
 
-- Renamed integrationTestStatusPort to [statusPort](../../wiki/Configuration#statusPort).
+- Renamed integrationTestStatusPort to [statusPort](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_statusport).
 
-- Moved documentation from README.md to [wiki pages](../../wiki).
+- Moved documentation from README.md to [wiki pages](../../wiki/).
 
-- Updated documentation, added **nice diagrams** to every task description. See more at [wiki pages](../../wiki).
+- Updated documentation, added **nice diagrams** to every task description. See more at [wiki pages](../../wiki/).
 
 #### Version 0.0.15
 
-- Introduced configuration property [fastReload](../../wiki/Configuration#fastReload).
+- Introduced configuration property [fastReload](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_fastreload).
 
 - Fixed JDK-8 compatibility issues.
 
 #### Version 0.0.14
 
-- Introduced configuration property [jvmArgs](../../wiki/Configuration#jvmArgs).
+- Introduced configuration property [jvmArgs](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_jvmargs).
 
 #### Version 0.0.13
 
-- Implemented [support of web fragments](../../wiki/Web-fragments-support)
+- Implemented [support of web fragments](http://akhikhl.github.io/gretty-doc/Web-fragments-support.html)
 - Implemented integration tests for most of the examples
 - Introduced bintray publishing configuration in build.gradle
 
 #### Version 0.0.12
 
-- Implemented [support of integration tests](../../wiki/Integration-tests-support)
+- Implemented [support of integration tests](http://akhikhl.github.io/gretty-doc/Integration-tests-support.html)
 
 #### Version 0.0.11
 
-- Introduced configuration property [logbackConfigFile](../../wiki/Gretty-Configuration#logbackConfigFile)
+- Introduced configuration property [logbackConfigFile](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_logbackconfigfile)
   (in response to [issue #6](https://github.com/akhikhl/gretty/issues/6) "Possibility to provide custom logback.xml or logback.groovy configuration")
 
 #### Version 0.0.10
@@ -95,12 +95,12 @@
 
 #### Version 0.0.9
 
-- Implemented out-of-the-box [JEE annotations support](../../wiki/JEE-annotations-support).
+- Implemented out-of-the-box [JEE annotations support](http://akhikhl.github.io/gretty-doc/JEE-annotations-support.html).
 - Various bug-fixes.
 
 #### Version 0.0.8
 
-- Implemented support of [jetty.xml](../../wiki/jetty.xml-support) and [jetty-env.xml](../../wiki/jetty-env.xml-support).
+- Implemented support of [jetty.xml](http://akhikhl.github.io/gretty-doc/jetty.xml-support.html) and [jetty-env.xml](http://akhikhl.github.io/gretty-doc/jetty-env.xml-support.html).
 
 #### Version 0.0.7
 
@@ -108,13 +108,13 @@
 
 #### Version 0.0.6
 
-- Implemented support of [multiple jetty versions and multiple servlet API versions](../../wiki/Switching-between-jetty-and-servlet-API-versions).
+- Implemented support of [multiple jetty versions and multiple servlet API versions](http://akhikhl.github.io/gretty-doc/Switching-between-Jetty-and-servlet-API-versions.html).
 
 ### version 0.0.5
 
-- Implemented [debugger support](../../wiki/Debugger-support) and [logging](../../wiki/Logging).
+- Implemented [debugger support](http://akhikhl.github.io/gretty-doc/Debugger-support.html) and [logging](http://akhikhl.github.io/gretty-doc/Logging.html).
 
 #### Version 0.0.4
 
-- Implemented support of [hot deployment](../../wiki/Hot-deployment).
+- Implemented [hot deployment](http://akhikhl.github.io/gretty-doc/Hot-deployment.html).
 
