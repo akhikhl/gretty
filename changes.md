@@ -34,7 +34,7 @@
 
 #### Version 0.0.18
 
-- implemented [multiple web-apps feature](http://akhikhl.github.io/gretty-doc/Multiple-web-aps-introduction.html).
+- implemented [multiple web-apps feature](http://akhikhl.github.io/gretty-doc/Multiple-web-apps-introduction.html).
 
 - implemented [debugger support for multiple web-apps](http://akhikhl.github.io/gretty-doc/Debugging-a-farm.html).
 
