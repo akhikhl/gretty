@@ -8,21 +8,21 @@
 Gretty is a feature-rich gradle plugin for running web-apps on Jetty.
 It supports multiple Jetty versions (7, 8 and 9), multiple web-apps and many more.
 It wraps Jetty functions as convenient Gradle tasks and configuration DSL.
-A complete list of Gretty features is available in [feature overview](../../wiki/Feature-overview).
+A complete list of Gretty features is available in [feature overview](http://akhikhl.github.io/gretty-doc/Feature-overview.html).
 
 #### Where to start
 
-If you are new with gretty, good starting points would be [getting started](../../wiki/Getting-started) page.
+If you are new with gretty, good starting points would be [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
 
 #### :star: What's new
 
-- [HTTPS protocol support](../../wiki/HTTPS-support)
+- [HTTPS protocol support](http://akhikhl.github.io/gretty-doc/HTTPS-support.html)
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
 #### Documentation
 
-You can systematically learn all about Gretty in [wiki pages](../../wiki).
+You can systematically learn all about Gretty in [online documentation](http://akhikhl.github.io/gretty-doc/).
 
 #### System requirements
 
