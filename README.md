@@ -22,7 +22,7 @@ See also: [complete list of changes](changes.md) in this and previous versions.
 
 #### Documentation
 
-You can systematically learn all about Gretty in [online documentation](http://akhikhl.github.io/gretty-doc/).
+You can learn all about nice Gretty features in [online documentation](http://akhikhl.github.io/gretty-doc/).
 
 #### System requirements
 
