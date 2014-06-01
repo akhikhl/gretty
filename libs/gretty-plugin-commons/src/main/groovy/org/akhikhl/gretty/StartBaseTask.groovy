@@ -12,8 +12,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /**
  * Base task for starting jetty
@@ -29,8 +27,13 @@ abstract class StartBaseTask extends DefaultTask {
 
   @TaskAction
   void action() {
-    def runner = new Runner(this)
-    runner.run()
+    if(project.configurations.compile.dependencies.find { it.name.startsWith('spring-boot') }) {
+      def runner = new SpringBootRunner(this)
+      runner.run()
+    } else {
+      def runner = new Runner(this)
+      runner.run()
+    }
   }
 
   protected boolean getDefaultJacocoEnabled() {

@@ -261,7 +261,6 @@ final class Runner {
 
     ScannerManagerBase scanman = project.ext.scannerManagerFactory.createScannerManager()
     scanman.startScanner(project, sconfig, webAppConfigs)
-    Runner self = this
     try {
       project.javaexec { spec ->
         spec.classpath = project.configurations.gretty
