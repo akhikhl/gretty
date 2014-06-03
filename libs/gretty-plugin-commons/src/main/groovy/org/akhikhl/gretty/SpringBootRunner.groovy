@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import java.util.concurrent.Executors
+import groovy.json.JsonBuilder
 import java.util.concurrent.ExecutorService
 import org.gradle.api.Project
 import org.slf4j.Logger
@@ -35,6 +36,24 @@ class SpringBootRunner {
     webAppConfigs = runConfig.getWebAppConfigs()
     executorService = Executors.newSingleThreadExecutor()
   }
+  
+  private String findMainClass() {
+		def bootExtension = project.extensions.findByName('springBoot')
+		if(bootExtension && bootExtension.mainClass)
+			return bootExtension.mainClass
+    def MainClassFinder = Class.forName('org.springframework.boot.loader.tools.MainClassFinder', true, getClass().classLoader)
+    return MainClassFinder.findSingleMainClass(project.sourceSets.main.output.classesDir)
+  }
+
+  private getCommandLineJson() {
+    def json = new JsonBuilder()
+    json {
+      mainClass findMainClass()
+      servicePort sconfig.servicePort
+      statusPort sconfig.statusPort
+    }
+    json
+  }
 
   void run() {
     println "running spring-boot app!"
@@ -42,8 +61,20 @@ class SpringBootRunner {
   }
 
   protected void runSpringBoot() {
+
+    def cmdLineJson = getCommandLineJson()
+    log.warn 'Command-line json: {}', cmdLineJson.toPrettyString()
+    cmdLineJson = cmdLineJson.toString()
+
+    // we are going to pass json as argument to java process.
+    // under windows we must escape double quotes in process parameters.
+    if(System.getProperty("os.name") =~ /(?i).*windows.*/)
+      cmdLineJson = cmdLineJson.replace('"', '\\"')
+    
     project.javaexec { spec ->
-      spec.classpath = project.configurations.gretty
+      spec.classpath = project.files(project.configurations.gretty.files + project.configurations.springBoot.files + [ project.sourceSets.main.output.classesDir, project.sourceSets.main.output.resourcesDir ])
+      // project.files(project.configurations.gretty.files + project.configurations.compile.files.findAll { !it.name.startsWith('jetty-webapp') })
+      // .files + project.configurations.compile.files.findAll { it.name.startsWith('spring') }
       spec.main = 'org.akhikhl.gretty.SpringBootRunner'
       spec.args = [ cmdLineJson ]
       spec.debug = startTask.debug

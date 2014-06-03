@@ -38,12 +38,21 @@ abstract class JettyPluginBase implements Plugin<Project> {
 
     project.extensions.create('gretty', GrettyExtension)
 
-    if(!project.configurations.findByName('grettyHelperConfig'))
+    if(!project.configurations.findByName('grettyHelperConfig')) {
       project.configurations {
         grettyHelperConfig
         grettyLoggingConfig
         gretty.extendsFrom(grettyHelperConfig)
+        springBoot {
+          extendsFrom runtime
+          exclude module: 'spring-boot-starter-tomcat'
+          exclude group: 'org.eclipse.jetty'
+        }
       }
+      project.dependencies {
+        springBoot 'org.springframework.boot:spring-boot-starter-jetty'
+      }
+    }
 
     injectDependencies(project)
 
