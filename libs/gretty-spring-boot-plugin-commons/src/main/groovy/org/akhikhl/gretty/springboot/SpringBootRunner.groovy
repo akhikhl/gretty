@@ -5,8 +5,13 @@
  *
  * See the file "license.txt" for copying and usage permission.
  */
-package org.akhikhl.gretty
+package org.akhikhl.gretty.springboot
 
+import org.akhikhl.gretty.StartBaseTask
+import org.akhikhl.gretty.RunConfig
+import org.akhikhl.gretty.Runner
+import org.akhikhl.gretty.ServerConfig
+import org.akhikhl.gretty.WebAppConfig
 import java.util.concurrent.Executors
 import groovy.json.JsonBuilder
 import java.util.concurrent.ExecutorService
@@ -18,22 +23,17 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
-class SpringBootRunner {
+class SpringBootRunner implements Runner {
 	
   protected static final Logger log = LoggerFactory.getLogger(SpringBootRunner)
 
-  protected final StartBaseTask startTask
-  protected final Project project
+  protected StartBaseTask startTask
+  protected Project project
   protected ServerConfig sconfig
   protected Iterable<WebAppConfig> webAppConfigs
   protected final ExecutorService executorService
 
-  SpringBootRunner(StartBaseTask startTask) {
-    this.startTask = startTask
-    project = startTask.project
-    RunConfig runConfig = startTask.getRunConfig()
-    sconfig = runConfig.getServerConfig()
-    webAppConfigs = runConfig.getWebAppConfigs()
+  SpringBootRunner() {
     executorService = Executors.newSingleThreadExecutor()
   }
   
@@ -54,13 +54,22 @@ class SpringBootRunner {
     }
     json
   }
+  
+  private void init(StartBaseTask startTask) {
+    this.startTask = startTask
+    project = startTask.project
+    RunConfig runConfig = startTask.getRunConfig()
+    sconfig = runConfig.getServerConfig()
+    webAppConfigs = runConfig.getWebAppConfigs()
+  }
 
-  void run() {
-    println "running spring-boot app!"
+  @Override
+  void run(StartBaseTask startTask) {
+    init(startTask)
     runSpringBoot()
   }
 
-  protected void runSpringBoot() {
+  private void runSpringBoot() {
 
     def cmdLineJson = getCommandLineJson()
     log.warn 'Command-line json: {}', cmdLineJson.toPrettyString()
@@ -73,9 +82,7 @@ class SpringBootRunner {
     
     project.javaexec { spec ->
       spec.classpath = project.files(project.configurations.gretty.files + project.configurations.springBoot.files + [ project.sourceSets.main.output.classesDir, project.sourceSets.main.output.resourcesDir ])
-      // project.files(project.configurations.gretty.files + project.configurations.compile.files.findAll { !it.name.startsWith('jetty-webapp') })
-      // .files + project.configurations.compile.files.findAll { it.name.startsWith('spring') }
-      spec.main = 'org.akhikhl.gretty.SpringBootRunner'
+      spec.main = 'org.akhikhl.gretty.springboot.Runner'
       spec.args = [ cmdLineJson ]
       spec.debug = startTask.debug
       log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs

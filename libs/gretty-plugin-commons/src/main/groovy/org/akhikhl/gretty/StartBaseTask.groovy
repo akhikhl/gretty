@@ -27,13 +27,7 @@ abstract class StartBaseTask extends DefaultTask {
 
   @TaskAction
   void action() {
-    if(project.configurations.compile.dependencies.find { it.name.startsWith('spring-boot') }) {
-      def runner = new SpringBootRunner(this)
-      runner.run()
-    } else {
-      def runner = new Runner(this)
-      runner.run()
-    }
+    project.ext.runnerFactory.createRunner().run(this)
   }
 
   protected boolean getDefaultJacocoEnabled() {

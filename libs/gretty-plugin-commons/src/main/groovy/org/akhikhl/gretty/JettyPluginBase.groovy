@@ -35,25 +35,11 @@ abstract class JettyPluginBase implements Plugin<Project> {
     project.ext.jettyVersion = project.ext.grettyPluginJettyVersion = getJettyVersion()
 
     project.ext.scannerManagerFactory = getScannerManagerFactory()
+    project.ext.runnerFactory = getRunnerFactory()
 
     project.extensions.create('gretty', GrettyExtension)
 
-    if(!project.configurations.findByName('grettyHelperConfig')) {
-      project.configurations {
-        grettyHelperConfig
-        grettyLoggingConfig
-        gretty.extendsFrom(grettyHelperConfig)
-        springBoot {
-          extendsFrom runtime
-          exclude module: 'spring-boot-starter-tomcat'
-          exclude group: 'org.eclipse.jetty'
-        }
-      }
-      project.dependencies {
-        springBoot 'org.springframework.boot:spring-boot-starter-jetty'
-      }
-    }
-
+    createConfigurations(project)
     injectDependencies(project)
 
     if(!project.tasks.findByName('run'))
@@ -228,12 +214,30 @@ abstract class JettyPluginBase implements Plugin<Project> {
     } // afterEvaluate
   } // apply
 
-  abstract String getJettyVersion()
+  protected abstract String getJettyVersion()
 
-  abstract String getPluginName()
+  protected abstract String getPluginName()
+  
+  protected RunnerFactory getRunnerFactory() {
+    new DefaultRunnerFactory()
+  }
 
-  abstract ScannerManagerFactory getScannerManagerFactory()
+  protected abstract ScannerManagerFactory getScannerManagerFactory()
+  
+  protected void createConfigurations(Project project) {
+    if(!project.configurations.findByName('grettyHelperConfig')) {
+      project.configurations {
+        grettyHelperConfig
+        grettyLoggingConfig
+        gretty.extendsFrom(grettyHelperConfig)
+      }
+    }
+  }
 
-  abstract void injectDependencies(Project project)
+  protected void injectDependencies(Project project) {
+    injectJettyDependencies(project)
+  }
+
+  protected abstract void injectJettyDependencies(Project project)
 
 } // JettyPluginBase

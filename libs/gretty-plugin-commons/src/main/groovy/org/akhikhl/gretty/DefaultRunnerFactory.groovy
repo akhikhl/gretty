@@ -11,7 +11,10 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-interface Runner {
-
-  void run(StartBaseTask startTask)
+class DefaultRunnerFactory implements RunnerFactory {
+  
+	Runner createRunner() {
+    new DefaultRunner()
+  }
 }
+

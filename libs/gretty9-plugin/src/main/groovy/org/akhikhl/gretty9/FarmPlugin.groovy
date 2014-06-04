@@ -18,22 +18,22 @@ import org.gradle.api.Project
 class FarmPlugin extends FarmPluginBase {
 
   @Override
-  String getJettyVersion() {
+  protected String getJettyVersion() {
     Messages.getString('jettyVersion')
   }
 
   @Override
-  String getPluginName() {
+  protected String getPluginName() {
     Messages.getString('farmPluginName')
   }
 
   @Override
-  ScannerManagerFactory getScannerManagerFactory() {
+  protected ScannerManagerFactory getScannerManagerFactory() {
     ScannerManagerFactoryImpl.instance
   }
 
   @Override
-  void injectDependencies(Project project) {
+  protected void injectDependencies(Project project) {
     project.dependencies {
       grettyHelperConfig 'org.akhikhl.gretty:gretty9-helper:0.0.23'
     }

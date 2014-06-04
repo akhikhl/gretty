@@ -193,11 +193,11 @@ abstract class FarmPluginBase implements Plugin<Project> {
     } // afterEvaluate
   } // apply
 
-  abstract String getJettyVersion()
+  protected abstract String getJettyVersion()
 
-  abstract String getPluginName()
+  protected abstract String getPluginName()
 
-  abstract ScannerManagerFactory getScannerManagerFactory()
+  protected abstract ScannerManagerFactory getScannerManagerFactory()
 
-  abstract void injectDependencies(Project project)
+  protected abstract void injectDependencies(Project project)
 }

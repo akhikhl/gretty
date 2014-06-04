@@ -5,17 +5,18 @@
  *
  * See the file "license.txt" for copying and usage permission.
  */
-package org.akhikhl.gretty8
+package org.akhikhl.gretty9.springboot
 
-import org.akhikhl.gretty.FarmPluginBase
+import org.akhikhl.gretty.springboot.JettySpringBootPluginBase
 import org.akhikhl.gretty.ScannerManagerFactory
+import org.akhikhl.gretty9.ScannerManagerFactoryImpl
 import org.gradle.api.Project
 
 /**
  *
  * @author akhikhl
  */
-class FarmPlugin extends FarmPluginBase {
+class JettySpringBootPlugin extends JettySpringBootPluginBase {
 
   @Override
   protected String getJettyVersion() {
@@ -24,7 +25,7 @@ class FarmPlugin extends FarmPluginBase {
 
   @Override
   protected String getPluginName() {
-    Messages.getString('farmPluginName')
+    Messages.getString('springBootPluginName')
   }
 
   @Override
@@ -33,10 +34,10 @@ class FarmPlugin extends FarmPluginBase {
   }
 
   @Override
-  protected void injectDependencies(Project project) {
+  protected void injectJettyDependencies(Project project) {
     project.dependencies {
-      grettyHelperConfig 'org.akhikhl.gretty:gretty8-helper:0.0.23'
+      providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+      grettyHelperConfig 'org.akhikhl.gretty:gretty9-spring-boot-helper:0.0.23'
     }
   }
 }
-

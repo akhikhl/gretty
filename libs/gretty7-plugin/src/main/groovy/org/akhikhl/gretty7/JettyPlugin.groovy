@@ -15,22 +15,22 @@ import org.akhikhl.gretty7.Messages
 final class JettyPlugin extends JettyPluginBase {
 
   @Override
-  String getJettyVersion() {
+  protected String getJettyVersion() {
     Messages.getString('jettyVersion')
   }
 
   @Override
-  String getPluginName() {
+  protected String getPluginName() {
     Messages.getString('pluginName')
   }
 
   @Override
-  ScannerManagerFactory getScannerManagerFactory() {
+  protected ScannerManagerFactory getScannerManagerFactory() {
     ScannerManagerFactoryImpl.instance
   }
 
   @Override
-  void injectDependencies(Project project) {
+  protected void injectJettyDependencies(Project project) {
     project.dependencies {
       providedCompile 'javax.servlet:servlet-api:2.5'
       grettyHelperConfig 'org.akhikhl.gretty:gretty7-helper:0.0.23'
