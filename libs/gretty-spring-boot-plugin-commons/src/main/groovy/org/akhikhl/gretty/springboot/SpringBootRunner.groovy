@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory
  * @author akhikhl
  */
 class SpringBootRunner implements Runner {
-	
+
   protected static final Logger log = LoggerFactory.getLogger(SpringBootRunner)
 
   protected StartBaseTask startTask
@@ -36,25 +36,17 @@ class SpringBootRunner implements Runner {
   SpringBootRunner() {
     executorService = Executors.newSingleThreadExecutor()
   }
-  
-  private String findMainClass() {
-		def bootExtension = project.extensions.findByName('springBoot')
-		if(bootExtension && bootExtension.mainClass)
-			return bootExtension.mainClass
-    def MainClassFinder = Class.forName('org.springframework.boot.loader.tools.MainClassFinder', true, getClass().classLoader)
-    return MainClassFinder.findSingleMainClass(project.sourceSets.main.output.classesDir)
-  }
 
   private getCommandLineJson() {
     def json = new JsonBuilder()
     json {
-      mainClass findMainClass()
+      mainClass SpringBootMainClassFinder.findMainClass(project)
       servicePort sconfig.servicePort
       statusPort sconfig.statusPort
     }
     json
   }
-  
+
   private void init(StartBaseTask startTask) {
     this.startTask = startTask
     project = startTask.project
@@ -79,7 +71,7 @@ class SpringBootRunner implements Runner {
     // under windows we must escape double quotes in process parameters.
     if(System.getProperty("os.name") =~ /(?i).*windows.*/)
       cmdLineJson = cmdLineJson.replace('"', '\\"')
-    
+
     project.javaexec { spec ->
       spec.classpath = project.files(project.configurations.gretty.files + project.configurations.springBoot.files + [ project.sourceSets.main.output.classesDir, project.sourceSets.main.output.resourcesDir ])
       spec.main = 'org.akhikhl.gretty.springboot.Runner'
@@ -93,5 +85,5 @@ class SpringBootRunner implements Runner {
         spec.jvmArgs jarg
       }
     }
-  }  
+  }
 }
