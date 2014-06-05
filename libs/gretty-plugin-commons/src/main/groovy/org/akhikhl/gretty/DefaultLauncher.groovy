@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
-final class DefaultLauncher implements Launcher {
+class DefaultLauncher implements Launcher {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultLauncher)
 
@@ -109,7 +109,7 @@ final class DefaultLauncher implements Launcher {
     sconfig.sslKeyManagerPassword = sslKeyManagerPassword
   }
 
-  private getCommandLineJson() {
+  protected getCommandLineJson() {
     def json = new JsonBuilder()
     json {
       servicePort sconfig.servicePort
@@ -118,7 +118,7 @@ final class DefaultLauncher implements Launcher {
     json
   }
 
-  private getRunConfigJson() {
+  protected getRunConfigJson() {
     def json = new JsonBuilder()
     json {
       if(sconfig.host)
@@ -180,7 +180,7 @@ final class DefaultLauncher implements Launcher {
     'org.akhikhl.gretty.Runner'
   }
 
-  private void init(StartBaseTask startTask) {
+  protected void init(StartBaseTask startTask) {
     this.startTask = startTask
     project = startTask.project
     RunConfig runConfig = startTask.getRunConfig()
@@ -188,7 +188,7 @@ final class DefaultLauncher implements Launcher {
     webAppConfigs = runConfig.getWebAppConfigs()
   }
   
-  void launch(StartBaseTask startTask) {
+  final void launch(StartBaseTask startTask) {
     
     init(startTask)
     
