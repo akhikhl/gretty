@@ -58,11 +58,7 @@ abstract class JettyPluginBase implements Plugin<Project> {
     project.afterEvaluate {
 
       if(!project.repositories)
-        project.repositories {
-          mavenLocal()
-          jcenter()
-          mavenCentral()
-        }
+        injectDefaultRepositories(project)
 
       for(String overlay in project.gretty.overlays)
         project.dependencies.add 'providedCompile', project.project(overlay)
@@ -232,6 +228,14 @@ abstract class JettyPluginBase implements Plugin<Project> {
         gretty.extendsFrom(grettyHelperConfig)
       }
     }
+  }
+  
+  protected void injectDefaultRepositories(Project project) {
+    project.repositories {
+      mavenLocal()
+      jcenter()
+      mavenCentral()
+    }    
   }
 
   protected void injectDependencies(Project project) {

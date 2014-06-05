@@ -38,11 +38,22 @@ abstract class JettySpringBootPluginBase extends JettyPluginBase {
   protected RunnerFactory getRunnerFactory() {
     new SpringBootRunnerFactory()
   }
+  
+  @Override
+  protected void injectDefaultRepositories(Project project) {
+    super.injectDefaultRepositories(project)
+    project.repositories {
+      maven { url 'http://repo.spring.io/release' }
+      maven { url 'http://repo.spring.io/milestone' }
+      maven { url 'http://repo.spring.io/snapshot' }      
+    }
+  }
 
   @Override
   protected void injectDependencies(Project project) {
     super.injectDependencies(project)
     project.dependencies {
+      compile 'org.springframework.boot:spring-boot-starter-web'
       springBoot 'org.springframework.boot:spring-boot-starter-jetty'
     }
   }

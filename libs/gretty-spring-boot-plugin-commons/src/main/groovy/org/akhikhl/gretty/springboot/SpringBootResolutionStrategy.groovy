@@ -26,10 +26,7 @@ class SpringBootResolutionStrategy {
       return
     project.configurations.create('versionManagement')
     resolveClasses()
-    if(PropertiesFileManagedDependencies == null)
-      resolveDependencyVersions_1_0_x(project)
-    else
-      resolveDependencyVersions_1_1_x(project)
+    resolveDependencyVersions(project)
   }
 
   private static resolveClasses() {
@@ -52,40 +49,41 @@ class SpringBootResolutionStrategy {
         // ignore, we are using older version of spring-boot
       }
   }
-
-  private static void resolveDependencyVersions_1_0_x(Project project) {
-    def managedDependencies
-    project.configurations.all { config ->
-      config.resolutionStrategy.eachDependency { DependencyResolveDetails resolveDetails ->
-        if(!resolveDetails.target.version) {
-          if(managedDependencies == null)
-            managedDependencies = ManagedDependencies.get()
-          if (resolveDetails.target.group == 'org.springframework.boot')
-            resolveDetails.useVersion(managedDependencies.version)
-          else {
-            def dependency = managedDependencies.find(target.group, target.name)
-            if (dependency)
-              resolveDetails.useVersion(dependency.version)
-          }
-        }
-      }
+  
+  private static getManagedDependencies(Project project) {
+    if(VersionManagedDependencies == null) 
+      ManagedDependencies.get()
+    else {
+      VersionManagedDependencies.newInstance(project.configurations.versionManagement.files.collect { file ->
+        assert file.name.toLowerCase().endsWith('.properties')
+        // FileInputStream is closed by PropertiesFileManagedDependencies constructor
+        PropertiesFileManagedDependencies.newInstance(new FileInputStream(file))
+      })
     }
   }
+  
+  static String getSpringBootVersion(Project project) {
+    getSpringBootVersionFromManagedDependencies(getManagedDependencies(project))
+  }
+  
+  private static String getSpringBootVersionFromManagedDependencies(managedDependencies) {
+    if(managedDependencies.metaClass.methods.find { it.name == 'getSpringBootVersion' })
+      // 1.1.x
+      managedDependencies.getSpringBootVersion()
+    else
+      // 1.0.x
+      managedDependencies.getVersion()
+  }
 
-  private static void resolveDependencyVersions_1_1_x(Project project) {
+  private static void resolveDependencyVersions(Project project) {
     def managedDependencies
     project.configurations.all { config ->
-      if(config.name == 'versionManagement')
-        return
       config.resolutionStrategy.eachDependency { DependencyResolveDetails resolveDetails ->
         if(!resolveDetails.target.version) {
           if(managedDependencies == null)
-            managedDependencies = VersionManagedDependencies.newInstance(project.configurations.versionManagement.files.collect { file ->
-              assert file.name.toLowerCase().endsWith('.properties')
-              PropertiesFileManagedDependencies.newInstance(new FileInputStream(file))
-            })
+            managedDependencies = getManagedDependencies(project)
           if (resolveDetails.target.group == 'org.springframework.boot')
-            resolveDetails.useVersion(managedDependencies.springBootVersion)
+            resolveDetails.useVersion(getSpringBootVersionFromManagedDependencies(managedDependencies))
           else {
             def dependency = managedDependencies.find(target.group, target.name)
             if (dependency)
