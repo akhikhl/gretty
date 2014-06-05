@@ -11,10 +11,10 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-class DefaultRunnerFactory implements RunnerFactory {
+class DefaultLauncherFactory implements LauncherFactory {
   
-	Runner createRunner() {
-    new DefaultRunner()
+	Launcher createLauncher() {
+    new DefaultLauncher()
   }
 }
 

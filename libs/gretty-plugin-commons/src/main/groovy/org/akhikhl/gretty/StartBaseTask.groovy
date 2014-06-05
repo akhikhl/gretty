@@ -27,7 +27,7 @@ abstract class StartBaseTask extends DefaultTask {
 
   @TaskAction
   void action() {
-    project.ext.runnerFactory.createRunner().run(this)
+    project.ext.launcherFactory.createLauncher().launch(this)
   }
 
   protected boolean getDefaultJacocoEnabled() {

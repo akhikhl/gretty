@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
-final class DefaultRunner implements Runner {
+final class DefaultLauncher implements Launcher {
 
-  protected static final Logger log = LoggerFactory.getLogger(DefaultRunner)
+  protected static final Logger log = LoggerFactory.getLogger(DefaultLauncher)
 
   protected StartBaseTask startTask
   protected Project project
@@ -44,7 +44,7 @@ final class DefaultRunner implements Runner {
     Security.addProvider(new BouncyCastleProvider());
   }
 
-  DefaultRunner() {
+  DefaultLauncher() {
     executorService = Executors.newSingleThreadExecutor()
   }
 
@@ -175,7 +175,11 @@ final class DefaultRunner implements Runner {
     }
     json
   }
-      
+
+  protected String getRunnerClassName() {
+    'org.akhikhl.gretty.Runner'
+  }
+
   private void init(StartBaseTask startTask) {
     this.startTask = startTask
     project = startTask.project
@@ -184,7 +188,7 @@ final class DefaultRunner implements Runner {
     webAppConfigs = runConfig.getWebAppConfigs()
   }
   
-  void run(StartBaseTask startTask) {
+  void launch(StartBaseTask startTask) {
     
     init(startTask)
     
@@ -200,7 +204,7 @@ final class DefaultRunner implements Runner {
 
     Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
     def runThread = Thread.start {
-      runJetty()
+      launchProcess()
     }
     def status = futureStatus.get()
     log.debug 'Got init status: {}', status
@@ -252,7 +256,7 @@ final class DefaultRunner implements Runner {
     }
   }
 
-  protected void runJetty() {
+  protected void launchProcess() {
 
     sconfig.onStart*.call()
 
@@ -270,7 +274,7 @@ final class DefaultRunner implements Runner {
     try {
       project.javaexec { spec ->
         spec.classpath = project.configurations.gretty
-        spec.main = 'org.akhikhl.gretty.Runner'
+        spec.main = getRunnerClassName()
         spec.args = [ cmdLineJson ]
         spec.debug = startTask.debug
         log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs

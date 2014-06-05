@@ -11,7 +11,7 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-interface Runner {
+interface Launcher {
 
-  void run(StartBaseTask startTask)
+  void launch(StartBaseTask startTask)
 }

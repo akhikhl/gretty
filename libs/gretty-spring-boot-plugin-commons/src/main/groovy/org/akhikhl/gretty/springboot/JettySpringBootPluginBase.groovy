@@ -8,7 +8,7 @@
 package org.akhikhl.gretty.springboot
 
 import org.akhikhl.gretty.JettyPluginBase
-import org.akhikhl.gretty.RunnerFactory
+import org.akhikhl.gretty.LauncherFactory
 import org.gradle.api.Project
 
 /**
@@ -35,8 +35,8 @@ abstract class JettySpringBootPluginBase extends JettyPluginBase {
   }
 
   @Override
-  protected RunnerFactory getRunnerFactory() {
-    new SpringBootRunnerFactory()
+  protected LauncherFactory getLauncherFactory() {
+    new SpringBootLauncherFactory()
   }
   
   @Override

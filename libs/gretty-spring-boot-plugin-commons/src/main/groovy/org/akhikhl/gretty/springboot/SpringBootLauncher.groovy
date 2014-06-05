@@ -9,7 +9,7 @@ package org.akhikhl.gretty.springboot
 
 import org.akhikhl.gretty.StartBaseTask
 import org.akhikhl.gretty.RunConfig
-import org.akhikhl.gretty.Runner
+import org.akhikhl.gretty.Launcher
 import org.akhikhl.gretty.ServerConfig
 import org.akhikhl.gretty.WebAppConfig
 import java.util.concurrent.Executors
@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
-class SpringBootRunner implements Runner {
+class SpringBootLauncher implements Launcher {
 
-  protected static final Logger log = LoggerFactory.getLogger(SpringBootRunner)
+  protected static final Logger log = LoggerFactory.getLogger(SpringBootLauncher)
 
   protected StartBaseTask startTask
   protected Project project
@@ -33,7 +33,7 @@ class SpringBootRunner implements Runner {
   protected Iterable<WebAppConfig> webAppConfigs
   protected final ExecutorService executorService
 
-  SpringBootRunner() {
+  SpringBootLauncher() {
     executorService = Executors.newSingleThreadExecutor()
   }
 
@@ -56,15 +56,15 @@ class SpringBootRunner implements Runner {
   }
 
   @Override
-  void run(StartBaseTask startTask) {
+  void launch(StartBaseTask startTask) {
     init(startTask)
-    runSpringBoot()
+    launchProcess()
   }
 
-  private void runSpringBoot() {
+  private void launchProcess() {
 
     def cmdLineJson = getCommandLineJson()
-    log.warn 'Command-line json: {}', cmdLineJson.toPrettyString()
+    log.debug 'Command-line json: {}', cmdLineJson.toPrettyString()
     cmdLineJson = cmdLineJson.toString()
 
     // we are going to pass json as argument to java process.

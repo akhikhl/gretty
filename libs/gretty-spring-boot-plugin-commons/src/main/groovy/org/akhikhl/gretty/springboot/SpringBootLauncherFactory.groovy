@@ -7,17 +7,17 @@
  */
 package org.akhikhl.gretty.springboot
 
-import org.akhikhl.gretty.Runner
-import org.akhikhl.gretty.RunnerFactory
+import org.akhikhl.gretty.Launcher
+import org.akhikhl.gretty.LauncherFactory
 
 /**
  *
  * @author akhikhl
  */
-class SpringBootRunnerFactory implements RunnerFactory {
+class SpringBootLauncherFactory implements LauncherFactory {
   
-	Runner createRunner() {
-    new SpringBootRunner()
+	Launcher createLauncher() {
+    new SpringBootLauncher()
   }
 }
 

@@ -35,7 +35,7 @@ abstract class JettyPluginBase implements Plugin<Project> {
     project.ext.jettyVersion = project.ext.grettyPluginJettyVersion = getJettyVersion()
 
     project.ext.scannerManagerFactory = getScannerManagerFactory()
-    project.ext.runnerFactory = getRunnerFactory()
+    project.ext.launcherFactory = getLauncherFactory()
 
     project.extensions.create('gretty', GrettyExtension)
 
@@ -214,8 +214,8 @@ abstract class JettyPluginBase implements Plugin<Project> {
 
   protected abstract String getPluginName()
   
-  protected RunnerFactory getRunnerFactory() {
-    new DefaultRunnerFactory()
+  protected LauncherFactory getLauncherFactory() {
+    new DefaultLauncherFactory()
   }
 
   protected abstract ScannerManagerFactory getScannerManagerFactory()

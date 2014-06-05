@@ -11,8 +11,8 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-interface RunnerFactory {
+interface LauncherFactory {
   
-	Runner createRunner()
+	Launcher createLauncher()
 }
 
