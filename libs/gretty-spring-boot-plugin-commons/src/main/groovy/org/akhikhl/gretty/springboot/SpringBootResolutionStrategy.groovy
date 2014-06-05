@@ -22,17 +22,17 @@ class SpringBootResolutionStrategy {
   protected static Class VersionManagedDependencies
 
   static void apply(Project project) {
-    init()
     if(project.configurations.findByName('versionManagement')) // already applied?
       return
     project.configurations.create('versionManagement')
+    resolveClasses()
     if(PropertiesFileManagedDependencies == null)
       resolveDependencyVersions_1_0_x(project)
     else
       resolveDependencyVersions_1_1_x(project)
   }
 
-  private static init() {
+  private static resolveClasses() {
     if(ManagedDependencies == null)
       try {
         ManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.ManagedDependencies', true, JettySpringBootPluginBase.classLoader)
