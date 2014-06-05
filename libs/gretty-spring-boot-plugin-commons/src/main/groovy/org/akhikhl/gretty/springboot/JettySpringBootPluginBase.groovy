@@ -18,8 +18,30 @@ import org.gradle.api.artifacts.DependencyResolveDetails
  */
 abstract class JettySpringBootPluginBase extends JettyPluginBase {
   
-  protected static final Class PropertiesFileManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.PropertiesFileManagedDependencies', true, JettySpringBootPluginBase.classLoader)
-  protected static final Class VersionManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.VersionManagedDependencies', true, JettySpringBootPluginBase.classLoader)
+  protected static Class ManagedDependencies
+  protected static Class PropertiesFileManagedDependencies
+  protected static Class VersionManagedDependencies
+  
+  JettySpringBootPluginBase() {
+    if(ManagedDependencies == null)
+      try {
+        ManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.ManagedDependencies', true, JettySpringBootPluginBase.classLoader)
+      } catch(ClassNotFoundException e) {
+        // ignore, we are using older version of spring-boot
+      }
+    if(PropertiesFileManagedDependencies == null)
+      try {
+        PropertiesFileManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.PropertiesFileManagedDependencies', true, JettySpringBootPluginBase.classLoader)
+      } catch(ClassNotFoundException e) {
+        // ignore, we are using older version of spring-boot
+      }
+    if(VersionManagedDependencies == null)
+      try {
+        VersionManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.VersionManagedDependencies', true, JettySpringBootPluginBase.classLoader)
+      } catch(ClassNotFoundException e) {
+        // ignore, we are using older version of spring-boot
+      }
+  }
 
   @Override
   protected void createConfigurations(Project project) {
@@ -34,7 +56,10 @@ abstract class JettySpringBootPluginBase extends JettyPluginBase {
       }
     if(!project.configurations.findByName('versionManagement')) {
       project.configurations.create('versionManagement')
-      resolveDependencyVersions(project)
+      if(PropertiesFileManagedDependencies == null)
+        resolveDependencyVersions(project)
+      else
+        resolveDependencyVersionsNew(project)
     }
   }	
   
@@ -52,6 +77,27 @@ abstract class JettySpringBootPluginBase extends JettyPluginBase {
   }
   
   private void resolveDependencyVersions(Project project) {
+    def managedDependencies
+    project.configurations.all { config ->
+      if(config.name == 'versionManagement')
+        return
+      config.resolutionStrategy.eachDependency { DependencyResolveDetails resolveDetails ->
+        if(!resolveDetails.target.version) {
+          if(managedDependencies == null)
+            managedDependencies = ManagedDependencies.get()
+          if (resolveDetails.target.group == 'org.springframework.boot')
+            resolveDetails.useVersion(managedDependencies.version)
+          else {
+            def dependency = managedDependencies.find(target.group, target.name)
+            if (dependency)
+              resolveDetails.useVersion(dependency.version)
+          }
+        }        
+      }
+    }
+  }
+  
+  private void resolveDependencyVersionsNew(Project project) {
     def managedDependencies
     project.configurations.all { config ->
       if(config.name == 'versionManagement')
