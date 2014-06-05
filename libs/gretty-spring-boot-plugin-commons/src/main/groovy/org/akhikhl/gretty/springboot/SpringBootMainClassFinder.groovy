@@ -17,9 +17,9 @@ class SpringBootMainClassFinder {
 
   static String findMainClass(Project project) {
 
-		def bootExtension = project.extensions.findByName('springBoot')
-		if(bootExtension && bootExtension.mainClass)
-			return bootExtension.mainClass
+    def bootExtension = project.extensions.findByName('springBoot')
+    if(bootExtension && bootExtension.mainClass)
+      return bootExtension.mainClass
 
     def MainClassFinder = Class.forName('org.springframework.boot.loader.tools.MainClassFinder', true, SpringBootMainClassFinder.classLoader)
 
