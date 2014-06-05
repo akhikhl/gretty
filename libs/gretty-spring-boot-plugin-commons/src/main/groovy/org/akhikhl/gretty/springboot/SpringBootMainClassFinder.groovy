@@ -23,6 +23,11 @@ class SpringBootMainClassFinder {
 
     def MainClassFinder = Class.forName('org.springframework.boot.loader.tools.MainClassFinder', true, SpringBootMainClassFinder.classLoader)
 
+    if(MainClassFinder.metaClass.methods.find { it.name == 'findSingleMainClass' })
+      // spring-boot 1.1.x
+      return MainClassFinder.findSingleMainClass(project.sourceSets.main.output.classesDir)
+
+    // spring-boot 1.0.x
     return MainClassFinder.findMainClass(project.sourceSets.main.output.classesDir)
   }
 }
