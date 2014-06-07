@@ -25,6 +25,7 @@ class WebAppConfig {
   def fastReload
   def inplaceResourceBase
   def warResourceBase
+  
   Set<URL> classPath
 
   String projectPath
@@ -109,44 +110,6 @@ class WebAppConfig {
   protected void resolve(Project project) {
     realmConfigFile = ProjectUtils.resolveSingleFile(project, realmConfigFile)
     jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, jettyEnvXmlFile)
-
-    def resolvedClassPath = new LinkedHashSet<URL>()
-    resolvedClassPath.addAll(ProjectUtils.getClassPath(project, inplace))
-    if(classPath != null)
-      for(def elem in classPath) {
-        while(elem instanceof Closure)
-          elem = elem()
-        if(elem != null) {
-          if(elem instanceof File) {
-            if(!elem.isAbsolute()) {
-              if(project == null)
-                elem = new File(System.getProperty('user.home'), elem.path).absolutePath
-              else
-                elem = new File(project.projectDir, elem.path)
-            }
-            elem = elem.toURI().toURL()
-          }
-          else if(elem instanceof URI)
-            elem = elem.toURL()
-          else if(!(elem instanceof URL)) {
-            elem = elem.toString()
-            if(!(elem =~ /.{2,}\:.+/)) { // no schema?
-              if(!new File(elem).isAbsolute()) {
-                if(project == null)
-                  elem = new File(System.getProperty('user.home'), elem).absolutePath
-                else
-                  elem = new File(project.projectDir, elem).absolutePath
-              }
-              if(!elem.startsWith('/'))
-                elem = '/' + elem
-              elem = 'file://' + elem
-            }
-            elem = new URL(elem.toString())
-          }
-          resolvedClassPath.add(elem)
-        }
-      }
-    classPath = resolvedClassPath
   }
 
   void scanDir(String value) {

@@ -117,67 +117,21 @@ class DefaultLauncher implements Launcher {
     }
     json
   }
-
-  protected getRunConfigJson() {
+  
+  private getRunConfigJson() {
     def json = new JsonBuilder()
     json {
-      if(sconfig.host)
-        host sconfig.host
-      if(sconfig.httpEnabled) {
-        httpPort sconfig.httpPort
-        if(sconfig.httpIdleTimeout)
-          httpIdleTimeout sconfig.httpIdleTimeout
-      }
-      if(sconfig.httpsEnabled) {
-        httpsPort sconfig.httpsPort
-        if(sconfig.httpsIdleTimeout)
-          httpsIdleTimeout sconfig.httpsIdleTimeout
-        if(sconfig.sslKeyStorePath)
-          sslKeyStorePath sconfig.sslKeyStorePath.absolutePath
-        if(sconfig.sslKeyStorePassword)
-          sslKeyStorePassword sconfig.sslKeyStorePassword
-        if(sconfig.sslKeyManagerPassword)
-          sslKeyManagerPassword sconfig.sslKeyManagerPassword
-        if(sconfig.sslTrustStorePath)
-          sslTrustStorePath sconfig.sslTrustStorePath.absolutePath
-        if(sconfig.sslTrustStorePassword)
-          sslTrustStorePassword sconfig.sslTrustStorePassword
-      }
-      if(sconfig.jettyXmlFile)
-        jettyXml sconfig.jettyXmlFile.absolutePath
-      if(sconfig.logbackConfigFile)
-        logbackConfig sconfig.logbackConfigFile.absolutePath
-      else
-        logging {
-          loggingLevel sconfig.loggingLevel
-          consoleLogEnabled sconfig.consoleLogEnabled
-          fileLogEnabled sconfig.fileLogEnabled
-          logFileName sconfig.logFileName
-          logDir sconfig.logDir
-        }
-      webApps webAppConfigs.collect { WebAppConfig webAppConfig ->
-        { ->
-          inplace webAppConfig.inplace
-          if(webAppConfig.classPath)
-            webappClassPath webAppConfig.classPath
-          contextPath webAppConfig.contextPath
-          resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase ?: webAppConfig.warResourceBase.toString() ?: '')
-          if(webAppConfig.initParameters)
-            initParams webAppConfig.initParameters
-          if(webAppConfig.realm && webAppConfig.realmConfigFile) {
-            realm webAppConfig.realm
-            realmConfigFile webAppConfig.realmConfigFile.absolutePath
-          }
-          if(webAppConfig.jettyEnvXmlFile)
-            jettyEnvXml webAppConfig.jettyEnvXmlFile.absolutePath
-        }
-      }
+      writeRunConfigJson(delegate)
     }
     json
   }
 
   protected String getRunnerClassName() {
     'org.akhikhl.gretty.Runner'
+  }
+  
+  protected String getRunnerRuntimeConfig() {
+    'runtime'
   }
 
   protected void init(StartBaseTask startTask) {
@@ -290,5 +244,103 @@ class DefaultLauncher implements Launcher {
     }
 
     sconfig.onStop*.call()
+  }
+  
+  protected Collection<URL> resolveWebAppClassPath(WebAppConfig webAppConfig) {
+    def resolvedClassPath = new LinkedHashSet<URL>()
+    resolvedClassPath.addAll(ProjectUtils.getClassPath(project, webAppConfig.inplace, getRunnerRuntimeConfig()))
+    if(webAppConfig.classPath != null)
+      for(def elem in webAppConfig.classPath) {
+        while(elem instanceof Closure)
+          elem = elem()
+        if(elem != null) {
+          if(elem instanceof File) {
+            if(!elem.isAbsolute()) {
+              if(project == null)
+                elem = new File(System.getProperty('user.home'), elem.path).absolutePath
+              else
+                elem = new File(project.projectDir, elem.path)
+            }
+            elem = elem.toURI().toURL()
+          }
+          else if(elem instanceof URI)
+            elem = elem.toURL()
+          else if(!(elem instanceof URL)) {
+            elem = elem.toString()
+            if(!(elem =~ /.{2,}\:.+/)) { // no schema?
+              if(!new File(elem).isAbsolute()) {
+                if(project == null)
+                  elem = new File(System.getProperty('user.home'), elem).absolutePath
+                else
+                  elem = new File(project.projectDir, elem).absolutePath
+              }
+              if(!elem.startsWith('/'))
+                elem = '/' + elem
+              elem = 'file://' + elem
+            }
+            elem = new URL(elem.toString())
+          }
+          resolvedClassPath.add(elem)
+        }
+      }
+    return resolvedClassPath
+  }
+  
+  protected writeRunConfigJson(json) {
+    def self = this
+    json.with {
+      if(sconfig.host)
+        host sconfig.host
+      if(sconfig.httpEnabled) {
+        httpPort sconfig.httpPort
+        if(sconfig.httpIdleTimeout)
+          httpIdleTimeout sconfig.httpIdleTimeout
+      }
+      if(sconfig.httpsEnabled) {
+        httpsPort sconfig.httpsPort
+        if(sconfig.httpsIdleTimeout)
+          httpsIdleTimeout sconfig.httpsIdleTimeout
+        if(sconfig.sslKeyStorePath)
+          sslKeyStorePath sconfig.sslKeyStorePath.absolutePath
+        if(sconfig.sslKeyStorePassword)
+          sslKeyStorePassword sconfig.sslKeyStorePassword
+        if(sconfig.sslKeyManagerPassword)
+          sslKeyManagerPassword sconfig.sslKeyManagerPassword
+        if(sconfig.sslTrustStorePath)
+          sslTrustStorePath sconfig.sslTrustStorePath.absolutePath
+        if(sconfig.sslTrustStorePassword)
+          sslTrustStorePassword sconfig.sslTrustStorePassword
+      }
+      if(sconfig.jettyXmlFile)
+        jettyXml sconfig.jettyXmlFile.absolutePath
+      if(sconfig.logbackConfigFile)
+        logbackConfig sconfig.logbackConfigFile.absolutePath
+      else
+        logging {
+          loggingLevel sconfig.loggingLevel
+          consoleLogEnabled sconfig.consoleLogEnabled
+          fileLogEnabled sconfig.fileLogEnabled
+          logFileName sconfig.logFileName
+          logDir sconfig.logDir
+        }
+      webApps webAppConfigs.collect { WebAppConfig webAppConfig ->
+        { ->
+          inplace webAppConfig.inplace
+          def classPath = self.resolveWebAppClassPath(webAppConfig)
+          if(classPath)
+            webappClassPath classPath            
+          contextPath webAppConfig.contextPath
+          resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase ?: webAppConfig.warResourceBase.toString() ?: '')
+          if(webAppConfig.initParameters)
+            initParams webAppConfig.initParameters
+          if(webAppConfig.realm && webAppConfig.realmConfigFile) {
+            realm webAppConfig.realm
+            realmConfigFile webAppConfig.realmConfigFile.absolutePath
+          }
+          if(webAppConfig.jettyEnvXmlFile)
+            jettyEnvXml webAppConfig.jettyEnvXmlFile.absolutePath
+        }
+      }
+    }
   }
 }

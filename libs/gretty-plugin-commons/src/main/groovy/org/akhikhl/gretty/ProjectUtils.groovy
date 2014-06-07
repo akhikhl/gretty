@@ -138,13 +138,15 @@ final class ProjectUtils {
     return contextPath
   }
 
-  static Set<URL> getClassPath(Project project, boolean inplace) {
+  static Set<URL> getClassPath(Project project, boolean inplace, String dependencyConfig) {
     Set<URL> urls = new LinkedHashSet()
     if(project != null && inplace) {
+      if(!dependencyConfig)
+        dependencyConfig = 'runtime'
       def addProjectClassPath
       addProjectClassPath = { Project proj ->
         urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
-        urls.addAll proj.configurations.runtime.files.collect { it.toURI().toURL() }
+        urls.addAll proj.configurations[dependencyConfig].files.collect { it.toURI().toURL() }
         // ATTENTION: order of overlay classpath is important!
         if(proj.extensions.findByName('gretty'))
           for(String overlay in proj.gretty.overlays.reverse())
