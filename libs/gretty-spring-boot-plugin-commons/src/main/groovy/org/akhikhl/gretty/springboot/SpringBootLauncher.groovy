@@ -8,6 +8,8 @@
 package org.akhikhl.gretty.springboot
 
 import org.akhikhl.gretty.DefaultLauncher
+import org.akhikhl.gretty.WebAppConfig
+import org.gradle.api.file.FileCollection
 
 /**
  *
@@ -21,6 +23,14 @@ class SpringBootLauncher extends DefaultLauncher {
   }
   
   @Override
+  protected FileCollection getRunnerClassPath() {
+    project.files(project.configurations.gretty.files +
+      webAppConfigs.collectMany { WebAppConfig webAppConfig ->
+        resolveWebAppClassPath(webAppConfig)
+      })
+  }
+  
+  @Override
   protected String getRunnerRuntimeConfig() {
     'springBoot'
   }
@@ -31,5 +41,9 @@ class SpringBootLauncher extends DefaultLauncher {
     json.with {
       springBootMainClass SpringBootMainClassFinder.findMainClass(project)
     }
+  }
+  
+  protected void writeWebAppClassPath(json, WebAppConfig webAppConfig) {
+    // webapp classpath is passed to runner
   }
 }

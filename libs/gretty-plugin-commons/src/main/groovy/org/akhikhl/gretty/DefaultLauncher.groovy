@@ -23,6 +23,7 @@ import org.bouncycastle.jce.provider.asymmetric.ec.KeyPairGenerator
 import org.bouncycastle.x509.X509V3CertificateGenerator
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -124,6 +125,10 @@ class DefaultLauncher implements Launcher {
       writeRunConfigJson(delegate)
     }
     json
+  }
+  
+  protected FileCollection getRunnerClassPath() {
+    project.configurations.gretty
   }
 
   protected String getRunnerClassName() {
@@ -227,7 +232,7 @@ class DefaultLauncher implements Launcher {
     scanman.startScanner(project, sconfig, webAppConfigs)
     try {
       project.javaexec { spec ->
-        spec.classpath = project.configurations.gretty
+        spec.classpath = getRunnerClassPath()
         spec.main = getRunnerClassName()
         spec.args = [ cmdLineJson ]
         spec.debug = startTask.debug
@@ -326,9 +331,7 @@ class DefaultLauncher implements Launcher {
       webApps webAppConfigs.collect { WebAppConfig webAppConfig ->
         { ->
           inplace webAppConfig.inplace
-          def classPath = self.resolveWebAppClassPath(webAppConfig)
-          if(classPath)
-            webappClassPath classPath            
+          self.writeWebAppClassPath(json, webAppConfig)
           contextPath webAppConfig.contextPath
           resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase ?: webAppConfig.warResourceBase.toString() ?: '')
           if(webAppConfig.initParameters)
@@ -342,5 +345,11 @@ class DefaultLauncher implements Launcher {
         }
       }
     }
+  }
+  
+  protected void writeWebAppClassPath(json, WebAppConfig webAppConfig) {
+    def classPath = resolveWebAppClassPath(webAppConfig)
+    if(classPath)
+      json.webappClassPath classPath
   }
 }
