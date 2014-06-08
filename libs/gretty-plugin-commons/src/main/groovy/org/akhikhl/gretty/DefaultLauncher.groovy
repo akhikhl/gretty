@@ -291,7 +291,22 @@ class DefaultLauncher implements Launcher {
     return resolvedClassPath
   }
   
-  protected writeRunConfigJson(json) {
+  protected void writeLoggingConfig(json) {
+    json.with {
+      if(sconfig.logbackConfigFile)
+        logbackConfig sconfig.logbackConfigFile.absolutePath
+      else
+        logging {
+          loggingLevel sconfig.loggingLevel
+          consoleLogEnabled sconfig.consoleLogEnabled
+          fileLogEnabled sconfig.fileLogEnabled
+          logFileName sconfig.logFileName
+          logDir sconfig.logDir
+        }
+    }    
+  }
+  
+  protected void writeRunConfigJson(json) {
     def self = this
     json.with {
       if(sconfig.host)
@@ -318,16 +333,7 @@ class DefaultLauncher implements Launcher {
       }
       if(sconfig.jettyXmlFile)
         jettyXml sconfig.jettyXmlFile.absolutePath
-      if(sconfig.logbackConfigFile)
-        logbackConfig sconfig.logbackConfigFile.absolutePath
-      else
-        logging {
-          loggingLevel sconfig.loggingLevel
-          consoleLogEnabled sconfig.consoleLogEnabled
-          fileLogEnabled sconfig.fileLogEnabled
-          logFileName sconfig.logFileName
-          logDir sconfig.logDir
-        }
+      writeLoggingConfig(json)
       webApps webAppConfigs.collect { WebAppConfig webAppConfig ->
         { ->
           inplace webAppConfig.inplace

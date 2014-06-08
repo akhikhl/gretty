@@ -33,6 +33,9 @@ final class SpringBootServerManager implements ServerManager {
   @Override
   void startServer() {
 
+    if(params.logbackConfig)
+      System.setProperty('logging.config', params.logbackConfig)
+
     def springBootMainClass = Class.forName(params.springBootMainClass, true, this.getClass().classLoader)
     springBootMainClass.main([ '--spring.main.sources=org.akhikhl.gretty.springboot' ] as String[])
     

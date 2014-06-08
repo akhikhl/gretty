@@ -1,0 +1,28 @@
+scan '30 seconds'
+
+String encoderPattern = '%-12date{HH:mm:ss} %-5level %logger{35} - %msg%n'
+
+def appenders = []
+<% if(consoleLogEnabled) { %>
+appender('CONSOLE', ConsoleAppender) {
+  encoder(PatternLayoutEncoder) {
+    pattern = encoderPattern
+  }
+}
+appenders += 'CONSOLE'
+<% } %>
+<% if(fileLogEnabled) { %>
+appender('FILE', RollingFileAppender) {
+  file = "${logDir}/${logFileName}.log"
+  append = true
+  rollingPolicy(TimeBasedRollingPolicy) {
+    fileNamePattern = "${logDir}/${logFileName}-%d{yyyy-MM-dd_HH}.log"
+    maxHistory = 7
+  }
+  encoder(PatternLayoutEncoder) {
+    pattern = encoderPattern
+  }
+}
+appenders += 'FILE'
+<% } %>
+root ${loggingLevel}, appenders

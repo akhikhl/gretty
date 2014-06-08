@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty.springboot
 
+import groovy.text.GStringTemplateEngine
 import org.akhikhl.gretty.DefaultLauncher
 import org.akhikhl.gretty.WebAppConfig
 import org.gradle.api.file.FileCollection
@@ -35,8 +36,33 @@ class SpringBootLauncher extends DefaultLauncher {
     'springBoot'
   }
   
+  protected void writeLoggingConfig(json) {
+    File logbackConfigFile
+    if(sconfig.logbackConfigFile)
+      logbackConfigFile = sconfig.logbackConfigFile
+    else {
+      logbackConfigFile = new File(project.buildDir, 'logging/logback.groovy')
+      logbackConfigFile.parentFile.mkdirs()
+      def binding = [
+        loggingLevel: sconfig.loggingLevel,
+        consoleLogEnabled: sconfig.consoleLogEnabled,
+        fileLogEnabled: sconfig.fileLogEnabled,
+        logFileName: sconfig.logFileName,
+        logDir: sconfig.logDir
+      ]
+      def template
+      getClass().getResourceAsStream('logback-groovy.template').withReader {
+        template = new GStringTemplateEngine().createTemplate(it).make(binding)
+      }
+      logbackConfigFile.text = template.toString()
+    }
+    json.with {
+      logbackConfig logbackConfigFile.absolutePath
+    }    
+  }
+  
   @Override
-  protected writeRunConfigJson(json) {
+  protected void writeRunConfigJson(json) {
     super.writeRunConfigJson(json)
     json.with {
       springBootMainClass SpringBootMainClassFinder.findMainClass(project)
