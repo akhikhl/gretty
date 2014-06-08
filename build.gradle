@@ -1,6 +1,12 @@
 group = 'org.akhikhl.gretty'
 version = '0.0.23'
 
+repositories {
+  mavenLocal()
+  jcenter()
+  maven { url "http://repo.spring.io/release" }
+}
+
 ext {
   project_id = 'gretty'
   project_description = 'Advanced gradle plugin for running web-apps on jetty'

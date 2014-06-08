@@ -11,6 +11,9 @@ import org.akhikhl.gretty.ServerManager
 import org.akhikhl.gretty.LoggingUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.embedded.jetty.JettyEmbeddedServletContainer
+import org.springframework.context.ApplicationContext
 
 /**
  *
@@ -18,53 +21,35 @@ import org.slf4j.LoggerFactory
  */
 final class SpringBootServerManager implements ServerManager {
   
-  protected Map params
-	protected server
-  protected Logger log 
+  protected static final Logger log = LoggerFactory.getLogger(SpringBootServerManager)
   
-  SpringBootServerManager() {
-  }
+  protected Map params
 
   @Override
   void setParams(Map params) {
     this.params = params
   }
- 
+  
   @Override
   void startServer() {
-    assert server == null
 
-    if(params.logging)
-      LoggingUtils.configureLogging(params.logging)
-    else if(params.logbackConfig)
-      LoggingUtils.useConfig(params.logbackConfig)
-
-    log = LoggerFactory.getLogger(this.getClass())
-    
-    //configurer.setLogger(log)
-    def webapp = params.webApps[0]
-    log.warn 'webapp.webappClassPath: {}', webapp.webappClassPath
-    URL[] classpathUrls = (webapp.webappClassPath.collect { new URL(it) }) as URL[]
-    classpathUrls.each {
-      log.warn 'URL {}', it
-    }
-    ClassLoader classLoader = new URLClassLoader(classpathUrls, this.getClass().getClassLoader())
-    Class.forName('org.springframework.boot.autoconfigure.EnableAutoConfigurationImportSelector', true, classLoader)
-    
-    def springBootMainClass = Class.forName(params.springBootMainClass, true, classLoader)
-    assert springBootMainClass != null
-    springBootMainClass.main([] as String[])
+    def springBootMainClass = Class.forName(params.springBootMainClass, true, this.getClass().classLoader)
+    springBootMainClass.main([ '--spring.main.sources=org.akhikhl.gretty.springboot' ] as String[])
     
     log.warn 'spring-boot server started!'
+    
+    /*String[] beanNames = ApplicationContextProvider.applicationContext.getBeanDefinitionNames()
+    Arrays.sort(beanNames)
+    for (String beanName : beanNames)
+      log.warn 'bean: {}', beanName*/
   }
 
   @Override
   void stopServer() {
-    if(server != null) {
-      server.stop()
-      server = null
+    if(ServletContainerConfigurer.servletContainer != null) {
+      ServletContainerConfigurer.servletContainer.stop()
+      ServletContainerConfigurer.servletContainer = null
     }
     log.warn 'spring-boot server stopped!'
-    log = null
   }
 }

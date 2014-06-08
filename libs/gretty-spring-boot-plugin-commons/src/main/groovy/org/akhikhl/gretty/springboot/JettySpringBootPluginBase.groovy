@@ -29,6 +29,13 @@ abstract class JettySpringBootPluginBase extends JettyPluginBase {
           extendsFrom runtime
           exclude module: 'spring-boot-starter-tomcat'
           exclude group: 'org.eclipse.jetty'
+        }        
+      }
+    if(!project.configurations.findByName('grettyNoSpringBoot'))
+      project.configurations {
+        grettyNoSpringBoot {
+          extendsFrom gretty
+          exclude group: 'org.springframework.boot'
         }
       }
     SpringBootResolutionStrategy.apply(project)
@@ -51,7 +58,6 @@ abstract class JettySpringBootPluginBase extends JettyPluginBase {
 
   @Override
   protected void injectDependencies(Project project) {
-    super.injectDependencies(project)
     project.dependencies {
       compile 'org.springframework.boot:spring-boot-starter-web'
       springBoot 'org.springframework.boot:spring-boot-starter-jetty'

@@ -238,10 +238,6 @@ abstract class JettyPluginBase implements Plugin<Project> {
     }    
   }
 
-  protected void injectDependencies(Project project) {
-    injectJettyDependencies(project)
-  }
-
-  protected abstract void injectJettyDependencies(Project project)
+  protected abstract void injectDependencies(Project project)
 
 } // JettyPluginBase

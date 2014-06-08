@@ -24,10 +24,10 @@ class SpringBootLauncher extends DefaultLauncher {
   
   @Override
   protected FileCollection getRunnerClassPath() {
-    project.files(project.configurations.gretty.files +
-      webAppConfigs.collectMany { WebAppConfig webAppConfig ->
-        resolveWebAppClassPath(webAppConfig)
-      })
+    def files = project.configurations.grettyNoSpringBoot.files
+    for(def wconfig in webAppConfigs)
+      files += resolveWebAppClassPath(wconfig)
+    project.files(files)
   }
   
   @Override
@@ -44,6 +44,6 @@ class SpringBootLauncher extends DefaultLauncher {
   }
   
   protected void writeWebAppClassPath(json, WebAppConfig webAppConfig) {
-    // webapp classpath is passed to runner
+    // webapp classpath is passed to the runner
   }
 }

@@ -156,12 +156,9 @@ final class ProjectUtils {
       for(File overlayJar in collectOverlayJars(project))
         if(urls.remove(overlayJar.toURI().toURL()))
           log.debug '{} is overlay jar, exclude from classpath', overlayJar
-      for(File grettyConfigJar in project.configurations.grettyHelperConfig.files)
-        if(urls.remove(grettyConfigJar.toURI().toURL()))
-          log.debug '{} is gretty-config jar, exclude from classpath', grettyConfigJar
+      for(URL url in urls)
+        log.debug 'classpath URL: {}', url
     }
-    for(URL url in urls)
-      log.debug 'classpath URL: {}', url
     return urls
   }
 
