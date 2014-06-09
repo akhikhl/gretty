@@ -74,11 +74,11 @@ class ServletContainerFactory extends JettyEmbeddedServletContainerFactory imple
       context.getSessionHandler().getSessionManager().setMaxInactiveInterval(getSessionTimeout())
       postProcessWebAppContext(context)
     }
-    
-		for (JettyServerCustomizer customizer : getServerCustomizers())
-			customizer.customize(server)
-    
-		return getJettyEmbeddedServletContainer(server)
+
+    for (JettyServerCustomizer customizer : getServerCustomizers())
+      customizer.customize(server)
+
+    return getJettyEmbeddedServletContainer(server)
   }
   
   public void setParams(Map params) {
