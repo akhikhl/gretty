@@ -5,5 +5,6 @@ dependencies {
   compile project(':libs:gretty-plugin-commons')
   compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
   compile "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"  
+  compile 'org.springframework:springloaded:1.2.0.RELEASE'
   compile gradleApi()
 }

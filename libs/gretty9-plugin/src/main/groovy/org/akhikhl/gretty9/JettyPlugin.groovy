@@ -14,6 +14,8 @@ import org.akhikhl.gretty9.Messages
 
 class JettyPlugin extends JettyPluginBase {
 
+  static final ScannerManagerFactory scannerManagerFactory = new ScannerManagerFactoryImpl()
+
   @Override
   protected String getJettyVersion() {
     Messages.getString('jettyVersion')
@@ -26,7 +28,7 @@ class JettyPlugin extends JettyPluginBase {
 
   @Override
   protected ScannerManagerFactory getScannerManagerFactory() {
-    ScannerManagerFactoryImpl.instance
+    scannerManagerFactory
   }
 
   @Override

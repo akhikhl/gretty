@@ -18,6 +18,8 @@ import org.gradle.api.Project
  */
 class JettySpringBootPlugin extends JettySpringBootPluginBase {
 
+  static final ScannerManagerFactory scannerManagerFactory = new ScannerManagerFactoryImpl(true)
+
   @Override
   protected String getJettyVersion() {
     Messages.getString('jettyVersion')
@@ -30,7 +32,7 @@ class JettySpringBootPlugin extends JettySpringBootPluginBase {
 
   @Override
   protected ScannerManagerFactory getScannerManagerFactory() {
-    ScannerManagerFactoryImpl.instance
+    scannerManagerFactory
   }
 
   @Override

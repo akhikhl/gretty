@@ -26,6 +26,8 @@ abstract class ScannerManagerBase {
   //protected boolean inplace
   protected scanner
   protected Map fastReloadMap
+  
+  boolean managedClassReload
 
   protected abstract void addScannerBulkListener(Closure listener)
 
@@ -83,8 +85,8 @@ abstract class ScannerManagerBase {
     sconfig.onScanFilesChanged*.call(changedFiles)
 
     List<WebAppConfig> changedWebAppProjects = []
-    boolean fastReload = true
-
+    Set reloadModes = new HashSet()
+    
     for(String f in changedFiles) {
       if(f.endsWith('.jar')) {
         List<WebAppConfig> dependantWebAppProjects = webapps.findAll {
@@ -92,7 +94,7 @@ abstract class ScannerManagerBase {
         }
         if(dependantWebAppProjects) {
           log.debug 'changed file {} is dependency of {}, switching to fullReload', f, (dependantWebAppProjects.collect { it.projectPath })
-          fastReload = false
+          reloadModes += 'full'
         }
         log.debug 'changed file {} affects projects {}', f, (dependantWebAppProjects.collect { it.projectPath })
         changedWebAppProjects += dependantWebAppProjects
@@ -106,37 +108,36 @@ abstract class ScannerManagerBase {
         changedWebAppProjects.add(webapp)
         def proj = project.project(webapp.projectPath)
         if(f.endsWith('.class')) {
-          log.debug 'file {} is class, switching to fullReload', f
-          fastReload = false
+          if(!managedClassReload) {
+            log.debug 'file {} is class, switching to fullReload', f
+            reloadModes += 'full'
+          }
         }
-        else if(['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml'].find { it == new File(f).name }) {
+        else if(new File(f).name in ['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml']) {
           log.debug 'file {} is configuration file, switching to fullReload', f
-          fastReload = false
+          reloadModes += 'full'
         }
         else if(f.startsWith(new File(proj.webAppDir, 'WEB-INF/lib').absolutePath)) {
           log.debug 'file {} is in WEB-INF/lib, switching to fullReload', f
-          fastReload = false
+          reloadModes += 'full'
         } else {
           List<FastReloadStruct> fastReloadDirs = fastReloadMap[proj.path]
-          if(!fastReloadDirs?.find { FastReloadStruct s ->
+          if(fastReloadDirs?.find { FastReloadStruct s ->
             String relPath = s.baseDir.toPath().relativize(Paths.get(f))
             f.startsWith(s.baseDir.absolutePath) && (s.pattern == null || relPath =~ s.pattern) && (s.excludesPattern == null || !(relPath =~ s.excludesPattern))
           }) {
+            log.debug 'file {} is in fastReload directories', f
+            reloadModes += 'fast'
+          } else {
             log.debug 'file {} is not in fastReload directories, switching to fullReload', f
-            fastReload = false
+            reloadModes += 'full'
           }
         }
       }
     }
 
-    if(fastReload) {
-      log.warn 'performing fastReload'
-      for(WebAppConfig webapp in changedWebAppProjects) {
-        def proj = project.project(webapp.projectPath)
-        ProjectUtils.prepareInplaceWebAppFolder(proj)
-      }
-    } else {
-      log.warn 'performing fullReload'
+    if(reloadModes.contains('full')) {
+      log.debug 'performing fullReload'
       for(WebAppConfig webapp in changedWebAppProjects) {
         Project proj = project.project(webapp.projectPath)
         ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
@@ -147,6 +148,12 @@ abstract class ScannerManagerBase {
         }
       }
       ServiceProtocol.send(sconfig.servicePort, 'restart')
+    } else if(reloadModes.contains('fast')) {
+      log.debug 'performing fastReload'
+      for(WebAppConfig webapp in changedWebAppProjects) {
+        def proj = project.project(webapp.projectPath)
+        ProjectUtils.prepareInplaceWebAppFolder(proj)
+      }
     }
   }
 
@@ -156,16 +163,16 @@ abstract class ScannerManagerBase {
     this.webapps = webapps
     if(!sconfig.scanInterval) {
       if(sconfig.scanInterval == null)
-        log.warn 'scanInterval not specified, hot deployment disabled'
+        log.debug 'scanInterval not specified, hot deployment disabled'
       else if(sconfig.scanInterval == 0)
-        log.warn 'scanInterval is zero, hot deployment disabled'
+        log.debug 'scanInterval is zero, hot deployment disabled'
       return
     }
     scanner = createScanner()
     scanner.scanDirs = getEffectiveScanDirs()
     configureFastReload()
     configureScanner()
-    log.warn 'Enabling hot deployment with interval of {} second(s)', sconfig.scanInterval
+    log.debug 'Enabling hot deployment with interval of {} second(s)', sconfig.scanInterval
     scanner.start()
   }
 

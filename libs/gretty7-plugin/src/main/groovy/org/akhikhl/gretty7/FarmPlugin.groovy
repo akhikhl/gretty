@@ -17,6 +17,8 @@ import org.gradle.api.Project
  */
 class FarmPlugin extends FarmPluginBase {
 
+  static final ScannerManagerFactory scannerManagerFactory = new ScannerManagerFactoryImpl()
+
   @Override
   String getJettyVersion() {
     Messages.getString('jettyVersion')
@@ -29,7 +31,7 @@ class FarmPlugin extends FarmPluginBase {
 
   @Override
   ScannerManagerFactory getScannerManagerFactory() {
-    ScannerManagerFactoryImpl.instance
+    scannerManagerFactory
   }
 
   @Override

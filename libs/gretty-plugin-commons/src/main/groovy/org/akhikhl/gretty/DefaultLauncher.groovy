@@ -24,6 +24,7 @@ import org.bouncycastle.x509.X509V3CertificateGenerator
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.process.JavaExecSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -47,6 +48,30 @@ class DefaultLauncher implements Launcher {
 
   DefaultLauncher() {
     executorService = Executors.newSingleThreadExecutor()
+  }
+  
+  protected void configureJavaExec(JavaExecSpec spec) {
+
+    def cmdLineJson = getCommandLineJson()
+    log.debug 'Command-line json: {}', cmdLineJson.toPrettyString()
+    cmdLineJson = cmdLineJson.toString()
+
+    // we are going to pass json as argument to java process.
+    // under windows we must escape double quotes in process parameters.
+    if(System.getProperty("os.name") =~ /(?i).*windows.*/)
+      cmdLineJson = cmdLineJson.replace('"', '\\"')
+      
+    spec.classpath = getRunnerClassPath()
+    spec.main = getRunnerClassName()
+    spec.args = [ cmdLineJson ]
+    spec.debug = startTask.debug
+    log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs
+    spec.jvmArgs sconfig.jvmArgs
+    if(startTask.jacoco) {
+      String jarg = startTask.jacoco.getAsJvmArg()
+      log.debug 'jacoco jvmArgs: {}', jarg
+      spec.jvmArgs jarg
+    }
   }
 
   private void generateAndUseSelfSignedCertificate() {
@@ -219,31 +244,10 @@ class DefaultLauncher implements Launcher {
 
     sconfig.onStart*.call()
 
-    def cmdLineJson = getCommandLineJson()
-    log.debug 'Command-line json: {}', cmdLineJson.toPrettyString()
-    cmdLineJson = cmdLineJson.toString()
-
-    // we are going to pass json as argument to java process.
-    // under windows we must escape double quotes in process parameters.
-    if(System.getProperty("os.name") =~ /(?i).*windows.*/)
-      cmdLineJson = cmdLineJson.replace('"', '\\"')
-
     ScannerManagerBase scanman = project.ext.scannerManagerFactory.createScannerManager()
     scanman.startScanner(project, sconfig, webAppConfigs)
     try {
-      project.javaexec { spec ->
-        spec.classpath = getRunnerClassPath()
-        spec.main = getRunnerClassName()
-        spec.args = [ cmdLineJson ]
-        spec.debug = startTask.debug
-        log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs
-        spec.jvmArgs sconfig.jvmArgs
-        if(startTask.jacoco) {
-          String jarg = startTask.jacoco.getAsJvmArg()
-          log.debug 'jacoco jvmArgs: {}', jarg
-          spec.jvmArgs jarg
-        }
-      }
+      project.javaexec this.&configureJavaExec
     } finally {
       scanman.stopScanner()
     }
