@@ -337,7 +337,7 @@ class DefaultLauncher implements Launcher {
       webApps webAppConfigs.collect { WebAppConfig webAppConfig ->
         { ->
           inplace webAppConfig.inplace
-          self.writeWebAppClassPath(json, webAppConfig)
+          self.writeWebAppClassPath(delegate, webAppConfig)
           contextPath webAppConfig.contextPath
           resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase ?: webAppConfig.warResourceBase.toString() ?: '')
           if(webAppConfig.initParameters)
