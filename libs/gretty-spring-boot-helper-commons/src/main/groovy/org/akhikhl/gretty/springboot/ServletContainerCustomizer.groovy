@@ -23,9 +23,14 @@ import org.springframework.stereotype.Component
 class ServletContainerCustomizer implements EmbeddedServletContainerCustomizer {
   
   private static final Logger log = LoggerFactory.getLogger(ServletContainerCustomizer)
+  
+  protected static Map params
 	
   void customize(ConfigurableEmbeddedServletContainer container) {
-    log.warn '***** ServletContainerCustomizer container {}', container
+    if(container instanceof GrettyConfigurableServletContainerFactory) {
+      GrettyConfigurableServletContainerFactory intf = container
+      intf.setParams(params)
+    }
   }
 }
 

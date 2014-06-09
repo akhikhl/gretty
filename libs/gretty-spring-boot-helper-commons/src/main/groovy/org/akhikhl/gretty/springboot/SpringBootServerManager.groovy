@@ -35,24 +35,25 @@ final class SpringBootServerManager implements ServerManager {
 
     if(params.logbackConfig)
       System.setProperty('logging.config', params.logbackConfig)
+      
+    ServletContainerCustomizer.params = params
 
     def springBootMainClass = Class.forName(params.springBootMainClass, true, this.getClass().classLoader)
     springBootMainClass.main([ '--spring.main.sources=org.akhikhl.gretty.springboot' ] as String[])
-    
-    log.warn 'spring-boot server started!'
-    
-    /*String[] beanNames = ApplicationContextProvider.applicationContext.getBeanDefinitionNames()
-    Arrays.sort(beanNames)
-    for (String beanName : beanNames)
-      log.warn 'bean: {}', beanName*/
+
+    if(log.isDebugEnabled()) {
+      String[] beanNames = ApplicationContextProvider.applicationContext.getBeanDefinitionNames()
+      Arrays.sort(beanNames)
+      for (String beanName : beanNames)
+        log.debug 'bean: {}', beanName
+    }
   }
 
   @Override
   void stopServer() {
-    if(ServletContainerConfigurer.servletContainer != null) {
-      ServletContainerConfigurer.servletContainer.stop()
-      ServletContainerConfigurer.servletContainer = null
+    if(ServletContainer.servletContainer != null) {
+      ServletContainer.servletContainer.stop()
+      ServletContainer.servletContainer = null
     }
-    log.warn 'spring-boot server stopped!'
   }
 }

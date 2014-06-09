@@ -23,9 +23,7 @@ import org.springframework.context.ApplicationEvent
  * @author akhikhl
  */
 @Component
-class ServletContainerConfigurer {
-  
-  private static final Logger log = LoggerFactory.getLogger(ServletContainerConfigurer)
+class ServletContainer {
   
   protected static JettyEmbeddedServletContainer servletContainer
   

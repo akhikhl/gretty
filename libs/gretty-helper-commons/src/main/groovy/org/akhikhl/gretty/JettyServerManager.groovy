@@ -42,36 +42,7 @@ final class JettyServerManager implements ServerManager {
     log = LoggerFactory.getLogger(this.getClass())
     configurer.setLogger(log)
     
-    server = configurer.createServer()
-    configurer.applyJettyXml(server, params.jettyXml)
-    configurer.configureConnectors(server, params)
-
-    List handlers = []
-
-    for(def webapp in params.webApps) {
-      def context = configurer.createWebAppContext(webapp.webappClassPath)
-      configurer.addConfigurationClasses(context, webapp.webappClassPath)
-      configurer.applyJettyEnvXml(context, webapp.jettyEnvXml)
-      configurer.configureRealm(context, webapp.realm, webapp.realmConfigFile)
-
-      context.setContextPath(webapp.contextPath)
-
-      webapp.initParams?.each { key, value ->
-        context.setInitParameter(key, value)
-      }
-
-      if(webapp.resourceBase != null) {
-        if(webapp.inplace)
-          context.setResourceBase(webapp.resourceBase)
-        else
-          context.setWar(webapp.resourceBase)
-      }
-
-      handlers.add(context)
-    }
-
-    configurer.setHandlersToServer(server, handlers)
-
+    server = ServerConfigurer.createAndConfigureServer(configurer, params)
     server.start()
   }
 
