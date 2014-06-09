@@ -33,31 +33,31 @@ class ServletContainerFactory extends JettyEmbeddedServletContainerFactory imple
   
   private Map params
 
-	protected void addDefaultServlet(WebAppContext context) {
-		ServletHolder holder = new ServletHolder()
-		holder.setName('default')
-		holder.setClassName('org.eclipse.jetty.servlet.DefaultServlet')
-		holder.setInitParameter('dirAllowed', 'false')
-		holder.setInitOrder(1)
-		context.getServletHandler().addServletWithMapping(holder, '/')
-		context.getServletHandler().getServletMapping('/').setDefault(true)
-	}
+  protected void addDefaultServlet(WebAppContext context) {
+    ServletHolder holder = new ServletHolder()
+    holder.setName('default')
+    holder.setClassName('org.eclipse.jetty.servlet.DefaultServlet')
+    holder.setInitParameter('dirAllowed', 'false')
+    holder.setInitOrder(1)
+    context.getServletHandler().addServletWithMapping(holder, '/')
+    context.getServletHandler().getServletMapping('/').setDefault(true)
+  }
 
-	protected void addJspServlet(WebAppContext context) {
-		ServletHolder holder = new ServletHolder()
-		holder.setName('jsp')
-		holder.setClassName(getJspServletClassName())
-		holder.setInitParameter('fork', 'false')
-		holder.setInitOrder(3)
-		context.getServletHandler().addServlet(holder)
-		ServletMapping mapping = new ServletMapping()
-		mapping.setServletName('jsp')
-		mapping.setPathSpecs([ '*.jsp', '*.jspx' ] as String[])
-		context.getServletHandler().addServletMapping(mapping)
-	}
-  
-	@Override
-	public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
+  protected void addJspServlet(WebAppContext context) {
+    ServletHolder holder = new ServletHolder()
+    holder.setName('jsp')
+    holder.setClassName(getJspServletClassName())
+    holder.setInitParameter('fork', 'false')
+    holder.setInitOrder(3)
+    context.getServletHandler().addServlet(holder)
+    ServletMapping mapping = new ServletMapping()
+    mapping.setServletName('jsp')
+    mapping.setPathSpecs([ '*.jsp', '*.jspx' ] as String[])
+    context.getServletHandler().addServletMapping(mapping)
+  }
+
+  @Override
+  public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
     def jettyConfigurer = new Jetty9Configurer()
     jettyConfigurer.setLogger(log)
     def server = ServerConfigurer.createAndConfigureServer(jettyConfigurer, params) { context ->
