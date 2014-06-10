@@ -25,11 +25,13 @@ class WebAppConfig {
   def fastReload
   def inplaceResourceBase
   def warResourceBase
-  
+
   Set<URL> classPath
 
   String projectPath
   Boolean inplace
+
+  def springBootSources
 
   void classPath(Object... args) {
     if(args) {
@@ -66,7 +68,7 @@ class WebAppConfig {
     result.realmConfigFile = 'jetty-realm.properties'
     result.jettyEnvXmlFile = 'jetty-env.xml'
     result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp" as String
-    result.warResourceBase = ProjectUtils.getFinalWarPath(project).toString()
+    result.warResourceBase = ProjectUtils.getFinalArchivePath(project).toString()
     result.projectPath = project.path
     return result
   }

@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
  */
 abstract class JettyPluginBase implements Plugin<Project> {
 
-  private static final Logger log = LoggerFactory.getLogger(JettyPluginBase)
+  protected static final Logger log = LoggerFactory.getLogger(JettyPluginBase)
 
   void apply(final Project project) {
 
@@ -28,7 +28,7 @@ abstract class JettyPluginBase implements Plugin<Project> {
       return
     }
 
-    if (!project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin))
+    if (shouldApplyWarPlugin() && !project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin))
       project.apply(plugin: org.gradle.api.plugins.WarPlugin)
 
     project.ext.jettyPluginName = getPluginName()
@@ -51,21 +51,20 @@ abstract class JettyPluginBase implements Plugin<Project> {
     project.tasks.whenObjectAdded { task ->
       if(task instanceof JettyStartTask)
         task.dependsOn {
-          task.effectiveInplace ? project.tasks.prepareInplaceWebApp : project.tasks.prepareWarWebApp
+          task.effectiveInplace ? project.tasks.prepareInplaceWebApp : project.tasks.prepareArchiveWebApp
         }
     }
 
     project.afterEvaluate {
 
-      if(!project.repositories)
-        injectDefaultRepositories(project)
+      injectDefaultRepositories(project)
 
       for(String overlay in project.gretty.overlays)
         project.dependencies.add 'providedCompile', project.project(overlay)
 
       project.task('prepareInplaceWebAppFolder', group: 'gretty') {
-        description = 'Copies webAppDir of this web-app and all WAR-overlays (if any) to ${buildDir}/inplaceWebapp'
-        inputs.dir project.webAppDir
+        description = 'Copies webAppDir of this web-app and all overlays (if any) to ${buildDir}/inplaceWebapp'
+        inputs.dir ProjectUtils.getWebAppDir(project)
         outputs.dir "${project.buildDir}/inplaceWebapp"
         doLast {
           ProjectUtils.prepareInplaceWebAppFolder(project)
@@ -73,7 +72,7 @@ abstract class JettyPluginBase implements Plugin<Project> {
       }
 
       project.task('prepareInplaceWebAppClasses', group: 'gretty') {
-        description = 'Compiles classes of this web-app and all WAR-overlays (if any)'
+        description = 'Compiles classes of this web-app and all overlays (if any)'
         dependsOn project.tasks.classes
         for(String overlay in project.gretty.overlays)
           dependsOn "$overlay:prepareInplaceWebAppClasses"
@@ -85,46 +84,48 @@ abstract class JettyPluginBase implements Plugin<Project> {
         dependsOn project.tasks.prepareInplaceWebAppClasses
       }
 
+      def archiveTask = project.tasks.findByName('war') ?: project.tasks.jar
+
       if(project.gretty.overlays) {
 
-        project.ext.finalWarPath = project.tasks.war.archivePath
+        project.ext.finalArchivePath = archiveTask.archivePath
 
-        project.tasks.war.archiveName = 'partialWar.war'
+        archiveTask.archiveName = 'partial.' + (project.tasks.findByName('war') ? 'war' : 'jar')
 
-        // 'explodeWebApps' task is only activated by 'overlayWar' task
+        // 'explodeWebApps' task is only activated by 'overlayArchive' task
         project.task('explodeWebApps', group: 'gretty') {
-          description = 'Explodes this web-app and all WAR-overlays (if any) to ${buildDir}/explodedWebapp'
+          description = 'Explodes this web-app and all overlays (if any) to ${buildDir}/explodedWebapp'
           for(String overlay in project.gretty.overlays)
             dependsOn "$overlay:assemble" as String
-          dependsOn project.tasks.war
+          dependsOn archiveTask
           for(String overlay in project.gretty.overlays)
-            inputs.file { ProjectUtils.getFinalWarPath(project.project(overlay)) }
-          inputs.file project.tasks.war.archivePath
+            inputs.file { ProjectUtils.getFinalArchivePath(project.project(overlay)) }
+          inputs.file archiveTask.archivePath
           outputs.dir "${project.buildDir}/explodedWebapp"
           doLast {
             ProjectUtils.prepareExplodedWebAppFolder(project)
           }
         }
 
-        project.task('overlayWar', group: 'gretty') {
-          description = 'Creates WAR from exploded web-app in ${buildDir}/explodedWebapp'
+        project.task('overlayArchive', group: 'gretty') {
+          description = 'Creates archive from exploded web-app in ${buildDir}/explodedWebapp'
           dependsOn project.tasks.explodeWebApps
           inputs.dir "${project.buildDir}/explodedWebapp"
-          outputs.file project.ext.finalWarPath
+          outputs.file project.ext.finalArchivePath
           doLast {
-            ant.zip destfile: project.ext.finalWarPath, basedir: "${project.buildDir}/explodedWebapp"
+            ant.zip destfile: project.ext.finalArchivePath, basedir: "${project.buildDir}/explodedWebapp"
           }
         }
 
-        project.tasks.assemble.dependsOn project.tasks.overlayWar
+        project.tasks.assemble.dependsOn project.tasks.overlayArchive
       } // overlays
 
-      project.task('prepareWarWebApp', group: 'gretty') {
+      project.task('prepareArchiveWebApp', group: 'gretty') {
         description = 'Prepares war web-app'
         if(project.gretty.overlays)
-          dependsOn project.tasks.overlayWar
+          dependsOn project.tasks.overlayArchive
         else
-          dependsOn project.tasks.war
+          dependsOn archiveTask
       }
 
       project.task('jettyRun', type: JettyStartTask, group: 'gretty') {
@@ -210,34 +211,42 @@ abstract class JettyPluginBase implements Plugin<Project> {
     } // afterEvaluate
   } // apply
 
-  protected abstract String getJettyVersion()
-
-  protected abstract String getPluginName()
-  
-  protected LauncherFactory getLauncherFactory() {
-    new DefaultLauncherFactory()
-  }
-
-  protected abstract ScannerManagerFactory getScannerManagerFactory()
-  
   protected void createConfigurations(Project project) {
-    if(!project.configurations.findByName('grettyHelperConfig')) {
+    if(!project.configurations.findByName('grettyHelperConfig'))
       project.configurations {
         grettyHelperConfig
         grettyLoggingConfig
         gretty.extendsFrom(grettyHelperConfig)
       }
-    }
+    if(!project.configurations.findByName('providedCompile'))
+      project.configurations {
+        providedCompile
+        compile.extendsFrom(providedCompile)
+      }
   }
-  
+
+  protected abstract String getJettyVersion()
+
+  protected abstract String getPluginName()
+
+  protected LauncherFactory getLauncherFactory() {
+    new DefaultLauncherFactory()
+  }
+
+  protected abstract ScannerManagerFactory getScannerManagerFactory()
+
   protected void injectDefaultRepositories(Project project) {
     project.repositories {
       mavenLocal()
       jcenter()
       mavenCentral()
-    }    
+    }
   }
 
   protected abstract void injectDependencies(Project project)
+
+  protected boolean shouldApplyWarPlugin() {
+    true
+  }
 
 } // JettyPluginBase

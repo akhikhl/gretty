@@ -27,7 +27,7 @@ class JettySpringBootPlugin extends JettySpringBootPluginBase {
 
   @Override
   protected String getPluginName() {
-    Messages.getString('springBootPluginName')
+    Messages.getString('jettySpringBootPluginName')
   }
 
   @Override

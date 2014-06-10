@@ -7,7 +7,7 @@
  */
 package org.akhikhl.gretty9.springboot
 
-import org.akhikhl.gretty.springboot.JettySpringBootPluginBase
+import org.akhikhl.gretty.springboot.FarmSpringBootPluginBase
 import org.akhikhl.gretty.ScannerManagerFactory
 import org.akhikhl.gretty9.ScannerManagerFactoryImpl
 import org.gradle.api.Project
@@ -16,7 +16,7 @@ import org.gradle.api.Project
  *
  * @author akhikhl
  */
-class JettySpringBootPlugin extends JettySpringBootPluginBase {
+class FarmSpringBootPlugin extends FarmSpringBootPluginBase {
 
   static final ScannerManagerFactory scannerManagerFactory = new ScannerManagerFactoryImpl(true)
 
@@ -27,7 +27,7 @@ class JettySpringBootPlugin extends JettySpringBootPluginBase {
 
   @Override
   protected String getPluginName() {
-    Messages.getString('jettySpringBootPluginName')
+    Messages.getString('farmSpringBootPluginName')
   }
 
   @Override
@@ -44,3 +44,4 @@ class JettySpringBootPlugin extends JettySpringBootPluginBase {
     }
   }
 }
+

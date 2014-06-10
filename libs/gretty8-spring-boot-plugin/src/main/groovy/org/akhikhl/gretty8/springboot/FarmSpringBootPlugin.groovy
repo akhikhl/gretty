@@ -5,18 +5,18 @@
  *
  * See the file "license.txt" for copying and usage permission.
  */
-package org.akhikhl.gretty9.springboot
+package org.akhikhl.gretty8.springboot
 
-import org.akhikhl.gretty.springboot.JettySpringBootPluginBase
+import org.akhikhl.gretty.springboot.FarmSpringBootPluginBase
 import org.akhikhl.gretty.ScannerManagerFactory
-import org.akhikhl.gretty9.ScannerManagerFactoryImpl
+import org.akhikhl.gretty8.ScannerManagerFactoryImpl
 import org.gradle.api.Project
 
 /**
  *
  * @author akhikhl
  */
-class JettySpringBootPlugin extends JettySpringBootPluginBase {
+class FarmSpringBootPlugin extends FarmSpringBootPluginBase {
 
   static final ScannerManagerFactory scannerManagerFactory = new ScannerManagerFactoryImpl(true)
 
@@ -27,7 +27,7 @@ class JettySpringBootPlugin extends JettySpringBootPluginBase {
 
   @Override
   protected String getPluginName() {
-    Messages.getString('jettySpringBootPluginName')
+    Messages.getString('farmSpringBootPluginName')
   }
 
   @Override
@@ -39,8 +39,9 @@ class JettySpringBootPlugin extends JettySpringBootPluginBase {
   protected void injectDependencies(Project project) {
     super.injectDependencies(project)
     project.dependencies {
-      providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
-      grettyHelperConfig 'org.akhikhl.gretty:gretty9-spring-boot-helper:0.0.23'
+      providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
+      grettyHelperConfig 'org.akhikhl.gretty:gretty8-spring-boot-helper:0.0.23'
     }
   }
 }
+

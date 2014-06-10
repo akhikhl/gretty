@@ -49,7 +49,7 @@ class DefaultLauncher implements Launcher {
   DefaultLauncher() {
     executorService = Executors.newSingleThreadExecutor()
   }
-  
+
   protected void configureJavaExec(JavaExecSpec spec) {
 
     def cmdLineJson = getCommandLineJson()
@@ -60,7 +60,7 @@ class DefaultLauncher implements Launcher {
     // under windows we must escape double quotes in process parameters.
     if(System.getProperty("os.name") =~ /(?i).*windows.*/)
       cmdLineJson = cmdLineJson.replace('"', '\\"')
-      
+
     spec.classpath = getRunnerClassPath()
     spec.main = getRunnerClassName()
     spec.args = [ cmdLineJson ]
@@ -143,7 +143,7 @@ class DefaultLauncher implements Launcher {
     }
     json
   }
-  
+
   private getRunConfigJson() {
     def json = new JsonBuilder()
     json {
@@ -151,7 +151,7 @@ class DefaultLauncher implements Launcher {
     }
     json
   }
-  
+
   protected FileCollection getRunnerClassPath() {
     project.configurations.gretty
   }
@@ -159,8 +159,8 @@ class DefaultLauncher implements Launcher {
   protected String getRunnerClassName() {
     'org.akhikhl.gretty.Runner'
   }
-  
-  protected String getRunnerRuntimeConfig() {
+
+  protected String getRunnerRuntimeConfig(Project proj) {
     'runtime'
   }
 
@@ -171,13 +171,13 @@ class DefaultLauncher implements Launcher {
     sconfig = runConfig.getServerConfig()
     webAppConfigs = runConfig.getWebAppConfigs()
   }
-  
+
   final void launch(StartBaseTask startTask) {
-    
+
     init(startTask)
-    
+
     for(WebAppConfig webAppConfig in webAppConfigs)
-      webAppConfig.prepareToRun()
+      prepareToRun(webAppConfig)
 
     if(sconfig.httpsEnabled) {
       if(sconfig.sslKeyStorePath)
@@ -195,8 +195,8 @@ class DefaultLauncher implements Launcher {
 
     futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
     def runConfigJson = getRunConfigJson()
-    log.debug 'Sending parameters to port {}', sconfig.servicePort
-    log.debug runConfigJson.toPrettyString()
+    log.warn 'Sending parameters to port {}', sconfig.servicePort
+    log.warn runConfigJson.toPrettyString()
     ServiceProtocol.send(sconfig.servicePort, runConfigJson.toString())
     status = futureStatus.get()
     log.debug 'Got start status: {}', status
@@ -254,47 +254,54 @@ class DefaultLauncher implements Launcher {
 
     sconfig.onStop*.call()
   }
-  
+
   protected Collection<URL> resolveWebAppClassPath(WebAppConfig webAppConfig) {
     def resolvedClassPath = new LinkedHashSet<URL>()
-    resolvedClassPath.addAll(ProjectUtils.getClassPath(project, webAppConfig.inplace, getRunnerRuntimeConfig()))
-    if(webAppConfig.classPath != null)
-      for(def elem in webAppConfig.classPath) {
-        while(elem instanceof Closure)
-          elem = elem()
-        if(elem != null) {
-          if(elem instanceof File) {
-            if(!elem.isAbsolute()) {
-              if(project == null)
-                elem = new File(System.getProperty('user.home'), elem.path).absolutePath
-              else
-                elem = new File(project.projectDir, elem.path)
-            }
-            elem = elem.toURI().toURL()
-          }
-          else if(elem instanceof URI)
-            elem = elem.toURL()
-          else if(!(elem instanceof URL)) {
-            elem = elem.toString()
-            if(!(elem =~ /.{2,}\:.+/)) { // no schema?
-              if(!new File(elem).isAbsolute()) {
-                if(project == null)
-                  elem = new File(System.getProperty('user.home'), elem).absolutePath
+    if(webAppConfig.projectPath) {
+      def proj = project.project(webAppConfig.projectPath)
+      resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, webAppConfig.inplace, getRunnerRuntimeConfig(proj)))
+      if(webAppConfig.classPath != null)
+        for(def elem in webAppConfig.classPath) {
+          while(elem instanceof Closure)
+            elem = elem()
+          if(elem != null) {
+            if(elem instanceof File) {
+              if(!elem.isAbsolute()) {
+                if(proj == null)
+                  elem = new File(System.getProperty('user.home'), elem.path).absolutePath
                 else
-                  elem = new File(project.projectDir, elem).absolutePath
+                  elem = new File(proj.projectDir, elem.path)
               }
-              if(!elem.startsWith('/'))
-                elem = '/' + elem
-              elem = 'file://' + elem
+              elem = elem.toURI().toURL()
             }
-            elem = new URL(elem.toString())
+            else if(elem instanceof URI)
+              elem = elem.toURL()
+            else if(!(elem instanceof URL)) {
+              elem = elem.toString()
+              if(!(elem =~ /.{2,}\:.+/)) { // no schema?
+                if(!new File(elem).isAbsolute()) {
+                  if(proj == null)
+                    elem = new File(System.getProperty('user.home'), elem).absolutePath
+                  else
+                    elem = new File(proj.projectDir, elem).absolutePath
+                }
+                if(!elem.startsWith('/'))
+                  elem = '/' + elem
+                elem = 'file://' + elem
+              }
+              elem = new URL(elem.toString())
+            }
+            resolvedClassPath.add(elem)
           }
-          resolvedClassPath.add(elem)
         }
-      }
+    }
     return resolvedClassPath
   }
-  
+
+  protected void prepareToRun(WebAppConfig wconfig) {
+    wconfig.prepareToRun()
+  }
+
   protected void writeLoggingConfig(json) {
     json.with {
       if(sconfig.logbackConfigFile)
@@ -307,9 +314,9 @@ class DefaultLauncher implements Launcher {
           logFileName sconfig.logFileName
           logDir sconfig.logDir
         }
-    }    
+    }
   }
-  
+
   protected void writeRunConfigJson(json) {
     def self = this
     json.with {
@@ -352,11 +359,13 @@ class DefaultLauncher implements Launcher {
           }
           if(webAppConfig.jettyEnvXmlFile)
             jettyEnvXml webAppConfig.jettyEnvXmlFile.absolutePath
+          if(webAppConfig.springBootSources)
+            springBootSources webAppConfig.springBootSources
         }
       }
     }
   }
-  
+
   protected void writeWebAppClassPath(json, WebAppConfig webAppConfig) {
     def classPath = resolveWebAppClassPath(webAppConfig)
     if(classPath)

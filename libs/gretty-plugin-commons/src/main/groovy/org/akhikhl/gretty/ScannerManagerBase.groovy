@@ -25,7 +25,7 @@ abstract class ScannerManagerBase {
   protected List<WebAppConfig> webapps
   protected scanner
   protected Map fastReloadMap
-  
+
   boolean managedClassReload
 
   protected abstract void addScannerBulkListener(Closure listener)
@@ -48,7 +48,7 @@ abstract class ScannerManagerBase {
   }
 
   private static void collectScanDirs(Collection<File> scanDirs, boolean inplace, Project proj) {
-    scanDirs.add(proj.webAppDir)
+    scanDirs.add(ProjectUtils.getWebAppDir(proj))
     scanDirs.addAll(proj.sourceSets.main.allSource.srcDirs)
     scanDirs.addAll(proj.sourceSets.main.runtimeClasspath.files)
     for(def overlay in proj.gretty.overlays)
@@ -83,15 +83,15 @@ abstract class ScannerManagerBase {
     sconfig.onScanFilesChanged*.call(changedFiles)
 
     Map<WebAppConfig> webAppProjectReloads = [:]
-    
+
     def reloadProject = { String projectPath, String reloadMode ->
       if(webAppProjectReloads[projectPath] == null)
         webAppProjectReloads[projectPath] = new HashSet()
       webAppProjectReloads[projectPath] += reloadMode
     }
-    
+
     boolean shouldRestart = false
-    
+
     for(String f in changedFiles) {
       if(f.endsWith('.jar')) {
         List<WebAppConfig> dependantWebAppProjects = webapps.findAll {
@@ -128,7 +128,7 @@ abstract class ScannerManagerBase {
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true
         }
-        else if(f.startsWith(new File(proj.webAppDir, 'WEB-INF/lib').absolutePath)) {
+        else if(f.startsWith(new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/lib').absolutePath)) {
           log.debug 'file {} is in WEB-INF/lib, jetty will be restarted', f
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true
@@ -156,7 +156,7 @@ abstract class ScannerManagerBase {
         WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
         ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
         try {
-          connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareWarWebApp').run()
+          connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp').run()
         } finally {
           connection.close()
         }
@@ -165,7 +165,7 @@ abstract class ScannerManagerBase {
         ProjectUtils.prepareInplaceWebAppFolder(proj)
       }
     }
-    
+
     if(shouldRestart)
       ServiceProtocol.send(sconfig.servicePort, 'restart')
   }

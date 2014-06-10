@@ -20,26 +20,29 @@ import org.springframework.context.ApplicationContext
  * @author akhikhl
  */
 final class SpringBootServerManager implements ServerManager {
-  
+
   protected static final Logger log = LoggerFactory.getLogger(SpringBootServerManager)
-  
+
   protected Map params
 
   @Override
   void setParams(Map params) {
     this.params = params
   }
-  
+
   @Override
   void startServer() {
 
     if(params.logbackConfig)
       System.setProperty('logging.config', params.logbackConfig)
-      
+
     ServletContainerCustomizer.params = params
 
     def springBootMainClass = Class.forName(params.springBootMainClass, true, this.getClass().classLoader)
-    springBootMainClass.main([ '--spring.main.sources=org.akhikhl.gretty.springboot' ] as String[])
+
+    def springBootSources = ([ 'org.akhikhl.gretty.springboot' ] + params.webApps.findResults { it.springBootSources }).join(',')
+
+    springBootMainClass.main([ "--spring.main.sources=$springBootSources" ] as String[])
 
     if(log.isDebugEnabled()) {
       String[] beanNames = ApplicationContextProvider.applicationContext.getBeanDefinitionNames()

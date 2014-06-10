@@ -19,7 +19,7 @@ final class ProjectUtils {
   private static final Logger log = LoggerFactory.getLogger(ProjectUtils)
 
   private static void addDefaultFastReloadDirs(List<FastReloadStruct> result, Project proj) {
-    result.add(new FastReloadStruct(baseDir: proj.webAppDir))
+    result.add(new FastReloadStruct(baseDir: getWebAppDir(proj)))
     for(def overlay in proj.gretty.overlays)
       addDefaultFastReloadDirs(result, proj.project(overlay))
   }
@@ -141,8 +141,6 @@ final class ProjectUtils {
   static Set<URL> getClassPath(Project project, boolean inplace, String dependencyConfig) {
     Set<URL> urls = new LinkedHashSet()
     if(project != null && inplace) {
-      if(!dependencyConfig)
-        dependencyConfig = 'runtime'
       def addProjectClassPath
       addProjectClassPath = { Project proj ->
         urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
@@ -175,8 +173,12 @@ final class ProjectUtils {
     return result
   }
 
-  static File getFinalWarPath(Project project) {
-    project.ext.properties.containsKey('finalWarPath') ? project.ext.finalWarPath : project.tasks.war.archivePath
+  static File getFinalArchivePath(Project project) {
+    project.ext.properties.containsKey('finalArchivePath') ? project.ext.finalArchivePath : (project.tasks.findByName('war') ?: project.tasks.jar).archivePath
+  }
+
+  static File getWebAppDir(Project project) {
+    project.hasProperty('webAppDir') ? project.webAppDir : new File(project.projectDir, 'src/main/webapp')
   }
 
   static void prepareExplodedWebAppFolder(Project project) {
@@ -184,12 +186,12 @@ final class ProjectUtils {
     for(String overlay in project.gretty.overlays) {
       def overlayProject = project.project(overlay)
       project.copy {
-        from overlayProject.zipTree(getFinalWarPath(overlayProject))
+        from overlayProject.zipTree(getFinalArchivePath(overlayProject))
         into "${project.buildDir}/explodedWebapp"
       }
     }
     project.copy {
-      from project.zipTree(project.tasks.war.archivePath)
+      from project.zipTree((project.tasks.findByName('war') ?: project.tasks.jar).archivePath)
       into "${project.buildDir}/explodedWebapp"
     }
   }
@@ -205,7 +207,7 @@ final class ProjectUtils {
       }
     }
     project.copy {
-      from project.webAppDir
+      from getWebAppDir(project)
       into "${project.buildDir}/inplaceWebapp"
     }
   }
@@ -231,11 +233,9 @@ final class ProjectUtils {
       File f = new File(project.projectDir, file.path)
       if(f.exists())
         result.add(f.absoluteFile)
-      if(project.hasProperty('webAppDir')) {
-        f = new File(new File(project.webAppDir, 'WEB-INF'), file.path)
-        if(f.exists())
-          result.add(f.absoluteFile)
-      }
+      f = new File(new File(getWebAppDir(project), 'WEB-INF'), file.path)
+      if(f.exists())
+        result.add(f.absoluteFile)
       result.addAll(collectFilesInOutput(project, file.path, false))
       if(project.extensions.findByName('gretty'))
         for(def overlay in project.gretty.overlays.reverse())

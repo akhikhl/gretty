@@ -7,7 +7,7 @@
  */
 package org.akhikhl.gretty.springboot
 
-import org.akhikhl.gretty.JettyPluginBase
+import org.akhikhl.gretty.FarmPluginBase
 import org.akhikhl.gretty.LauncherFactory
 import org.gradle.api.Project
 
@@ -15,7 +15,7 @@ import org.gradle.api.Project
  *
  * @author akhikhl
  */
-abstract class JettySpringBootPluginBase extends JettyPluginBase {
+abstract class FarmSpringBootPluginBase extends FarmPluginBase {
 
   @Override
   protected void createConfigurations(Project project) {
@@ -60,8 +60,5 @@ abstract class JettySpringBootPluginBase extends JettyPluginBase {
       springBoot 'org.springframework.boot:spring-boot-starter-jetty'
     }
   }
-
-  protected boolean shouldApplyWarPlugin() {
-    false
-  }
 }
+

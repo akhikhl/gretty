@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
  */
 abstract class FarmPluginBase implements Plugin<Project> {
 
-  private static final Logger log = LoggerFactory.getLogger(FarmPluginBase)
+  protected static final Logger log = LoggerFactory.getLogger(FarmPluginBase)
 
   void apply(final Project project) {
 
@@ -31,6 +31,7 @@ abstract class FarmPluginBase implements Plugin<Project> {
     project.ext.jettyVersion = project.ext.grettyFarmPluginJettyVersion = getJettyVersion()
 
     project.ext.scannerManagerFactory = getScannerManagerFactory()
+    project.ext.launcherFactory = getLauncherFactory()
 
     project.extensions.create('farm', Farm)
     project.farm.integrationTestTask = 'integrationTest'
@@ -38,12 +39,7 @@ abstract class FarmPluginBase implements Plugin<Project> {
     project.extensions.create('farms', Farms)
     project.farms.farmsMap[''] = project.farm
 
-    if(!project.configurations.findByName('grettyHelperConfig'))
-      project.configurations {
-        grettyHelperConfig
-        grettyLoggingConfig
-        gretty.extendsFrom(grettyHelperConfig)
-      }
+    createConfigurations(project)
 
     injectDependencies(project)
 
@@ -59,19 +55,14 @@ abstract class FarmPluginBase implements Plugin<Project> {
           task.getWebAppConfigsForProjects().collect {
             def proj = project.project(it.projectPath)
             boolean inplace = it.inplace == null ? task.inplace : it.inplace
-            inplace ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareWarWebApp
+            inplace ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareArchiveWebApp
           }
         }
     }
 
     project.afterEvaluate {
 
-      if(!project.repositories)
-        project.repositories {
-          mavenLocal()
-          jcenter()
-          mavenCentral()
-        }
+      injectDefaultRepositories(project)
 
       project.farms.farmsMap.each { fname, farm ->
 
@@ -193,11 +184,37 @@ abstract class FarmPluginBase implements Plugin<Project> {
     } // afterEvaluate
   } // apply
 
+  protected void createConfigurations(Project project) {
+    if(!project.configurations.findByName('grettyHelperConfig'))
+      project.configurations {
+        grettyHelperConfig
+        grettyLoggingConfig
+        gretty.extendsFrom(grettyHelperConfig)
+      }
+    if(!project.configurations.findByName('providedCompile'))
+      project.configurations {
+        providedCompile
+        compile.extendsFrom(providedCompile)
+      }
+  }
+
   protected abstract String getJettyVersion()
 
   protected abstract String getPluginName()
 
+  protected LauncherFactory getLauncherFactory() {
+    new DefaultLauncherFactory()
+  }
+
   protected abstract ScannerManagerFactory getScannerManagerFactory()
+
+  protected void injectDefaultRepositories(Project project) {
+    project.repositories {
+      mavenLocal()
+      jcenter()
+      mavenCentral()
+    }
+  }
 
   protected abstract void injectDependencies(Project project)
 }
