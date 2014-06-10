@@ -23,7 +23,6 @@ abstract class ScannerManagerBase {
   protected Project project
   protected ServerConfig sconfig
   protected List<WebAppConfig> webapps
-  //protected boolean inplace
   protected scanner
   protected Map fastReloadMap
   
@@ -51,8 +50,7 @@ abstract class ScannerManagerBase {
   private static void collectScanDirs(Collection<File> scanDirs, boolean inplace, Project proj) {
     scanDirs.add(proj.webAppDir)
     scanDirs.addAll(proj.sourceSets.main.allSource.srcDirs)
-    // do not scan build output, otherwise we are in a loop: scan -> build -> scan ...
-    scanDirs.addAll(proj.sourceSets.main.runtimeClasspath.files - proj.sourceSets.main.output.files)
+    scanDirs.addAll(proj.sourceSets.main.runtimeClasspath.files)
     for(def overlay in proj.gretty.overlays)
       collectScanDirs(scanDirs, inplace, proj.project(overlay))
   }
@@ -84,8 +82,15 @@ abstract class ScannerManagerBase {
 
     sconfig.onScanFilesChanged*.call(changedFiles)
 
-    List<WebAppConfig> changedWebAppProjects = []
-    Set reloadModes = new HashSet()
+    Map<WebAppConfig> webAppProjectReloads = [:]
+    
+    def reloadProject = { String projectPath, String reloadMode ->
+      if(webAppProjectReloads[projectPath] == null)
+        webAppProjectReloads[projectPath] = new HashSet()
+      webAppProjectReloads[projectPath] += reloadMode
+    }
+    
+    boolean shouldRestart = false
     
     for(String f in changedFiles) {
       if(f.endsWith('.jar')) {
@@ -93,33 +98,40 @@ abstract class ScannerManagerBase {
           it.projectPath && project.project(it.projectPath).configurations.compile.dependencies.find { it.absolutePath == f }
         }
         if(dependantWebAppProjects) {
-          log.debug 'changed file {} is dependency of {}, switching to fullReload', f, (dependantWebAppProjects.collect { it.projectPath })
-          reloadModes += 'full'
+          for(WebAppConfig wconfig in dependantWebAppProjects) {
+            log.debug 'changed file {} is dependency of {}, the latter will be recompiled', f, wconfig.projectPath
+            reloadProject(wconfig.projectPath, 'compile')
+          }
+          shouldRestart = true
+          continue
         }
-        log.debug 'changed file {} affects projects {}', f, (dependantWebAppProjects.collect { it.projectPath })
-        changedWebAppProjects += dependantWebAppProjects
-        continue
       }
-      WebAppConfig webapp = webapps.find {
+      WebAppConfig wconfig = webapps.find {
         it.projectPath && f.startsWith(project.project(it.projectPath).projectDir.absolutePath)
       }
-      if(webapp != null) {
-        log.debug 'changed file {} affects project {}', f, webapp.projectPath
-        changedWebAppProjects.add(webapp)
-        def proj = project.project(webapp.projectPath)
-        if(f.endsWith('.class')) {
-          if(!managedClassReload) {
-            log.debug 'file {} is class, switching to fullReload', f
-            reloadModes += 'full'
+      if(wconfig != null) {
+        log.debug 'changed file {} affects project {}', f, wconfig.projectPath
+        def proj = project.project(wconfig.projectPath)
+
+        if (proj.sourceSets.main.allSource.srcDirs.find { f.startsWith(it.absolutePath) }) {
+          reloadProject(wconfig.projectPath, 'compile')
+          // restart is done when reacting in output change, not source change
+        } else if (proj.sourceSets.main.output.files.find { f.startsWith(it.absolutePath) }) {
+          if(managedClassReload) {
+            log.debug 'file {} is in managed output of {}, jetty will not be restarted', f, wconfig.projectPath
+          } else {
+            log.debug 'file {} is in output of {}, jetty will be restarted', f, wconfig.projectPath
+            shouldRestart = true
           }
-        }
-        else if(new File(f).name in ['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml']) {
-          log.debug 'file {} is configuration file, switching to fullReload', f
-          reloadModes += 'full'
+        } else if (new File(f).name in ['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml']) {
+          log.debug 'file {} is configuration file, jetty will be restarted', f
+          reloadProject(wconfig.projectPath, 'compile')
+          shouldRestart = true
         }
         else if(f.startsWith(new File(proj.webAppDir, 'WEB-INF/lib').absolutePath)) {
-          log.debug 'file {} is in WEB-INF/lib, switching to fullReload', f
-          reloadModes += 'full'
+          log.debug 'file {} is in WEB-INF/lib, jetty will be restarted', f
+          reloadProject(wconfig.projectPath, 'compile')
+          shouldRestart = true
         } else {
           List<FastReloadStruct> fastReloadDirs = fastReloadMap[proj.path]
           if(fastReloadDirs?.find { FastReloadStruct s ->
@@ -127,34 +139,35 @@ abstract class ScannerManagerBase {
             f.startsWith(s.baseDir.absolutePath) && (s.pattern == null || relPath =~ s.pattern) && (s.excludesPattern == null || !(relPath =~ s.excludesPattern))
           }) {
             log.debug 'file {} is in fastReload directories', f
-            reloadModes += 'fast'
+            reloadProject(wconfig.projectPath, 'fastReload')
           } else {
             log.debug 'file {} is not in fastReload directories, switching to fullReload', f
-            reloadModes += 'full'
+            reloadProject(wconfig.projectPath, 'compile')
+            shouldRestart = true
           }
         }
       }
     }
 
-    if(reloadModes.contains('full')) {
-      log.debug 'performing fullReload'
-      for(WebAppConfig webapp in changedWebAppProjects) {
-        Project proj = project.project(webapp.projectPath)
+    webAppProjectReloads.each { String projectPath, Set reloadModes ->
+      Project proj = project.project(projectPath)
+      if(reloadModes.contains('compile')) {
+        log.debug 'Recompiling {}', (projectPath == ':' ? proj.name : projectPath)
+        WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
         ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
         try {
-          connection.newBuild().forTasks(webapp.inplace ? 'prepareInplaceWebApp' : 'prepareWarWebApp').run()
+          connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareWarWebApp').run()
         } finally {
           connection.close()
         }
-      }
-      ServiceProtocol.send(sconfig.servicePort, 'restart')
-    } else if(reloadModes.contains('fast')) {
-      log.debug 'performing fastReload'
-      for(WebAppConfig webapp in changedWebAppProjects) {
-        def proj = project.project(webapp.projectPath)
+      } else if(reloadModes.contains('fastReload')) {
+        log.debug 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
         ProjectUtils.prepareInplaceWebAppFolder(proj)
       }
     }
+    
+    if(shouldRestart)
+      ServiceProtocol.send(sconfig.servicePort, 'restart')
   }
 
   final void startScanner(Project project, ServerConfig sconfig, List<WebAppConfig> webapps) {
