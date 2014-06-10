@@ -7,10 +7,13 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.ToString
+
 /**
  *
  * @author akhikhl
  */
+@ToString
 class FastReloadStruct {
   File baseDir
   def pattern
