@@ -2,7 +2,7 @@ scan '30 seconds'
 
 String encoderPattern = '%-12date{HH:mm:ss} %-5level %logger{35} - %msg%n'
 String logDir = "${System.getProperty('user.home')}/logs"
-String logFileName = 'spring-boot-simple'
+String logFileName = 'spring-boot-app'
 
 appender('CONSOLE', ConsoleAppender) {
   encoder(PatternLayoutEncoder) {

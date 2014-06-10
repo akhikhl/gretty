@@ -1,0 +1,23 @@
+body {
+  padding-top: 20px;
+  font-size: 18px;
+  font-family: "Abel", serif;
+}
+
+h1 {
+  font-family: "Abel", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+}
+
+button {
+  margin: 8px 0 8px 0;
+}
+
+.margin-base-vertical {
+  margin: 40px 0;
+}
+
+.result {
+  margin: 8px 0 16px 0;
+}

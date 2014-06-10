@@ -1,0 +1,23 @@
+apply plugin: 'groovy'
+apply plugin: 'gretty-spring-boot'
+apply plugin: 'gretty-farm-spring-boot'
+
+//apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+
+version = '1.0.0'
+
+dependencies {
+  compile 'org.codehaus.groovy:groovy-all:2.3.2'
+}
+
+gretty {
+  scanInterval = 1
+  fastReload = true
+}
+
+farm {
+  scanInterval = 1
+  webapp project
+  webapp ':spring-boot-farm:spring-boot-webservice'
+  webapp ':spring-boot-farm:jee-webservice'
+}
