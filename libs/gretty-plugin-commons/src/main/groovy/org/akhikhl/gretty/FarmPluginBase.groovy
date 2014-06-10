@@ -97,19 +97,6 @@ abstract class FarmPluginBase implements Plugin<Project> {
         if(!fname)
           project.tasks.debug.dependsOn 'farmRunDebug'
 
-        project.task('farmRunWar' + fname, type: FarmStartTask, group: 'gretty') {
-          description = "Starts ${farmDescr} on WAR-files, in interactive mode."
-          farmName = fname
-          inplace = false
-        }
-
-        project.task('farmRunWarDebug' + fname, type: FarmStartTask, group: 'gretty') {
-          description = "Starts ${farmDescr} on WAR-files, in debug and in interactive mode."
-          farmName = fname
-          debug = true
-          inplace = false
-        }
-
         project.task('farmStart' + fname, type: FarmStartTask, group: 'gretty') {
           description = "Starts ${farmDescr} inplace (stopped by 'farmStop${fname}')."
           farmName = fname
@@ -123,19 +110,34 @@ abstract class FarmPluginBase implements Plugin<Project> {
           debug = true
         }
 
-        project.task('farmStartWar' + fname, type: FarmStartTask, group: 'gretty') {
-          description = "Starts ${farmDescr} on WAR-files (stopped by 'farmStop${fname}')."
-          farmName = fname
-          interactive = false
-          inplace = false
-        }
+        if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
+          project.task('farmRunWar' + fname, type: FarmStartTask, group: 'gretty') {
+            description = "Starts ${farmDescr} on WAR-files, in interactive mode."
+            farmName = fname
+            inplace = false
+          }
 
-        project.task('farmStartWarDebug' + fname, type: FarmStartTask, group: 'gretty') {
-          description = "Starts ${farmDescr} on WAR-files, in debug (stopped by 'farmStop${fname}')."
-          farmName = fname
-          interactive = false
-          debug = true
-          inplace = false
+          project.task('farmRunWarDebug' + fname, type: FarmStartTask, group: 'gretty') {
+            description = "Starts ${farmDescr} on WAR-files, in debug and in interactive mode."
+            farmName = fname
+            debug = true
+            inplace = false
+          }
+
+          project.task('farmStartWar' + fname, type: FarmStartTask, group: 'gretty') {
+            description = "Starts ${farmDescr} on WAR-files (stopped by 'farmStop${fname}')."
+            farmName = fname
+            interactive = false
+            inplace = false
+          }
+
+          project.task('farmStartWarDebug' + fname, type: FarmStartTask, group: 'gretty') {
+            description = "Starts ${farmDescr} on WAR-files, in debug (stopped by 'farmStop${fname}')."
+            farmName = fname
+            interactive = false
+            debug = true
+            inplace = false
+          }
         }
 
         project.task('farmStop' + fname, type: FarmStopTask, group: 'gretty') {

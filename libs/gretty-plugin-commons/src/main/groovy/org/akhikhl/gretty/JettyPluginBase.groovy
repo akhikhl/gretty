@@ -145,17 +145,6 @@ abstract class JettyPluginBase implements Plugin<Project> {
       if(!project.ext.has('grettyFarmPluginName'))
         project.tasks.debug.dependsOn 'jettyRunDebug'
 
-      project.task('jettyRunWar', type: JettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in interactive mode.'
-        inplace = false
-      }
-
-      project.task('jettyRunWarDebug', type: JettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug and interactive mode.'
-        inplace = false
-        debug = true
-      }
-
       project.task('jettyStart', type: JettyStartTask, group: 'gretty') {
         description = 'Starts web-app inplace (stopped by \'jettyStop\').'
         interactive = false
@@ -167,17 +156,30 @@ abstract class JettyPluginBase implements Plugin<Project> {
         debug = true
       }
 
-      project.task('jettyStartWar', type: JettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file (stopped by \'jettyStop\').'
-        inplace = false
-        interactive = false
-      }
+      if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
+        project.task('jettyRunWar', type: JettyStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in interactive mode.'
+          inplace = false
+        }
 
-      project.task('jettyStartWarDebug', type: JettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug mode (stopped by \'jettyStop\').'
-        inplace = false
-        interactive = false
-        debug = true
+        project.task('jettyRunWarDebug', type: JettyStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in debug and interactive mode.'
+          inplace = false
+          debug = true
+        }
+
+        project.task('jettyStartWar', type: JettyStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file (stopped by \'jettyStop\').'
+          inplace = false
+          interactive = false
+        }
+
+        project.task('jettyStartWarDebug', type: JettyStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in debug mode (stopped by \'jettyStop\').'
+          inplace = false
+          interactive = false
+          debug = true
+        }
       }
 
       project.task('jettyStop', type: JettyStopTask, group: 'gretty') {
