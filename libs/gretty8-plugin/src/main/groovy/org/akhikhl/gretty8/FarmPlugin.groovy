@@ -17,16 +17,22 @@ import org.gradle.api.Project
  */
 class FarmPlugin extends FarmPluginBase {
 
-  static final ScannerManagerFactory scannerManagerFactory = new ScannerManagerFactoryImpl()
+  private final ScannerManagerFactory scannerManagerFactory = new ScannerManagerFactoryImpl()
+
+  private final ResourceBundle messages
+
+  FarmPlugin() {
+    messages = ResourceBundle.getBundle('org.akhikhl.gretty8.Messages', Locale.ENGLISH, this.getClass().getClassLoader())
+  }
 
   @Override
   protected String getJettyVersion() {
-    Messages.getString('jettyVersion')
+    messages.getString('jettyVersion')
   }
 
   @Override
   protected String getPluginName() {
-    Messages.getString('farmPluginName')
+    messages.getString('farmPluginName')
   }
 
   @Override
