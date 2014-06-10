@@ -25,12 +25,15 @@ public class ExampleServlet extends HttpServlet {
       throw new ServletException(ex);
     }
     String greeting = config.getString("greeting");
-    try (PrintWriter out = response.getWriter()) {
+    PrintWriter out = response.getWriter();
+    try {
       out.println("<html><body><h1>" + greeting + "</h1>");
       out.println("<p>test message 1</p>");
       out.println("</body></html>");
       out.println();
       out.flush();
+    } finally {
+      out.close();
     }
   }
 }

@@ -80,7 +80,7 @@ final class ProjectUtils {
           collectInDir = { File dir ->
             dir.listFiles().each {
               if(it.isFile()) {
-                String relPath = sourceDir.toPath().relativize(it.toPath())
+                String relPath = it.absolutePath - sourceDir.absolutePath - '/'
                 boolean match = (filePattern instanceof java.util.regex.Pattern) ? (relPath =~ filePattern) : (relPath == filePattern)
                 if(match)
                   result.add(it)

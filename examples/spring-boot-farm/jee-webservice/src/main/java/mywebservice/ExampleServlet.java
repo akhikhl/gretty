@@ -15,9 +15,12 @@ public class ExampleServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    try (PrintWriter out = response.getWriter()) {
+    PrintWriter out = response.getWriter();
+    try {
       SimpleDateFormat format = new SimpleDateFormat("EEE, d MMM yyyy");
       out.println("{ \"date\": \"" + format.format(new Date()) + "\" }");
+    } finally {
+      out.close();
     }
   }
 }

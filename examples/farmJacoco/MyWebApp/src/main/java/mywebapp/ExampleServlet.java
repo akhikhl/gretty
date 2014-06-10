@@ -13,8 +13,11 @@ public class ExampleServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    try (PrintWriter out = response.getWriter()) {
+    PrintWriter out = response.getWriter();
+    try {
       out.println("{ \"message\": \"Hello, world!\" }");
+    } finally {
+      out.close();
     }
   }
 }

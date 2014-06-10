@@ -23,9 +23,12 @@ public class ExampleServlet extends HttpServlet {
     Template template = ve.getTemplate("/hellogretty/templates/servletpage.html", "UTF-8");
     VelocityContext context = new VelocityContext();
     context.put("today", new java.util.Date());
-    try (PrintWriter out = response.getWriter()) {
+    PrintWriter out = response.getWriter();
+    try {
       template.merge(context, out);
       out.flush();
+    } finally {
+      out.close();
     }
   }
 

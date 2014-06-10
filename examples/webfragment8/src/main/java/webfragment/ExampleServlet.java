@@ -14,12 +14,15 @@ public class ExampleServlet extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    try (PrintWriter out = response.getWriter()) {
+    PrintWriter out = response.getWriter();
+    try {
       out.println("<html><body><h1>Hello, this is webfragment.ExampleServlet</h1>");
       out.println("<p>generated on " + new Date() + "</p>");
       out.println("</body></html>");
       out.println();
       out.flush();
+    } finally {
+      out.close();
     }
   }
 }
