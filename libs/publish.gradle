@@ -5,111 +5,44 @@ apply plugin: 'signing'
 apply plugin: 'maven-publish'
 apply plugin: 'bintray'
 
-def thisProject = project    
+import org.gradle.api.internal.artifacts.publish.DefaultPublishArtifact
 
-if(thisProject.hasProperty('publishToSonatype')) {
-  
-  assert thisProject.hasProperty('signing.keyId')
-  assert thisProject.hasProperty('signing.password')
-  assert thisProject.hasProperty('signing.secretKeyRingFile')
-  assert thisProject.hasProperty('sonatypeUsername')
-  assert thisProject.hasProperty('sonatypePassword')
-  
-  signing {
-    sign configurations.archives
-  }
+def thisProject = project
 
-  uploadArchives {
-    repositories {
-      mavenDeployer {
-        beforeDeployment { deployment -> signing.signPom(deployment) }
+install.repositories.mavenInstaller.pom*.whenConfigured { pom ->
+  pom.project {
+    name thisProject.name
+    packaging 'jar'
+    description thisProject.project_description
+    url thisProject.project_website
 
-        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-          authentication(userName: project.sonatypeUsername, password: project.sonatypePassword)
-        }
+    scm {
+      url thisProject.project_scm
+      connection thisProject.project_scm
+      developerConnection thisProject.project_scm
+    }
 
-        pom.project {
-          name thisProject.name
-          packaging 'jar'
-          description thisProject.project_description
-          url thisProject.project_website
-
-          scm {
-            url thisProject.project_scm
-            connection thisProject.project_scm
-            developerConnection thisProject.project_scm
-          }
-
-          licenses {
-            license {
-              name thisProject.license
-              url thisProject.license_url
-              distribution 'repo'
-            }
-          }
-
-          developers {
-            developer {
-              id thisProject.developer_id
-              name thisProject.developer_name
-            }
-          }
-        }
+    licenses {
+      license {
+        name thisProject.license
+        url thisProject.license_url
+        distribution 'repo'
       }
     }
-  } // uploadArchives
-} // publishToSonatype
 
-// used by bintray
-publishing {
-  publications {
-    mavenAll(MavenPublication) {
-      if (plugins.hasPlugin('java')) {
-        from components.java
+    developers {
+      developer {
+        id thisProject.developer_id
+        name thisProject.developer_name
       }
-      artifact sourcesJar {
-        classifier "sources"
-      }
-      artifact javadocJar {
-        classifier "javadoc"
-      }
-      pom.withXml {
-        new NodeBuilder(current: asNode()).with {
-          name thisProject.name
-          packaging 'jar'
-          description thisProject.project_description
-          url thisProject.project_website
-
-          scm {
-            url thisProject.project_scm
-            connection thisProject.project_scm
-            developerConnection thisProject.project_scm
-          }
-
-          licenses {
-            license {
-              name thisProject.license
-              url thisProject.license_url
-              distribution 'repo'
-            }
-          }
-
-          developers {
-            developer {
-              id thisProject.developer_id
-              name thisProject.developer_name
-            }
-          }
-        }
-      }      
     }
   }
-} // publishing
+}
 
 bintray {
   user = project.hasProperty('bintrayUser') ? project.bintrayUser : ''
   key = project.hasProperty('bintrayKey') ? project.bintrayKey : ''
-  publications = ['mavenAll'] // When uploading Maven-based publication files
+  configurations = ['archives']
   pkg {
     repo = 'maven'
     name = thisProject.rootProject.project_id
@@ -118,5 +51,20 @@ bintray {
     labels = ['gretty', 'jetty', 'gradle', 'plugin']
   }
   dryRun = false
+}
+
+bintrayUpload {
+  doFirst {
+    def signatureArtifacts = []
+    collectArtifacts(project.configurations.archives).each { a ->
+      def s = signing.sign(a.file)
+      s.signatureFiles.each { f ->
+        def fname = f.name
+        def ext = fname.substring(fname.lastIndexOf('.') + 1)
+        signatureArtifacts.add(new DefaultPublishArtifact(a.name, a.extension + '.' + ext, ext, a.classifier, new Date(), f, [] as Object[]))
+      }
+    }
+    project.configurations.archives.artifacts.addAll(signatureArtifacts)
+  }
 }
 
