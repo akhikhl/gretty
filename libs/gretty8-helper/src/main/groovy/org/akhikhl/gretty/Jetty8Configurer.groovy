@@ -38,7 +38,7 @@ import org.slf4j.Logger
  * @author akhikhl
  */
 class Jetty8Configurer implements JettyConfigurer {
-  
+
   private Logger log
 
   @Override
@@ -131,7 +131,7 @@ class Jetty8Configurer implements JettyConfigurer {
   }
 
   @Override
-  createWebAppContext(List<String> webappClassPath) {
+  def createWebAppContext(List<String> webappClassPath) {
     WebAppContext context = new WebAppContext()
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !(it =~ /.*javax\.servlet-api.*\.jar/) }.join(';'))
     context.addEventListener(new ContextDetachingSCL())
@@ -146,7 +146,7 @@ class Jetty8Configurer implements JettyConfigurer {
     contexts.setHandlers(handlers as Handler[])
     server.setHandler(contexts)
   }
-  
+
   @Override
   void setLogger(Logger log) {
     this.log = log
