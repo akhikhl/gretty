@@ -1,6 +1,6 @@
 apply plugin: 'gretty'
 
-// apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 group = 'org.akhikhl.gretty.examples'
 version = '1.0'

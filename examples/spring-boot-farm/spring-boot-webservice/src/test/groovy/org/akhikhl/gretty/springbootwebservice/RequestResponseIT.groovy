@@ -1,4 +1,4 @@
-package mywebservice
+package org.akhikhl.gretty.springbootwebservice
 
 import spock.lang.Specification
 import groovyx.net.http.*
@@ -24,7 +24,7 @@ class RequestResponseIT extends Specification {
   def 'should get expected response'() {
   when:
     def result = http.request(POST, JSON) {
-      uri.path = "${contextPath}/myservlet/getdate"
+      uri.path = "${contextPath}/mycontroller/getdate"
       response.success = { resp, json ->
         json.date
       }

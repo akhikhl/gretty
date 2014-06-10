@@ -1,13 +1,14 @@
 apply plugin: 'groovy'
 apply plugin: 'gretty-spring-boot'
 
-//apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 group = 'org.akhikhl.gretty.examples'
 version = '1.0'
 
 dependencies {
   compile 'org.codehaus.groovy:groovy-all:2.3.2'
+  testCompile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 }
 
 gretty {

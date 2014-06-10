@@ -11,7 +11,7 @@ jQuery(function($) {
   });
   $('#sendRequest2').click(function() {
     $('#result2').addClass('hide');
-    $.ajax({ type: 'POST', url: '/jee-webservice/getdate', dataType: 'json' }).done(function(data) {
+    $.ajax({ type: 'POST', url: '/jee-webservice/myservlet/getdate', dataType: 'json' }).done(function(data) {
       $('#result2').removeClass('hide bg-danger').addClass('bg-success').text('Got from server: ' + data.date);
     }).fail(function(jqXHR, textStatus, errorThrown) {
       $('#result2').removeClass('hide bg-success').addClass('bg-danger').text('error: ' + errorThrown);

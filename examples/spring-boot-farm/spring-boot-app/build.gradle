@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 apply plugin: 'gretty-spring-boot'
 apply plugin: 'gretty-farm-spring-boot'
 
-//apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 version = '1.0.0'
 
