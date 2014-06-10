@@ -28,36 +28,37 @@ import org.springframework.util.ClassUtils
  */
 @Component('jettyEmbeddedServletContainerFactory')
 class ServletContainerFactory extends JettyEmbeddedServletContainerFactory implements GrettyConfigurableServletContainerFactory {
-  
+
   private static final Logger log = LoggerFactory.getLogger(ServletContainerFactory)
-  
+
   private Map params
 
   @Override
   public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
     def jettyConfigurer = new Jetty8Configurer()
     jettyConfigurer.setLogger(log)
-    def server = ServerConfigurer.createAndConfigureServer(jettyConfigurer, params) { context ->
-      
-      if (isRegisterDefaultServlet())
-        addDefaultServlet(context)
-        
-      if (isRegisterJspServlet() && ClassUtils.isPresent(getJspServletClassName(), getClass().getClassLoader()))
-        addJspServlet(context)
-        
-      ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
-      Configuration[] configurations = getWebAppContextConfigurations(context, initializersToUse)
-      context.setConfigurations(configurations)
-      context.getSessionHandler().getSessionManager().setMaxInactiveInterval(getSessionTimeout())
-      postProcessWebAppContext(context)
+    def server = ServerConfigurer.createAndConfigureServer(jettyConfigurer, params) { webapp, context ->
+      if(webapp.springBoot) {
+        if (isRegisterDefaultServlet())
+          addDefaultServlet(context)
+
+        if (isRegisterJspServlet() && ClassUtils.isPresent(getJspServletClassName(), getClass().getClassLoader()))
+          addJspServlet(context)
+
+        ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
+        Configuration[] configurations = getWebAppContextConfigurations(context, initializersToUse)
+        context.setConfigurations(configurations)
+        context.getSessionHandler().getSessionManager().setMaxInactiveInterval(getSessionTimeout())
+        postProcessWebAppContext(context)
+      }
     }
-    
+
     for (JettyServerCustomizer customizer : getServerCustomizers())
       customizer.customize(server)
-      
+
     return getJettyEmbeddedServletContainer(server)
   }
-  
+
   public void setParams(Map params) {
     this.params = params
   }

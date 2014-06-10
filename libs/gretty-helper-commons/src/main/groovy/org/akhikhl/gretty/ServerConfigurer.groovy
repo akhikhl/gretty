@@ -12,9 +12,9 @@ package org.akhikhl.gretty
  * @author akhikhl
  */
 class ServerConfigurer {
-	
+
   static createAndConfigureServer(JettyConfigurer configurer, Map params, Closure configureContext = null) {
-    
+
     def server = configurer.createServer()
     configurer.applyJettyXml(server, params.jettyXml)
     configurer.configureConnectors(server, params)
@@ -39,15 +39,15 @@ class ServerConfigurer {
         else
           context.setWar(webapp.resourceBase)
       }
-      
+
       if(configureContext)
-        configureContext(context)
+        configureContext(webapp, context)
 
       handlers.add(context)
     }
 
     configurer.setHandlersToServer(server, handlers)
-    
+
     return server
   }
 }

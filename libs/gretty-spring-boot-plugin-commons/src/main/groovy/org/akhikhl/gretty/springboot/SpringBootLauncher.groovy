@@ -129,8 +129,10 @@ class SpringBootLauncher extends DefaultLauncher {
   protected void writeWebAppClassPath(json, WebAppConfig webAppConfig) {
     if(webAppConfig.projectPath) {
       def proj = project.project(webAppConfig.projectPath)
-      if(proj.configurations.findByName('springBoot'))
+      if(proj.configurations.findByName('springBoot')) {
+        json.springBoot true
         return // webapp classpath is passed directly to the runner
+      }
     }
     super.writeWebAppClassPath(json, webAppConfig)
   }
