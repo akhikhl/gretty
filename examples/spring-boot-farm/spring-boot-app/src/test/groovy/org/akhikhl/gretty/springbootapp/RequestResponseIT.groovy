@@ -19,6 +19,8 @@ class RequestResponseIT extends GebReportingSpec {
   }
 
   def 'should get response from spring-boot web-service'() {
+    if(!System.getProperty('gretty.farm'))
+      return
   when:
     go baseURI
     $('#sendRequest1').click()
@@ -28,6 +30,8 @@ class RequestResponseIT extends GebReportingSpec {
   }
 
   def 'should get response from jee web-service'() {
+    if(!System.getProperty('gretty.farm'))
+      return
   when:
     go baseURI
     $('#sendRequest2').click()
