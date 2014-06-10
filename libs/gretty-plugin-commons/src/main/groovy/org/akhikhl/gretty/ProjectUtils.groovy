@@ -38,7 +38,7 @@ final class ProjectUtils {
       else if(f instanceof Map) {
         f.each { key, value ->
           if(key == 'baseDir')
-            baseDir = value
+            baseDir = value instanceof File ? value : new File(value.toString())
           else if(key == 'pattern')
             pattern = value
           else if(key == 'excludesPattern')
@@ -161,11 +161,9 @@ final class ProjectUtils {
   }
 
   static List<FastReloadStruct> getFastReload(Project project, List fastReloads = null) {
-    if(fastReloads == null) {
+    if(fastReloads == null)
       fastReloads = []
-      collectFastReloads(fastReloads, project)
-    }
-    log.debug 'fastReloads={}', fastReloads
+    collectFastReloads(fastReloads, project)
     List<FastReloadStruct> result = []
     if(fastReloads.find { (it instanceof Boolean) && it })
       addDefaultFastReloadDirs(result, project)

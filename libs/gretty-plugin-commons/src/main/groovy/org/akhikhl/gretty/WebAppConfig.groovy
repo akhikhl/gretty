@@ -135,7 +135,10 @@ class WebAppConfig {
       }
   }
 
-  void setFastReload(boolean newValue) {
-    fastReload = [ newValue ]
+  void setFastReload(newValue) {
+    if(newValue == null || Collection.class.isAssignableFrom(newValue.getClass()))
+      fastReload = newValue
+    else
+      fastReload = [ newValue ]
   }
 }
