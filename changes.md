@@ -4,6 +4,12 @@
 
 ### What's new:
 
+#### Version 0.0.24
+
+- Implemented [spring-boot support](http://akhikhl.github.io/gretty-doc/spring-boot-support.html).
+
+- Improved compatibility with JRE-6.
+
 #### Version 0.0.23
 
 - Implemented [HTTPS support](http://akhikhl.github.io/gretty-doc/HTTPS-support.html).

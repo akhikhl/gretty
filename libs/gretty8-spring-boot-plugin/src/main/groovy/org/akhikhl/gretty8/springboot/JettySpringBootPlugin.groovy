@@ -40,7 +40,7 @@ class JettySpringBootPlugin extends JettySpringBootPluginBase {
     super.injectDependencies(project)
     project.dependencies {
       providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
-      grettyHelperConfig 'org.akhikhl.gretty:gretty8-spring-boot-helper:0.0.23'
+      grettyHelperConfig 'org.akhikhl.gretty:gretty8-spring-boot-helper:0.0.24'
     }
   }
 }

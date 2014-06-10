@@ -12,8 +12,8 @@ buildscript {
   dependencies {
     classpath "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
     classpath "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"
-    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.23'
-    classpath 'org.akhikhl.gretty:gretty-spring-boot-plugin:0.0.23'
+    classpath 'org.akhikhl.gretty:gretty-plugin:0.0.24'
+    classpath 'org.akhikhl.gretty:gretty-spring-boot-plugin:0.0.24'
   }
 }
 

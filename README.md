@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) 
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
-[![Latest Version](http://img.shields.io/badge/latest_version-0.0.23-47b31f.svg)](https://github.com/akhikhl/gretty/tree/v0.0.23) 
+[![Latest Version](http://img.shields.io/badge/latest_version-0.0.24-47b31f.svg)](https://github.com/akhikhl/gretty/tree/v0.0.24) 
 [![License](http://img.shields.io/badge/license-MIT-949494.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on Jetty.
@@ -16,7 +16,7 @@ If you are new with gretty, good starting points would be [getting started](http
 
 #### :star: What's new
 
-- [HTTPS protocol support](http://akhikhl.github.io/gretty-doc/HTTPS-support.html)
+- [spring-boot support](http://akhikhl.github.io/gretty-doc/spring-boot-support.html)
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 

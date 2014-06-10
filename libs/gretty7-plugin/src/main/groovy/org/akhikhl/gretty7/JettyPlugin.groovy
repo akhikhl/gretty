@@ -35,7 +35,7 @@ final class JettyPlugin extends JettyPluginBase {
   protected void injectDependencies(Project project) {
     project.dependencies {
       providedCompile 'javax.servlet:servlet-api:2.5'
-      grettyHelperConfig 'org.akhikhl.gretty:gretty7-helper:0.0.23'
+      grettyHelperConfig 'org.akhikhl.gretty:gretty7-helper:0.0.24'
     }
   }
 }
