@@ -73,6 +73,35 @@ publishing {
       artifact javadocJar {
         classifier "javadoc"
       }
+      pom.withXml {
+        new NodeBuilder(current: asNode()).with {
+          name thisProject.name
+          packaging 'jar'
+          description thisProject.project_description
+          url thisProject.project_website
+
+          scm {
+            url thisProject.project_scm
+            connection thisProject.project_scm
+            developerConnection thisProject.project_scm
+          }
+
+          licenses {
+            license {
+              name thisProject.license
+              url thisProject.license_url
+              distribution 'repo'
+            }
+          }
+
+          developers {
+            developer {
+              id thisProject.developer_id
+              name thisProject.developer_name
+            }
+          }
+        }
+      }      
     }
   }
 } // publishing
@@ -83,7 +112,7 @@ bintray {
   publications = ['mavenAll'] // When uploading Maven-based publication files
   pkg {
     repo = 'maven'
-    name = thisProject.project_id
+    name = thisProject.rootProject.project_id
     desc = thisProject.rootProject.description
     licenses = ['MIT']
     labels = ['gretty', 'jetty', 'gradle', 'plugin']
