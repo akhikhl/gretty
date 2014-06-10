@@ -7,8 +7,6 @@
  */
 package org.akhikhl.gretty
 
-import java.nio.file.Path
-import java.nio.file.Paths
 import org.gradle.api.Project
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
@@ -135,7 +133,7 @@ abstract class ScannerManagerBase {
         } else {
           List<FastReloadStruct> fastReloadDirs = fastReloadMap[proj.path]
           if(fastReloadDirs?.find { FastReloadStruct s ->
-            String relPath = s.baseDir.toPath().relativize(Paths.get(f))
+            String relPath = f - s.baseDir.absolutePath - File.separator
             f.startsWith(s.baseDir.absolutePath) && (s.pattern == null || relPath =~ s.pattern) && (s.excludesPattern == null || !(relPath =~ s.excludesPattern))
           }) {
             log.debug 'file {} is in fastReload directories', f
@@ -152,7 +150,7 @@ abstract class ScannerManagerBase {
     webAppProjectReloads.each { String projectPath, Set reloadModes ->
       Project proj = project.project(projectPath)
       if(reloadModes.contains('compile')) {
-        log.debug 'Recompiling {}', (projectPath == ':' ? proj.name : projectPath)
+        log.warn 'Recompiling {}', (projectPath == ':' ? proj.name : projectPath)
         WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
         ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
         try {
@@ -161,7 +159,7 @@ abstract class ScannerManagerBase {
           connection.close()
         }
       } else if(reloadModes.contains('fastReload')) {
-        log.debug 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
+        log.warn 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
         ProjectUtils.prepareInplaceWebAppFolder(proj)
       }
     }
