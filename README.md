@@ -16,7 +16,7 @@ If you are new with gretty, good starting points would be [getting started](http
 
 #### :star: What's new
 
-- [spring-boot support](http://akhikhl.github.io/gretty-doc/spring-boot-support.html)
+- [Full support of Spring Boot 1.1.0](http://akhikhl.github.io/gretty-doc/spring-boot-support.html).
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
