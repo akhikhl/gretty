@@ -4,6 +4,7 @@
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
 [![Latest Version](http://img.shields.io/badge/latest_version-0.0.25-47b31f.svg)](https://github.com/akhikhl/gretty/tree/v0.0.25) 
 [![License](http://img.shields.io/badge/license-MIT-949494.svg)](#copyright-and-license)
+[![Project Stats](https://www.ohloh.net/p/gretty/widgets/project_thin_badge.gif)](https://www.ohloh.net/p/gretty)
 
 Gretty is a feature-rich gradle plugin for running web-apps on Jetty.
 It supports multiple Jetty versions (7, 8 and 9), multiple web-apps and many more.
