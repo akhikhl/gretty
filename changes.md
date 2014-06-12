@@ -7,7 +7,7 @@
 #### Version 0.0.25
 
 - Adopted new plugin identification scheme suggested at the portal [http://plugins.gradle.org](http://plugins.gradle.org).
- See more information at [Gretty plugin names](http://akhikhl.github.io/gretty-doc/Gretty-plugin-names.html).
+ See more information at [Gretty gradle plugins](http://akhikhl.github.io/gretty-doc/Gretty-gradle-plugins.html).
 
 - Upgraded to Jetty 9.2.1.v20140609. See [Jetty Release 9.2.0 announcement](http://dev.eclipse.org/mhonarc/lists/jetty-announce/msg00065.html)
  and [Jetty 9.2.1.v20140609 release announcement](http://dev.eclipse.org/mhonarc/lists/jetty-announce/msg00066.html) for technical details
