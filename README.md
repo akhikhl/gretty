@@ -15,6 +15,11 @@ A complete list of Gretty features is available in [feature overview](http://akh
 
 If you are new with gretty, good starting point would be [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
 
+### :bell: Attention
+
+Since version 0.0.25 Gretty adopted new plugin identification scheme suggested at the portal [http://plugins.gradle.org](http://plugins.gradle.org).
+ See more information at [Gretty plugin names](http://akhikhl.github.io/gretty-doc/Gretty-plugin-names.html).
+
 #### :star: What's new
 
 - [Full support of Spring Boot 1.1.0](http://akhikhl.github.io/gretty-doc/spring-boot-support.html).
