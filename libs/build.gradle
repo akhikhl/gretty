@@ -15,10 +15,10 @@ ext {
   jetty9_version = '9.2.1.v20140609'
   jetty9_servlet_api_version = '3.1.0'
   asm_version = '5.0.1'
-  groovy_version = '1.8.6' // this is groovy version supported by gradle 1.1.2
+  groovy_version = '1.8.6' // this is groovy version used by gradle 1.1.2
   spock_version = '0.7-groovy-2.0'
   logback_version = '1.1.2'
   slf4j_version = '1.7.6'
-  springBootVersion = '1.1.0.RELEASE'
+  springBootVersion = '1.1.1.RELEASE'
 }
 

@@ -5,11 +5,11 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty9-plugin:0.0.24'
+    classpath 'org.akhikhl.gretty:gretty9:0.0.25'
   }
 }
 
-apply plugin: 'gretty9'
+apply plugin: 'org.akhikhl.gretty9'
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
   
 gretty {

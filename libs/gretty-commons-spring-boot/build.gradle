@@ -1,0 +1,10 @@
+apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('libs/publish.gradle')
+
+dependencies {
+  compile project(':libs:gretty-commons')
+  compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
+  compile "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"  
+  compile 'org.springframework:springloaded:1.2.0.RELEASE'
+  compile gradleApi()
+}

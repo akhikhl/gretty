@@ -1,0 +1,22 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+  
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty:0.0.25'
+  }
+}
+
+repositories {
+  jcenter()
+}
+
+project.apply plugin: 'war'
+
+// use `apply plugin: 'org.akhikhl.gretty'` instead, when copying this script to "build.gradle"
+
+if (!project.plugins.findPlugin(org.akhikhl.gretty.JettyPlugin))
+  project.apply(plugin: org.akhikhl.gretty.JettyPlugin)
+
+

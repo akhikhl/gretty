@@ -12,12 +12,12 @@ buildscript {
   dependencies {
     classpath "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
     classpath "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"
-    classpath 'org.akhikhl.gretty:gretty-spring-boot-plugin:0.0.24'
+    classpath 'org.akhikhl.gretty:gretty-spring-boot:0.0.25'
   }
 }
 
 apply plugin: 'groovy'
-apply plugin: 'gretty-spring-boot'
+apply plugin: 'org.akhikhl.gretty-spring-boot'
 
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 

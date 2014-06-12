@@ -4,6 +4,17 @@
 
 ### What's new:
 
+#### Version 0.0.25
+
+- Adopted new plugin identification scheme suggested at the portal [http://plugins.gradle.org](http://plugins.gradle.org/submit).
+ See more information at [Gretty plugin names](http://akhikhl.github.io/gretty-doc/Gretty-plugin-names.html).
+
+- Upgraded to Jetty 9.2.1.v20140609. See [Jetty Release 9.2.0 announcement](http://dev.eclipse.org/mhonarc/lists/jetty-announce/msg00065.html)
+ and [Jetty 9.2.1.v20140609 release announcement](http://dev.eclipse.org/mhonarc/lists/jetty-announce/msg00066.html) for technical details
+ on new Jetty version.
+ 
+- Upgraded to Spring Boot 1.1.1.RELEASE.
+
 #### Version 0.0.24
 
 - Implemented [spring-boot support](http://akhikhl.github.io/gretty-doc/spring-boot-support.html).

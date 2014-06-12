@@ -1,0 +1,16 @@
+apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('libs/publish.gradle')
+
+import org.apache.tools.ant.filters.*
+
+dependencies {
+  compile project(':libs:gretty9')
+  compile project(':libs:gretty-commons-spring-boot')
+  compile gradleApi()
+}
+
+processResources {
+  filter ReplaceTokens, tokens: [
+    jettyVersion: project.jetty9_version
+  ]
+}

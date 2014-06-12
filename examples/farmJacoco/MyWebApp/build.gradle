@@ -1,5 +1,5 @@
-apply plugin: 'gretty'
-apply plugin: 'gretty-farm'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty-farm'
 
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 

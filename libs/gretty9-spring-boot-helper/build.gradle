@@ -3,5 +3,5 @@ apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
   compile project(':libs:gretty9-helper')
-  compile project(':libs:gretty-spring-boot-helper-commons')
+  compile project(':libs:gretty-commons-spring-boot-helper')
 }

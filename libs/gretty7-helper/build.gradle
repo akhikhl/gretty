@@ -10,7 +10,7 @@ configurations {
 }
 
 dependencies {
-  compile project(':libs:gretty-helper-commons')
+  compile project(':libs:gretty-commons-helper')
   compile "javax.servlet:servlet-api:$jetty7_servlet_api_version"
   compile "org.eclipse.jetty:jetty-server:$jetty7_version"
   compile "org.eclipse.jetty:jetty-servlet:$jetty7_version"

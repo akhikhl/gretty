@@ -8,7 +8,7 @@ configurations {
 }
 
 dependencies {
-  compile project(':libs:gretty-helper-commons')
+  compile project(':libs:gretty-commons-helper')
   compile "javax.servlet:javax.servlet-api:$jetty8_servlet_api_version"
   compile "org.eclipse.jetty:jetty-server:$jetty8_version"
   compile "org.eclipse.jetty:jetty-servlet:$jetty8_version"
