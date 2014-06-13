@@ -12,6 +12,9 @@ import ch.qos.logback.classic.Level
 
 class GrettyExtension {
 
+  Integer jettyVersion
+  Boolean managedClassReload
+
   @Delegate
   protected ServerConfig serverConfig = new ServerConfig()
 

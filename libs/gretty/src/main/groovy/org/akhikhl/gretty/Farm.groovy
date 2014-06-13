@@ -15,6 +15,9 @@ import org.gradle.api.Project
  */
 class Farm {
 
+  Integer jettyVersion
+  Boolean managedClassReload
+
   @Delegate
   protected ServerConfig serverConfig = new ServerConfig()
 

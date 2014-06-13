@@ -4,7 +4,7 @@ apply from: rootProject.file('libs/publish.gradle')
 import org.apache.tools.ant.filters.*
 
 dependencies {
-  compile project(':libs:gretty9')
+  //compile project(':libs:gretty9')
   compile project(':libs:gretty-commons-spring-boot')
   compile gradleApi()
 }

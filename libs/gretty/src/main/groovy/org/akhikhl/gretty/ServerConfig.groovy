@@ -14,7 +14,7 @@ import org.gradle.api.Project
  * @author akhikhl
  */
 class ServerConfig {
-
+  
   List<String> jvmArgs
   String host
   Boolean httpEnabled

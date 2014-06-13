@@ -202,7 +202,7 @@ class DefaultLauncher implements Launcher {
     log.debug 'Got start status: {}', status
 
     System.out.println()
-    log.warn 'Jetty server {} started.', project.ext.jettyVersion
+    log.warn 'Jetty server {} started.', project.gretty.jettyVersion
     for(WebAppConfig webAppConfig in webAppConfigs) {
       String webappName
       if(webAppConfig.inplace)
@@ -244,7 +244,7 @@ class DefaultLauncher implements Launcher {
 
     sconfig.onStart*.call()
 
-    ScannerManagerBase scanman = project.ext.scannerManagerFactory.createScannerManager()
+    ScannerManagerBase scanman = ScannerManagerFactory.createScannerManager(project, sconfig)
     scanman.startScanner(project, sconfig, webAppConfigs)
     try {
       project.javaexec this.&configureJavaExec

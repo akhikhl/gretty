@@ -30,7 +30,6 @@ abstract class FarmPluginBase implements Plugin<Project> {
     project.ext.grettyFarmPluginName = getPluginName()
     project.ext.jettyVersion = project.ext.grettyFarmPluginJettyVersion = getJettyVersion()
 
-    project.ext.scannerManagerFactory = getScannerManagerFactory()
     project.ext.launcherFactory = getLauncherFactory()
 
     project.extensions.create('farm', Farm)

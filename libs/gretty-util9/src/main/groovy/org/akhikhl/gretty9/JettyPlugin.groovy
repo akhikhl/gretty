@@ -13,8 +13,6 @@ import org.akhikhl.gretty.ScannerManagerFactory
 
 class JettyPlugin extends JettyPluginBase {
 
-  private final ScannerManagerFactory scannerManagerFactory = new ScannerManagerFactoryImpl()
-
   private final ResourceBundle messages
 
   JettyPlugin() {
@@ -29,11 +27,6 @@ class JettyPlugin extends JettyPluginBase {
   @Override
   protected String getPluginName() {
     messages.getString('pluginName')
-  }
-
-  @Override
-  protected ScannerManagerFactory getScannerManagerFactory() {
-    scannerManagerFactory
   }
 
   @Override
