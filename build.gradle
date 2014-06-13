@@ -1,5 +1,5 @@
 group = 'org.akhikhl.gretty'
-version = '0.0.25'
+version = '0.0.26'
 
 repositories {
   mavenLocal()

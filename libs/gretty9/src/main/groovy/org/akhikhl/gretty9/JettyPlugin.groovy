@@ -40,7 +40,7 @@ class JettyPlugin extends JettyPluginBase {
   protected void injectDependencies(Project project) {
     project.dependencies {
       providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
-      grettyHelperConfig 'org.akhikhl.gretty:gretty9-helper:0.0.25'
+      grettyHelperConfig 'org.akhikhl.gretty:gretty9-helper:0.0.26'
     }
   }
 }

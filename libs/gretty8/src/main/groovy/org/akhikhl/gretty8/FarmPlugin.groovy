@@ -43,7 +43,7 @@ class FarmPlugin extends FarmPluginBase {
   @Override
   protected void injectDependencies(Project project) {
     project.dependencies {
-      grettyHelperConfig 'org.akhikhl.gretty:gretty8-helper:0.0.25'
+      grettyHelperConfig 'org.akhikhl.gretty:gretty8-helper:0.0.26'
     }
   }
 }
