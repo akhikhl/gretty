@@ -38,6 +38,14 @@ class FarmStartTask extends StartBaseTask {
 
     new RunConfig() {
 
+      String getJettyVersion() {
+        JettyVersionResolver.resolve(tempFarm.jettyVersion)
+      }
+
+      boolean getManagedClassReload() {
+        tempFarm.managedClassReload
+      }
+
       ServerConfig getServerConfig() {
         tempFarm.serverConfig
       }

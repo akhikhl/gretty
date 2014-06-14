@@ -1,4 +1,4 @@
- /*
+/*
  * gretty
  *
  * Copyright 2013  Andrey Hihlovskiy.

@@ -42,6 +42,14 @@ class JettyStartTask extends StartBaseTask {
 
     new RunConfig() {
 
+      String getJettyVersion() {
+        JettyVersionResolver.resolve(project.gretty.jettyVersion)
+      }
+
+      boolean getManagedClassReload() {
+        project.gretty.managedClassReload
+      }
+
       ServerConfig getServerConfig() {
         sconfig
       }

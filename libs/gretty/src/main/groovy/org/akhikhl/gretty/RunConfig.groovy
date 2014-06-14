@@ -12,6 +12,10 @@ package org.akhikhl.gretty
  * @author akhikhl
  */
 interface RunConfig {
+  
+  String getJettyVersion()
+  
+  boolean getManagedClassReload()
 
   ServerConfig getServerConfig()
 

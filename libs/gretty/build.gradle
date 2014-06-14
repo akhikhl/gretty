@@ -1,6 +1,8 @@
 apply from: rootProject.file('libs/common.gradle')
 apply from: rootProject.file('libs/publish.gradle')
 
+import org.apache.tools.ant.filters.*
+
 dependencies {
   compile "ch.qos.logback:logback-classic:$logback_version"
   compile 'commons-io:commons-io:2.4'
@@ -9,3 +11,10 @@ dependencies {
   compile gradleApi()
 }
 
+processResources {
+  filter ReplaceTokens, tokens: [
+    jetty7Version: project.jetty7_version,
+    jetty8Version: project.jetty8_version,
+    jetty9Version: project.jetty9_version
+  ]
+}

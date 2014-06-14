@@ -33,7 +33,7 @@ class ScannerManagerFactory {
         ScannerManagerClass = Class.forName('org.akhikhl.gretty9.ScannerManager', true, classLoader)
         break
       default:
-        throw new GradleException("Unsupported jetty version: $jettyVersion (supported versions: 7, 8, 9)")
+        throwUnsupportedJettyVersion(jettyVersion)
     }
     def scannerManager = ScannerManagerClass.newInstance()
     scannerManager.managedClassReload = sconfig.managedClassReload as boolean

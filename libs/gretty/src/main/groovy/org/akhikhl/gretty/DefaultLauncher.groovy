@@ -38,6 +38,8 @@ class DefaultLauncher implements Launcher {
 
   protected StartBaseTask startTask
   protected Project project
+  protected String jettyVersion
+  protected boolean managedClassReload
   protected ServerConfig sconfig
   protected Iterable<WebAppConfig> webAppConfigs
   protected final ExecutorService executorService
@@ -168,6 +170,8 @@ class DefaultLauncher implements Launcher {
     this.startTask = startTask
     project = startTask.project
     RunConfig runConfig = startTask.getRunConfig()
+    jettyVersion = runConfig.getJettyVersion()
+    managedClassReload = runConfig.getManagedClassReload()
     sconfig = runConfig.getServerConfig()
     webAppConfigs = runConfig.getWebAppConfigs()
   }
@@ -202,7 +206,7 @@ class DefaultLauncher implements Launcher {
     log.debug 'Got start status: {}', status
 
     System.out.println()
-    log.warn 'Jetty server {} started.', project.gretty.jettyVersion
+    log.warn 'Jetty server {} started.', jettyVersion
     for(WebAppConfig webAppConfig in webAppConfigs) {
       String webappName
       if(webAppConfig.inplace)
