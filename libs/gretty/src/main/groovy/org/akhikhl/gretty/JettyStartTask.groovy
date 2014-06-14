@@ -42,8 +42,8 @@ class JettyStartTask extends StartBaseTask {
 
     new RunConfig() {
 
-      String getJettyVersion() {
-        JettyVersionResolver.resolve(project.gretty.jettyVersion)
+      String getServletContainer() {
+        project.gretty.servletContainer
       }
 
       boolean getManagedClassReload() {

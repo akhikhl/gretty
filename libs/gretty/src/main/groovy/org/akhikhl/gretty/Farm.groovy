@@ -15,7 +15,7 @@ import org.gradle.api.Project
  */
 class Farm {
 
-  Integer jettyVersion
+  String servletContainer
   Boolean managedClassReload
 
   @Delegate

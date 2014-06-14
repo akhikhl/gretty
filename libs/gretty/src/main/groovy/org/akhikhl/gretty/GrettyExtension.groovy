@@ -12,7 +12,7 @@ import ch.qos.logback.classic.Level
 
 class GrettyExtension {
 
-  Integer jettyVersion
+  String servletContainer
   Boolean managedClassReload
 
   @Delegate

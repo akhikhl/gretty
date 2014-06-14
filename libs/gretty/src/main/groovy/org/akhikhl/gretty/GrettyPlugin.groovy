@@ -343,23 +343,23 @@ class GrettyPlugin implements Plugin<Project> {
   } // apply
 
   private void createConfigurations(Project project) {
-    if(!project.configurations.findByName('grettyHelperConfig'))
-      project.configurations {
-        grettyHelperConfig
-        grettyLoggingConfig
-        gretty.extendsFrom(grettyHelperConfig)
-        grettyUtil7
-        grettyUtil8
-        grettyUtil9
-      }
-    if(!project.configurations.findByName('providedCompile'))
+    project.configurations {
+      gretty
+      grettyLoggingConfig
+    }
+    if(!project.configurations.findByName('providedCompile')) 
       project.configurations {
         providedCompile
-        compile.extendsFrom(providedCompile)
-        grettyUtil7 'org.akhikhl.gretty:gretty-util7'
-        grettyUtil8 'org.akhikhl.gretty:gretty-util8'
-        grettyUtil9 'org.akhikhl.gretty:gretty-util9'
+        compile.extendsFrom(providedCompile)        
       }
+    ServletContainerConfig.getConfigs().each { configName, config ->
+      project.configurations.create config.grettyHelperConfig
+      project.configurations.create config.grettyUtilConfig
+    }
+  }
+  
+  private String getGrettyVersion() {
+    Externalized.getString('grettyVersion')
   }
 
   private LauncherFactory getLauncherFactory() {
@@ -375,10 +375,12 @@ class GrettyPlugin implements Plugin<Project> {
   }
 
   private void injectDependencies(Project project) {
-    project.dependencies {
-      providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
-      grettyHelperConfig 'org.akhikhl.gretty:gretty9-helper:0.0.25'
+    ServletContainerConfig.getConfigs().each { configName, config ->
+      project.dependencies.create config.grettyHelperConfig, config.grettyHelperGAV
+      project.dependencies.create config.grettyUtilConfig, config.grettyUtilGAV
     }
-  }
-  
-} // JettyPluginBase
+    project.dependencies {
+      providedCompile ServletContainerConfig.getConfig(project.gretty.servletContainer).servletApiGAV
+    }
+  }  
+}

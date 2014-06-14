@@ -6,6 +6,8 @@ subDirs.each { File subdir ->
   include subdir.absolutePath.substring(rootDir.absolutePath.length() + 1).replace(File.separator, ':')
 }*/
 include 'libs:gretty'
+include 'libs:gretty-util7'
+include 'libs:gretty-util8'
 include 'libs:gretty-util9'
 
 

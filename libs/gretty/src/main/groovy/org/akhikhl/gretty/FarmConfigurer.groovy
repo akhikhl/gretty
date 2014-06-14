@@ -63,8 +63,6 @@ class FarmConfigurer {
     WebAppConfig webappConfig = new WebAppConfig()
     if(!proj.extensions.findByName('gretty'))
       throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
-    if(proj.ext.grettyPluginJettyVersion != project.ext.grettyFarmPluginJettyVersion)
-      throw new GradleException("${proj} uses jetty version ${proj.ext.grettyPluginJettyVersion} different from version ${project.ext.grettyFarmPluginJettyVersion} used by farm.")
     ConfigUtils.complementProperties(webappConfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefaultForProject(proj), new WebAppConfig(inplace: inplace))
     webappConfig.resolve(proj)
     webappConfig

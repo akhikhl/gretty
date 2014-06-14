@@ -38,7 +38,7 @@ class DefaultLauncher implements Launcher {
 
   protected StartBaseTask startTask
   protected Project project
-  protected String jettyVersion
+  protected String servletContainer
   protected boolean managedClassReload
   protected ServerConfig sconfig
   protected Iterable<WebAppConfig> webAppConfigs
@@ -155,7 +155,7 @@ class DefaultLauncher implements Launcher {
   }
 
   protected FileCollection getRunnerClassPath() {
-    project.configurations.gretty
+    project.configurations.gretty + project.configurations[ServletContainerConfig.getConfig(servletContainer).grettyHelperConfig]
   }
 
   protected String getRunnerClassName() {
@@ -170,7 +170,7 @@ class DefaultLauncher implements Launcher {
     this.startTask = startTask
     project = startTask.project
     RunConfig runConfig = startTask.getRunConfig()
-    jettyVersion = runConfig.getJettyVersion()
+    servletContainer = runConfig.getServletContainer()
     managedClassReload = runConfig.getManagedClassReload()
     sconfig = runConfig.getServerConfig()
     webAppConfigs = runConfig.getWebAppConfigs()
@@ -206,7 +206,7 @@ class DefaultLauncher implements Launcher {
     log.debug 'Got start status: {}', status
 
     System.out.println()
-    log.warn 'Jetty server {} started.', jettyVersion
+    log.warn '{} started.', servletContainerFullName
     for(WebAppConfig webAppConfig in webAppConfigs) {
       String webappName
       if(webAppConfig.inplace)
@@ -240,7 +240,7 @@ class DefaultLauncher implements Launcher {
       } else
         System.out.println "Run 'gradle ${startTask.getStopTaskName()}' to stop the jetty server."
       runThread.join()
-      log.warn 'Jetty server stopped.'
+      log.warn '{} stopped.', servletContainerFullName
     }
   }
 
@@ -248,7 +248,7 @@ class DefaultLauncher implements Launcher {
 
     sconfig.onStart*.call()
 
-    ScannerManagerBase scanman = ScannerManagerFactory.createScannerManager(project, sconfig)
+    ScannerManagerBase scanman = ScannerManagerFactory.createScannerManager(project, servletContainer, managedClassReload)
     scanman.startScanner(project, sconfig, webAppConfigs)
     try {
       project.javaexec this.&configureJavaExec
