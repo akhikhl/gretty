@@ -5,7 +5,7 @@
  *
  * See the file "license.txt" for copying and usage permission.
  */
-package org.akhikhl.gretty.springboot
+package org.akhikhl.gretty
 
 import groovy.text.GStringTemplateEngine
 import org.akhikhl.gretty.DefaultLauncher

@@ -5,7 +5,7 @@
  *
  * See the file "license.txt" for copying and usage permission.
  */
-package org.akhikhl.gretty.springboot
+package org.akhikhl.gretty
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -32,19 +32,19 @@ class SpringBootResolutionStrategy {
   private static resolveClasses() {
     if(ManagedDependencies == null)
       try {
-        ManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.ManagedDependencies', true, JettySpringBootPluginBase.classLoader)
+        ManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.ManagedDependencies', true, SpringBootResolutionStrategy.classLoader)
       } catch(ClassNotFoundException e) {
         throw new GradleException('There is no spring-boot-dependency-tools on the classpath of gretty plugin.')
       }
     if(PropertiesFileManagedDependencies == null)
       try {
-        PropertiesFileManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.PropertiesFileManagedDependencies', true, JettySpringBootPluginBase.classLoader)
+        PropertiesFileManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.PropertiesFileManagedDependencies', true, SpringBootResolutionStrategy.classLoader)
       } catch(ClassNotFoundException e) {
         // ignore, we are using older version of spring-boot
       }
     if(VersionManagedDependencies == null)
       try {
-        VersionManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.VersionManagedDependencies', true, JettySpringBootPluginBase.classLoader)
+        VersionManagedDependencies = Class.forName('org.springframework.boot.dependency.tools.VersionManagedDependencies', true, SpringBootResolutionStrategy.classLoader)
       } catch(ClassNotFoundException e) {
         // ignore, we are using older version of spring-boot
       }
