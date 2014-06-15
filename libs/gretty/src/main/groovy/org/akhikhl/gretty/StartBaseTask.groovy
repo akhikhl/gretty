@@ -27,7 +27,15 @@ abstract class StartBaseTask extends DefaultTask {
 
   @TaskAction
   void action() {
-    project.ext.launcherFactory.createLauncher().launch(this)
+    LauncherConfig config = getLauncherConfig()
+    Launcher launcher = anyWebAppUsesSpringBoot(config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
+    launcher.launch()
+  }
+  
+  protected final boolean anyWebAppUsesSpringBoot(Iterable<WebAppConfig> wconfigs) {
+    wconfigs.find { wconfig -> 
+      wconfig.springBoot || (wconfig.projectPath && ProjectUtils.isSpringBootApp(project.project(wconfig.projectPath)))
+    }
   }
 
   protected boolean getDefaultJacocoEnabled() {
@@ -46,7 +54,7 @@ abstract class StartBaseTask extends DefaultTask {
     jacocoHelper?.jacoco
   }
 
-  abstract RunConfig getRunConfig()
+  abstract LauncherConfig getLauncherConfig()
 
   protected abstract String getStopTaskName()
 

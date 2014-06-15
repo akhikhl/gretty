@@ -5,11 +5,12 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty8:0.0.26'
+    classpath 'org.akhikhl.gretty:gretty:0.0.26'
   }
 }
 
-apply plugin: 'org.akhikhl.gretty8'
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
 
 dependencies {
   // not needed by gretty, we used it for template processing within webapp
@@ -17,6 +18,7 @@ dependencies {
 }
 
 gretty {
+  servletContainer = 'jetty8'
   scanInterval = 1
   fastReload = true
   realm 'auth'

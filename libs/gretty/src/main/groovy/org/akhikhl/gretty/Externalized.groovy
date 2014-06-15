@@ -17,7 +17,7 @@ class Externalized {
   
 	static String getString(String key) {
     if(resources == null)
-      resources = ResourceBundle.getBundle('org.akhikhl.gretty.Externalized', Locale.ENGLISH, this.getClass().getClassLoader())
+      resources = ResourceBundle.getBundle('org.akhikhl.gretty.Externalized', Locale.ENGLISH, Externalized.getClassLoader())
     resources.getString(key)
   }
 }

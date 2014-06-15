@@ -8,12 +8,11 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.GradleException
-import ch.qos.logback.classic.Level
 
 class GrettyExtension {
 
-  String servletContainer
-  Boolean managedClassReload
+  String servletContainer = 'jetty9'
+  boolean managedClassReload = true
 
   @Delegate
   protected ServerConfig serverConfig = new ServerConfig()

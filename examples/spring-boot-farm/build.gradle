@@ -1,19 +1,11 @@
 buildscript {
-  ext {
-    springBootVersion = '1.1.0.BUILD-SNAPSHOT'
-  }
-  
   repositories {
     mavenLocal()
     jcenter()
-    maven { url "http://repo.spring.io/snapshot" }
   }
 
   dependencies {
-    classpath "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
-    classpath "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"
     classpath 'org.akhikhl.gretty:gretty:0.0.26'
-    classpath 'org.akhikhl.gretty:gretty-spring-boot:0.0.26'
   }
 }
 

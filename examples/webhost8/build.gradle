@@ -5,14 +5,19 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty8:0.0.26'
+    classpath 'org.akhikhl.gretty:gretty:0.0.26'
   }
 }
 
-apply plugin: 'org.akhikhl.gretty8'
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 dependencies {
   compile project(':webfragment8')
+}
+
+gretty {
+  servletContainer = 'jetty8'
 }
 

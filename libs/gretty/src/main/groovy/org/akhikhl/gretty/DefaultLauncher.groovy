@@ -36,10 +36,8 @@ class DefaultLauncher implements Launcher {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultLauncher)
 
-  protected StartBaseTask startTask
   protected Project project
-  protected String servletContainer
-  protected boolean managedClassReload
+  protected LauncherConfig config
   protected ServerConfig sconfig
   protected Iterable<WebAppConfig> webAppConfigs
   protected final ExecutorService executorService
@@ -48,7 +46,11 @@ class DefaultLauncher implements Launcher {
     Security.addProvider(new BouncyCastleProvider());
   }
 
-  DefaultLauncher() {
+  DefaultLauncher(Project project, LauncherConfig config) {
+    this.project = project
+    this.config = config
+    sconfig = config.getServerConfig()    
+    webAppConfigs = config.getWebAppConfigs()
     executorService = Executors.newSingleThreadExecutor()
   }
 
@@ -66,11 +68,11 @@ class DefaultLauncher implements Launcher {
     spec.classpath = getRunnerClassPath()
     spec.main = getRunnerClassName()
     spec.args = [ cmdLineJson ]
-    spec.debug = startTask.debug
+    spec.debug = config.getDebug()
     log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs
     spec.jvmArgs sconfig.jvmArgs
-    if(startTask.jacoco) {
-      String jarg = startTask.jacoco.getAsJvmArg()
+    if(config.getJacocoConfig()) {
+      String jarg = config.getJacocoConfig().getAsJvmArg()
       log.debug 'jacoco jvmArgs: {}', jarg
       spec.jvmArgs jarg
     }
@@ -155,30 +157,18 @@ class DefaultLauncher implements Launcher {
   }
 
   protected FileCollection getRunnerClassPath() {
-    project.configurations.gretty + project.configurations[ServletContainerConfig.getConfig(servletContainer).grettyHelperConfig]
+    project.configurations.gretty + project.configurations[getServletContainerConfig().grettyRunnerConfig]
   }
 
   protected String getRunnerClassName() {
     'org.akhikhl.gretty.Runner'
   }
-
-  protected String getRunnerRuntimeConfig(Project proj) {
-    'runtime'
+  
+  protected Map getServletContainerConfig() {
+    ServletContainerConfig.getConfig(config.getServletContainer())
   }
 
-  protected void init(StartBaseTask startTask) {
-    this.startTask = startTask
-    project = startTask.project
-    RunConfig runConfig = startTask.getRunConfig()
-    servletContainer = runConfig.getServletContainer()
-    managedClassReload = runConfig.getManagedClassReload()
-    sconfig = runConfig.getServerConfig()
-    webAppConfigs = runConfig.getWebAppConfigs()
-  }
-
-  final void launch(StartBaseTask startTask) {
-
-    init(startTask)
+  final void launch() {
 
     for(WebAppConfig webAppConfig in webAppConfigs)
       prepareToRun(webAppConfig)
@@ -206,7 +196,7 @@ class DefaultLauncher implements Launcher {
     log.debug 'Got start status: {}', status
 
     System.out.println()
-    log.warn '{} started.', servletContainerFullName
+    log.warn '{} started.', getServletContainerConfig().fullName
     for(WebAppConfig webAppConfig in webAppConfigs) {
       String webappName
       if(webAppConfig.inplace)
@@ -229,18 +219,18 @@ class DefaultLauncher implements Launcher {
     }
     log.info 'servicePort: {}, statusPort: {}', sconfig.servicePort, sconfig.statusPort
 
-    if(startTask.getIntegrationTest())
+    if(config.getIntegrationTest())
       project.ext.grettyRunnerThread = runThread
     else {
-      if(startTask.interactive) {
+      if(config.getInteractive()) {
         System.out.println 'Press any key to stop the jetty server.'
         System.in.read()
         log.debug 'Sending command: {}', 'stop'
         ServiceProtocol.send(sconfig.servicePort, 'stop')
       } else
-        System.out.println "Run 'gradle ${startTask.getStopTaskName()}' to stop the jetty server."
+        System.out.println "Run 'gradle ${config.getStopTaskName()}' to stop the jetty server."
       runThread.join()
-      log.warn '{} stopped.', servletContainerFullName
+      log.warn '{} stopped.', getServletContainerConfig().fullName
     }
   }
 
@@ -248,7 +238,7 @@ class DefaultLauncher implements Launcher {
 
     sconfig.onStart*.call()
 
-    ScannerManagerBase scanman = ScannerManagerFactory.createScannerManager(project, servletContainer, managedClassReload)
+    ScannerManagerBase scanman = ScannerManagerFactory.createScannerManager(project, config.getServletContainer(), config.getManagedClassReload())
     scanman.startScanner(project, sconfig, webAppConfigs)
     try {
       project.javaexec this.&configureJavaExec
@@ -259,13 +249,14 @@ class DefaultLauncher implements Launcher {
     sconfig.onStop*.call()
   }
 
-  protected Collection<URL> resolveWebAppClassPath(WebAppConfig webAppConfig) {
+  protected Collection<URL> resolveWebAppClassPath(WebAppConfig wconfig) {
     def resolvedClassPath = new LinkedHashSet<URL>()
-    if(webAppConfig.projectPath) {
-      def proj = project.project(webAppConfig.projectPath)
-      resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, webAppConfig.inplace, getRunnerRuntimeConfig(proj)))
-      if(webAppConfig.classPath != null)
-        for(def elem in webAppConfig.classPath) {
+    if(wconfig.projectPath) {
+      def proj = project.project(wconfig.projectPath)
+      String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtime'      
+      resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, wconfig.inplace, runtimeConfig))
+      if(wconfig.classPath != null)
+        for(def elem in wconfig.classPath) {
           while(elem instanceof Closure)
             elem = elem()
           if(elem != null) {

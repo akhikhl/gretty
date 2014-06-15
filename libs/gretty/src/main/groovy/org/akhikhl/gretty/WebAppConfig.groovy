@@ -31,6 +31,7 @@ class WebAppConfig {
   String projectPath
   Boolean inplace
 
+  Boolean springBoot
   def springBootSources
 
   void classPath(Object... args) {

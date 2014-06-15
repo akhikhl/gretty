@@ -66,16 +66,16 @@ class JettyBeforeIntegrationTestTask extends JettyStartTask {
 
   protected void passSystemPropertiesToIntegrationTask(JavaForkOptions task) {
 
-    def runConfig = getRunConfig()
+    def launcherConfig = getLauncherConfig()
 
-    def host = runConfig.serverConfig.host
+    def host = launcherConfig.serverConfig.host
 
-    def contextPath = runConfig.webAppConfigs[0].contextPath
+    def contextPath = launcherConfig.webAppConfigs[0].contextPath
     task.systemProperty 'gretty.contextPath', contextPath
 
-    def httpPort = runConfig.serverConfig.httpPort
+    def httpPort = launcherConfig.serverConfig.httpPort
 
-    if(httpPort && runConfig.serverConfig.httpEnabled) {
+    if(httpPort && launcherConfig.serverConfig.httpEnabled) {
       task.systemProperty 'gretty.port', httpPort
       task.systemProperty 'gretty.httpPort', httpPort
       def baseURI = "http://${host}:${httpPort}${contextPath}"
@@ -83,9 +83,9 @@ class JettyBeforeIntegrationTestTask extends JettyStartTask {
       task.systemProperty 'gretty.httpBaseURI', baseURI
     }
 
-    def httpsPort = runConfig.serverConfig.httpsPort
+    def httpsPort = launcherConfig.serverConfig.httpsPort
 
-    if(httpsPort && runConfig.serverConfig.httpsEnabled) {
+    if(httpsPort && launcherConfig.serverConfig.httpsEnabled) {
       task.systemProperty 'gretty.httpsPort', httpsPort
       task.systemProperty 'gretty.httpsBaseURI', "https://${host}:${httpsPort}${contextPath}"
     }

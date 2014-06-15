@@ -30,7 +30,9 @@ class JettyStartTask extends StartBaseTask {
   }
 
   @Override
-  RunConfig getRunConfig() {
+  LauncherConfig getLauncherConfig() {
+  
+    def self = this
 
     ServerConfig sconfig = new ServerConfig()
     ConfigUtils.complementProperties(sconfig, serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
@@ -40,18 +42,38 @@ class JettyStartTask extends StartBaseTask {
     ConfigUtils.complementProperties(wconfig, webAppConfig, project.gretty.webAppConfig, WebAppConfig.getDefaultForProject(project), new WebAppConfig(inplace: true))
     wconfig.resolve(project)
 
-    new RunConfig() {
+    new LauncherConfig() {
+        
+      boolean getDebug() {
+        self.debug
+      }
 
-      String getServletContainer() {
-        project.gretty.servletContainer
+      boolean getIntegrationTest() {
+        self.getIntegrationTest()
+      }
+  
+      boolean getInteractive() {
+        self.getInteractive()
+      }
+
+      def getJacocoConfig() {
+        self.jacoco
       }
 
       boolean getManagedClassReload() {
-        project.gretty.managedClassReload
+        self.project.gretty.managedClassReload
       }
 
       ServerConfig getServerConfig() {
         sconfig
+      }
+
+      String getServletContainer() {
+        self.project.gretty.servletContainer
+      }
+  
+      String getStopTaskName() {
+        self.getStopTaskName()
       }
 
       Iterable<WebAppConfig> getWebAppConfigs() {

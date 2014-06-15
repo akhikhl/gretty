@@ -13,5 +13,5 @@ package org.akhikhl.gretty
  */
 interface Launcher {
 
-  void launch(StartBaseTask startTask)
+  void launch()
 }

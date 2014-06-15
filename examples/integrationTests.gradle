@@ -6,7 +6,7 @@ apply from rootProject.file('integrationTests.gradle')
 apply plugin: 'groovy' // this is needed for spock
 
 ext {
-  groovy_version = '2.3.0'
+  groovy_version = '2.3.3'
   logback_version = '1.1.2'
   spock_version = '0.7-groovy-2.0'
   gebVersion = '0.9.2'

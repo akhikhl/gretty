@@ -5,14 +5,16 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty7:0.0.26'
+    classpath 'org.akhikhl.gretty:gretty:0.0.26'
   }
 }
 
-apply plugin: 'org.akhikhl.gretty7'
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 gretty {
-  contextPath '/grettyOverlay7'
+  servletContainer = 'jetty7'
+  contextPath = '/grettyOverlay7'
   overlay ':helloGretty7'
 }

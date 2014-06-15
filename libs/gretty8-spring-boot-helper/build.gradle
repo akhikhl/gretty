@@ -1,7 +1,0 @@
-apply from: rootProject.file('libs/common.gradle')
-apply from: rootProject.file('libs/publish.gradle')
-
-dependencies {
-  compile project(':libs:gretty8-helper')
-  compile project(':libs:gretty-commons-spring-boot-helper')
-}

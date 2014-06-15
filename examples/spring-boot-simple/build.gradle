@@ -1,34 +1,28 @@
 buildscript {
-  ext {
-    springBootVersion = '1.1.0.BUILD-SNAPSHOT'
-  }
-  
   repositories {
     mavenLocal()
     jcenter()
-    maven { url "http://repo.spring.io/snapshot" }
   }
 
   dependencies {
-    classpath "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
-    classpath "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"
-    classpath 'org.akhikhl.gretty:gretty-spring-boot:0.0.26'
+    classpath 'org.akhikhl.gretty:gretty:0.0.26'
   }
 }
 
 apply plugin: 'groovy'
-apply plugin: 'org.akhikhl.gretty-spring-boot'
+apply plugin: 'org.akhikhl.gretty'
 
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 version = '1.0.0'
 
 dependencies {
-  compile 'org.codehaus.groovy:groovy-all:2.3.2'
+  compile 'org.codehaus.groovy:groovy-all:2.3.3'
 }
 
 gretty {
   scanInterval = 1
   fastReload = true
+  springBoot = true
 }
 

@@ -179,6 +179,11 @@ final class ProjectUtils {
     project.hasProperty('webAppDir') ? project.webAppDir : new File(project.projectDir, 'src/main/webapp')
   }
 
+  // ATTENTION: this function resolves compile configuration!
+  static boolean isSpringBootApp(Project project) {
+    project.configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == 'org.springframework.boot' }
+  }
+
   static void prepareExplodedWebAppFolder(Project project) {
     // ATTENTION: overlay copy order is important!
     for(String overlay in project.gretty.overlays) {

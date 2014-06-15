@@ -25,6 +25,10 @@ class SpringBootLauncher extends DefaultLauncher {
 	private static final String SPRING_LOADED_AGENT_CLASSNAME = 'org.springsource.loaded.agent.SpringLoadedAgent'
 
   protected static final Logger log = LoggerFactory.getLogger(SpringBootLauncher)
+  
+  SpringBootLauncher(Project project, LauncherConfig config) {
+    super(project, config)
+  }
 
   @Override
   protected void configureJavaExec(JavaExecSpec spec) {
@@ -59,20 +63,15 @@ class SpringBootLauncher extends DefaultLauncher {
 
   @Override
   protected FileCollection getRunnerClassPath() {
-    def files = project.configurations.grettyNoSpringBoot.files
+    def files = project.configurations.grettyNoSpringBoot.files + project.configurations[ServletContainerConfig.getConfig(config.getServletContainer()).grettyRunnerSpringBootConfig].files
     for(def wconfig in webAppConfigs) {
       if(wconfig.projectPath) {
         def proj = project.project(wconfig.projectPath)
-        if(proj.configurations.findByName('springBoot'))
+        if(ProjectUtils.isSpringBootApp(proj))
           files += resolveWebAppClassPath(wconfig)
       }
     }
     project.files(files)
-  }
-
-  @Override
-  protected String getRunnerRuntimeConfig(Project proj) {
-    proj.configurations.findByName('springBoot') ? 'springBoot' : 'runtime'
   }
 
   @Override
@@ -129,7 +128,7 @@ class SpringBootLauncher extends DefaultLauncher {
   protected void writeWebAppClassPath(json, WebAppConfig webAppConfig) {
     if(webAppConfig.projectPath) {
       def proj = project.project(webAppConfig.projectPath)
-      if(proj.configurations.findByName('springBoot')) {
+      if(ProjectUtils.isSpringBootApp(proj)) {
         json.springBoot true
         return // webapp classpath is passed directly to the runner
       }

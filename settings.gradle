@@ -1,13 +1,8 @@
 // This script automatically discovers sub-projects.
 // It should not contain any project-specific information.
 
-/*def subDirs = new File(rootDir, 'libs').listFiles({ File f -> new File(f, 'build.gradle').isFile() } as FileFilter)
+def subDirs = new File(rootDir, 'libs').listFiles({ File f -> new File(f, 'build.gradle').isFile() } as FileFilter)
 subDirs.each { File subdir ->
   include subdir.absolutePath.substring(rootDir.absolutePath.length() + 1).replace(File.separator, ':')
-}*/
-include 'libs:gretty'
-include 'libs:gretty-util7'
-include 'libs:gretty-util8'
-include 'libs:gretty-util9'
-
+}
 

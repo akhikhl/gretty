@@ -26,7 +26,9 @@ class FarmStartTask extends StartBaseTask {
   boolean inplace = true
 
   @Override
-  RunConfig getRunConfig() {
+  LauncherConfig getLauncherConfig() {
+  
+    def self = this
 
     FarmConfigurer configurer = new FarmConfigurer(project)
 
@@ -36,10 +38,22 @@ class FarmStartTask extends StartBaseTask {
     List<WebAppConfig> wconfigs = []
     configurer.resolveWebAppRefs(tempFarm.webAppRefs, wconfigs, inplace)
 
-    new RunConfig() {
+    new LauncherConfig() {
+        
+      boolean getDebug() {
+        self.debug
+      }
 
-      String getServletContainer() {
-        tempFarm.servletContainer
+      boolean getIntegrationTest() {
+        self.getIntegrationTest()
+      }
+  
+      boolean getInteractive() {
+        self.getInteractive()
+      }
+
+      def getJacocoConfig() {
+        self.jacoco
       }
 
       boolean getManagedClassReload() {
@@ -48,6 +62,14 @@ class FarmStartTask extends StartBaseTask {
 
       ServerConfig getServerConfig() {
         tempFarm.serverConfig
+      }
+
+      String getServletContainer() {
+        tempFarm.servletContainer
+      }
+  
+      String getStopTaskName() {
+        self.getStopTaskName()
       }
 
       Iterable<WebAppConfig> getWebAppConfigs() {

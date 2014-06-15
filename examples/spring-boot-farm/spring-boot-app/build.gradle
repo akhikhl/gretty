@@ -1,18 +1,19 @@
 apply plugin: 'groovy'
-apply plugin: 'org.akhikhl.gretty-spring-boot'
-apply plugin: 'org.akhikhl.gretty-spring-boot-farm'
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
 
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 version = '1.0.0'
 
 dependencies {
-  compile 'org.codehaus.groovy:groovy-all:2.3.2'
+  compile 'org.codehaus.groovy:groovy-all:2.3.3'
 }
 
 gretty {
   scanInterval = 1
   fastReload = true
+  springBoot = true
 }
 
 farm {

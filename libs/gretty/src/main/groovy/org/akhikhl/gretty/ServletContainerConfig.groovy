@@ -26,9 +26,10 @@ class ServletContainerConfig {
         servletContainerVersion: jetty7Version,
         jettyVersion: jetty7Version,
         fullName: "Jetty $jetty7Version",
-        grettyHelperConfig: 'grettyHelper7',
-        grettyHelperGAV: "org.akhikhl.gretty:gretty7-helper:$grettyVersion",
+        grettyRunnerConfig: 'grettyRunner7',
+        grettyRunnerGAV: "org.akhikhl.gretty:gretty-runner7:$grettyVersion",
         grettyUtilConfig: 'grettyUtil7',
+        grettyUtilGAV: "org.akhikhl.gretty:gretty-util7:$grettyVersion",
         grettyUtilPackage: 'org.akhikhl.gretty.util7',
         servletApiGAV: 'javax.servlet:servlet-api:2.5'
       ],
@@ -36,9 +37,12 @@ class ServletContainerConfig {
         servletContainerVersion: jetty8Version,
         jettyVersion: jetty8Version,
         fullName: "Jetty $jetty8Version",
-        grettyHelperConfig: 'grettyHelper8',
-        grettyHelperGAV: "org.akhikhl.gretty:gretty8-helper:$grettyVersion",
+        grettyRunnerConfig: 'grettyRunner8',
+        grettyRunnerGAV: "org.akhikhl.gretty:gretty-runner8:$grettyVersion",
+        grettyRunnerSpringBootConfig: 'grettyRunnerSpringBoot8',
+        grettyRunnerSpringBootGAV: "org.akhikhl.gretty:gretty-runner8-spring-boot:$grettyVersion",
         grettyUtilConfig: 'grettyUtil8',
+        grettyUtilGAV: "org.akhikhl.gretty:gretty-util8:$grettyVersion",
         grettyUtilPackage: 'org.akhikhl.gretty.util8',
         servletApiGAV: 'javax.servlet:javax.servlet-api:3.0.1'
       ],
@@ -46,9 +50,12 @@ class ServletContainerConfig {
         servletContainerVersion: jetty9Version,
         jettyVersion: jetty9Version,
         fullName: "Jetty $jetty9Version",
-        grettyHelperConfig: 'grettyHelper9',
-        grettyHelperGAV: "org.akhikhl.gretty:gretty9-helper:$grettyVersion",
+        grettyRunnerConfig: 'grettyRunner9',
+        grettyRunnerGAV: "org.akhikhl.gretty:gretty-runner9:$grettyVersion",
+        grettyRunnerSpringBootConfig: 'grettyRunnerSpringBoot9',
+        grettyRunnerSpringBootGAV: "org.akhikhl.gretty:gretty-runner9-spring-boot:$grettyVersion",
         grettyUtilConfig: 'grettyUtil9',
+        grettyUtilGAV: "org.akhikhl.gretty:gretty-util9:$grettyVersion",
         grettyUtilPackage: 'org.akhikhl.gretty.util9',
         servletApiGAV: 'javax.servlet:javax.servlet-api:3.1.0'
       ]
@@ -60,6 +67,7 @@ class ServletContainerConfig {
     def result = configs[servletContainer.toString()]
     if(!result)
       throw new GradleException("Unsupported servlet container: $servletContainer")
+    result
   }
   
   static Map getConfigs() {
