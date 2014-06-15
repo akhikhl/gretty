@@ -27,7 +27,6 @@ class GrettyPlugin implements Plugin<Project> {
       log.warn 'You already applied JettyPlugin to the project {}, so second apply is ignored', project.name
       return
     }
-
     project.ext.jettyPluginApplied = true
 
     project.ext.launcherFactory = getLauncherFactory()
@@ -346,6 +345,15 @@ class GrettyPlugin implements Plugin<Project> {
     project.configurations {
       gretty
       grettyLoggingConfig
+      springBoot {
+        extendsFrom runtime
+        exclude module: 'spring-boot-starter-tomcat'
+        exclude group: 'org.eclipse.jetty'
+      }
+      grettyNoSpringBoot {
+        extendsFrom gretty
+        exclude group: 'org.springframework.boot'
+      }
     }
     if(!project.configurations.findByName('providedCompile')) 
       project.configurations {
@@ -356,6 +364,7 @@ class GrettyPlugin implements Plugin<Project> {
       project.configurations.create config.grettyHelperConfig
       project.configurations.create config.grettyUtilConfig
     }
+    SpringBootResolutionStrategy.apply(project)
   }
   
   private String getGrettyVersion() {
