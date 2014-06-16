@@ -11,6 +11,7 @@ dependencies {
   compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
   compile "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"  
   compile 'org.springframework:springloaded:1.2.0.RELEASE'
+  compile "org.eclipse.jetty:jetty-util:$jetty9_version" // provides org.eclipse.jetty.util.Scanner
   compile gradleApi()
 }
 

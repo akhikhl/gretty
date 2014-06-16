@@ -238,8 +238,8 @@ class DefaultLauncher implements Launcher {
 
     sconfig.onStart*.call()
 
-    ScannerManagerBase scanman = ScannerManagerFactory.createScannerManager(project, config.getServletContainer(), config.getManagedClassReload())
-    scanman.startScanner(project, sconfig, webAppConfigs)
+    ScannerManager scanman = new ScannerManager()
+    scanman.startScanner(project, sconfig, webAppConfigs, config.getManagedClassReload())
     try {
       project.javaexec this.&configureJavaExec
     } finally {

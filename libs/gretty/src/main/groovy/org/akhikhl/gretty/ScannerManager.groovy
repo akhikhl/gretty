@@ -1,4 +1,4 @@
- /*
+/*
  * gretty
  *
  * Copyright 2013  Andrey Hihlovskiy.
@@ -7,6 +7,9 @@
  */
 package org.akhikhl.gretty
 
+import org.eclipse.jetty.util.Scanner
+import org.eclipse.jetty.util.Scanner.BulkListener
+import org.eclipse.jetty.util.Scanner.ScanCycleListener
 import org.gradle.api.Project
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
@@ -14,19 +17,24 @@ import org.gradle.tooling.ProjectConnection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-abstract class ScannerManagerBase {
+final class ScannerManager {
 
-  private static final Logger log = LoggerFactory.getLogger(ScannerManagerBase)
+  private static final Logger log = LoggerFactory.getLogger(ScannerManager)
 
   protected Project project
   protected ServerConfig sconfig
   protected List<WebAppConfig> webapps
   protected scanner
   protected Map fastReloadMap
+  protected boolean managedClassReload
 
-  boolean managedClassReload
-
-  protected abstract void addScannerBulkListener(Closure listener)
+  private static void collectScanDirs(Collection<File> scanDirs, boolean inplace, Project proj) {
+    scanDirs.add(ProjectUtils.getWebAppDir(proj))
+    scanDirs.addAll(proj.sourceSets.main.allSource.srcDirs)
+    scanDirs.addAll(proj.sourceSets.main.runtimeClasspath.files)
+    for(def overlay in proj.gretty.overlays)
+      collectScanDirs(scanDirs, inplace, proj.project(overlay))
+  }
 
   private void configureFastReload() {
     fastReloadMap = [:]
@@ -38,22 +46,28 @@ abstract class ScannerManagerBase {
   }
 
   protected void configureScanner() {
+    
     scanner.reportExistingFilesOnStartup = false
     scanner.scanInterval = sconfig.scanInterval
-    addScannerBulkListener { Collection<String> changedFiles ->
-      scanFilesChanged(changedFiles)
-    }
+    
+    scanner.addListener(new BulkListener() {
+      void filesChanged(List<String> filenames) {
+        listener.call(filenames)
+        scanFilesChanged(filenames)
+      }
+    });
+    
+    scanner.reportDirs = true
+    scanner.recursive = true
+    
+    scanner.addListener(new ScanCycleListener() {
+      void scanEnded(int cycle) {
+      }
+      void scanStarted(int cycle) {
+        sconfig.onScan*.call(cycle)
+      }
+    });
   }
-
-  private static void collectScanDirs(Collection<File> scanDirs, boolean inplace, Project proj) {
-    scanDirs.add(ProjectUtils.getWebAppDir(proj))
-    scanDirs.addAll(proj.sourceSets.main.allSource.srcDirs)
-    scanDirs.addAll(proj.sourceSets.main.runtimeClasspath.files)
-    for(def overlay in proj.gretty.overlays)
-      collectScanDirs(scanDirs, inplace, proj.project(overlay))
-  }
-
-  protected abstract createScanner()
 
   private List<File> getEffectiveScanDirs() {
     Set<File> scanDirs = new LinkedHashSet()
@@ -168,10 +182,11 @@ abstract class ScannerManagerBase {
       ServiceProtocol.send(sconfig.servicePort, 'restart')
   }
 
-  final void startScanner(Project project, ServerConfig sconfig, List<WebAppConfig> webapps) {
+  final void startScanner(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean managedClassReload) {
     this.project = project
     this.sconfig = sconfig
     this.webapps = webapps
+    this.managedClassReload = managedClassReload
     if(!sconfig.scanInterval) {
       if(sconfig.scanInterval == null)
         log.debug 'scanInterval not specified, hot deployment disabled'
@@ -179,7 +194,7 @@ abstract class ScannerManagerBase {
         log.debug 'scanInterval is zero, hot deployment disabled'
       return
     }
-    scanner = createScanner()
+    scanner = new Scanner()
     scanner.scanDirs = getEffectiveScanDirs()
     configureFastReload()
     configureScanner()
@@ -192,6 +207,10 @@ abstract class ScannerManagerBase {
       log.info 'Stopping scanner'
       scanner.stop()
       scanner = null
+      project = null
+      sconfig = null
+      webapps = null
+      fastReloadMap = null
     }
   }
 }
