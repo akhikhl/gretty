@@ -66,7 +66,11 @@ class DefaultLauncher implements Launcher {
       cmdLineJson = cmdLineJson.replace('"', '\\"')
 
     spec.classpath = getRunnerClassPath()
-    spec.main = getRunnerClassName()
+    if(log.isDebugEnabled())
+      getRunnerClassPath().each {
+        log.debug 'runnerclasspath: {}', it
+      }
+    spec.main = 'org.akhikhl.gretty.Runner'
     spec.args = [ cmdLineJson ]
     spec.debug = config.getDebug()
     log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs
@@ -144,6 +148,7 @@ class DefaultLauncher implements Launcher {
     json {
       servicePort sconfig.servicePort
       statusPort sconfig.statusPort
+      serverManagerFactory getServerManagerFactory()
     }
     json
   }
@@ -157,13 +162,13 @@ class DefaultLauncher implements Launcher {
   }
 
   protected FileCollection getRunnerClassPath() {
-    project.configurations.gretty + project.configurations[getServletContainerConfig().grettyRunnerConfig]
-  }
-
-  protected String getRunnerClassName() {
-    'org.akhikhl.gretty.Runner'
+    project.configurations.gretty + project.configurations[getServletContainerConfig().grettyServletContainerRunnerConfig]
   }
   
+  protected String getServerManagerFactory() {
+    'org.akhikhl.gretty.ServerManagerFactory'
+  }
+
   protected Map getServletContainerConfig() {
     ServletContainerConfig.getConfig(config.getServletContainer())
   }

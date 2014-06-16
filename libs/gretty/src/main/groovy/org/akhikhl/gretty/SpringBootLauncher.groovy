@@ -57,13 +57,12 @@ class SpringBootLauncher extends DefaultLauncher {
   }
 
   @Override
-  protected String getRunnerClassName() {
-    'org.akhikhl.gretty.springboot.Runner'
-  }
-
-  @Override
   protected FileCollection getRunnerClassPath() {
-    def files = project.configurations.grettyNoSpringBoot.files + project.configurations[ServletContainerConfig.getConfig(config.getServletContainer()).grettyRunnerSpringBootConfig].files
+    def servletContainerConfig = getServletContainerConfig()
+    def files = project.configurations.grettyNoSpringBoot.files + 
+      project.configurations[servletContainerConfig.grettyServletContainerRunnerConfig].files
+    if(servletContainerConfig.servletContainerType == 'jetty')
+      files += project.configurations.grettyRunnerSpringBootJetty.files
     for(def wconfig in webAppConfigs) {
       if(wconfig.projectPath) {
         def proj = project.project(wconfig.projectPath)
@@ -72,6 +71,11 @@ class SpringBootLauncher extends DefaultLauncher {
       }
     }
     project.files(files)
+  }
+  
+  @Override
+  protected String getServerManagerFactory() {
+    'org.akhikhl.gretty.SpringBootServerManagerFactory'
   }
 
   @Override

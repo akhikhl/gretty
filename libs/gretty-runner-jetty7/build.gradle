@@ -1,0 +1,21 @@
+apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('libs/publish.gradle')
+
+configurations {
+  compile {
+    exclude group: 'org.eclipse.jetty.orbit', module: 'javax.servlet'
+    exclude group: 'org.slf4j', module: 'slf4j-simple'
+    exclude group: 'org.slf4j', module: 'jcl104-over-slf4j'
+  }
+}
+
+dependencies {
+  compile project(':libs:gretty-runner-jetty')
+  compile "javax.servlet:servlet-api:$jetty7_servlet_api_version"
+  compile "org.eclipse.jetty:jetty-server:$jetty7_version"
+  compile "org.eclipse.jetty:jetty-servlet:$jetty7_version"
+  compile "org.eclipse.jetty:jetty-webapp:$jetty7_version"
+  compile "org.eclipse.jetty:jetty-security:$jetty7_version"
+  compile "org.eclipse.jetty:jetty-jsp:$jetty7_version"
+  compile "org.eclipse.jetty:jetty-plus:$jetty7_version"
+}

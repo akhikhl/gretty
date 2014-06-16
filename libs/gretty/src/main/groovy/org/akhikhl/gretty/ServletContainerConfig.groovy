@@ -23,40 +23,27 @@ class ServletContainerConfig {
     String jetty8Version = Externalized.getString('jetty8Version')
     String jetty9Version = Externalized.getString('jetty9Version')
     [ 'jetty7': [
+        servletContainerType: 'jetty',
         servletContainerVersion: jetty7Version,
-        jettyVersion: jetty7Version,
         fullName: "Jetty $jetty7Version",
-        grettyRunnerConfig: 'grettyRunner7',
-        grettyRunnerGAV: "org.akhikhl.gretty:gretty-runner7:$grettyVersion",
-        grettyUtilConfig: 'grettyUtil7',
-        grettyUtilGAV: "org.akhikhl.gretty:gretty-util7:$grettyVersion",
-        grettyUtilPackage: 'org.akhikhl.gretty.util7',
+        grettyServletContainerRunnerConfig: 'grettyRunnerJetty7',
+        grettyServletContainerRunnerGAV: "org.akhikhl.gretty:gretty-runner-jetty7:$grettyVersion",
         servletApiGAV: 'javax.servlet:servlet-api:2.5'
       ],
       'jetty8': [
+        servletContainerType: 'jetty',
         servletContainerVersion: jetty8Version,
-        jettyVersion: jetty8Version,
         fullName: "Jetty $jetty8Version",
-        grettyRunnerConfig: 'grettyRunner8',
-        grettyRunnerGAV: "org.akhikhl.gretty:gretty-runner8:$grettyVersion",
-        grettyRunnerSpringBootConfig: 'grettyRunnerSpringBoot8',
-        grettyRunnerSpringBootGAV: "org.akhikhl.gretty:gretty-runner8-spring-boot:$grettyVersion",
-        grettyUtilConfig: 'grettyUtil8',
-        grettyUtilGAV: "org.akhikhl.gretty:gretty-util8:$grettyVersion",
-        grettyUtilPackage: 'org.akhikhl.gretty.util8',
+        grettyServletContainerRunnerConfig: 'grettyRunnerJetty8',
+        grettyServletContainerRunnerGAV: "org.akhikhl.gretty:gretty-runner-jetty8:$grettyVersion",
         servletApiGAV: 'javax.servlet:javax.servlet-api:3.0.1'
       ],
       'jetty9': [
+        servletContainerType: 'jetty',
         servletContainerVersion: jetty9Version,
-        jettyVersion: jetty9Version,
         fullName: "Jetty $jetty9Version",
-        grettyRunnerConfig: 'grettyRunner9',
-        grettyRunnerGAV: "org.akhikhl.gretty:gretty-runner9:$grettyVersion",
-        grettyRunnerSpringBootConfig: 'grettyRunnerSpringBoot9',
-        grettyRunnerSpringBootGAV: "org.akhikhl.gretty:gretty-runner9-spring-boot:$grettyVersion",
-        grettyUtilConfig: 'grettyUtil9',
-        grettyUtilGAV: "org.akhikhl.gretty:gretty-util9:$grettyVersion",
-        grettyUtilPackage: 'org.akhikhl.gretty.util9',
+        grettyServletContainerRunnerConfig: 'grettyRunnerJetty9',
+        grettyServletContainerRunnerGAV: "org.akhikhl.gretty:gretty-runner-jetty9:$grettyVersion",
         servletApiGAV: 'javax.servlet:javax.servlet-api:3.1.0'
       ]
     ]

@@ -24,7 +24,6 @@ class GrettyPlugin implements Plugin<Project> {
   private void addConfigurations(Project project) {
     project.configurations {
       gretty
-      grettyLoggingConfig
       springBoot {
         extendsFrom project.configurations.runtime
         exclude module: 'spring-boot-starter-tomcat'
@@ -34,6 +33,10 @@ class GrettyPlugin implements Plugin<Project> {
         extendsFrom project.configurations.gretty
         exclude group: 'org.springframework.boot'
       }
+      grettyRunnerSpringBoot
+      grettyRunnerSpringBootJetty {
+        extendsFrom project.configurations.grettyRunnerSpringBoot
+      }
     }
     if(!project.configurations.findByName('providedCompile')) 
       project.configurations {
@@ -41,25 +44,25 @@ class GrettyPlugin implements Plugin<Project> {
         compile.extendsFrom(providedCompile)        
       }
     ServletContainerConfig.getConfigs().each { configName, config ->
-      project.configurations.create config.grettyRunnerConfig
-      if(config.grettyRunnerSpringBootConfig)
-        project.configurations.create config.grettyRunnerSpringBootConfig
-      project.configurations.create config.grettyUtilConfig
+      project.configurations.create config.grettyServletContainerRunnerConfig
     }
     SpringBootResolutionStrategy.apply(project)
   }
 
   private void addDependencies(Project project) {
     
-    ServletContainerConfig.getConfigs().each { configName, config ->
-      project.dependencies.add config.grettyRunnerConfig, config.grettyRunnerGAV.toString()
-      if(config.grettyRunnerSpringBootConfig)
-        project.dependencies.add config.grettyRunnerSpringBootConfig, config.grettyRunnerSpringBootGAV.toString()
-      project.dependencies.add config.grettyUtilConfig, config.grettyUtilGAV.toString()
-    }
+    String grettyVersion = Externalized.getString('grettyVersion')
     
     project.dependencies {
       providedCompile ServletContainerConfig.getConfig(project.gretty.servletContainer).servletApiGAV
+      grettyRunnerSpringBoot "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion"
+      grettyRunnerSpringBootJetty "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
+        exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
+      }
+    }
+    
+    ServletContainerConfig.getConfigs().each { configName, config ->
+      project.dependencies.add config.grettyServletContainerRunnerConfig, config.grettyServletContainerRunnerGAV.toString()
     }
     
     if(project.gretty.springBoot)
