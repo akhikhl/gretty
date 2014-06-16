@@ -16,3 +16,7 @@ apply from: rootProject.file('integrationTests.gradle') // remove this to disabl
 dependencies {
   compile 'commons-configuration:commons-configuration:1.9'
 }
+
+gretty {
+  servletContainer = 'jetty8'
+}

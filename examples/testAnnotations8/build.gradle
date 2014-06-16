@@ -17,3 +17,6 @@ dependencies {
   compile 'commons-configuration:commons-configuration:1.9'
 }
 
+gretty {
+  servletContainer = 'jetty8'
+}
