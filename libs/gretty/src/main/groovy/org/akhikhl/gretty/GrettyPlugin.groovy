@@ -25,7 +25,8 @@ class GrettyPlugin implements Plugin<Project> {
     project.configurations {
       gretty
       springBoot {
-        extendsFrom project.configurations.runtime
+        if(project.configurations.findByName('runtime'))
+          extendsFrom project.configurations.runtime
         exclude module: 'spring-boot-starter-tomcat'
         exclude group: 'org.eclipse.jetty'
       }
@@ -38,10 +39,10 @@ class GrettyPlugin implements Plugin<Project> {
         extendsFrom project.configurations.grettyRunnerSpringBoot
       }
     }
-    if(!project.configurations.findByName('providedCompile')) 
+    if(!project.configurations.findByName('providedCompile'))
       project.configurations {
         providedCompile
-        compile.extendsFrom(providedCompile)        
+        compile.extendsFrom(providedCompile)
       }
     ServletContainerConfig.getConfigs().each { configName, config ->
       project.configurations.create config.grettyServletContainerRunnerConfig
@@ -50,9 +51,9 @@ class GrettyPlugin implements Plugin<Project> {
   }
 
   private void addDependencies(Project project) {
-    
+
     String grettyVersion = Externalized.getString('grettyVersion')
-    
+
     project.dependencies {
       providedCompile ServletContainerConfig.getConfig(project.gretty.servletContainer).servletApiGAV
       grettyRunnerSpringBoot "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion"
@@ -60,21 +61,21 @@ class GrettyPlugin implements Plugin<Project> {
         exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
       }
     }
-    
+
     ServletContainerConfig.getConfigs().each { configName, config ->
       project.dependencies.add config.grettyServletContainerRunnerConfig, config.grettyServletContainerRunnerGAV.toString()
     }
-    
+
     if(project.gretty.springBoot)
       project.dependencies {
         compile 'org.springframework.boot:spring-boot-starter-web'
         springBoot 'org.springframework.boot:spring-boot-starter-jetty'
-      }    
+      }
 
     for(String overlay in project.gretty.overlays)
       project.dependencies.add 'providedCompile', project.project(overlay)
   }
-  
+
   private void addExtensions(Project project) {
 
     project.extensions.create('gretty', GrettyExtension)
@@ -85,7 +86,7 @@ class GrettyPlugin implements Plugin<Project> {
     project.extensions.create('farms', Farms)
     project.farms.farmsMap[''] = project.farm
   }
-  
+
   private void addRepositories(Project project) {
     project.repositories {
       mavenLocal()
@@ -96,9 +97,9 @@ class GrettyPlugin implements Plugin<Project> {
       maven { url 'http://repo.spring.io/snapshot' }
     }
   }
-  
+
   private void addTaskDependencies(Project project) {
-    
+
     project.tasks.whenObjectAdded { task ->
       if(task instanceof JettyStartTask)
         task.dependsOn {
@@ -111,10 +112,10 @@ class GrettyPlugin implements Plugin<Project> {
             boolean inplace = it.inplace == null ? task.inplace : it.inplace
             inplace ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareArchiveWebApp
           }
-        }        
+        }
     }
   }
-  
+
   private void addTasks(Project project) {
 
     project.task('prepareInplaceWebAppFolder', group: 'gretty') {
@@ -355,7 +356,7 @@ class GrettyPlugin implements Plugin<Project> {
       }
     } // farmsMap
   } // addTasks
-  
+
   private void afterAfterEvaluate(Project project) {
 
     for(Closure afterEvaluateClosure in project.gretty.afterEvaluate) {
@@ -386,11 +387,11 @@ class GrettyPlugin implements Plugin<Project> {
 
       if(!project.tasks.farmAfterIntegrationTest.integrationTestTaskAssigned)
         project.tasks.farmAfterIntegrationTest.integrationTestTask null // default binding
-    }    
+    }
   }
 
   void apply(final Project project) {
-    
+
     addExtensions(project)
     addConfigurations(project)
 
@@ -408,7 +409,7 @@ class GrettyPlugin implements Plugin<Project> {
       addDependencies(project)
       addTasks(project)
       afterAfterEvaluate(project)
-      
+
     } // afterEvaluate
   } // apply
 }

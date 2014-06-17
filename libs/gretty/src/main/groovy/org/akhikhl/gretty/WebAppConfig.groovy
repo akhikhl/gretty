@@ -68,7 +68,7 @@ class WebAppConfig {
     result.contextPath = '/' + project.name
     result.realmConfigFile = 'jetty-realm.properties'
     result.jettyEnvXmlFile = 'jetty-env.xml'
-    result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp" as String
+    result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp/" as String
     result.warResourceBase = ProjectUtils.getFinalArchivePath(project).toString()
     result.projectPath = project.path
     return result
@@ -105,8 +105,12 @@ class WebAppConfig {
 
   protected void prepareToRun() {
     ConfigUtils.resolveClosures(this)
-    if(contextPath instanceof String && !contextPath.startsWith('/'))
-      contextPath = '/' + contextPath
+    if(contextPath instanceof String) {
+      if(!contextPath.startsWith('/'))
+        contextPath = '/' + contextPath
+      if(contextPath != '/' && contextPath.endsWith('/'))
+        contextPath = contextPath.substring(0, contextPath.length() - 1)
+    }
     ConfigUtils.resolveClosures(initParameters)
   }
 

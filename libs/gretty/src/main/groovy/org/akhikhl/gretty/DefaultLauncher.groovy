@@ -49,7 +49,7 @@ class DefaultLauncher implements Launcher {
   DefaultLauncher(Project project, LauncherConfig config) {
     this.project = project
     this.config = config
-    sconfig = config.getServerConfig()    
+    sconfig = config.getServerConfig()
     webAppConfigs = config.getWebAppConfigs()
     executorService = Executors.newSingleThreadExecutor()
   }
@@ -164,7 +164,7 @@ class DefaultLauncher implements Launcher {
   protected FileCollection getRunnerClassPath() {
     project.configurations.gretty + project.configurations[getServletContainerConfig().grettyServletContainerRunnerConfig]
   }
-  
+
   protected String getServerManagerFactory() {
     'org.akhikhl.gretty.ServerManagerFactory'
   }
@@ -258,7 +258,7 @@ class DefaultLauncher implements Launcher {
     def resolvedClassPath = new LinkedHashSet<URL>()
     if(wconfig.projectPath) {
       def proj = project.project(wconfig.projectPath)
-      String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtime'      
+      String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtime'
       resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, wconfig.inplace, runtimeConfig))
       if(wconfig.classPath != null)
         for(def elem in wconfig.classPath) {

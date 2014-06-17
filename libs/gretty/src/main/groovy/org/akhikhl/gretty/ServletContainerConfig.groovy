@@ -14,14 +14,15 @@ import org.gradle.api.GradleException
  * @author akhikhl
  */
 class ServletContainerConfig {
-  
-	private static configs = createConfigs() 
-  
+
+	private static configs = createConfigs()
+
   private static createConfigs() {
     String grettyVersion = Externalized.getString('grettyVersion')
     String jetty7Version = Externalized.getString('jetty7Version')
     String jetty8Version = Externalized.getString('jetty8Version')
     String jetty9Version = Externalized.getString('jetty9Version')
+    String tomcat7Version = Externalized.getString('tomcat7Version')
     [ 'jetty7': [
         servletContainerType: 'jetty',
         servletContainerVersion: jetty7Version,
@@ -45,10 +46,18 @@ class ServletContainerConfig {
         grettyServletContainerRunnerConfig: 'grettyRunnerJetty9',
         grettyServletContainerRunnerGAV: "org.akhikhl.gretty:gretty-runner-jetty9:$grettyVersion",
         servletApiGAV: 'javax.servlet:javax.servlet-api:3.1.0'
+      ],
+      'tomcat7': [
+        servletContainerType: 'tomcat',
+        servletContainerVersion: tomcat7Version,
+        fullName: "Tomcat $tomcat7Version",
+        grettyServletContainerRunnerConfig: 'grettyRunnerTomcat7',
+        grettyServletContainerRunnerGAV: "org.akhikhl.gretty:gretty-runner-tomcat7:$grettyVersion",
+        servletApiGAV: 'javax.servlet:javax.servlet-api:3.0.1'
       ]
     ]
   }
-  
+
   static getConfig(servletContainer) {
     servletContainer = servletContainer ?: 'jetty9'
     def result = configs[servletContainer.toString()]
@@ -56,7 +65,7 @@ class ServletContainerConfig {
       throw new GradleException("Unsupported servlet container: $servletContainer")
     result
   }
-  
+
   static Map getConfigs() {
     configs.asImmutable()
   }

@@ -14,6 +14,8 @@ ext {
   jetty8_servlet_api_version = '3.0.1'
   jetty9_version = '9.2.1.v20140609'
   jetty9_servlet_api_version = '3.1.0'
+  tomcat7_version = '7.0.54'
+  tomcat7_servlet_api_version = '3.0.1'
   asm_version = '5.0.1'
   groovy_version = '1.8.6' // this is groovy version used by gradle 1.1.2
   spock_version = '0.7-groovy-2.0'
