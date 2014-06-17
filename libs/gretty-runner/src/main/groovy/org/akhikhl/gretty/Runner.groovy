@@ -24,7 +24,7 @@ final class Runner extends RunnerBase {
   private Runner(Map params) {
     super(params)
   }
-  
+
   @Override
   protected ServerManager createServerManager() {
     def ServerManagerFactory = Class.forName(params.serverManagerFactory, true, this.getClass().classLoader)

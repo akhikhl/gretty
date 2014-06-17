@@ -11,6 +11,7 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
+import ch.qos.logback.classic.jul.LevelChangePropagator
 import ch.qos.logback.classic.turbo.ReconfigureOnChangeFilter
 import ch.qos.logback.classic.util.ContextInitializer
 import ch.qos.logback.core.ConsoleAppender
@@ -38,6 +39,10 @@ final class LoggingUtils {
       start()
       it
     })
+
+    def levelChangePropagator = new LevelChangePropagator()
+    levelChangePropagator.setContext(logCtx)
+    logCtx.addListener(levelChangePropagator)
 
     def logConsoleAppender
     if(consoleLogEnabled && loggingLevel != Level.OFF)

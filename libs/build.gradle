@@ -20,7 +20,7 @@ ext {
   groovy_version = '1.8.6' // this is groovy version used by gradle 1.1.2
   spock_version = '0.7-groovy-2.0'
   logback_version = '1.1.2'
-  slf4j_version = '1.7.6'
+  slf4j_version = '1.7.7'
   springBootVersion = '1.1.1.RELEASE'
 }
 

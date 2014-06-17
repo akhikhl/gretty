@@ -40,6 +40,8 @@ class TomcatServerManager implements ServerManager {
     else if(params.logbackConfig)
       LoggingUtils.useConfig(params.logbackConfig)
 
+    org.slf4j.bridge.SLF4JBridgeHandler.install()
+
     log = LoggerFactory.getLogger(this.getClass())
 
     Tomcat tomcat = new Tomcat()
@@ -48,7 +50,7 @@ class TomcatServerManager implements ServerManager {
     tempDir.deleteOnExit()
     tomcat.setBaseDir(tempDir.absolutePath)
 
-		tomcat.getHost().setAutoDeploy(false)
+		tomcat.getHost().setAutoDeploy(true)
 		tomcat.getEngine().setBackgroundProcessorDelay(-1)
 
     if(params.host)
@@ -75,9 +77,6 @@ class TomcatServerManager implements ServerManager {
       tomcat.getHost().addChild(context)
     }
     tomcat.start()
-    /*Thread.start {
-      tomcat.getServer().await()
-    }*/
     server = tomcat
   }
 
