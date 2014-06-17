@@ -13,6 +13,8 @@ import org.springframework.boot.context.embedded.jetty.JettyServerCustomizer
 import org.springframework.boot.context.embedded.ServletContextInitializer
 import org.springframework.stereotype.Component
 import org.springframework.util.ClassUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
@@ -20,6 +22,8 @@ import org.springframework.util.ClassUtils
  */
 @Component('jettyEmbeddedServletContainerFactory')
 class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory implements GrettyConfigurableServletContainerFactory {
+
+  protected static final Logger log = LoggerFactory.getLogger(JettyServletContainerFactory)
 
   private Map params
 
