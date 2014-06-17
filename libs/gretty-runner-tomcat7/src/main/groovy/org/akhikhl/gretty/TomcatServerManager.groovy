@@ -46,7 +46,7 @@ class TomcatServerManager implements ServerManager {
 
     Tomcat tomcat = new Tomcat()
     File tempDir = new File(System.getProperty('java.io.tmpdir'), 'tomcat-' + UUID.randomUUID().toString())
-    tempDir.mkdirs()
+    new File(tempDir, 'webapps').mkdirs()
     tempDir.deleteOnExit()
     tomcat.setBaseDir(tempDir.absolutePath)
 
