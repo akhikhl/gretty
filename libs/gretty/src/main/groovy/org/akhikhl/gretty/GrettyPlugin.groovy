@@ -269,9 +269,6 @@ class GrettyPlugin implements Plugin<Project> {
           }
       }
 
-      if(!fname)
-        project.tasks.run.dependsOn 'farmRun'
-
       project.task('farmRunDebug' + fname, type: FarmStartTask, group: 'gretty') {
         description = "Starts ${farmDescr} inplace, in debug and in interactive mode."
         farmName = fname
