@@ -7,6 +7,9 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.catalina.Container
+import org.apache.catalina.Context
+import org.apache.catalina.Host
 import org.apache.catalina.connector.Connector
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.loader.WebappLoader
@@ -120,11 +123,35 @@ class TomcatServerManager implements ServerManager {
   @Override
   void stopServer() {
     if(server != null) {
+      shutdownSpringloadedThreads()
       server.stop()
       server.getServer().await()
       server.destroy()
       server = null
       log = null
     }
+  }
+  
+  void shutdownSpringloadedThreads() {
+    def TypeRegistry
+    try {
+      TypeRegistry = Class.forName('org.springsource.loaded.TypeRegistry', true, this.class.getClassLoader())
+    } catch(ClassNotFoundException e) {
+      // springloaded not present, just ignore
+      return
+    }
+    def contexts = server.getHost().findChildren().findAll { it instanceof StandardContext }
+    for(StandardContext context in contexts) {
+      ClassLoader classLoader = context.getLoader().getClassLoader()
+      while(classLoader != null) {
+        def typeRegistry = TypeRegistry.getTypeRegistryFor(classLoader)
+        if(typeRegistry != null && typeRegistry.@fsWatcher != null) {
+          log.info 'springloaded shutdown: {}', typeRegistry.@fsWatcher.@thread
+          typeRegistry.@fsWatcher.shutdown()
+          typeRegistry.@fsWatcher.@thread.join()
+        }
+        classLoader = classLoader.getParent()
+      }
+    }    
   }
 }

@@ -85,8 +85,10 @@ class DefaultLauncher implements Launcher {
       spec.jvmArgs jarg
     }
 
-    if(config.getManagedClassReload())
+    if(config.getManagedClassReload()) {
       spec.jvmArgs '-javaagent:' + getSpringLoadedAgent().absolutePath, '-noverify'
+      spec.systemProperty 'springloaded', 'exclusions=org.akhikhl.gretty..*'
+    }
 
     // Speeding up tomcat startup, according to http://wiki.apache.org/tomcat/HowTo/FasterStartUp
     // ATTENTION: replacing the blocking entropy source (/dev/random) with a non-blocking one
