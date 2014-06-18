@@ -65,21 +65,29 @@ class DefaultLauncher implements Launcher {
     if(System.getProperty("os.name") =~ /(?i).*windows.*/)
       cmdLineJson = cmdLineJson.replace('"', '\\"')
 
-    spec.classpath = getRunnerClassPath()
     if(log.isDebugEnabled())
       getRunnerClassPath().each {
         log.debug 'runnerclasspath: {}', it
       }
+    spec.classpath = getRunnerClassPath()
+
     spec.main = 'org.akhikhl.gretty.Runner'
     spec.args = [ cmdLineJson ]
+
     spec.debug = config.getDebug()
+
     log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs
     spec.jvmArgs sconfig.jvmArgs
+
     if(config.getJacocoConfig()) {
       String jarg = config.getJacocoConfig().getAsJvmArg()
       log.debug 'jacoco jvmArgs: {}', jarg
       spec.jvmArgs jarg
     }
+
+    if(config.getManagedClassReload())
+      spec.jvmArgs '-javaagent:' + getSpringLoadedAgent().absolutePath, '-noverify'
+
     // Speeding up tomcat startup, according to http://wiki.apache.org/tomcat/HowTo/FasterStartUp
     // ATTENTION: replacing the blocking entropy source (/dev/random) with a non-blocking one
     // actually reduces security because you are getting less-random data.
@@ -175,6 +183,10 @@ class DefaultLauncher implements Launcher {
 
   protected Map getServletContainerConfig() {
     ServletContainerConfig.getConfig(config.getServletContainer())
+  }
+
+  protected File getSpringLoadedAgent() {
+    project.configurations.grettySpringLoaded.singleFile
   }
 
   final void launch() {

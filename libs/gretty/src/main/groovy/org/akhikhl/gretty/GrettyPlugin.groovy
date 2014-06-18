@@ -38,6 +38,9 @@ class GrettyPlugin implements Plugin<Project> {
       grettyRunnerSpringBootJetty {
         extendsFrom project.configurations.grettyRunnerSpringBoot
       }
+      grettySpringLoaded {
+        transitive = false
+      }
     }
     if(!project.configurations.findByName('providedCompile'))
       project.configurations {
@@ -58,8 +61,10 @@ class GrettyPlugin implements Plugin<Project> {
       providedCompile ServletContainerConfig.getConfig(project.gretty.servletContainer).servletApiGAV
       grettyRunnerSpringBoot "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion"
       grettyRunnerSpringBootJetty "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
+        // concrete implementation is chosen depending on servletContainer property
         exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
       }
+      grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
     }
 
     ServletContainerConfig.getConfigs().each { configName, config ->
