@@ -80,6 +80,10 @@ class DefaultLauncher implements Launcher {
       log.debug 'jacoco jvmArgs: {}', jarg
       spec.jvmArgs jarg
     }
+    // Speeding up tomcat startup, according to http://wiki.apache.org/tomcat/HowTo/FasterStartUp
+    // ATTENTION: replacing the blocking entropy source (/dev/random) with a non-blocking one
+    // actually reduces security because you are getting less-random data.
+    spec.systemProperty 'java.security.egd', 'file:/dev/./urandom'
   }
 
   private void generateAndUseSelfSignedCertificate() {
