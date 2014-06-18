@@ -16,15 +16,15 @@ import org.gradle.api.GradleException
 class ConfigUtils {
 
   static complementProperties(Object dst, Iterable srcs) {
-    complementProperties_(dst, srcs)
+    complementProperties_(null, dst, srcs)
   }
 
   static complementProperties(Object dst, Object... srcs) {
-    complementProperties_(dst, srcs)
+    complementProperties_(null, dst, srcs)
   }
 
-  private static complementProperties_(Object dst, Object srcs) {
-    List dstProps = dst.metaClass.properties.findAll { it.name != 'class' && it.name != 'metaClass' }
+  private static complementProperties_(List propNames, Object dst, Object srcs) {
+    List dstProps = dst.metaClass.properties.findAll { it.name != 'class' && it.name != 'metaClass' && (propNames == null || propNames.contains(it.name)) }
     for(def src in srcs) {
       if(src instanceof Map)
         for(def prop in dstProps) {
@@ -48,6 +48,14 @@ class ConfigUtils {
         }
     }
     dst
+  }
+
+  static complementSpecificProperties(List propNames, Object dst, Iterable srcs) {
+    complementProperties_(propNames, dst, srcs)
+  }
+
+  static complementSpecificProperties(List propNames, Object dst, Object... srcs) {
+    complementProperties_(propNames, dst, srcs)
   }
 
   static void requireAnyProperty(Object obj, String... propNames) {

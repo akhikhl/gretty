@@ -168,6 +168,7 @@ final class ProjectUtils {
     if(fastReloads.find { (it instanceof Boolean) && it })
       addDefaultFastReloadDirs(result, project)
     addFastReloadDirs(result, project, fastReloads)
+    log.debug '{} fastReload: {}', project, result
     return result
   }
 

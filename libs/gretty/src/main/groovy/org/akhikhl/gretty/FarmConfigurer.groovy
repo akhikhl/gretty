@@ -27,6 +27,7 @@ class FarmConfigurer {
   }
 
   void configureFarm(Farm dstFarm, Farm[] srcFarms = []) {
+    ConfigUtils.complementSpecificProperties(['servletContainer', 'managedClassReload'], dstFarm, srcFarms)
     ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ ServerConfig.getDefault(project) ])
     dstFarm.serverConfig.resolve(project)
     for(def f in srcFarms)

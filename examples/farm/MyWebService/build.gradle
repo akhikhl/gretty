@@ -10,11 +10,6 @@ apply from: rootProject.file('integrationTests.gradle') // remove this to disabl
 group = 'org.akhikhl.gretty.examples'
 version = '1.0'
 
-gretty {
-  scanInterval = 1
-  fastReload = true
-}
-
 dependencies {
   testCompile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 }

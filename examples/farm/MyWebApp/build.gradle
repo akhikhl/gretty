@@ -2,11 +2,6 @@ apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
-gretty {
-  scanInterval = 1
-  fastReload = true
-}
-
 /*
   This is default farm.
   It provides farm-specific tasks, for example farmRun, farmStart, farmStop.
@@ -14,8 +9,6 @@ gretty {
   all subprojects of current project into farm.
 */
 farm {
-  scanInterval = 1
-
   // can add this project
   webapp project
 
