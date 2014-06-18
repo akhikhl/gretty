@@ -46,20 +46,19 @@ final class ScannerManager {
   }
 
   protected void configureScanner() {
-    
+
     scanner.reportExistingFilesOnStartup = false
     scanner.scanInterval = sconfig.scanInterval
-    
+
     scanner.addListener(new BulkListener() {
       void filesChanged(List<String> filenames) {
-        listener.call(filenames)
         scanFilesChanged(filenames)
       }
     });
-    
+
     scanner.reportDirs = true
     scanner.recursive = true
-    
+
     scanner.addListener(new ScanCycleListener() {
       void scanEnded(int cycle) {
       }
