@@ -56,7 +56,7 @@ class ServerConfig {
     result.servicePort = 9900
     result.statusPort = 9901
     result.jettyXmlFile = 'jetty.xml'
-    // scanInterval defaults to null. This means: hot deployment is disabled.
+    result.scanInterval = 1
     result.loggingLevel = 'INFO'
     result.consoleLogEnabled = true
     result.fileLogEnabled = true

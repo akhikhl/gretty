@@ -68,6 +68,7 @@ class WebAppConfig {
     result.contextPath = '/' + project.name
     result.realmConfigFile = 'jetty-realm.properties'
     result.jettyEnvXmlFile = 'jetty-env.xml'
+    result.fastReload = true
     result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp/" as String
     result.warResourceBase = ProjectUtils.getFinalArchivePath(project).toString()
     result.projectPath = project.path
