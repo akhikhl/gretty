@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.catalina.connector.Connector
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.loader.WebappLoader
 import org.apache.catalina.startup.ContextConfig
@@ -58,8 +59,42 @@ class TomcatServerManager implements ServerManager {
     if(params.host)
       tomcat.setHostname(params.host)
 
-    if(params.httpPort)
-      tomcat.setPort(params.httpPort)
+    if(params.httpPort) {
+      final Connector httpConn = new Connector('HTTP/1.1')
+      httpConn.setScheme('http')
+      httpConn.setPort(params.httpPort)
+      httpConn.setProperty('maxPostSize', '0')  // unlimited
+      if(params.httpIdleTimeout)
+        httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout)
+      if(params.httpsPort)
+        httpConn.setRedirectPort(params.httpsPort)
+      tomcat.getService().addConnector(httpConn)
+      tomcat.setConnector(httpConn)
+    }
+
+    if(params.httpsPort) {
+      final Connector httpsConn = new Connector('HTTP/1.1')
+      httpsConn.setScheme('https')
+      httpsConn.setPort(params.httpsPort)
+      httpsConn.setProperty('maxPostSize', '0')  // unlimited
+      httpsConn.setSecure(true)
+      httpsConn.setProperty('SSLEnabled', 'true')
+      if(params.sslKeyManagerPassword)
+        httpsConn.setProperty('keyPass', params.sslKeyManagerPassword)
+      if(params.sslKeyStorePath)
+        httpsConn.setProperty('keystoreFile', params.sslKeyStorePath)
+      if(params.sslKeyStorePassword)
+        httpsConn.setProperty('keystorePass', params.sslKeyStorePassword)
+      if(params.sslTrustStorePath)
+        httpsConn.setProperty('truststoreFile', params.sslTrustStorePath)
+      if(params.sslTrustStorePassword)
+        httpsConn.setProperty('truststorePass', params.sslTrustStorePassword)
+      if(params.httpsIdleTimeout)
+        httpsConn.setProperty('keepAliveTimeout', params.httpsIdleTimeout)
+      tomcat.getService().addConnector(httpsConn)
+      if(!params.httpPort)
+        tomcat.setConnector(httpsConn)
+    }
 
     for(def webapp in params.webApps) {
       StandardContext context = new StandardContext()
@@ -86,6 +121,8 @@ class TomcatServerManager implements ServerManager {
   void stopServer() {
     if(server != null) {
       server.stop()
+      server.getServer().await()
+      server.destroy()
       server = null
       log = null
     }
