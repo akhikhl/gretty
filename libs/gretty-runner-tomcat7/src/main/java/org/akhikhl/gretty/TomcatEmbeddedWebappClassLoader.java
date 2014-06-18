@@ -55,10 +55,8 @@ public class TomcatEmbeddedWebappClassLoader extends WebappClassLoader {
 		if (!delegateLoad)
 			resultClass = (resultClass == null ? loadFromParent(name) : resultClass);
 
-		if (resultClass == null) {
-      log.error("Class not found: {}", name);
+		if (resultClass == null)
 			throw new ClassNotFoundException(name);
-    }
 
 		return resolveIfNecessary(resultClass, resolve);
 	}

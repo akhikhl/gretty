@@ -13,6 +13,7 @@ import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
 import org.apache.catalina.startup.Tomcat.DefaultWebXmlListener
 import org.apache.catalina.startup.Tomcat.FixContextListener
+import org.slf4j.bridge.SLF4JBridgeHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -40,7 +41,8 @@ class TomcatServerManager implements ServerManager {
     else if(params.logbackConfig)
       LoggingUtils.useConfig(params.logbackConfig)
 
-    org.slf4j.bridge.SLF4JBridgeHandler.install()
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install()
 
     log = LoggerFactory.getLogger(this.getClass())
 
