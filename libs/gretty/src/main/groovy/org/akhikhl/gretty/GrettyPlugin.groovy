@@ -64,7 +64,7 @@ class GrettyPlugin implements Plugin<Project> {
         // concrete implementation is chosen depending on servletContainer property
         exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
       }
-      grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
+      grettySpringLoaded 'org.springframework:springloaded:1.2.1.BUILD-SNAPSHOT'
     }
 
     ServletContainerConfig.getConfigs().each { configName, config ->
