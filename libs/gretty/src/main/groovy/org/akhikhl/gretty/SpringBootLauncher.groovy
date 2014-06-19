@@ -32,7 +32,7 @@ class SpringBootLauncher extends DefaultLauncher {
   protected FileCollection getRunnerClassPath() {
     def servletContainerConfig = getServletContainerConfig()
     def files = project.configurations.grettyNoSpringBoot.files + 
-      project.configurations[servletContainerConfig.grettyServletContainerRunnerConfig].files
+      project.configurations[servletContainerConfig.servletContainerRunnerConfig].files
     if(servletContainerConfig.servletContainerType == 'jetty')
       files += project.configurations.grettyRunnerSpringBootJetty.files
     for(def wconfig in webAppConfigs) {

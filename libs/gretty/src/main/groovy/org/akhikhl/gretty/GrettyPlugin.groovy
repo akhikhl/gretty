@@ -48,7 +48,7 @@ class GrettyPlugin implements Plugin<Project> {
         compile.extendsFrom(providedCompile)
       }
     ServletContainerConfig.getConfigs().each { configName, config ->
-      project.configurations.create config.grettyServletContainerRunnerConfig
+      project.configurations.create config.servletContainerRunnerConfig
     }
     SpringBootResolutionStrategy.apply(project)
   }
@@ -58,7 +58,6 @@ class GrettyPlugin implements Plugin<Project> {
     String grettyVersion = Externalized.getString('grettyVersion')
 
     project.dependencies {
-      providedCompile ServletContainerConfig.getConfig(project.gretty.servletContainer).servletApiGAV
       grettyRunnerSpringBoot "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion"
       grettyRunnerSpringBootJetty "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
         // concrete implementation is chosen depending on servletContainer property
@@ -66,9 +65,19 @@ class GrettyPlugin implements Plugin<Project> {
       }
       grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
     }
-
+    
+    ServletContainerConfig.getConfig(project.gretty.servletContainer).with { config ->
+      def closure = config.servletApiDependencies
+      closure = closure.rehydrate(config, closure.owner, closure.thisObject)
+      closure.resolveStrategy = Closure.DELEGATE_FIRST
+      closure(project)
+    }
+    
     ServletContainerConfig.getConfigs().each { configName, config ->
-      project.dependencies.add config.grettyServletContainerRunnerConfig, config.grettyServletContainerRunnerGAV.toString()
+      def closure = config.servletContainerRunnerDependencies
+      closure = closure.rehydrate(config, closure.owner, closure.thisObject)
+      closure.resolveStrategy = Closure.DELEGATE_FIRST
+      closure(project)
     }
 
     if(project.gretty.springBoot)

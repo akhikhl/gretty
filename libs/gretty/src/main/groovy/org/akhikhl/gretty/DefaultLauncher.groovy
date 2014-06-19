@@ -176,7 +176,7 @@ class DefaultLauncher implements Launcher {
   }
 
   protected FileCollection getRunnerClassPath() {
-    project.configurations.gretty + project.configurations[getServletContainerConfig().grettyServletContainerRunnerConfig]
+    project.configurations.gretty + project.configurations[getServletContainerConfig().servletContainerRunnerConfig]
   }
 
   protected String getServerManagerFactory() {
