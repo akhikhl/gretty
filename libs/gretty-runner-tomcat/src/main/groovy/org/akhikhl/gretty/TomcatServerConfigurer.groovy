@@ -102,7 +102,8 @@ class TomcatServerConfigurer {
       loader.setDelegate(true)
       context.setLoader(loader)
       context.addLifecycleListener(new ContextConfig())
-
+      fixAnnotationResources(classpathUrls, context)
+      
       if(configureContext)
         configureContext(webapp, context)
       
@@ -110,6 +111,22 @@ class TomcatServerConfigurer {
     }
     
     tomcat
+  }
+  
+  private void fixAnnotationResources(URL[] classpathUrls, StandardContext context) {
+    // need to fix resource paths for tomcat7 in order to make annotations work
+    Class VirtualDirContext
+    try {
+      VirtualDirContext = Class.forName('org.apache.naming.resources.VirtualDirContext', true, this.class.getClassLoader())
+    } catch(ClassNotFoundException e) {
+      // we are on newer version of tomcat, so annotations will work and there's nothing to fix.
+      return
+    }
+    String extraResourcePaths = classpathUrls.collect { it.path }.findAll { !it.endsWith('.jar') }.collect { '/WEB-INF/classes=' + it }.join(',')
+    log.warn 'extraResourcePaths {}', extraResourcePaths
+    def resources = VirtualDirContext.newInstance()
+    resources.setExtraResourcePaths(extraResourcePaths)
+    context.setResources(resources)      
   }
   
   private class SpringloadedCleanup implements LifecycleListener {
