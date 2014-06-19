@@ -61,7 +61,7 @@ class JettyStartTask extends StartBaseTask {
       }
 
       boolean getManagedClassReload() {
-        self.project.gretty.managedClassReload
+        self.getManagedClassReload()
       }
 
       ServerConfig getServerConfig() {
@@ -80,6 +80,10 @@ class JettyStartTask extends StartBaseTask {
         [ wconfig ]
       }
     }
+  }
+  
+  protected boolean getManagedClassReload() {
+    project.gretty.managedClassReload
   }
 
   @Override

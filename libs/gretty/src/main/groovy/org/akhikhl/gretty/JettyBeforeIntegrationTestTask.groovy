@@ -21,6 +21,10 @@ class JettyBeforeIntegrationTestTask extends JettyStartTask {
 
   private String integrationTestTask_
   private boolean integrationTestTaskAssigned
+  
+  JettyBeforeIntegrationTestTask() {
+    scanInterval = 0 // disable scanning on integration tests
+  }
 
   @Override
   protected boolean getDefaultJacocoEnabled() {
@@ -38,6 +42,12 @@ class JettyBeforeIntegrationTestTask extends JettyStartTask {
 
   boolean getIntegrationTestTaskAssigned() {
     integrationTestTaskAssigned
+  }
+  
+  @Override
+  protected boolean getManagedClassReload() {
+    // disable managed class reloads on integration tests
+    false
   }
 
   void integrationTestTask(String integrationTestTask) {
