@@ -42,7 +42,7 @@ final class JettyServerManager implements ServerManager {
     log = LoggerFactory.getLogger(this.getClass())
     configurer.setLogger(log)
     
-    server = JettyServerConfigurer.createAndConfigureServer(configurer, params)
+    server = new JettyServerConfigurer().createAndConfigureServer(configurer, params)
     server.start()
   }
 

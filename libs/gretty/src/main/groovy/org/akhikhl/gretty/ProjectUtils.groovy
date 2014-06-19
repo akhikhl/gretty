@@ -210,6 +210,7 @@ final class ProjectUtils {
         into "${project.buildDir}/inplaceWebapp"
       }
     }
+    new File(project.buildDir, 'inplaceWebapp').mkdirs()
     project.copy {
       from getWebAppDir(project)
       into "${project.buildDir}/inplaceWebapp"

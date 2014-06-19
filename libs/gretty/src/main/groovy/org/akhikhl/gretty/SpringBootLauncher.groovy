@@ -35,6 +35,8 @@ class SpringBootLauncher extends DefaultLauncher {
       project.configurations[servletContainerConfig.servletContainerRunnerConfig].files
     if(servletContainerConfig.servletContainerType == 'jetty')
       files += project.configurations.grettyRunnerSpringBootJetty.files
+    else if(servletContainerConfig.servletContainerType == 'tomcat')
+      files += project.configurations.grettyRunnerSpringBootTomcat.files
     for(def wconfig in webAppConfigs) {
       if(wconfig.projectPath) {
         def proj = project.project(wconfig.projectPath)

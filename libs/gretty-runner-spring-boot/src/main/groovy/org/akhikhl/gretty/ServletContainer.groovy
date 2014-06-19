@@ -9,14 +9,11 @@ package org.akhikhl.gretty
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
+import org.springframework.boot.context.embedded.EmbeddedServletContainer
 import org.springframework.boot.context.embedded.EmbeddedServletContainerInitializedEvent
-import org.springframework.boot.context.embedded.jetty.JettyEmbeddedServletContainer
 import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
-
-import org.springframework.context.ApplicationEvent
 
 /**
  *
@@ -25,7 +22,7 @@ import org.springframework.context.ApplicationEvent
 @Component
 class ServletContainer {
   
-  protected static JettyEmbeddedServletContainer servletContainer
+  protected static EmbeddedServletContainer servletContainer
   
   @Bean
   def servletContainerInitializedEvent() {

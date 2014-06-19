@@ -13,7 +13,7 @@ package org.akhikhl.gretty
  */
 class JettyServerConfigurer {
 
-  static createAndConfigureServer(JettyConfigurer configurer, Map params, Closure configureContext = null) {
+  def createAndConfigureServer(JettyConfigurer configurer, Map params, Closure configureContext = null) {
 
     def server = configurer.createServer()
     configurer.applyJettyXml(server, params.jettyXml)
@@ -51,4 +51,3 @@ class JettyServerConfigurer {
     return server
   }
 }
-

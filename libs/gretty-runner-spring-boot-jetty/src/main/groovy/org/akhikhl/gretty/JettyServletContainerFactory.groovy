@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty
 
+import org.akhikhl.gretty.JettyServerConfigurer
 import org.springframework.boot.context.embedded.EmbeddedServletContainer
 import org.springframework.boot.context.embedded.jetty.JettyEmbeddedServletContainerFactory
 import org.springframework.boot.context.embedded.jetty.JettyServerCustomizer
@@ -29,10 +30,8 @@ class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory 
 
   @Override
   public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
-    def JettyConfigurer = Class.forName('org.akhikhl.gretty.JettyConfigurerImpl', true, this.getClass().classLoader)
-    def jettyConfigurer = JettyConfigurer.newInstance()
+    def jettyConfigurer = Class.forName('org.akhikhl.gretty.JettyConfigurerImpl', true, this.getClass().classLoader).newInstance()
     jettyConfigurer.setLogger(log)
-    def JettyServerConfigurer = Class.forName('org.akhikhl.gretty.JettyServerConfigurer', true, this.getClass().classLoader)
     def server = JettyServerConfigurer.createAndConfigureServer(jettyConfigurer, params) { webapp, context ->
       if(webapp.springBoot) {
         if (isRegisterDefaultServlet())

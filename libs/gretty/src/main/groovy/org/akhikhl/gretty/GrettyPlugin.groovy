@@ -38,6 +38,9 @@ class GrettyPlugin implements Plugin<Project> {
       grettyRunnerSpringBootJetty {
         extendsFrom project.configurations.grettyRunnerSpringBoot
       }
+      grettyRunnerSpringBootTomcat {
+        extendsFrom project.configurations.grettyRunnerSpringBoot
+      }
       grettySpringLoaded {
         transitive = false
       }
@@ -63,6 +66,7 @@ class GrettyPlugin implements Plugin<Project> {
         // concrete implementation is chosen depending on servletContainer property
         exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
       }
+      grettyRunnerSpringBootTomcat "org.akhikhl.gretty:gretty-runner-spring-boot-tomcat:$grettyVersion"
       grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
     }
     

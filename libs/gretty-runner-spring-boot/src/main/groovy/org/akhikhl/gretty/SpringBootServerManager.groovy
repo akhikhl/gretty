@@ -12,7 +12,6 @@ import org.akhikhl.gretty.LoggingUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.context.embedded.jetty.JettyEmbeddedServletContainer
 import org.springframework.context.ApplicationContext
 
 /**
