@@ -25,8 +25,7 @@ jacoco {
 }
 
 gretty {
-  scanInterval = 1
-  fastReload = true
+  managedClassReload = false
   
   // gretty.afterEvaluate is executed, when standard gretty tasks are already created
   afterEvaluate {

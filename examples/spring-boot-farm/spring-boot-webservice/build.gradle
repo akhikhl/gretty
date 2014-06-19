@@ -13,8 +13,6 @@ dependencies {
 }
 
 gretty {
-  scanInterval = 1
-  fastReload = true
   springBoot = true
 }
 

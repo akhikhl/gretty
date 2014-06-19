@@ -11,13 +11,10 @@ dependencies {
 }
 
 gretty {
-  scanInterval = 1
-  fastReload = true
   springBoot = true
 }
 
 farm {
-  scanInterval = 1
   webapp project
   webapp ':spring-boot-farm:spring-boot-webservice'
   webapp ':spring-boot-farm:jee-webservice'

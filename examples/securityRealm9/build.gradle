@@ -19,8 +19,6 @@ dependencies {
 
 gretty {
   servletContainer = 'jetty9'
-  scanInterval = 1
-  fastReload = true
   realm 'auth'
   // realmConfigFile is optional. When omitted, 'jetty-realm.properties' is assumed.
   // If path is relative, the file will be searched in projectDir, build/resources/main and src/main/webapp/WEB-INF.

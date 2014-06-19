@@ -9,13 +9,7 @@ jacoco {
   toolVersion = '+'
 }
 
-gretty {
-  scanInterval = 1
-  fastReload = true
-}
-
 farm {
-  scanInterval = 1
   webapp project
   webapp ':farmJacoco:MyWebService'
 

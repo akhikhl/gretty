@@ -20,8 +20,6 @@ dependencies {
 
 gretty {
   servletContainer = 'jetty8'
-  scanInterval = 1
-  fastReload = true
   httpsEnabled = true
 }
 

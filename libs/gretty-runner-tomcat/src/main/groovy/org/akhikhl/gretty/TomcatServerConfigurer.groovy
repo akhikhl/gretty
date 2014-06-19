@@ -93,13 +93,9 @@ class TomcatServerConfigurer {
       context.setDocBase(webapp.resourceBase)
       context.addLifecycleListener(new FixContextListener())
       ClassLoader parentClassLoader = params.parentClassLoader ?: this.getClass().getClassLoader()
-      ClassLoader classLoader
-      if(webapp.webappClassPath) {
-        URL[] classpathUrls = (webapp.webappClassPath.collect { new URL(it) }) as URL[]
-        classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
-        context.addLifecycleListener(new SpringloadedCleanup())
-      } else
-        classLoader = parentClassLoader
+      URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
+      ClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
+      context.addLifecycleListener(new SpringloadedCleanup())
       context.setParentClassLoader(classLoader)
       WebappLoader loader = new WebappLoader(classLoader)
       loader.setLoaderClass(TomcatEmbeddedWebappClassLoader.class.getName())

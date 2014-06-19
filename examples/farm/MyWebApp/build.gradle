@@ -50,7 +50,6 @@ farms {
     port = 8090
     servicePort = 8091
     statusPort = 8092
-    scanInterval = 1
     webapp project, contextPath: '/blabla'
     webapp 'org.akhikhl.gretty.examples:MyWebService:1.0', suppressMavenToProjectResolution: true
   }

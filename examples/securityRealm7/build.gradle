@@ -19,8 +19,6 @@ dependencies {
 
 gretty {
   servletContainer = 'jetty7'
-  scanInterval = 1
-  fastReload = true
   realm 'auth'
   onStart {
     println 'Enter user name "test" and password "test123" for logon.'

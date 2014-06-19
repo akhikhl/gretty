@@ -6,7 +6,7 @@
   <servlet>
     <display-name>ExampleServlet</display-name>
     <servlet-name>ExampleServlet</servlet-name>
-    <servlet-class>mywebapp.ExampleServlet</servlet-class>
+    <servlet-class>org.akhikhl.examples.gretty.mywebapp.ExampleServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 

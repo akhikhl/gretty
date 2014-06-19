@@ -32,7 +32,7 @@ class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory 
   public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
     def jettyConfigurer = Class.forName('org.akhikhl.gretty.JettyConfigurerImpl', true, this.getClass().classLoader).newInstance()
     jettyConfigurer.setLogger(log)
-    def server = JettyServerConfigurer.createAndConfigureServer(jettyConfigurer, params) { webapp, context ->
+    def server = new JettyServerConfigurer().createAndConfigureServer(jettyConfigurer, params) { webapp, context ->
       if(webapp.springBoot) {
         if (isRegisterDefaultServlet())
           addDefaultServlet(context)

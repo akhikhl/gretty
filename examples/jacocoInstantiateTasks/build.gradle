@@ -26,11 +26,6 @@ jacoco {
   toolVersion = '+'
 }
 
-gretty {
-  scanInterval = 1
-  fastReload = true
-}
-
 task('myIntegrationTest', type: Test, dependsOn: 'test') {
   
   finalizedBy { tasks.integrationTestClientReport }
