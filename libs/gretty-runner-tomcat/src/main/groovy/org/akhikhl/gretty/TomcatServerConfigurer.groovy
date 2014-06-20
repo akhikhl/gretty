@@ -102,8 +102,7 @@ class TomcatServerConfigurer {
       ClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
       context.addLifecycleListener(new SpringloadedCleanup())
       context.setParentClassLoader(classLoader)
-      context.setJarScanner(configurer.createJarScanner(context.getJarScanner(), ''));
-      context.getJarScanner().debug = true
+      context.setJarScanner(configurer.createJarScanner(context.getJarScanner(), new JarSkipPatterns()))
       WebappLoader loader = new WebappLoader(classLoader)
       loader.setLoaderClass(TomcatEmbeddedWebappClassLoader.class.getName())
       loader.setDelegate(true)
@@ -116,13 +115,6 @@ class TomcatServerConfigurer {
 
       if(!context.findChild('default'))
         context.addLifecycleListener(new DefaultWebXmlListener())
-
-      context.addLifecycleListener(new LifecycleListener() {
-        public void lifecycleEvent(LifecycleEvent event) {
-          if(event.getType() == Lifecycle.AFTER_START_EVENT)
-            log.warn 'DBG attribute jarscanner: {}', context.getServletContext().getAttribute(JarScanner.class.getName())
-        }
-      });
 
       tomcat.getHost().addChild(context)
     }

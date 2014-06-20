@@ -19,7 +19,7 @@ interface TomcatConfigurer {
 
   ContextConfig createContextConfig(URL[] classpathUrls)
 
-  JarScanner createJarScanner(JarScanner jarScanner, String skipPattern)
+  JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns)
 
   void setLogger(Logger logger)
 }

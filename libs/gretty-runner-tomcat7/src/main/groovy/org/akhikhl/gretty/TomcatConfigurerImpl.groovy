@@ -49,8 +49,8 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     }
   }
 
-  JarScanner createJarScanner(JarScanner jarScanner, String skipPattern) {
-    new SkipPatternJarScanner(jarScanner, skipPattern)
+  JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns) {
+    new SkipPatternJarScanner(jarScanner, skipPatterns)
   }
 
   void setLogger(Logger logger) {
