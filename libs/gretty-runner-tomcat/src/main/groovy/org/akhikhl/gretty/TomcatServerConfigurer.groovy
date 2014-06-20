@@ -7,34 +7,45 @@
  */
 package org.akhikhl.gretty
 
+import javax.naming.directory.DirContext
+import javax.servlet.ServletContext
 import org.apache.catalina.Container
 import org.apache.catalina.Context
 import org.apache.catalina.Host
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
 import org.apache.catalina.LifecycleListener
+import org.apache.catalina.Server
 import org.apache.catalina.connector.Connector
 import org.apache.catalina.core.StandardContext
+import org.apache.catalina.deploy.WebXml
 import org.apache.catalina.loader.WebappLoader
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
 import org.apache.catalina.startup.Tomcat.DefaultWebXmlListener
 import org.apache.catalina.startup.Tomcat.FixContextListener
+import org.apache.naming.resources.BaseDirContext
+import org.apache.naming.resources.FileDirContext
+import org.apache.tomcat.JarScanner
+import org.apache.tomcat.JarScannerCallback
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.xml.sax.InputSource
+
+import org.apache.tomcat.util.scan.JarFactory
 
 /**
  *
  * @author ahi
  */
 class TomcatServerConfigurer {
-  
+
   protected final Logger log
 
   TomcatServerConfigurer() {
     log = LoggerFactory.getLogger(this.getClass())
   }
-  
+
   Tomcat createAndConfigureServer(Map params, Closure configureContext = null) {
 
     Tomcat tomcat = new Tomcat()
@@ -87,32 +98,64 @@ class TomcatServerConfigurer {
     }
 
     for(def webapp in params.webApps) {
-      StandardContext context = (params.contextClass ? params.contextClass.newInstance() : new StandardContext())
+      StandardContext context = (params.contextClass ? params.contextClass.newInstance() : new StandardContext() {
+        def log = LoggerFactory.getLogger(this.getClass())
+        DirContext webappResources
+        public void addResourceJarUrl(URL url) {
+          super.addResourceJarUrl(url)
+          log.warn 'addResourceJarUrl {}', url
+          def p = webappResources.getRealPath('page1.htm')
+          log.warn 'webappResources.getRealPath("page1.htm") -> {}', p
+        }
+        public String getRealPath(String path) {
+          def result = super.getRealPath(path)
+          log.warn '*** getRealPath {} -> {}', path, result
+          result
+        }
+        public boolean resourcesStart() {
+          def result = super.resourcesStart()
+          log.warn 'resourcesStart -> {}', result
+          result
+        }
+        public synchronized void setResources(DirContext resources) {
+          webappResources = resources
+          super.setResources(webappResources)
+        }
+      })
       context.setName(webapp.contextPath)
       context.setPath(webapp.contextPath)
       context.setDocBase(webapp.resourceBase)
       context.addLifecycleListener(new FixContextListener())
+      // context.setLogEffectiveWebXml(true) // enable for debugging webxml merge
       ClassLoader parentClassLoader = params.parentClassLoader ?: this.getClass().getClassLoader()
       URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
       ClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
       context.addLifecycleListener(new SpringloadedCleanup())
       context.setParentClassLoader(classLoader)
+      SkipPatternJarScanner.apply(context, '')
       WebappLoader loader = new WebappLoader(classLoader)
       loader.setLoaderClass(TomcatEmbeddedWebappClassLoader.class.getName())
       loader.setDelegate(true)
       context.setLoader(loader)
-      context.addLifecycleListener(new ContextConfig())
-      fixAnnotationResources(classpathUrls, context)
-      
+      context.addLifecycleListener(new ContextConfig() {
+        def log = LoggerFactory.getLogger(this.getClass())
+        protected synchronized void configureStart() {
+          log.warn 'ContextConfig.configureStart BEFORE'
+          super.configureStart()
+          log.warn 'ContextConfig.configureStart AFTER'
+        }
+      })
+      //fixAnnotationResources(classpathUrls, context)
+
       if(configureContext)
         configureContext(webapp, context)
-      
+
       tomcat.getHost().addChild(context)
     }
-    
+
     tomcat
   }
-  
+
   private void fixAnnotationResources(URL[] classpathUrls, StandardContext context) {
     // need to fix resource paths for tomcat7 in order to make annotations work
     Class VirtualDirContext
@@ -123,21 +166,21 @@ class TomcatServerConfigurer {
       return
     }
     String extraResourcePaths = classpathUrls.collect { it.path }.findAll { !it.endsWith('.jar') }.collect { '/WEB-INF/classes=' + it }.join(',')
-    log.warn 'extraResourcePaths {}', extraResourcePaths
     def resources = VirtualDirContext.newInstance()
     resources.setExtraResourcePaths(extraResourcePaths)
-    context.setResources(resources)      
+    log.warn 'context.setResources {}', resources
+    context.setResources(resources)
   }
-  
+
   private class SpringloadedCleanup implements LifecycleListener {
-    
+
 		@Override
 		public void lifecycleEvent(LifecycleEvent event) {
       if(event.getType() == Lifecycle.BEFORE_STOP_EVENT)
         cleanup(event.getLifecycle())
     }
-    
-    protected void cleanup(StandardContext context) {      
+
+    protected void cleanup(StandardContext context) {
       def TypeRegistry
       try {
         TypeRegistry = Class.forName('org.springsource.loaded.TypeRegistry', true, this.class.getClassLoader())
