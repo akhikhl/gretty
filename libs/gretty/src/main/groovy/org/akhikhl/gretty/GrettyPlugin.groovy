@@ -73,14 +73,14 @@ class GrettyPlugin implements Plugin<Project> {
       }
       grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
     }
-    
+
     ServletContainerConfig.getConfig(project.gretty.servletContainer).with { config ->
       def closure = config.servletApiDependencies
       closure = closure.rehydrate(config, closure.owner, closure.thisObject)
       closure.resolveStrategy = Closure.DELEGATE_FIRST
       closure(project)
     }
-    
+
     ServletContainerConfig.getConfigs().each { configName, config ->
       def closure = config.servletContainerRunnerDependencies
       closure = closure.rehydrate(config, closure.owner, closure.thisObject)
@@ -302,9 +302,6 @@ class GrettyPlugin implements Plugin<Project> {
             GradleUtils.disableTaskOnOtherProjects(project, 'farmRunDebug')
           }
       }
-
-      if(!fname)
-        project.tasks.debug.dependsOn 'farmRunDebug'
 
       project.task('farmStart' + fname, type: FarmStartTask, group: 'gretty') {
         description = "Starts ${farmDescr} inplace (stopped by 'farmStop${fname}')."
