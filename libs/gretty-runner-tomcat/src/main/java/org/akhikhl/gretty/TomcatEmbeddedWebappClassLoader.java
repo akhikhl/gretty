@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The class was copied from:
+ * The code was copied from:
  * https://github.com/spring-projects/spring-boot/blob/master/spring-boot/src/main/java/org/springframework/boot/context/embedded/tomcat/TomcatEmbeddedWebappClassLoader.java
  * Changes compared to original version: replaced logging to slf4j.
  *
