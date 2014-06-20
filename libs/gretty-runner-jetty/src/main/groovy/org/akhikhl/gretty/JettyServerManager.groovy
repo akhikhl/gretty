@@ -15,12 +15,12 @@ import org.slf4j.LoggerFactory
  * @author akhikhl
  */
 final class JettyServerManager implements ServerManager {
-  
+
   private JettyConfigurer configurer
   protected Map params
 	protected server
-  protected Logger log 
-  
+  protected Logger log
+
   JettyServerManager(JettyConfigurer configurer) {
     this.configurer = configurer
   }
@@ -29,7 +29,7 @@ final class JettyServerManager implements ServerManager {
   void setParams(Map params) {
     this.params = params
   }
- 
+
   @Override
   void startServer() {
     assert server == null
@@ -41,7 +41,7 @@ final class JettyServerManager implements ServerManager {
 
     log = LoggerFactory.getLogger(this.getClass())
     configurer.setLogger(log)
-    
+
     server = new JettyServerConfigurer().createAndConfigureServer(configurer, params)
     server.start()
   }

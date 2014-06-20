@@ -37,7 +37,11 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
 
   @Override
   public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
-    def server = new TomcatServerConfigurer().createAndConfigureServer(params) { webapp, context ->
+
+    def tomcatConfigurer = Class.forName('org.akhikhl.gretty.TomcatConfigurerImpl', true, this.getClass().classLoader).newInstance()
+    tomcatConfigurer.setLogger(log)
+
+    def server = new TomcatServerConfigurer().createAndConfigureServer(tomcatConfigurer, params) { webapp, context ->
       if(webapp.springBoot) {
         if (isRegisterDefaultServlet())
           addDefaultServlet(context)
@@ -96,7 +100,7 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
 		catch (Exception ex) {
 			// Probably not Tomcat 8
 		}
-	}  
+	}
 	private static class StoreMergedWebXmlListener implements LifecycleListener {
 
 		private final String MERGED_WEB_XML = org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML;
@@ -132,5 +136,5 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
 			}
 		}
 
-	}  
+	}
 }

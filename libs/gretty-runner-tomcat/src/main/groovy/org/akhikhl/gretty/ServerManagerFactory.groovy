@@ -14,7 +14,8 @@ package org.akhikhl.gretty
 class ServerManagerFactory {
 
   static ServerManager createServerManager() {
-    new TomcatServerManager()
+    def TomcatConfigurer = Class.forName('org.akhikhl.gretty.TomcatConfigurerImpl', true, ServerManagerFactory.classLoader)
+    new TomcatServerManager(TomcatConfigurer.newInstance())
   }
 }
 

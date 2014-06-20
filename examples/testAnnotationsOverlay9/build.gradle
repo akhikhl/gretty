@@ -14,7 +14,7 @@ apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
   
 gretty {
-  servletContainer = 'jetty9'
+  servletContainer = 'tomcat8'
   overlay ':testAnnotations9'
 }
 

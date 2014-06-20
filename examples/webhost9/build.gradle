@@ -18,6 +18,6 @@ dependencies {
 }
 
 gretty {
-  servletContainer = 'jetty9'
+  servletContainer = 'tomcat7'
 }
 

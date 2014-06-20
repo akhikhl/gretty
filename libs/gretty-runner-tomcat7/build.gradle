@@ -1,0 +1,9 @@
+apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('libs/publish.gradle')
+
+dependencies {
+  compile project(':libs:gretty-runner-tomcat')
+  compile "org.apache.tomcat.embed:tomcat-embed-el:$tomcat7_version"
+  compile "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat7_version"
+}
+

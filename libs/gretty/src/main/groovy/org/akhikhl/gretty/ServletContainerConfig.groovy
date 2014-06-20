@@ -40,7 +40,7 @@ class ServletContainerConfig {
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile jetty7ServletApi
-          }          
+          }
         }
       ],
       'jetty8': [
@@ -54,7 +54,7 @@ class ServletContainerConfig {
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile jetty8ServletApi
-          }          
+          }
         }
       ],
       'jetty9': [
@@ -68,7 +68,7 @@ class ServletContainerConfig {
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile jetty9ServletApi
-          }          
+          }
         }
       ],
       'tomcat7': [
@@ -77,19 +77,12 @@ class ServletContainerConfig {
         fullName: "Tomcat $tomcat7Version",
         servletContainerRunnerConfig: 'grettyRunnerTomcat7',
         servletContainerRunnerDependencies: { project ->
-          project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat:$grettyVersion", {
-            exclude group: 'org.apache.tomcat.embed'
-            exclude group: 'avax.servlet', module: 'javax.servlet-api'
-          }
-          project.dependencies.add servletContainerRunnerConfig, "org.apache.tomcat.embed:tomcat-embed-core:$tomcat7Version"
-          project.dependencies.add servletContainerRunnerConfig, "org.apache.tomcat.embed:tomcat-embed-el:$tomcat7Version"
-          project.dependencies.add servletContainerRunnerConfig, "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat7Version"
-          project.dependencies.add servletContainerRunnerConfig, "org.apache.tomcat.embed:tomcat-embed-logging-juli:$tomcat7Version"
+          project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat7:$grettyVersion"
         },
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile tomcat7ServletApi
-          }          
+          }
         }
       ],
       'tomcat8': [
@@ -98,19 +91,12 @@ class ServletContainerConfig {
         fullName: "Tomcat $tomcat8Version",
         servletContainerRunnerConfig: 'grettyRunnerTomcat8',
         servletContainerRunnerDependencies: { project ->
-          project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat:$grettyVersion", {
-            exclude group: 'org.apache.tomcat.embed'
-            exclude group: 'avax.servlet', module: 'javax.servlet-api'
-          }
-          project.dependencies.add servletContainerRunnerConfig, "org.apache.tomcat.embed:tomcat-embed-core:$tomcat8Version"
-          project.dependencies.add servletContainerRunnerConfig, "org.apache.tomcat.embed:tomcat-embed-el:$tomcat8Version"
-          project.dependencies.add servletContainerRunnerConfig, "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat8Version"
-          project.dependencies.add servletContainerRunnerConfig, "org.apache.tomcat.embed:tomcat-embed-logging-juli:$tomcat8Version"
+          project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat8:$grettyVersion"
         },
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile tomcat8ServletApi
-          }          
+          }
         }
       ]
     ]
