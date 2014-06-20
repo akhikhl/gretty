@@ -61,7 +61,8 @@ class JarSkipPatterns {
     'logback*.jar',
     'springloaded*.jar',
     'sysout-over-slf4j*.jar',
-    'tomcat-embed*.jar' ]
+    'tomcat-embed*.jar',
+    'velocity-*.jar' ]
 
   private final Set<String> patterns = new LinkedHashSet<String>()
 
