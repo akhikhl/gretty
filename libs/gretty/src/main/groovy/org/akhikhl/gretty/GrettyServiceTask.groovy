@@ -8,12 +8,12 @@
 package org.akhikhl.gretty
 
 /**
- * This class is deprecated, please use JettyStopTask and JettyRestartTask instead.
+ * This class is deprecated, please use AppStopTask and AppRestartTask instead.
  *
  * @author akhikhl
  */
 @Deprecated
-class GrettyServiceTask extends JettyServiceTask {
+class GrettyServiceTask extends AppServiceTask {
 
   String command
 

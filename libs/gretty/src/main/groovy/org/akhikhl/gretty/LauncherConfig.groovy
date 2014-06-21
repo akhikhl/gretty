@@ -25,8 +25,6 @@ interface LauncherConfig {
 
   ServerConfig getServerConfig()
   
-  String getServletContainer()
-  
   String getStopTaskName()
 
   Iterable<WebAppConfig> getWebAppConfigs()

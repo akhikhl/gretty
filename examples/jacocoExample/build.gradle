@@ -30,16 +30,14 @@ gretty {
 
     // "jacoco" extension is created automatically for all JettyBeforeIntegrationTest tasks
     // and has type org.gradle.testing.jacoco.plugins.JacocoTaskExtension
-    tasks.jettyBeforeIntegrationTest.jacoco {
+    tasks.appBeforeIntegrationTest.jacoco {
       append = false
       destinationFile = new File(project.buildDir, 'jacoco/integrationTest_server.exec')
       // excludes.add 'hellogretty.ExampleServlet'
     }
     
     // reports should be generated only after integration tests
-    tasks.jettyAfterIntegrationTest {
-      finalizedBy tasks.integrationTestServerReport
-    }
+    tasks.appAfterIntegrationTest.finalizedBy tasks.integrationTestServerReport
   }
 }
 

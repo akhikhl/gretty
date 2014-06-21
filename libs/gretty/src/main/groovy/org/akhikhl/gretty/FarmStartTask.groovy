@@ -63,10 +63,6 @@ class FarmStartTask extends StartBaseTask {
       ServerConfig getServerConfig() {
         tempFarm.serverConfig
       }
-
-      String getServletContainer() {
-        tempFarm.servletContainer
-      }
   
       String getStopTaskName() {
         self.getStopTaskName()

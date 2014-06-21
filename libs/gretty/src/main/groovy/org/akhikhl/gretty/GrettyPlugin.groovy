@@ -123,7 +123,7 @@ class GrettyPlugin implements Plugin<Project> {
   private void addTaskDependencies(Project project) {
 
     project.tasks.whenObjectAdded { task ->
-      if(task instanceof JettyStartTask)
+      if(task instanceof AppStartTask)
         task.dependsOn {
           task.effectiveInplace ? project.tasks.prepareInplaceWebApp : project.tasks.prepareArchiveWebApp
         }
@@ -206,22 +206,85 @@ class GrettyPlugin implements Plugin<Project> {
         dependsOn archiveTask
     }
 
-    project.task('jettyRun', type: JettyStartTask, group: 'gretty') {
+    project.task('appRun', type: AppStartTask, group: 'gretty') {
       description = 'Starts web-app inplace, in interactive mode.'
     }
 
-    // As soon as farm plugin applies to the same project, it takes over run task.
-    if(!project.ext.has('grettyFarmPluginName'))
-      project.tasks.run.dependsOn 'jettyRun'
+    project.tasks.run.dependsOn 'appRun'
+
+    project.task('appRunDebug', type: AppStartTask, group: 'gretty') {
+      description = 'Starts web-app inplace, in debug and interactive mode.'
+      debug = true
+    }
+
+    project.tasks.debug.dependsOn 'appRunDebug'
+
+    project.task('appStart', type: AppStartTask, group: 'gretty') {
+      description = 'Starts web-app inplace (stopped by \'appStop\').'
+      interactive = false
+    }
+
+    project.task('appStartDebug', type: AppStartTask, group: 'gretty') {
+      description = 'Starts web-app inplace, in debug mode (stopped by \'appStop\').'
+      interactive = false
+      debug = true
+    }
+
+    if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
+      
+      project.task('appRunWar', type: AppStartTask, group: 'gretty') {
+        description = 'Starts web-app on WAR-file, in interactive mode.'
+        inplace = false
+      }
+
+      project.task('appRunWarDebug', type: AppStartTask, group: 'gretty') {
+        description = 'Starts web-app on WAR-file, in debug and interactive mode.'
+        inplace = false
+        debug = true
+      }
+
+      project.task('appStartWar', type: AppStartTask, group: 'gretty') {
+        description = 'Starts web-app on WAR-file (stopped by \'appStop\').'
+        inplace = false
+        interactive = false
+      }
+
+      project.task('appStartWarDebug', type: AppStartTask, group: 'gretty') {
+        description = 'Starts web-app on WAR-file, in debug mode (stopped by \'appStop\').'
+        inplace = false
+        interactive = false
+        debug = true
+      }
+    }
+
+    project.task('appStop', type: AppStopTask, group: 'gretty') {
+      description = 'Sends \'stop\' command to a running server.'
+    }
+
+    project.task('appRestart', type: AppRestartTask, group: 'gretty') {
+      description = 'Sends \'restart\' command to a running server.'
+    }
+
+    project.task('appBeforeIntegrationTest', type: AppBeforeIntegrationTestTask, group: 'gretty') {
+      description = 'Starts server before integration test.'
+    }
+    
+    project.ext.jettyBeforeIntegrationTest = project.tasks.ext.jettyBeforeIntegrationTest = project.tasks.appBeforeIntegrationTest
+
+    project.task('appAfterIntegrationTest', type: AppAfterIntegrationTestTask, group: 'gretty') {
+      description = 'Stops server after integration test.'
+    }
+    
+    project.ext.jettyAfterIntegrationTest = project.tasks.ext.jettyAfterIntegrationTest = project.tasks.appAfterIntegrationTest
+
+    project.task('jettyRun', type: JettyStartTask, group: 'gretty') {
+      description = 'Starts web-app inplace, in interactive mode.'
+    }
 
     project.task('jettyRunDebug', type: JettyStartTask, group: 'gretty') {
       description = 'Starts web-app inplace, in debug and interactive mode.'
       debug = true
     }
-
-    // As soon as farm plugin applies to the same project, it takes over debug task.
-    if(!project.ext.has('grettyFarmPluginName'))
-      project.tasks.debug.dependsOn 'jettyRunDebug'
 
     project.task('jettyStart', type: JettyStartTask, group: 'gretty') {
       description = 'Starts web-app inplace (stopped by \'jettyStop\').'
@@ -235,6 +298,7 @@ class GrettyPlugin implements Plugin<Project> {
     }
 
     if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
+      
       project.task('jettyRunWar', type: JettyStartTask, group: 'gretty') {
         description = 'Starts web-app on WAR-file, in interactive mode.'
         inplace = false
@@ -260,20 +324,12 @@ class GrettyPlugin implements Plugin<Project> {
       }
     }
 
-    project.task('jettyStop', type: JettyStopTask, group: 'gretty') {
-      description = 'Sends \'stop\' command to running jetty server.'
+    project.task('jettyStop', type: AppStopTask, group: 'gretty') {
+      description = 'Sends \'stop\' command to a running server.'
     }
 
-    project.task('jettyRestart', type: JettyRestartTask, group: 'gretty') {
-      description = 'Sends \'restart\' command to running jetty server.'
-    }
-
-    project.task('jettyBeforeIntegrationTest', type: JettyBeforeIntegrationTestTask, group: 'gretty') {
-      description = 'Starts jetty server before integration test.'
-    }
-
-    project.task('jettyAfterIntegrationTest', type: JettyAfterIntegrationTestTask, group: 'gretty') {
-      description = 'Stops jetty server after integration test.'
+    project.task('jettyRestart', type: AppRestartTask, group: 'gretty') {
+      description = 'Sends \'restart\' command to a running server.'
     }
 
     project.farms.farmsMap.each { fname, farm ->
@@ -381,11 +437,11 @@ class GrettyPlugin implements Plugin<Project> {
       afterEvaluateClosure()
     }
 
-    if(!project.tasks.jettyBeforeIntegrationTest.integrationTestTaskAssigned)
-      project.tasks.jettyBeforeIntegrationTest.integrationTestTask null // default binding
+    if(!project.tasks.appBeforeIntegrationTest.integrationTestTaskAssigned)
+      project.tasks.appBeforeIntegrationTest.integrationTestTask null // default binding
 
-    if(!project.tasks.jettyAfterIntegrationTest.integrationTestTaskAssigned)
-      project.tasks.jettyAfterIntegrationTest.integrationTestTask null // default binding
+    if(!project.tasks.appAfterIntegrationTest.integrationTestTaskAssigned)
+      project.tasks.appAfterIntegrationTest.integrationTestTask null // default binding
 
     project.farms.farmsMap.each { fname, farm ->
 

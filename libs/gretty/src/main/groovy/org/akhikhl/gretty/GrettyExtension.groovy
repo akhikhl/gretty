@@ -11,9 +11,6 @@ import org.gradle.api.GradleException
 
 class GrettyExtension {
 
-  String servletContainer = 'jetty9'
-  boolean managedClassReload = true
-
   @Delegate
   protected ServerConfig serverConfig = new ServerConfig()
 

@@ -8,11 +8,12 @@
 package org.akhikhl.gretty
 
 /**
- * This class is deprecated, please use AppStartTask instead.
  *
  * @author akhikhl
  */
-@Deprecated
-class GrettyStartTask extends AppStartTask {
+class AppStopTask extends AppServiceTask {
 
+  String getCommand() {
+    'stop'
+  }
 }

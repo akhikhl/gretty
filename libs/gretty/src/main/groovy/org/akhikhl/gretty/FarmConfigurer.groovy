@@ -29,10 +29,9 @@ class FarmConfigurer {
   }
 
   void configureFarm(Farm dstFarm, Farm[] srcFarms = []) {
-    ConfigUtils.complementSpecificProperties(['servletContainer', 'managedClassReload'], dstFarm, srcFarms)
-    servletContainer = dstFarm.servletContainer
-    managedClassReload = dstFarm.managedClassReload
     ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ ServerConfig.getDefault(project) ])
+    servletContainer = dstFarm.serverConfig.servletContainer
+    managedClassReload = dstFarm.serverConfig.managedClassReload
     dstFarm.serverConfig.resolve(project)
     for(def f in srcFarms)
       mergeWebAppRefMaps(dstFarm.webAppRefs, f.webAppRefs)

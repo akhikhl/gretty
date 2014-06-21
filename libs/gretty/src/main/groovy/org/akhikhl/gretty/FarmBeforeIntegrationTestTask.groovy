@@ -27,7 +27,7 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     doFirst {
       getWebAppProjects().each {
         it.tasks.each { t ->
-          if(t instanceof JettyBeforeIntegrationTestTask || t instanceof JettyAfterIntegrationTestTask)
+          if(t instanceof AppBeforeIntegrationTestTask || t instanceof AppAfterIntegrationTestTask)
             t.enabled = false
         }
       }
@@ -72,8 +72,8 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
                 passSystemPropertiesToIntegrationTask(webappProject, t)
             }
           }
-        } else if(t instanceof JettyBeforeIntegrationTestTask)
-          t.mustRunAfter thisTask // need this to be able to disable JettyBeforeIntegrationTestTask in doFirst
+        } else if(t instanceof AppBeforeIntegrationTestTask)
+          t.mustRunAfter thisTask // need this to be able to disable AppBeforeIntegrationTestTask in doFirst
       }
     }
     integrationTestTaskAssigned = true

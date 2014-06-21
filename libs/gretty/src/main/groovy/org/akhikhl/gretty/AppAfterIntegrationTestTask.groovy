@@ -7,7 +7,6 @@
  */
 package org.akhikhl.gretty
 
-import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,14 +15,12 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
-class FarmAfterIntegrationTestTask extends FarmStopTask {
+class AppAfterIntegrationTestTask extends AppStopTask {
 
-  private static final Logger log = LoggerFactory.getLogger(FarmBeforeIntegrationTestTask)
+  private static final Logger log = LoggerFactory.getLogger(AppAfterIntegrationTestTask)
 
   private String integrationTestTask_
   private boolean integrationTestTaskAssigned
-
-  protected Map webAppRefs = [:]
 
   @TaskAction
   void action() {
@@ -36,21 +33,11 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
   }
 
   String getIntegrationTestTask() {
-    integrationTestTask_ ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
+    integrationTestTask_ ?: project.gretty.integrationTestTask
   }
 
   boolean getIntegrationTestTaskAssigned() {
     integrationTestTaskAssigned
-  }
-
-  Iterable<Project> getWebAppProjects() {
-    FarmConfigurer configurer = new FarmConfigurer(project)
-    Map wrefs = [:]
-    FarmConfigurer.mergeWebAppRefMaps(wrefs, webAppRefs)
-    FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).webAppRefs)
-    if(!wrefs)
-      wrefs = configurer.getDefaultWebAppRefMap()
-    configurer.getWebAppProjects(wrefs)
   }
 
   void integrationTestTask(String integrationTestTask) {
@@ -60,20 +47,10 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     }
     integrationTestTask_ = integrationTestTask
     def thisTask = this
-    getWebAppProjects().each {
-      it.tasks.all { t ->
-        if(t.name == thisTask.integrationTestTask)
-          thisTask.mustRunAfter t
-        else if(t instanceof AppAfterIntegrationTestTask)
-          thisTask.mustRunAfter t
-      }
+    project.tasks.all { t ->
+      if(t.name == thisTask.integrationTestTask)
+        t.finalizedBy thisTask
     }
     integrationTestTaskAssigned = true
-  }
-
-  void webapp(Map options = [:], w) {
-    if(w instanceof Project)
-      w = w.path
-    webAppRefs[w] = options
   }
 }

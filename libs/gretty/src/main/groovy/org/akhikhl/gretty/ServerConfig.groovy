@@ -14,8 +14,10 @@ import org.gradle.api.Project
  * @author akhikhl
  */
 class ServerConfig {
-  
+
   List<String> jvmArgs
+  String servletContainer
+  Boolean managedClassReload
   String host
   Boolean httpEnabled
   Integer httpPort
@@ -46,6 +48,8 @@ class ServerConfig {
   protected static ServerConfig getDefault(Project project) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
+    result.servletContainer = 'jetty9'
+    result.managedClassReload = true
     result.host = 'localhost'
     result.httpEnabled = true
     result.httpPort = 8080

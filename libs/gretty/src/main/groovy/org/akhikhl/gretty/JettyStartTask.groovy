@@ -7,88 +7,29 @@
  */
 package org.akhikhl.gretty
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 /**
- * Gradle task for starting jetty
  *
  * @author akhikhl
  */
-class JettyStartTask extends StartBaseTask {
+class JettyStartTask extends AppStartTask {
 
-  @Delegate
-  private ServerConfig serverConfig = new ServerConfig()
-
-  @Delegate
-  private WebAppConfig webAppConfig = new WebAppConfig()
-
-  protected boolean getEffectiveInplace() {
-    if(webAppConfig.inplace != null)
-      webAppConfig.inplace
-    else if(project.gretty.webAppConfig.inplace != null)
-      project.gretty.webAppConfig.inplace
-    else
-      true
-  }
+  protected static final Logger log = LoggerFactory.getLogger(JettyStartTask)
 
   @Override
-  LauncherConfig getLauncherConfig() {
-  
-    def self = this
-
-    ServerConfig sconfig = new ServerConfig()
-    ConfigUtils.complementProperties(sconfig, serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
-    sconfig.resolve(project)
-
-    WebAppConfig wconfig = new WebAppConfig()
-    ConfigUtils.complementProperties(wconfig, webAppConfig, project.gretty.webAppConfig, WebAppConfig.getDefaultForProject(project), new WebAppConfig(inplace: true))
-    
-    wconfig.resolve(project, project.gretty.servletContainer)
-
-    new LauncherConfig() {
-        
-      boolean getDebug() {
-        self.debug
-      }
-
-      boolean getIntegrationTest() {
-        self.getIntegrationTest()
-      }
-  
-      boolean getInteractive() {
-        self.getInteractive()
-      }
-
-      def getJacocoConfig() {
-        self.jacoco
-      }
-
-      boolean getManagedClassReload() {
-        self.getManagedClassReload()
-      }
-
-      ServerConfig getServerConfig() {
-        sconfig
-      }
-
-      String getServletContainer() {
-        self.project.gretty.servletContainer
-      }
-  
-      String getStopTaskName() {
-        self.getStopTaskName()
-      }
-
-      Iterable<WebAppConfig> getWebAppConfigs() {
-        [ wconfig ]
-      }
+  protected String getCompatibleServletContainer(String servletContainer) {
+    def config = ServletContainerConfig.getConfig(servletContainer)
+    if(config.servletContainerType == 'jetty')
+      return servletContainer
+    def compatibleConfigEntry = ServletContainerConfig.getConfigs.find { name, c ->
+      c.servletContainerType == 'jetty' && c.servletApiVersion == config.servletApiVersion
     }
-  }
-  
-  protected boolean getManagedClassReload() {
-    project.gretty.managedClassReload
-  }
-
-  @Override
-  protected String getStopTaskName() {
-    'jettyStop'
+    if(compatibleConfigEntry)
+      return compatibleConfig.key
+    String defaultJettyServletContainer = 'jetty9'
+    log.warn 'Cannot find jetty container with compatible servlet-api to {}, defaulting to {}', servletContainer, defaultJettyServletContainer
+    defaultJettyServletContainer
   }
 }

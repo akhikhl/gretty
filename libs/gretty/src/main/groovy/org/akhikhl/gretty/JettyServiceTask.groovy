@@ -7,30 +7,20 @@
  */
 package org.akhikhl.gretty
 
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * Gradle task for control over jetty
  *
  * @author akhikhl
  */
-abstract class JettyServiceTask extends DefaultTask {
+abstract class JettyServiceTask extends AppServiceTask {
 
-  private static Logger log = LoggerFactory.getLogger(JettyServiceTask)
-
-  Integer servicePort
-
-  @TaskAction
-  void action() {
-    ServerConfig serverConfig = new ServerConfig(servicePort: servicePort)
-    ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
-    serverConfig.resolve(project)
-    log.debug 'Sending command {} to port {}', command, serverConfig.servicePort
-    ServiceProtocol.send(serverConfig.servicePort, command)
+  protected static final Logger log = LoggerFactory.getLogger(JettyBeforeIntegrationTestTask)
+	
+  JettyServiceTask() {
+    doFirst {
+      log.warn 'JettyServiceTask is deprecated and will be removed in Gretty 2.0. Please use AppServiceTask instead.'
+    }
   }
-
-  abstract String getCommand()
 }

@@ -21,14 +21,19 @@ class ServletContainerConfig {
     String grettyVersion = Externalized.getString('grettyVersion')
     String jetty7Version = Externalized.getString('jetty7Version')
     String jetty7ServletApi = Externalized.getString('jetty7ServletApi')
+    String jetty7ServletApiVersion = Externalized.getString('jetty7ServletApiVersion')
     String jetty8Version = Externalized.getString('jetty8Version')
     String jetty8ServletApi = Externalized.getString('jetty8ServletApi')
+    String jetty8ServletApiVersion = Externalized.getString('jetty8ServletApiVersion')
     String jetty9Version = Externalized.getString('jetty9Version')
     String jetty9ServletApi = Externalized.getString('jetty9ServletApi')
+    String jetty9ServletApiVersion = Externalized.getString('jetty9ServletApiVersion')
     String tomcat7Version = Externalized.getString('tomcat7Version')
     String tomcat7ServletApi = Externalized.getString('tomcat7ServletApi')
+    String tomcat7ServletApiVersion = Externalized.getString('tomcat7ServletApiVersion')
     String tomcat8Version = Externalized.getString('tomcat8Version')
     String tomcat8ServletApi = Externalized.getString('tomcat8ServletApi')
+    String tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
     [ 'jetty7': [
         servletContainerType: 'jetty',
         servletContainerVersion: jetty7Version,
@@ -37,6 +42,7 @@ class ServletContainerConfig {
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-jetty7:$grettyVersion"
         },
+        servletApiVersion: jetty7ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile jetty7ServletApi
@@ -51,6 +57,7 @@ class ServletContainerConfig {
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-jetty8:$grettyVersion"
         },
+        servletApiVersion: jetty8ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile jetty8ServletApi
@@ -65,6 +72,7 @@ class ServletContainerConfig {
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-jetty9:$grettyVersion"
         },
+        servletApiVersion: jetty9ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile jetty9ServletApi
@@ -79,6 +87,7 @@ class ServletContainerConfig {
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat7:$grettyVersion"
         },
+        servletApiVersion: tomcat7ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile tomcat7ServletApi
@@ -93,6 +102,7 @@ class ServletContainerConfig {
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat8:$grettyVersion"
         },
+        servletApiVersion: tomcat8ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
             providedCompile tomcat8ServletApi

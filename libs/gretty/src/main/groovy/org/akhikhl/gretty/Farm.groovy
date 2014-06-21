@@ -15,9 +15,6 @@ import org.gradle.api.Project
  */
 class Farm {
 
-  String servletContainer
-  Boolean managedClassReload
-
   @Delegate
   protected ServerConfig serverConfig = new ServerConfig()
 

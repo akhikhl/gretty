@@ -184,7 +184,7 @@ class DefaultLauncher implements Launcher {
   }
 
   protected Map getServletContainerConfig() {
-    ServletContainerConfig.getConfig(config.getServletContainer())
+    ServletContainerConfig.getConfig(sconfig.servletContainer)
   }
 
   protected File getSpringLoadedAgent() {
