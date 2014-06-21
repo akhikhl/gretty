@@ -7,23 +7,14 @@
  */
 package org.akhikhl.gretty
 
-import javax.naming.directory.DirContext
-import javax.servlet.ServletContext
-import org.apache.catalina.Container
-import org.apache.catalina.Context
-import org.apache.catalina.Host
-import org.apache.catalina.Lifecycle
-import org.apache.catalina.LifecycleEvent
-import org.apache.catalina.LifecycleListener
-import org.apache.catalina.Server
 import org.apache.catalina.connector.Connector
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.loader.WebappLoader
+import org.apache.catalina.realm.MemoryRealm
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
 import org.apache.catalina.startup.Tomcat.DefaultWebXmlListener
 import org.apache.catalina.startup.Tomcat.FixContextListener
-import org.apache.tomcat.JarScanner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -95,7 +86,6 @@ class TomcatServerConfigurer {
       context.setName(webapp.contextPath)
       context.setPath(webapp.contextPath)
       context.setDocBase(webapp.resourceBase)
-      context.addLifecycleListener(new FixContextListener())
       // context.setLogEffectiveWebXml(true) // enable for debugging webxml merge
       ClassLoader parentClassLoader = params.parentClassLoader ?: this.getClass().getClassLoader()
       URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
@@ -115,39 +105,20 @@ class TomcatServerConfigurer {
 
       if(!context.findChild('default'))
         context.addLifecycleListener(new DefaultWebXmlListener())
+        
+      if(webapp.realmConfigFile) {
+        if(new File(webapp.realmConfigFile).exists()) {
+          log.warn 'Configuring security realm with config {}', webapp.realmConfigFile
+          def realm = new MemoryRealm()
+          realm.setPathname(webapp.realmConfigFile)
+          context.setRealm(realm)
+        }
+      } else
+        context.addLifecycleListener(new FixContextListener())
 
       tomcat.getHost().addChild(context)
     }
 
     tomcat
-  }
-
-  private class SpringloadedCleanup implements LifecycleListener {
-
-		@Override
-		public void lifecycleEvent(LifecycleEvent event) {
-      if(event.getType() == Lifecycle.BEFORE_STOP_EVENT)
-        cleanup(event.getLifecycle())
-    }
-
-    protected void cleanup(StandardContext context) {
-      def TypeRegistry
-      try {
-        TypeRegistry = Class.forName('org.springsource.loaded.TypeRegistry', true, this.class.getClassLoader())
-      } catch(ClassNotFoundException e) {
-        // springloaded not present, just ignore
-        return
-      }
-      ClassLoader classLoader = context.getLoader().getClassLoader()
-      while(classLoader != null) {
-        def typeRegistry = TypeRegistry.getTypeRegistryFor(classLoader)
-        if(typeRegistry != null && typeRegistry.@fsWatcher != null) {
-          log.info 'springloaded shutdown: {}', typeRegistry.@fsWatcher.@thread
-          typeRegistry.@fsWatcher.shutdown()
-          typeRegistry.@fsWatcher.@thread.join()
-        }
-        classLoader = classLoader.getParent()
-      }
-    }
   }
 }

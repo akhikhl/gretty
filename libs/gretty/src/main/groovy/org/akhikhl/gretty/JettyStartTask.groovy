@@ -40,7 +40,8 @@ class JettyStartTask extends StartBaseTask {
 
     WebAppConfig wconfig = new WebAppConfig()
     ConfigUtils.complementProperties(wconfig, webAppConfig, project.gretty.webAppConfig, WebAppConfig.getDefaultForProject(project), new WebAppConfig(inplace: true))
-    wconfig.resolve(project)
+    
+    wconfig.resolve(project, project.gretty.servletContainer)
 
     new LauncherConfig() {
         

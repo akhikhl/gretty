@@ -9,12 +9,16 @@ package org.akhikhl.gretty
 
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Project
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
  * @author akhikhl
  */
 class WebAppConfig {
+
+  private static final Logger log = LoggerFactory.getLogger(WebAppConfig)
 
   def contextPath
   def initParameters
@@ -66,7 +70,7 @@ class WebAppConfig {
   protected static WebAppConfig getDefaultForProject(Project project) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + project.name
-    result.realmConfigFile = 'jetty-realm.properties'
+    result.realmConfigFile = null
     result.jettyEnvXmlFile = 'jetty-env.xml'
     result.fastReload = true
     result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp/" as String
@@ -115,9 +119,31 @@ class WebAppConfig {
     ConfigUtils.resolveClosures(initParameters)
   }
 
-  protected void resolve(Project project) {
-    realmConfigFile = ProjectUtils.resolveSingleFile(project, realmConfigFile)
-    jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, jettyEnvXmlFile)
+  protected void resolve(Project project, String servletContainer) {
+    
+    String servletContainerType = ServletContainerConfig.getConfig(servletContainer).servletContainerType
+    
+    boolean defaultRealmConfigFile = false
+    if(!realmConfigFile) {
+      defaultRealmConfigFile = true
+      if(servletContainerType == 'tomcat')
+        realmConfigFile = 'tomcat-users.xml'
+      else
+        realmConfigFile = 'jetty-realm.properties'
+    }
+    
+    if(servletContainerType == 'jetty' && !defaultRealmConfigFile && !realm)
+      log.warn 'Realm config file is specified, but realm is not specified.'
+    
+    def resolvedRealmConfigFile = ProjectUtils.resolveSingleFile(project, realmConfigFile)
+    if(!resolvedRealmConfigFile && !defaultRealmConfigFile)
+      log.warn 'The realm config file {} does not exist.', realmConfigFile
+    realmConfigFile = resolvedRealmConfigFile
+    
+    if(servletContainerType == 'jetty')
+      jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, jettyEnvXmlFile)
+    else
+      jettyEnvXmlFile = null
   }
 
   void scanDir(String value) {

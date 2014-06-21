@@ -24,7 +24,7 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
   ContextConfig createContextConfig(URL[] classpathUrls) {
 
     new ContextConfig() {
-
+       
       protected void processAnnotationsFile(File file, WebXml fragment, boolean handlesTypesOnly) {
         log.debug 'processAnnotationsFile file={}', file
         super.processAnnotationsFile(file, fragment, handlesTypesOnly)
@@ -37,6 +37,7 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
       protected Map<String,WebXml> processJarsForWebFragments(WebXml application) {
         def fragments = super.processJarsForWebFragments(application)
+        // here we enable annotation processing for non-jar urls in the classpath
         for(URL url in classpathUrls.findAll { !it.path.endsWith('.jar') && new File(it.path).exists() }) {
           WebXml fragment = new WebXml()
           fragment.setDistributable(true)

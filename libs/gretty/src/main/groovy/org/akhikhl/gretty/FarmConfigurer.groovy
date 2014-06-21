@@ -21,6 +21,8 @@ class FarmConfigurer {
   private static final Logger log = LoggerFactory.getLogger(FarmConfigurer)
 
   private final Project project
+  private String servletContainer
+  private Boolean managedClassReload
 
   FarmConfigurer(Project project) {
     this.project = project
@@ -28,13 +30,16 @@ class FarmConfigurer {
 
   void configureFarm(Farm dstFarm, Farm[] srcFarms = []) {
     ConfigUtils.complementSpecificProperties(['servletContainer', 'managedClassReload'], dstFarm, srcFarms)
+    servletContainer = dstFarm.servletContainer
+    managedClassReload = dstFarm.managedClassReload
     ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ ServerConfig.getDefault(project) ])
     dstFarm.serverConfig.resolve(project)
     for(def f in srcFarms)
       mergeWebAppRefMaps(dstFarm.webAppRefs, f.webAppRefs)
     if(!dstFarm.webAppRefs)
       dstFarm.webAppRefs = getDefaultWebAppRefMap()
-    if(dstFarm.integrationTestTask == null) dstFarm.integrationTestTask = srcFarms.findResult { it.integrationTestTask }
+    if(dstFarm.integrationTestTask == null) 
+      dstFarm.integrationTestTask = srcFarms.findResult { it.integrationTestTask }
   }
 
   Map getDefaultWebAppRefMap() {
@@ -53,28 +58,28 @@ class FarmConfigurer {
   }
 
   WebAppConfig getWebAppConfigForMavenDependency(Map options, String dependency) {
-    WebAppConfig webappConfig = new WebAppConfig()
-    ConfigUtils.complementProperties(webappConfig, options, WebAppConfig.getDefaultForMavenDependency(project, dependency))
-    webappConfig.inplace = false // always war-file, ignore options.inplace
-    webappConfig.resolve(null)
-    webappConfig
+    WebAppConfig wconfig = new WebAppConfig()
+    ConfigUtils.complementProperties(wconfig, options, WebAppConfig.getDefaultForMavenDependency(project, dependency))
+    wconfig.inplace = false // always war-file, ignore options.inplace
+    wconfig.resolve(null, servletContainer)
+    wconfig
   }
 
   WebAppConfig getWebAppConfigForProject(Map options, Project proj, Boolean inplace = null) {
-    WebAppConfig webappConfig = new WebAppConfig()
+    WebAppConfig wconfig = new WebAppConfig()
     if(!proj.extensions.findByName('gretty'))
       throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
-    ConfigUtils.complementProperties(webappConfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefaultForProject(proj), new WebAppConfig(inplace: inplace))
-    webappConfig.resolve(proj)
-    webappConfig
+    ConfigUtils.complementProperties(wconfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefaultForProject(proj), new WebAppConfig(inplace: inplace))
+    wconfig.resolve(proj, servletContainer)
+    wconfig
   }
 
   WebAppConfig getWebAppConfigForWarFile(Map options, File warFile) {
-    WebAppConfig webappConfig = new WebAppConfig()
-    ConfigUtils.complementProperties(webappConfig, options, WebAppConfig.getDefaultForWarFile(project, warFile))
-    webappConfig.inplace = false // always war-file, ignore options.inplace
-    webappConfig.resolve(null)
-    webappConfig
+    WebAppConfig wconfig = new WebAppConfig()
+    ConfigUtils.complementProperties(wconfig, options, WebAppConfig.getDefaultForWarFile(project, warFile))
+    wconfig.inplace = false // always war-file, ignore options.inplace
+    wconfig.resolve(null, servletContainer)
+    wconfig
   }
 
   Iterable<WebAppConfig> getWebAppConfigsForProjects(Map wrefs, Boolean inplace = null) {

@@ -28,8 +28,11 @@
       <role-name>testuser</role-name>
     </auth-constraint>
   </security-constraint>
+  <security-role>
+    <role-name>testuser</role-name>
+  </security-role>
   <login-config>
     <auth-method>BASIC</auth-method>
     <realm-name>auth</realm-name>
-  </login-config>  
+  </login-config>
 </web-app>

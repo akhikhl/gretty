@@ -371,10 +371,10 @@ class DefaultLauncher implements Launcher {
           resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase ?: webAppConfig.warResourceBase.toString() ?: '')
           if(webAppConfig.initParameters)
             initParams webAppConfig.initParameters
-          if(webAppConfig.realm && webAppConfig.realmConfigFile) {
+          if(webAppConfig.realm)
             realm webAppConfig.realm
+          if(webAppConfig.realmConfigFile)
             realmConfigFile webAppConfig.realmConfigFile.absolutePath
-          }
           if(webAppConfig.jettyEnvXmlFile)
             jettyEnvXml webAppConfig.jettyEnvXmlFile.absolutePath
           if(webAppConfig.springBootSources)
