@@ -11,10 +11,10 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-class JettyStartTask extends AppStartTask {
+class TomcatStartTask extends AppStartTask {
 
   @Override
   protected String getCompatibleServletContainer(String servletContainer) {
-    ServletContainerConfig.getJettyCompatibleServletContainer(servletContainer)
+    ServletContainerConfig.getTomcatCompatibleServletContainer(servletContainer)
   }
 }

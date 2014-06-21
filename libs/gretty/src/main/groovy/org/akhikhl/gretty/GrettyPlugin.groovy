@@ -268,14 +268,10 @@ class GrettyPlugin implements Plugin<Project> {
     project.task('appBeforeIntegrationTest', type: AppBeforeIntegrationTestTask, group: 'gretty') {
       description = 'Starts server before integration test.'
     }
-    
-    project.ext.jettyBeforeIntegrationTest = project.tasks.ext.jettyBeforeIntegrationTest = project.tasks.appBeforeIntegrationTest
 
     project.task('appAfterIntegrationTest', type: AppAfterIntegrationTestTask, group: 'gretty') {
       description = 'Stops server after integration test.'
     }
-    
-    project.ext.jettyAfterIntegrationTest = project.tasks.ext.jettyAfterIntegrationTest = project.tasks.appAfterIntegrationTest
 
     project.task('jettyRun', type: JettyStartTask, group: 'gretty') {
       description = 'Starts web-app inplace, in interactive mode.'
@@ -331,6 +327,65 @@ class GrettyPlugin implements Plugin<Project> {
     project.task('jettyRestart', type: AppRestartTask, group: 'gretty') {
       description = 'Sends \'restart\' command to a running server.'
     }
+
+    project.task('tomcatRun', type: TomcatStartTask, group: 'gretty') {
+      description = 'Starts web-app inplace, in interactive mode.'
+    }
+
+    project.task('tomcatRunDebug', type: TomcatStartTask, group: 'gretty') {
+      description = 'Starts web-app inplace, in debug and interactive mode.'
+      debug = true
+    }
+
+    project.task('tomcatStart', type: TomcatStartTask, group: 'gretty') {
+      description = 'Starts web-app inplace (stopped by \'tomcatStop\').'
+      interactive = false
+    }
+
+    project.task('tomcatStartDebug', type: TomcatStartTask, group: 'gretty') {
+      description = 'Starts web-app inplace, in debug mode (stopped by \'tomcatStop\').'
+      interactive = false
+      debug = true
+    }
+
+    if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
+      
+      project.task('tomcatRunWar', type: TomcatStartTask, group: 'gretty') {
+        description = 'Starts web-app on WAR-file, in interactive mode.'
+        inplace = false
+      }
+
+      project.task('tomcatRunWarDebug', type: TomcatStartTask, group: 'gretty') {
+        description = 'Starts web-app on WAR-file, in debug and interactive mode.'
+        inplace = false
+        debug = true
+      }
+
+      project.task('tomcatStartWar', type: TomcatStartTask, group: 'gretty') {
+        description = 'Starts web-app on WAR-file (stopped by \'tomcatStop\').'
+        inplace = false
+        interactive = false
+      }
+
+      project.task('tomcatStartWarDebug', type: TomcatStartTask, group: 'gretty') {
+        description = 'Starts web-app on WAR-file, in debug mode (stopped by \'tomcatStop\').'
+        inplace = false
+        interactive = false
+        debug = true
+      }
+    }
+
+    project.task('tomcatStop', type: AppStopTask, group: 'gretty') {
+      description = 'Sends \'stop\' command to a running server.'
+    }
+
+    project.task('tomcatRestart', type: AppRestartTask, group: 'gretty') {
+      description = 'Sends \'restart\' command to a running server.'
+    }
+    
+    project.ext.jettyBeforeIntegrationTest = project.tasks.ext.jettyBeforeIntegrationTest = project.tasks.appBeforeIntegrationTest
+    
+    project.ext.jettyAfterIntegrationTest = project.tasks.ext.jettyAfterIntegrationTest = project.tasks.appAfterIntegrationTest
 
     project.farms.farmsMap.each { fname, farm ->
 

@@ -8,12 +8,16 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.GradleException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
  * @author akhikhl
  */
 class ServletContainerConfig {
+
+  protected static final Logger log = LoggerFactory.getLogger(ServletContainerConfig)
 
 	private static configs = createConfigs()
 
@@ -122,5 +126,33 @@ class ServletContainerConfig {
 
   static Map getConfigs() {
     configs.asImmutable()
+  }
+  
+  static String getJettyCompatibleServletContainer(String servletContainer) {
+    def config = getConfig(servletContainer)
+    if(config.servletContainerType == 'jetty')
+      return servletContainer
+    def compatibleConfigEntry = getConfigs().find { name, c ->
+      c.servletContainerType == 'jetty' && c.servletApiVersion == config.servletApiVersion
+    }
+    if(compatibleConfigEntry)
+      return compatibleConfigEntry.key
+    String defaultJettyServletContainer = 'jetty9'
+    log.warn 'Cannot find jetty container with compatible servlet-api to {}, defaulting to {}', servletContainer, defaultJettyServletContainer
+    defaultJettyServletContainer
+  }
+  
+  static String getTomcatCompatibleServletContainer(String servletContainer) {
+    def config = getConfig(servletContainer)
+    if(config.servletContainerType == 'tomcat')
+      return servletContainer
+    def compatibleConfigEntry = getConfigs().find { name, c ->
+      c.servletContainerType == 'tomcat' && c.servletApiVersion == config.servletApiVersion
+    }
+    if(compatibleConfigEntry)
+      return compatibleConfigEntry.key
+    String defaultJettyServletContainer = 'tomcat8'
+    log.warn 'Cannot find tomcat container with compatible servlet-api to {}, defaulting to {}', servletContainer, defaultJettyServletContainer
+    defaultJettyServletContainer
   }
 }

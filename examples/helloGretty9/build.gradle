@@ -19,7 +19,7 @@ dependencies {
 }
 
 gretty {
-  servletContainer = 'tomcat7'
+  servletContainer = 'jetty9'
   httpsEnabled = true
 }
 
