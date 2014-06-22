@@ -6,11 +6,11 @@
 
 #### Version 1.0.0
  
-- Unified all Gretty plugins to a single plugin "org.akhikhl.gretty"
+- Unified all Gretty plugins to a single plugin "org.akhikhl.gretty".
 
-- Introduced servlet container selection with servletContainer property.
+- Introduced [servlet container selection via servletContainer property](http://akhikhl.github.io/gretty-doc/Switching-between-servlet-containers.html).
 
-- Added support of Tomcat 7 and 8.
+- Added support of [Tomcat 7 and 8](http://akhikhl.github.io/gretty-doc/Switching-between-servlet-containers.html).
 
 - Added start task functions prepareServerConfig and prepareWebAppConfig
  for processing of merged configurations.
