@@ -76,7 +76,7 @@ class DefaultLauncher implements Launcher {
 
     spec.debug = config.getDebug()
 
-    log.warn 'server-config jvmArgs: {}', sconfig.jvmArgs
+    log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs
     spec.jvmArgs sconfig.jvmArgs
 
     if(config.getJacocoConfig()) {
