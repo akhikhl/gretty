@@ -4,6 +4,17 @@
 
 ### What's new:
 
+#### Version 1.0.0
+ 
+- Unified all Gretty plugins to a single plugin "org.akhikhl.gretty"
+
+- Introduced servlet container selection with servletContainer property.
+
+- Added support of Tomcat 7 and 8.
+
+- Added start task functions prepareServerConfig and prepareWebAppConfig
+ for processing of merged configurations.
+
 #### Version 0.0.25
 
 - Adopted new plugin identification scheme suggested at the portal [http://plugins.gradle.org](http://plugins.gradle.org).
@@ -125,7 +136,7 @@
 
 #### Version 0.0.6
 
-- Implemented support of [multiple jetty versions and multiple servlet API versions](http://akhikhl.github.io/gretty-doc/Switching-between-Jetty-and-servlet-API-versions.html).
+- Implemented support of [multiple jetty versions and multiple servlet API versions](http://akhikhl.github.io/gretty-doc/Switching-between-servlet-containers.html).
 
 ### version 0.0.5
 
