@@ -17,3 +17,5 @@ project.apply plugin: 'war'
 if (!project.plugins.findPlugin(org.akhikhl.gretty9.GrettyPlugin))
   project.apply(plugin: org.akhikhl.gretty9.GrettyPlugin)
 
+System.err.println 'gretty9-0.0.15.plugin is deprecated, please use gretty.plugin instead'
+

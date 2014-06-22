@@ -4,7 +4,7 @@ buildscript {
   }
   
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty+'
+    classpath 'org.akhikhl.gretty:gretty:+'
   }
 }
 
@@ -12,8 +12,6 @@ repositories {
   jcenter()
 }
 
-project.apply plugin: 'war'
-
-if (!project.plugins.findPlugin(org.akhikhl.gretty.JettyPlugin))
-  project.apply(plugin: org.akhikhl.gretty.JettyPlugin)
+if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
+  project.apply(plugin: org.akhikhl.gretty.GrettyPlugin)
 
