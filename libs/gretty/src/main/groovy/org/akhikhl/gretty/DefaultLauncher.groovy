@@ -76,7 +76,7 @@ class DefaultLauncher implements Launcher {
 
     spec.debug = config.getDebug()
 
-    log.debug 'server-config jvmArgs: {}', sconfig.jvmArgs
+    log.warn 'server-config jvmArgs: {}', sconfig.jvmArgs
     spec.jvmArgs sconfig.jvmArgs
 
     if(config.getJacocoConfig()) {
@@ -246,12 +246,12 @@ class DefaultLauncher implements Launcher {
       project.ext.grettyRunnerThread = runThread
     else {
       if(config.getInteractive()) {
-        System.out.println 'Press any key to stop the jetty server.'
+        System.out.println 'Press any key to stop the server.'
         System.in.read()
         log.debug 'Sending command: {}', 'stop'
         ServiceProtocol.send(sconfig.servicePort, 'stop')
       } else
-        System.out.println "Run 'gradle ${config.getStopTaskName()}' to stop the jetty server."
+        System.out.println "Run 'gradle ${config.getStopTaskName()}' to stop the server."
       runThread.join()
       log.warn '{} stopped.', getServletContainerConfig().fullName
     }

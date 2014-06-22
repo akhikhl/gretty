@@ -24,52 +24,31 @@ class FarmStartTask extends StartBaseTask {
   protected Map webAppRefs = [:]
 
   boolean inplace = true
-
-  @Override
-  LauncherConfig getLauncherConfig() {
   
-    def self = this
+  @Override
+  protected StartConfig getStartConfig() {
 
     FarmConfigurer configurer = new FarmConfigurer(project)
 
     Farm tempFarm = new Farm()
     configurer.configureFarm(tempFarm, new Farm(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName), new Farm(servletContainer: 'jetty9', managedClassReload: true))
+    doPrepareServerConfig(tempFarm.serverConfig)
 
     List<WebAppConfig> wconfigs = []
     configurer.resolveWebAppRefs(tempFarm.webAppRefs, wconfigs, inplace)
+    for(WebAppConfig wconfig in wconfigs)
+      doPrepareWebAppConfig(wconfig)
 
-    new LauncherConfig() {
-        
-      boolean getDebug() {
-        self.debug
-      }
+    new StartConfig() {
 
-      boolean getIntegrationTest() {
-        self.getIntegrationTest()
-      }
-  
-      boolean getInteractive() {
-        self.getInteractive()
-      }
-
-      def getJacocoConfig() {
-        self.jacoco
-      }
-
-      boolean getManagedClassReload() {
-        tempFarm.managedClassReload
-      }
-
+      @Override
       ServerConfig getServerConfig() {
         tempFarm.serverConfig
       }
-  
-      String getStopTaskName() {
-        self.getStopTaskName()
-      }
 
+      @Override
       Iterable<WebAppConfig> getWebAppConfigs() {
-        wconfigs
+        wconfig
       }
     }
   }

@@ -20,16 +20,6 @@ class AppStartTask extends StartBaseTask {
   @Delegate
   private WebAppConfig webAppConfig = new WebAppConfig()
   
-  private List<Closure> prepareServerConfigClosures = []
-  
-  private void doPrepareServerConfig(ServerConfig sconfig) {
-    for(Closure c in prepareServerConfigClosures) {
-      c = c.rehydrate(sconfig, c.owner, c.thisObject)
-      c.resolveStrategy = Closure.DELEGATE_FIRST
-      c()
-    }
-  }
-  
   protected String getCompatibleServletContainer(String servletContainer) {
     servletContainer
   }
@@ -42,11 +32,9 @@ class AppStartTask extends StartBaseTask {
     else
       true
   }
-
-  @Override
-  LauncherConfig getLauncherConfig() {
   
-    def self = this
+  @Override
+  protected StartConfig getStartConfig() {
 
     ServerConfig sconfig = new ServerConfig()
     ConfigUtils.complementProperties(sconfig, serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
@@ -57,53 +45,24 @@ class AppStartTask extends StartBaseTask {
     WebAppConfig wconfig = new WebAppConfig()
     ConfigUtils.complementProperties(wconfig, webAppConfig, project.gretty.webAppConfig, WebAppConfig.getDefaultForProject(project), new WebAppConfig(inplace: true))    
     wconfig.resolve(project, sconfig.servletContainer)
+    doPrepareWebAppConfig(wconfig)
 
-    new LauncherConfig() {
-        
-      boolean getDebug() {
-        self.debug
-      }
+    new StartConfig() {
 
-      boolean getIntegrationTest() {
-        self.getIntegrationTest()
-      }
-  
-      boolean getInteractive() {
-        self.getInteractive()
-      }
-
-      def getJacocoConfig() {
-        self.jacoco
-      }
-
-      boolean getManagedClassReload() {
-        self.getManagedClassReload()
-      }
-
+      @Override
       ServerConfig getServerConfig() {
         sconfig
       }
-  
-      String getStopTaskName() {
-        self.getStopTaskName()
-      }
 
+      @Override
       Iterable<WebAppConfig> getWebAppConfigs() {
         [ wconfig ]
       }
     }
   }
-  
-  protected boolean getManagedClassReload() {
-    project.gretty.managedClassReload
-  }
 
   @Override
   protected String getStopTaskName() {
-    'jettyStop'
-  }
-  
-  void prepareServerConfig(Closure closure) {
-    prepareServerConfigClosures.add(closure)
+    'appStop'
   }
 }

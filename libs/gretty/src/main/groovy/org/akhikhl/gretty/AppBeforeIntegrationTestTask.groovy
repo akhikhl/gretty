@@ -45,7 +45,7 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
   }
   
   @Override
-  protected boolean getManagedClassReload() {
+  protected boolean getManagedClassReload(ServerConfig sconfig) {
     // disable managed class reloads on integration tests
     false
   }
