@@ -12,8 +12,15 @@
 
 - Added support of [Tomcat 7 and 8](http://akhikhl.github.io/gretty-doc/Switching-between-servlet-containers.html).
 
-- Added start task functions prepareServerConfig and prepareWebAppConfig
- for processing of merged configurations.
+- Introduced servlet-container-agnostic tasks appRun, appRunDebug, ..., as well as servlet-container-specific tasks jettyRun, jettyRunDebug, ..., tomcatRun, tomcatRunDebug, ...
+
+- Facilitated all web-apps with [spring-loaded](https://github.com/spring-projects/spring-loaded) by default. This can be turned off by setting `managedClassReload=false` in Gretty configuration.
+
+- Hot-deployment property [scanInterval](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_scaninterval) is set to 1 (second) by default. Hot-deployment can be turned off by setting `scanInterval=0` in Gretty configuration.
+
+- Hot-deployment property [fastReload](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_fastreload) is set to true by default. Fast reloading can be turned off by setting `fastReload=false` in Gretty configuration.
+
+- Added start task functions [prepareServerConfig and prepareWebAppConfig](http://akhikhl.github.io/gretty-doc/Gretty-task-classes.html#_property_inheritance_override) for property inheritance override in gretty tasks.
 
 #### Version 0.0.25
 
