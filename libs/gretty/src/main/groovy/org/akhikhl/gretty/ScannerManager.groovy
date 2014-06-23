@@ -129,18 +129,18 @@ final class ScannerManager {
           // restart is done when reacting in output change, not source change
         } else if (proj.sourceSets.main.output.files.find { f.startsWith(it.absolutePath) }) {
           if(managedClassReload) {
-            log.debug 'file {} is in managed output of {}, jetty will not be restarted', f, wconfig.projectPath
+            log.debug 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
           } else {
-            log.debug 'file {} is in output of {}, jetty will be restarted', f, wconfig.projectPath
+            log.debug 'file {} is in output of {}, servlet-container will be restarted', f, wconfig.projectPath
             shouldRestart = true
           }
-        } else if (new File(f).name in ['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml']) {
-          log.debug 'file {} is configuration file, jetty will be restarted', f
+        } else if (new File(f).name in ['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml', 'tomcat-users.xml']) {
+          log.debug 'file {} is configuration file, servlet-container will be restarted', f
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true
         }
         else if(f.startsWith(new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/lib').absolutePath)) {
-          log.debug 'file {} is in WEB-INF/lib, jetty will be restarted', f
+          log.debug 'file {} is in WEB-INF/lib, servlet-container will be restarted', f
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true
         } else {
