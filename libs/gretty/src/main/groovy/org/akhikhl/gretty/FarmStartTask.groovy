@@ -24,7 +24,7 @@ class FarmStartTask extends StartBaseTask {
   protected Map webAppRefs = [:]
 
   boolean inplace = true
-  
+
   @Override
   protected StartConfig getStartConfig() {
 
@@ -48,7 +48,7 @@ class FarmStartTask extends StartBaseTask {
 
       @Override
       Iterable<WebAppConfig> getWebAppConfigs() {
-        wconfig
+        wconfigs
       }
     }
   }
