@@ -22,7 +22,7 @@ Since version 0.0.25 Gretty adopted new plugin identification scheme suggested a
 
 #### :star: What's new
 
-- [Full support of Spring Boot 1.1.x](http://akhikhl.github.io/gretty-doc/spring-boot-support.html).
+- [Support of Tomcat 7 and 8](http://akhikhl.github.io/gretty-doc/Switching-between-servlet-containers.html).
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
