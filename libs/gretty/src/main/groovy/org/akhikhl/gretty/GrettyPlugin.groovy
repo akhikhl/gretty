@@ -140,252 +140,256 @@ class GrettyPlugin implements Plugin<Project> {
 
   private void addTasks(Project project) {
 
-    project.task('prepareInplaceWebAppFolder', group: 'gretty') {
-      description = 'Copies webAppDir of this web-app and all overlays (if any) to ${buildDir}/inplaceWebapp'
-      inputs.dir ProjectUtils.getWebAppDir(project)
-      outputs.dir "${project.buildDir}/inplaceWebapp"
-      doLast {
-        ProjectUtils.prepareInplaceWebAppFolder(project)
-      }
-    }
+    if(project.tasks.findByName('classes')) { // JVM project?
 
-    project.task('prepareInplaceWebAppClasses', group: 'gretty') {
-      description = 'Compiles classes of this web-app and all overlays (if any)'
-      dependsOn project.tasks.classes
-      for(String overlay in project.gretty.overlays)
-        dependsOn "$overlay:prepareInplaceWebAppClasses"
-    }
-
-    project.task('prepareInplaceWebApp', group: 'gretty') {
-      description = 'Prepares inplace web-app'
-      dependsOn project.tasks.prepareInplaceWebAppFolder
-      dependsOn project.tasks.prepareInplaceWebAppClasses
-    }
-
-    def archiveTask = project.tasks.findByName('war') ?: project.tasks.jar
-
-    if(project.gretty.overlays) {
-
-      project.ext.finalArchivePath = archiveTask.archivePath
-
-      archiveTask.archiveName = 'partial.' + (project.tasks.findByName('war') ? 'war' : 'jar')
-
-      // 'explodeWebApps' task is only activated by 'overlayArchive' task
-      project.task('explodeWebApps', group: 'gretty') {
-        description = 'Explodes this web-app and all overlays (if any) to ${buildDir}/explodedWebapp'
-        for(String overlay in project.gretty.overlays)
-          dependsOn "$overlay:assemble" as String
-        dependsOn archiveTask
-        for(String overlay in project.gretty.overlays)
-          inputs.file { ProjectUtils.getFinalArchivePath(project.project(overlay)) }
-        inputs.file archiveTask.archivePath
-        outputs.dir "${project.buildDir}/explodedWebapp"
+      project.task('prepareInplaceWebAppFolder', group: 'gretty') {
+        description = 'Copies webAppDir of this web-app and all overlays (if any) to ${buildDir}/inplaceWebapp'
+        inputs.dir ProjectUtils.getWebAppDir(project)
+        outputs.dir "${project.buildDir}/inplaceWebapp"
         doLast {
-          ProjectUtils.prepareExplodedWebAppFolder(project)
+          ProjectUtils.prepareInplaceWebAppFolder(project)
         }
       }
 
-      project.task('overlayArchive', group: 'gretty') {
-        description = 'Creates archive from exploded web-app in ${buildDir}/explodedWebapp'
-        dependsOn project.tasks.explodeWebApps
-        inputs.dir "${project.buildDir}/explodedWebapp"
-        outputs.file project.ext.finalArchivePath
-        doLast {
-          ant.zip destfile: project.ext.finalArchivePath, basedir: "${project.buildDir}/explodedWebapp"
+      project.task('prepareInplaceWebAppClasses', group: 'gretty') {
+        description = 'Compiles classes of this web-app and all overlays (if any)'
+        dependsOn project.tasks.classes
+        for(String overlay in project.gretty.overlays)
+          dependsOn "$overlay:prepareInplaceWebAppClasses"
+      }
+
+      project.task('prepareInplaceWebApp', group: 'gretty') {
+        description = 'Prepares inplace web-app'
+        dependsOn project.tasks.prepareInplaceWebAppFolder
+        dependsOn project.tasks.prepareInplaceWebAppClasses
+      }
+
+      def archiveTask = project.tasks.findByName('war') ?: project.tasks.jar
+
+      if(project.gretty.overlays) {
+
+        project.ext.finalArchivePath = archiveTask.archivePath
+
+        archiveTask.archiveName = 'partial.' + (project.tasks.findByName('war') ? 'war' : 'jar')
+
+        // 'explodeWebApps' task is only activated by 'overlayArchive' task
+        project.task('explodeWebApps', group: 'gretty') {
+          description = 'Explodes this web-app and all overlays (if any) to ${buildDir}/explodedWebapp'
+          for(String overlay in project.gretty.overlays)
+            dependsOn "$overlay:assemble" as String
+          dependsOn archiveTask
+          for(String overlay in project.gretty.overlays)
+            inputs.file { ProjectUtils.getFinalArchivePath(project.project(overlay)) }
+          inputs.file archiveTask.archivePath
+          outputs.dir "${project.buildDir}/explodedWebapp"
+          doLast {
+            ProjectUtils.prepareExplodedWebAppFolder(project)
+          }
+        }
+
+        project.task('overlayArchive', group: 'gretty') {
+          description = 'Creates archive from exploded web-app in ${buildDir}/explodedWebapp'
+          dependsOn project.tasks.explodeWebApps
+          inputs.dir "${project.buildDir}/explodedWebapp"
+          outputs.file project.ext.finalArchivePath
+          doLast {
+            ant.zip destfile: project.ext.finalArchivePath, basedir: "${project.buildDir}/explodedWebapp"
+          }
+        }
+
+        project.tasks.assemble.dependsOn project.tasks.overlayArchive
+      } // overlays
+
+      project.task('prepareArchiveWebApp', group: 'gretty') {
+        description = 'Prepares war web-app'
+        if(project.gretty.overlays)
+          dependsOn project.tasks.overlayArchive
+        else
+          dependsOn archiveTask
+      }
+
+      project.task('appRun', type: AppStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace, in interactive mode.'
+      }
+
+      project.tasks.run.dependsOn 'appRun'
+
+      project.task('appRunDebug', type: AppStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace, in debug and interactive mode.'
+        debug = true
+      }
+
+      project.tasks.debug.dependsOn 'appRunDebug'
+
+      project.task('appStart', type: AppStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace (stopped by \'appStop\').'
+        interactive = false
+      }
+
+      project.task('appStartDebug', type: AppStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace, in debug mode (stopped by \'appStop\').'
+        interactive = false
+        debug = true
+      }
+
+      if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
+
+        project.task('appRunWar', type: AppStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in interactive mode.'
+          inplace = false
+        }
+
+        project.task('appRunWarDebug', type: AppStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in debug and interactive mode.'
+          inplace = false
+          debug = true
+        }
+
+        project.task('appStartWar', type: AppStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file (stopped by \'appStop\').'
+          inplace = false
+          interactive = false
+        }
+
+        project.task('appStartWarDebug', type: AppStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in debug mode (stopped by \'appStop\').'
+          inplace = false
+          interactive = false
+          debug = true
         }
       }
 
-      project.tasks.assemble.dependsOn project.tasks.overlayArchive
-    } // overlays
-
-    project.task('prepareArchiveWebApp', group: 'gretty') {
-      description = 'Prepares war web-app'
-      if(project.gretty.overlays)
-        dependsOn project.tasks.overlayArchive
-      else
-        dependsOn archiveTask
-    }
-
-    project.task('appRun', type: AppStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace, in interactive mode.'
-    }
-
-    project.tasks.run.dependsOn 'appRun'
-
-    project.task('appRunDebug', type: AppStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace, in debug and interactive mode.'
-      debug = true
-    }
-
-    project.tasks.debug.dependsOn 'appRunDebug'
-
-    project.task('appStart', type: AppStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace (stopped by \'appStop\').'
-      interactive = false
-    }
-
-    project.task('appStartDebug', type: AppStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace, in debug mode (stopped by \'appStop\').'
-      interactive = false
-      debug = true
-    }
-
-    if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
-      
-      project.task('appRunWar', type: AppStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in interactive mode.'
-        inplace = false
+      project.task('appStop', type: AppStopTask, group: 'gretty') {
+        description = 'Sends \'stop\' command to a running server.'
       }
 
-      project.task('appRunWarDebug', type: AppStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug and interactive mode.'
-        inplace = false
+      project.task('appRestart', type: AppRestartTask, group: 'gretty') {
+        description = 'Sends \'restart\' command to a running server.'
+      }
+
+      project.task('appBeforeIntegrationTest', type: AppBeforeIntegrationTestTask, group: 'gretty') {
+        description = 'Starts server before integration test.'
+      }
+
+      project.task('appAfterIntegrationTest', type: AppAfterIntegrationTestTask, group: 'gretty') {
+        description = 'Stops server after integration test.'
+      }
+
+      project.task('jettyRun', type: JettyStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace, in interactive mode.'
+      }
+
+      project.task('jettyRunDebug', type: JettyStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace, in debug and interactive mode.'
         debug = true
       }
 
-      project.task('appStartWar', type: AppStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file (stopped by \'appStop\').'
-        inplace = false
+      project.task('jettyStart', type: JettyStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace (stopped by \'jettyStop\').'
         interactive = false
       }
 
-      project.task('appStartWarDebug', type: AppStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug mode (stopped by \'appStop\').'
-        inplace = false
+      project.task('jettyStartDebug', type: JettyStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace, in debug mode (stopped by \'jettyStop\').'
         interactive = false
         debug = true
       }
-    }
 
-    project.task('appStop', type: AppStopTask, group: 'gretty') {
-      description = 'Sends \'stop\' command to a running server.'
-    }
+      if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
 
-    project.task('appRestart', type: AppRestartTask, group: 'gretty') {
-      description = 'Sends \'restart\' command to a running server.'
-    }
+        project.task('jettyRunWar', type: JettyStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in interactive mode.'
+          inplace = false
+        }
 
-    project.task('appBeforeIntegrationTest', type: AppBeforeIntegrationTestTask, group: 'gretty') {
-      description = 'Starts server before integration test.'
-    }
+        project.task('jettyRunWarDebug', type: JettyStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in debug and interactive mode.'
+          inplace = false
+          debug = true
+        }
 
-    project.task('appAfterIntegrationTest', type: AppAfterIntegrationTestTask, group: 'gretty') {
-      description = 'Stops server after integration test.'
-    }
+        project.task('jettyStartWar', type: JettyStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file (stopped by \'jettyStop\').'
+          inplace = false
+          interactive = false
+        }
 
-    project.task('jettyRun', type: JettyStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace, in interactive mode.'
-    }
-
-    project.task('jettyRunDebug', type: JettyStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace, in debug and interactive mode.'
-      debug = true
-    }
-
-    project.task('jettyStart', type: JettyStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace (stopped by \'jettyStop\').'
-      interactive = false
-    }
-
-    project.task('jettyStartDebug', type: JettyStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace, in debug mode (stopped by \'jettyStop\').'
-      interactive = false
-      debug = true
-    }
-
-    if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
-      
-      project.task('jettyRunWar', type: JettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in interactive mode.'
-        inplace = false
+        project.task('jettyStartWarDebug', type: JettyStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in debug mode (stopped by \'jettyStop\').'
+          inplace = false
+          interactive = false
+          debug = true
+        }
       }
 
-      project.task('jettyRunWarDebug', type: JettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug and interactive mode.'
-        inplace = false
+      project.task('jettyStop', type: AppStopTask, group: 'gretty') {
+        description = 'Sends \'stop\' command to a running server.'
+      }
+
+      project.task('jettyRestart', type: AppRestartTask, group: 'gretty') {
+        description = 'Sends \'restart\' command to a running server.'
+      }
+
+      project.task('tomcatRun', type: TomcatStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace, in interactive mode.'
+      }
+
+      project.task('tomcatRunDebug', type: TomcatStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace, in debug and interactive mode.'
         debug = true
       }
 
-      project.task('jettyStartWar', type: JettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file (stopped by \'jettyStop\').'
-        inplace = false
+      project.task('tomcatStart', type: TomcatStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace (stopped by \'tomcatStop\').'
         interactive = false
       }
 
-      project.task('jettyStartWarDebug', type: JettyStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug mode (stopped by \'jettyStop\').'
-        inplace = false
+      project.task('tomcatStartDebug', type: TomcatStartTask, group: 'gretty') {
+        description = 'Starts web-app inplace, in debug mode (stopped by \'tomcatStop\').'
         interactive = false
         debug = true
       }
-    }
 
-    project.task('jettyStop', type: AppStopTask, group: 'gretty') {
-      description = 'Sends \'stop\' command to a running server.'
-    }
+      if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
 
-    project.task('jettyRestart', type: AppRestartTask, group: 'gretty') {
-      description = 'Sends \'restart\' command to a running server.'
-    }
+        project.task('tomcatRunWar', type: TomcatStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in interactive mode.'
+          inplace = false
+        }
 
-    project.task('tomcatRun', type: TomcatStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace, in interactive mode.'
-    }
+        project.task('tomcatRunWarDebug', type: TomcatStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in debug and interactive mode.'
+          inplace = false
+          debug = true
+        }
 
-    project.task('tomcatRunDebug', type: TomcatStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace, in debug and interactive mode.'
-      debug = true
-    }
+        project.task('tomcatStartWar', type: TomcatStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file (stopped by \'tomcatStop\').'
+          inplace = false
+          interactive = false
+        }
 
-    project.task('tomcatStart', type: TomcatStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace (stopped by \'tomcatStop\').'
-      interactive = false
-    }
-
-    project.task('tomcatStartDebug', type: TomcatStartTask, group: 'gretty') {
-      description = 'Starts web-app inplace, in debug mode (stopped by \'tomcatStop\').'
-      interactive = false
-      debug = true
-    }
-
-    if(project.plugins.findPlugin(org.gradle.api.plugins.WarPlugin)) {
-      
-      project.task('tomcatRunWar', type: TomcatStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in interactive mode.'
-        inplace = false
+        project.task('tomcatStartWarDebug', type: TomcatStartTask, group: 'gretty') {
+          description = 'Starts web-app on WAR-file, in debug mode (stopped by \'tomcatStop\').'
+          inplace = false
+          interactive = false
+          debug = true
+        }
       }
 
-      project.task('tomcatRunWarDebug', type: TomcatStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug and interactive mode.'
-        inplace = false
-        debug = true
+      project.task('tomcatStop', type: AppStopTask, group: 'gretty') {
+        description = 'Sends \'stop\' command to a running server.'
       }
 
-      project.task('tomcatStartWar', type: TomcatStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file (stopped by \'tomcatStop\').'
-        inplace = false
-        interactive = false
+      project.task('tomcatRestart', type: AppRestartTask, group: 'gretty') {
+        description = 'Sends \'restart\' command to a running server.'
       }
 
-      project.task('tomcatStartWarDebug', type: TomcatStartTask, group: 'gretty') {
-        description = 'Starts web-app on WAR-file, in debug mode (stopped by \'tomcatStop\').'
-        inplace = false
-        interactive = false
-        debug = true
-      }
-    }
+      project.ext.jettyBeforeIntegrationTest = project.tasks.ext.jettyBeforeIntegrationTest = project.tasks.appBeforeIntegrationTest
 
-    project.task('tomcatStop', type: AppStopTask, group: 'gretty') {
-      description = 'Sends \'stop\' command to a running server.'
-    }
+      project.ext.jettyAfterIntegrationTest = project.tasks.ext.jettyAfterIntegrationTest = project.tasks.appAfterIntegrationTest
 
-    project.task('tomcatRestart', type: AppRestartTask, group: 'gretty') {
-      description = 'Sends \'restart\' command to a running server.'
-    }
-    
-    project.ext.jettyBeforeIntegrationTest = project.tasks.ext.jettyBeforeIntegrationTest = project.tasks.appBeforeIntegrationTest
-    
-    project.ext.jettyAfterIntegrationTest = project.tasks.ext.jettyAfterIntegrationTest = project.tasks.appAfterIntegrationTest
+    } // JVM project
 
     project.farms.farmsMap.each { fname, farm ->
 
@@ -492,11 +496,15 @@ class GrettyPlugin implements Plugin<Project> {
       afterEvaluateClosure()
     }
 
-    if(!project.tasks.appBeforeIntegrationTest.integrationTestTaskAssigned)
-      project.tasks.appBeforeIntegrationTest.integrationTestTask null // default binding
+    project.tasks.findByName('appBeforeIntegrationTest')?.with {
+      if(!integrationTestTaskAssigned)
+        integrationTestTask null // default binding
+    }
 
-    if(!project.tasks.appAfterIntegrationTest.integrationTestTaskAssigned)
-      project.tasks.appAfterIntegrationTest.integrationTestTask null // default binding
+    project.tasks.findByName('appAfterIntegrationTest')?.with {
+      if(!integrationTestTaskAssigned)
+        integrationTestTask null // default binding
+    }
 
     project.farms.farmsMap.each { fname, farm ->
 
