@@ -1,12 +1,12 @@
-![logo](http://akhikhl.github.io/gretty/media/gretty_logo.png "gretty logo")
+![logo](http://akhikhl.github.io/gretty/media/gretty_logo_1.x.png "gretty logo")
 
 [![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) 
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
 [![Latest Version](http://img.shields.io/badge/latest_version-1.0.0-47b31f.svg)](https://github.com/akhikhl/gretty/tree/v1.0.0) 
 [![License](http://img.shields.io/badge/license-MIT-949494.svg)](#copyright-and-license)
 
-Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers. 
-It supports Jetty versions 7, 8 and 9, Tomcat versions 7 and 8, multiple web-apps and many more. 
+Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
+It supports Jetty versions 7, 8 and 9, Tomcat versions 7 and 8, multiple web-apps and many more.
 It wraps servlet container functions as convenient Gradle tasks and configuration DSL.
 
 A complete list of Gretty features is available in [feature overview](http://akhikhl.github.io/gretty-doc/Feature-overview.html).
