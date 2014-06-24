@@ -15,7 +15,7 @@ A complete list of Gretty features is available in [feature overview](http://akh
 
 If you are new with Gretty, good starting point would be [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
 
-### :bell: Attention
+#### :bell: Attention
 
 Since version 1.0.0 Gretty is represented as single gradle plugin. The right way to apply the plugin is `apply plugin: 'org.akhikhl.gretty'`. Buildscript instruction to include Gretty also has changed, see more information at [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
 
