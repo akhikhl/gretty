@@ -18,7 +18,7 @@ If you are new with gretty, good starting point would be [getting started](http:
 ### :bell: Attention
 
 Since version 0.0.25 Gretty adopted new plugin identification scheme suggested at the portal [http://plugins.gradle.org](http://plugins.gradle.org).
- See more information at [Gretty gradle plugins](http://akhikhl.github.io/gretty-doc/Gretty-gradle-plugins.html).
+ The right way to apply the plugin is `apply plugin: 'org.akhikhl.gretty'`.
 
 #### :star: What's new
 
