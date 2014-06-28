@@ -31,6 +31,7 @@ abstract class StartBaseTask extends DefaultTask {
   @TaskAction
   void action() {
     LauncherConfig config = getLauncherConfig()
+    CertificateGenerator.maybeGenerate(project, config.getServerConfig())
     Launcher launcher = anyWebAppUsesSpringBoot(config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
     launcher.launch()
   }

@@ -7,7 +7,6 @@
  */
 package org.akhikhl.gretty
 
-import org.gradle.api.GradleException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -120,7 +119,7 @@ class ServletContainerConfig {
     servletContainer = servletContainer ?: 'jetty9'
     def result = configs[servletContainer.toString()]
     if(!result)
-      throw new GradleException("Unsupported servlet container: $servletContainer")
+      throw new Exception("Unsupported servlet container: $servletContainer")
     result
   }
 

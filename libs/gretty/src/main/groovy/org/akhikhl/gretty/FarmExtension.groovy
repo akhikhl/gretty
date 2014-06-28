@@ -13,13 +13,7 @@ import org.gradle.api.Project
  *
  * @author akhikhl
  */
-class Farm {
-
-  @Delegate
-  protected ServerConfig serverConfig = new ServerConfig()
-
-  // key is project path or war path, value is options
-  Map webAppRefs = [:]
+class FarmExtension extends FarmConfig {
 
   String integrationTestTask = 'integrationTest'
 
@@ -29,6 +23,7 @@ class Farm {
     afterEvaluate.add(closure)
   }
 
+  @Override
   void webapp(Map options = [:], w) {
     if(w instanceof Project)
       w = w.path

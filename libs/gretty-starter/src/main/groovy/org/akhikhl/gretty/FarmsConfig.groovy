@@ -11,18 +11,20 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-class Farms {
+class FarmsConfig {
 
   protected Map farmsMap = [:]
+  
+  FarmConfig createFarm() {
+    new FarmConfig()
+  }
 
   void farm(String name = null, Closure closure) {
     if(name == null)
       name = ''
     def f = farmsMap[name]
-    if(f == null) {
-      f = farmsMap[name] = new Farm()
-      f.integrationTestTask = 'integrationTest'
-    }
+    if(f == null)
+      f = farmsMap[name] = createFarm()
     closure.delegate = f
     closure.resolveStrategy = Closure.DELEGATE_FIRST
     closure()

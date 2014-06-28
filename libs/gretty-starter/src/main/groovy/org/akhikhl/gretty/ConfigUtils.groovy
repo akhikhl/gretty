@@ -7,8 +7,6 @@
  */
 package org.akhikhl.gretty
 
-import org.gradle.api.GradleException
-
 /**
  *
  * @author akhikhl
@@ -70,16 +68,16 @@ class ConfigUtils {
           return
       }
     }
-    throw new GradleException("Missing at least one of the required properties ${propNames} in ${obj.getClass().getName()}")
+    throw new Exception("Missing at least one of the required properties ${propNames} in ${obj.getClass().getName()}")
   }
 
   static void requireProperty(Object obj, String propName) {
     if(obj instanceof Map) {
       if(obj[propName] == null)
-        throw new GradleException("Missing required property '${propName}' in ${obj.getClass().getName()}")
+        throw new Exception("Missing required property '${propName}' in ${obj.getClass().getName()}")
     } else {
       if(!obj.hasProperty(propName) || obj.properties[propName] == null)
-        throw new GradleException("Missing required property '${propName}' in ${obj.getClass().getName()}")
+        throw new Exception("Missing required property '${propName}' in ${obj.getClass().getName()}")
     }
   }
 

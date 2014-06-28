@@ -27,7 +27,7 @@ abstract class FarmServiceTask extends DefaultTask {
   @TaskAction
   void action() {
     FarmConfigurer configurer = new FarmConfigurer(project)
-    Farm farm = new Farm(servicePort: servicePort)
+    FarmExtension farm = new FarmExtension(servicePort: servicePort)
     configurer.configureFarm(farm, configurer.getProjectFarm(farmName))
     log.debug 'Sending command {} to port {}', command, farm.servicePort
     ServiceProtocol.send(farm.servicePort, command)

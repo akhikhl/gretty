@@ -30,8 +30,8 @@ class FarmStartTask extends StartBaseTask {
 
     FarmConfigurer configurer = new FarmConfigurer(project)
 
-    Farm tempFarm = new Farm()
-    configurer.configureFarm(tempFarm, new Farm(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName), new Farm(servletContainer: 'jetty9', managedClassReload: true))
+    FarmExtension tempFarm = new FarmExtension()
+    configurer.configureFarm(tempFarm, new FarmExtension(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName), new FarmExtension(servletContainer: 'jetty9', managedClassReload: true))
     doPrepareServerConfig(tempFarm.serverConfig)
 
     List<WebAppConfig> wconfigs = []

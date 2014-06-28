@@ -8,17 +8,12 @@
 package org.akhikhl.gretty
 
 import org.apache.commons.io.FilenameUtils
-import org.gradle.api.Project
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /**
  *
  * @author akhikhl
  */
 class WebAppConfig {
-
-  private static final Logger log = LoggerFactory.getLogger(WebAppConfig)
 
   def contextPath
   def initParameters
@@ -67,31 +62,7 @@ class WebAppConfig {
     fastReload.add(map)
   }
 
-  protected static WebAppConfig getDefaultForProject(Project project) {
-    WebAppConfig result = new WebAppConfig()
-    result.contextPath = '/' + project.name
-    result.realmConfigFile = null
-    result.jettyEnvXmlFile = 'jetty-env.xml'
-    result.fastReload = true
-    result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp/" as String
-    result.warResourceBase = ProjectUtils.getFinalArchivePath(project).toString()
-    result.projectPath = project.path
-    return result
-  }
-
-  protected static WebAppConfig getDefaultForMavenDependency(Project project, String dependency) {
-    WebAppConfig result = new WebAppConfig()
-    result.contextPath = '/' + dependency.split(':')[1]
-    result.warResourceBase = {
-      def gav = dependency.split(':')
-      def artifact = project.configurations.farm.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1] }
-      artifact.file.absolutePath
-    }
-    result.inplace = false
-    return result
-  }
-
-  protected static WebAppConfig getDefaultForWarFile(Project project, File warFile) {
+  static WebAppConfig getDefaultWebAppConfigForWarFile(File warFile) {
     WebAppConfig result = new WebAppConfig()
     String baseName = FilenameUtils.getBaseName(warFile.name)
     // remove version suffix
@@ -117,33 +88,6 @@ class WebAppConfig {
         contextPath = contextPath.substring(0, contextPath.length() - 1)
     }
     ConfigUtils.resolveClosures(initParameters)
-  }
-
-  protected void resolve(Project project, String servletContainer) {
-    
-    String servletContainerType = ServletContainerConfig.getConfig(servletContainer).servletContainerType
-    
-    boolean defaultRealmConfigFile = false
-    if(!realmConfigFile) {
-      defaultRealmConfigFile = true
-      if(servletContainerType == 'tomcat')
-        realmConfigFile = 'tomcat-users.xml'
-      else
-        realmConfigFile = 'jetty-realm.properties'
-    }
-    
-    if(servletContainerType == 'jetty' && !defaultRealmConfigFile && !realm)
-      log.warn 'Realm config file is specified, but realm is not specified.'
-    
-    def resolvedRealmConfigFile = ProjectUtils.resolveSingleFile(project, realmConfigFile)
-    if(!resolvedRealmConfigFile && !defaultRealmConfigFile)
-      log.warn 'The realm config file {} does not exist.', realmConfigFile
-    realmConfigFile = resolvedRealmConfigFile
-    
-    if(servletContainerType == 'jetty')
-      jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, jettyEnvXmlFile)
-    else
-      jettyEnvXmlFile = null
   }
 
   void scanDir(String value) {

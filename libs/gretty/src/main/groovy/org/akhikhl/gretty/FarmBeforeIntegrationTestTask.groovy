@@ -81,8 +81,8 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
 
   protected void passSystemPropertiesToIntegrationTask(Project webappProject, JavaForkOptions task) {
     FarmConfigurer configurer = new FarmConfigurer(project)
-    Farm tempFarm = new Farm()
-    configurer.configureFarm(tempFarm, new Farm(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
+    FarmExtension tempFarm = new FarmExtension()
+    configurer.configureFarm(tempFarm, new FarmExtension(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
     def options = tempFarm.webAppRefs.find { key, value -> configurer.resolveWebAppRefToProject(key) == webappProject }.value
     def webappConfig = configurer.getWebAppConfigForProject(options, webappProject, inplace)
     webappConfig.prepareToRun()

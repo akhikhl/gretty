@@ -26,8 +26,8 @@ abstract class AppServiceTask extends DefaultTask {
   @TaskAction
   void action() {
     ServerConfig serverConfig = new ServerConfig(servicePort: servicePort)
-    ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ServerConfig.getDefault(project))
-    serverConfig.resolve(project)
+    ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
+    ProjectUtils.resolveServerConfig(serverConfig, project)
     log.debug 'Sending command {} to port {}', command, serverConfig.servicePort
     ServiceProtocol.send(serverConfig.servicePort, command)
   }

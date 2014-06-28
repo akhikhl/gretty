@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import java.util.regex.Pattern
+import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
@@ -160,6 +161,54 @@ final class ProjectUtils {
     return urls
   }
 
+  static ServerConfig getDefaultServerConfig(Project project) {
+    ServerConfig result = new ServerConfig()
+    result.jvmArgs = []
+    result.servletContainer = 'jetty9'
+    result.managedClassReload = true
+    result.host = 'localhost'
+    result.httpEnabled = true
+    result.httpPort = 8080
+    // httpIdleTimeout defaults to null. This means: no idle timeout is set for http protocol.
+    result.httpsEnabled = false
+    result.httpsPort = 8443
+    // httpsIdleTimeout defaults to null. This means: no idle timeout is set for https protocol.
+    result.servicePort = 9900
+    result.statusPort = 9901
+    result.jettyXmlFile = 'jetty.xml'
+    result.scanInterval = 1
+    result.loggingLevel = 'INFO'
+    result.consoleLogEnabled = true
+    result.fileLogEnabled = true
+    result.logFileName = project.name
+    result.logDir = "${System.getProperty('user.home')}/logs" as String
+    return result
+  }
+
+  static WebAppConfig getDefaultWebAppConfigForProject(Project project) {
+    WebAppConfig result = new WebAppConfig()
+    result.contextPath = '/' + project.name
+    result.realmConfigFile = null
+    result.jettyEnvXmlFile = 'jetty-env.xml'
+    result.fastReload = true
+    result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp/" as String
+    result.warResourceBase = ProjectUtils.getFinalArchivePath(project).toString()
+    result.projectPath = project.path
+    return result
+  }
+
+  static WebAppConfig getDefaultWebAppConfigForMavenDependency(Project project, String dependency) {
+    WebAppConfig result = new WebAppConfig()
+    result.contextPath = '/' + dependency.split(':')[1]
+    result.warResourceBase = {
+      def gav = dependency.split(':')
+      def artifact = project.configurations.farm.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1] }
+      artifact.file.absolutePath
+    }
+    result.inplace = false
+    return result
+  }
+
   static List<FastReloadStruct> getFastReload(Project project, List fastReloads = null) {
     if(fastReloads == null)
       fastReloads = []
@@ -215,6 +264,73 @@ final class ProjectUtils {
       from getWebAppDir(project)
       into "${project.buildDir}/inplaceWebapp"
     }
+  }
+
+  static void resolveServerConfig(ServerConfig sconfig, Project project) {
+
+    def resolvedJvmArgs = []
+    for(def arg in sconfig.jvmArgs) {
+      while(arg instanceof Closure)
+        arg = arg()
+      if(arg != null)
+        resolvedJvmArgs.add(arg.toString())
+    }
+    sconfig.jvmArgs = resolvedJvmArgs
+
+    sconfig.sslKeyStorePath = resolveSingleFile(project, sconfig.sslKeyStorePath)
+    sconfig.sslTrustStorePath = resolveSingleFile(project, sconfig.sslTrustStorePath)
+
+    def f = resolveSingleFile(project, sconfig.jettyXmlFile)
+    if(f == null && sconfig.jettyXmlFile) {
+      def f2 = sconfig.jettyXmlFile
+      if(!(f2 instanceof File))
+        f2 = new File(f2)
+      if(!f2.isAbsolute()) {
+        String jettyHome = System.getenv('JETTY_HOME')
+        if(!jettyHome)
+          jettyHome = System.getProperty('jetty.home')
+        if(jettyHome != null) {
+          File f3 = new File(new File(jettyHome, 'etc'), f2.path)
+          if(f3.exists())
+            f = f3
+        }
+      }
+    }
+    sconfig.jettyXmlFile = f
+
+    f = ProjectUtils.resolveSingleFile(project, sconfig.logbackConfigFile)
+    if(f == null && sconfig.logbackConfigFile != 'logback.groovy')
+      f = ProjectUtils.resolveSingleFile(project, 'logback.groovy')
+    if(f == null && sconfig.logbackConfigFile != 'logback.xml')
+      f = ProjectUtils.resolveSingleFile(project, 'logback.xml')
+    sconfig.logbackConfigFile = f
+  }
+
+  static void resolveWebAppConfig(WebAppConfig wconfig, Project project, String servletContainer) {
+    
+    String servletContainerType = ServletContainerConfig.getConfig(servletContainer).servletContainerType
+    
+    boolean defaultRealmConfigFile = false
+    if(!wconfig.realmConfigFile) {
+      defaultRealmConfigFile = true
+      if(servletContainerType == 'tomcat')
+        wconfig.realmConfigFile = 'tomcat-users.xml'
+      else
+        wconfig.realmConfigFile = 'jetty-realm.properties'
+    }
+    
+    if(servletContainerType == 'jetty' && !defaultRealmConfigFile && !wconfig.realm)
+      log.warn 'Realm config file is specified, but realm is not specified.'
+    
+    def resolvedRealmConfigFile = ProjectUtils.resolveSingleFile(project, wconfig.realmConfigFile)
+    if(!resolvedRealmConfigFile && !defaultRealmConfigFile)
+      log.warn 'The realm config file {} does not exist.', wconfig.realmConfigFile
+    wconfig.realmConfigFile = resolvedRealmConfigFile
+    
+    if(servletContainerType == 'jetty')
+      wconfig.jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, wconfig.jettyEnvXmlFile)
+    else
+      wconfig.jettyEnvXmlFile = null
   }
 
   static List<File> resolveFile(Project project, file) {

@@ -102,10 +102,10 @@ class GrettyPlugin implements Plugin<Project> {
 
     project.extensions.create('gretty', GrettyExtension)
 
-    project.extensions.create('farm', Farm)
+    project.extensions.create('farm', FarmExtension)
     project.farm.integrationTestTask = 'integrationTest'
 
-    project.extensions.create('farms', Farms)
+    project.extensions.create('farms', FarmsExtension)
     project.farms.farmsMap[''] = project.farm
   }
 

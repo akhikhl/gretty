@@ -1,0 +1,35 @@
+apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('libs/publish.gradle')
+
+import org.apache.tools.ant.filters.*
+
+dependencies {
+  compile "ch.qos.logback:logback-classic:$logback_version"
+  compile 'commons-io:commons-io:2.4'
+  compile 'org.apache.commons:commons-lang3:3.3.2'
+  compile 'commons-configuration:commons-configuration:1.10'
+  compile 'org.bouncycastle:bcprov-jdk16:1.46'
+  compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
+  compile "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"
+}
+
+processResources {
+  filter ReplaceTokens, tokens: [
+    grettyVersion: project.version,
+    jetty7Version: project.jetty7_version,
+    jetty7ServletApi: project.jetty7_servlet_api,
+    jetty7ServletApiVersion: project.jetty7_servlet_api_version,
+    jetty8Version: project.jetty8_version,
+    jetty8ServletApi: project.jetty8_servlet_api,
+    jetty8ServletApiVersion: project.jetty8_servlet_api_version,
+    jetty9Version: project.jetty9_version,
+    jetty9ServletApi: project.jetty9_servlet_api,
+    jetty9ServletApiVersion: project.jetty9_servlet_api_version,
+    tomcat7Version: project.tomcat7_version,
+    tomcat7ServletApi: project.tomcat7_servlet_api,
+    tomcat7ServletApiVersion: project.tomcat7_servlet_api_version,
+    tomcat8Version: project.tomcat8_version,
+    tomcat8ServletApi: project.tomcat8_servlet_api,
+    tomcat8ServletApiVersion: project.tomcat8_servlet_api_version
+  ]
+}

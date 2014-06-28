@@ -7,15 +7,11 @@
  */
 package org.akhikhl.gretty
 
-import org.gradle.api.GradleException
-
-class GrettyExtension {
-
-  @Delegate
-  protected ServerConfig serverConfig = new ServerConfig()
-
-  @Delegate
-  protected WebAppConfig webAppConfig = new WebAppConfig()
+/**
+ *
+ * @author akhikhl
+ */
+class GrettyExtension extends GrettyConfig {
 
   protected List overlays = []
 
@@ -29,7 +25,7 @@ class GrettyExtension {
 
   void overlay(def newValue) {
     if(!(newValue instanceof String))
-      throw new GradleException("Overlay ${newValue?.toString()} should be a string")
+      throw new Exception("Overlay ${newValue?.toString()} should be a string")
     overlays.add newValue
   }
 }

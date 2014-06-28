@@ -28,11 +28,11 @@ class FarmConfigurer {
     this.project = project
   }
 
-  void configureFarm(Farm dstFarm, Farm[] srcFarms = []) {
-    ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ ServerConfig.getDefault(project) ])
+  void configureFarm(FarmExtension dstFarm, FarmExtension[] srcFarms = []) {
+    ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ ProjectUtils.getDefaultServerConfig(project) ])
     servletContainer = dstFarm.serverConfig.servletContainer
     managedClassReload = dstFarm.serverConfig.managedClassReload
-    dstFarm.serverConfig.resolve(project)
+    ProjectUtils.resolveServerConfig(dstFarm.serverConfig, project)
     for(def f in srcFarms)
       mergeWebAppRefMaps(dstFarm.webAppRefs, f.webAppRefs)
     if(!dstFarm.webAppRefs)
@@ -49,7 +49,7 @@ class FarmConfigurer {
     result
   }
 
-  Farm getProjectFarm(String sourceFarmName) {
+  FarmExtension getProjectFarm(String sourceFarmName) {
     def sourceFarm = project.farms.farmsMap[sourceFarmName]
     if(!sourceFarm)
       throw new GradleException("Farm '${sourceFarmName}' is not defined in project farms")
@@ -58,9 +58,9 @@ class FarmConfigurer {
 
   WebAppConfig getWebAppConfigForMavenDependency(Map options, String dependency) {
     WebAppConfig wconfig = new WebAppConfig()
-    ConfigUtils.complementProperties(wconfig, options, WebAppConfig.getDefaultForMavenDependency(project, dependency))
+    ConfigUtils.complementProperties(wconfig, options, ProjectUtils.getDefaultWebAppConfigForMavenDependency(project, dependency))
     wconfig.inplace = false // always war-file, ignore options.inplace
-    wconfig.resolve(null, servletContainer)
+    ProjectUtils.resolveWebAppConfig(wconfig, null, servletContainer)
     wconfig
   }
 
@@ -68,16 +68,16 @@ class FarmConfigurer {
     WebAppConfig wconfig = new WebAppConfig()
     if(!proj.extensions.findByName('gretty'))
       throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
-    ConfigUtils.complementProperties(wconfig, options, proj.gretty.webAppConfig, WebAppConfig.getDefaultForProject(proj), new WebAppConfig(inplace: inplace))
-    wconfig.resolve(proj, servletContainer)
+    ConfigUtils.complementProperties(wconfig, options, proj.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(proj), new WebAppConfig(inplace: inplace))
+    ProjectUtils.resolveWebAppConfig(wconfig, proj, servletContainer)
     wconfig
   }
 
   WebAppConfig getWebAppConfigForWarFile(Map options, File warFile) {
     WebAppConfig wconfig = new WebAppConfig()
-    ConfigUtils.complementProperties(wconfig, options, WebAppConfig.getDefaultForWarFile(project, warFile))
+    ConfigUtils.complementProperties(wconfig, options, WebAppConfig.getDefaultWebAppConfigForWarFile(warFile))
     wconfig.inplace = false // always war-file, ignore options.inplace
-    wconfig.resolve(null, servletContainer)
+    ProjectUtils.resolveWebAppConfig(wconfig, null, servletContainer)
     wconfig
   }
 
