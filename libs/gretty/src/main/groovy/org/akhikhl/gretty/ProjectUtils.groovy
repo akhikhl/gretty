@@ -265,8 +265,48 @@ final class ProjectUtils {
       into "${project.buildDir}/inplaceWebapp"
     }
   }
+  
+  static Set<URL> resolveClassPath(Project project, Collection<URL> classPath) {
+    def resolvedClassPath = new LinkedHashSet()
+    if(classPath == null)
+      return resolvedClassPath
+    for(def elem in classPath) {
+      while(elem instanceof Closure)
+        elem = elem()
+      if(elem != null) {
+        if(elem instanceof File) {
+          if(!elem.isAbsolute()) {
+            if(project == null)
+              elem = new File(System.getProperty('user.home'), elem.path).absolutePath
+            else
+              elem = new File(project.projectDir, elem.path)
+          }
+          elem = elem.toURI().toURL()
+        }
+        else if(elem instanceof URI)
+          elem = elem.toURL()
+        else if(!(elem instanceof URL)) {
+          elem = elem.toString()
+          if(!(elem =~ /.{2,}\:.+/)) { // no schema?
+            if(!new File(elem).isAbsolute()) {
+              if(project == null)
+                elem = new File(System.getProperty('user.home'), elem).absolutePath
+              else
+                elem = new File(project.projectDir, elem).absolutePath
+            }
+            if(!elem.startsWith('/'))
+              elem = '/' + elem
+            elem = 'file://' + elem
+          }
+          elem = new URL(elem.toString())
+        }
+        resolvedClassPath.add(elem)
+      }
+    }
+    resolvedClassPath
+  }
 
-  static void resolveServerConfig(ServerConfig sconfig, Project project) {
+  static void resolveServerConfig(Project project, ServerConfig sconfig) {
 
     def resolvedJvmArgs = []
     for(def arg in sconfig.jvmArgs) {
@@ -306,7 +346,7 @@ final class ProjectUtils {
     sconfig.logbackConfigFile = f
   }
 
-  static void resolveWebAppConfig(WebAppConfig wconfig, Project project, String servletContainer) {
+  static void resolveWebAppConfig(Project project, WebAppConfig wconfig, String servletContainer) {
     
     String servletContainerType = ServletContainerConfig.getConfig(servletContainer).servletContainerType
     

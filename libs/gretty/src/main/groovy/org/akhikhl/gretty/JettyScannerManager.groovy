@@ -17,16 +17,23 @@ import org.gradle.tooling.ProjectConnection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-final class ScannerManager {
+final class JettyScannerManager implements ScannerManager {
 
-  private static final Logger log = LoggerFactory.getLogger(ScannerManager)
+  private static final Logger log = LoggerFactory.getLogger(JettyScannerManager)
 
   protected Project project
   protected ServerConfig sconfig
   protected List<WebAppConfig> webapps
-  protected scanner
+  protected Scanner scanner
   protected Map fastReloadMap
   protected boolean managedClassReload
+  
+  JettyScannerManager(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean managedClassReload) {
+    this.project = project
+    this.sconfig = sconfig
+    this.webapps = webapps
+    this.managedClassReload = managedClassReload
+  }
 
   private static void collectScanDirs(Collection<File> scanDirs, boolean inplace, Project proj) {
     scanDirs.add(ProjectUtils.getWebAppDir(proj))
@@ -181,11 +188,8 @@ final class ScannerManager {
       ServiceProtocol.send(sconfig.servicePort, 'restart')
   }
 
-  final void startScanner(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean managedClassReload) {
-    this.project = project
-    this.sconfig = sconfig
-    this.webapps = webapps
-    this.managedClassReload = managedClassReload
+  @Override
+  void startScanner() {
     if(!sconfig.scanInterval) {
       if(sconfig.scanInterval == null)
         log.debug 'scanInterval not specified, hot deployment disabled'
@@ -201,7 +205,8 @@ final class ScannerManager {
     scanner.start()
   }
 
-  final void stopScanner() {
+  @Override
+  void stopScanner() {
     if(scanner != null) {
       log.info 'Stopping scanner'
       scanner.stop()

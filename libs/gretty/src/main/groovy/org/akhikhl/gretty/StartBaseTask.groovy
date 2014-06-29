@@ -33,6 +33,7 @@ abstract class StartBaseTask extends DefaultTask {
     LauncherConfig config = getLauncherConfig()
     CertificateGenerator.maybeGenerate(project, config.getServerConfig())
     Launcher launcher = anyWebAppUsesSpringBoot(config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
+    launcher.scannerManager = new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
     launcher.launch()
   }
   

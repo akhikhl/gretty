@@ -32,7 +32,7 @@ class FarmConfigurer {
     ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ ProjectUtils.getDefaultServerConfig(project) ])
     servletContainer = dstFarm.serverConfig.servletContainer
     managedClassReload = dstFarm.serverConfig.managedClassReload
-    ProjectUtils.resolveServerConfig(dstFarm.serverConfig, project)
+    ProjectUtils.resolveServerConfig(project, dstFarm.serverConfig)
     for(def f in srcFarms)
       mergeWebAppRefMaps(dstFarm.webAppRefs, f.webAppRefs)
     if(!dstFarm.webAppRefs)
@@ -60,7 +60,7 @@ class FarmConfigurer {
     WebAppConfig wconfig = new WebAppConfig()
     ConfigUtils.complementProperties(wconfig, options, ProjectUtils.getDefaultWebAppConfigForMavenDependency(project, dependency))
     wconfig.inplace = false // always war-file, ignore options.inplace
-    ProjectUtils.resolveWebAppConfig(wconfig, null, servletContainer)
+    ProjectUtils.resolveWebAppConfig(null, wconfig, servletContainer)
     wconfig
   }
 
@@ -69,7 +69,7 @@ class FarmConfigurer {
     if(!proj.extensions.findByName('gretty'))
       throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
     ConfigUtils.complementProperties(wconfig, options, proj.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(proj), new WebAppConfig(inplace: inplace))
-    ProjectUtils.resolveWebAppConfig(wconfig, proj, servletContainer)
+    ProjectUtils.resolveWebAppConfig(proj, wconfig, servletContainer)
     wconfig
   }
 
@@ -77,7 +77,7 @@ class FarmConfigurer {
     WebAppConfig wconfig = new WebAppConfig()
     ConfigUtils.complementProperties(wconfig, options, WebAppConfig.getDefaultWebAppConfigForWarFile(warFile))
     wconfig.inplace = false // always war-file, ignore options.inplace
-    ProjectUtils.resolveWebAppConfig(wconfig, null, servletContainer)
+    ProjectUtils.resolveWebAppConfig(null, wconfig, servletContainer)
     wconfig
   }
 

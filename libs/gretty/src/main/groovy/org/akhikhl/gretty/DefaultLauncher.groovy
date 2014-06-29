@@ -31,6 +31,8 @@ class DefaultLauncher implements Launcher {
   protected ServerConfig sconfig
   protected Iterable<WebAppConfig> webAppConfigs
   protected final ExecutorService executorService
+  
+  ScannerManager scannerManager
 
   DefaultLauncher(Project project, LauncherConfig config) {
     this.project = project
@@ -123,7 +125,7 @@ class DefaultLauncher implements Launcher {
 
     Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
     def runThread = Thread.start {
-      launchProcess()
+      launchProcess()      
     }
     def status = futureStatus.get()
     log.debug 'Got init status: {}', status
@@ -176,18 +178,17 @@ class DefaultLauncher implements Launcher {
   }
 
   protected void launchProcess() {
-
     sconfig.onStart*.call()
-
-    ScannerManager scanman = new ScannerManager()
-    scanman.startScanner(project, sconfig, webAppConfigs, config.getManagedClassReload())
     try {
-      project.javaexec this.&configureJavaExec
+      scannerManager?.startScanner()
+      try {
+        project.javaexec this.&configureJavaExec
+      } finally {
+        scannerManager?.stopScanner()
+      }
     } finally {
-      scanman.stopScanner()
+      sconfig.onStop*.call()
     }
-
-    sconfig.onStop*.call()
   }
 
   protected Collection<URL> resolveWebAppClassPath(WebAppConfig wconfig) {
@@ -196,40 +197,7 @@ class DefaultLauncher implements Launcher {
       def proj = project.project(wconfig.projectPath)
       String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtime'
       resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, wconfig.inplace, runtimeConfig))
-      if(wconfig.classPath != null)
-        for(def elem in wconfig.classPath) {
-          while(elem instanceof Closure)
-            elem = elem()
-          if(elem != null) {
-            if(elem instanceof File) {
-              if(!elem.isAbsolute()) {
-                if(proj == null)
-                  elem = new File(System.getProperty('user.home'), elem.path).absolutePath
-                else
-                  elem = new File(proj.projectDir, elem.path)
-              }
-              elem = elem.toURI().toURL()
-            }
-            else if(elem instanceof URI)
-              elem = elem.toURL()
-            else if(!(elem instanceof URL)) {
-              elem = elem.toString()
-              if(!(elem =~ /.{2,}\:.+/)) { // no schema?
-                if(!new File(elem).isAbsolute()) {
-                  if(proj == null)
-                    elem = new File(System.getProperty('user.home'), elem).absolutePath
-                  else
-                    elem = new File(proj.projectDir, elem).absolutePath
-                }
-                if(!elem.startsWith('/'))
-                  elem = '/' + elem
-                elem = 'file://' + elem
-              }
-              elem = new URL(elem.toString())
-            }
-            resolvedClassPath.add(elem)
-          }
-        }
+      resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
     }
     return resolvedClassPath
   }

@@ -11,11 +11,9 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-interface Launcher {
-  
-  ScannerManager getScannerManager()
-
-  void launch()
-  
-  void setScannerManager(ScannerManager newValue)
+interface ScannerManager {
+	
+  void startScanner()
+  void stopScanner()
 }
+

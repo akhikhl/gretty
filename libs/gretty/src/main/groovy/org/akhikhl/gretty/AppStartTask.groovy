@@ -39,12 +39,12 @@ class AppStartTask extends StartBaseTask {
     ServerConfig sconfig = new ServerConfig()
     ConfigUtils.complementProperties(sconfig, serverConfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
     sconfig.servletContainer = getCompatibleServletContainer(sconfig.servletContainer)
-    ProjectUtils.resolveServerConfig(sconfig, project)
+    ProjectUtils.resolveServerConfig(project, sconfig)
     doPrepareServerConfig(sconfig)
 
     WebAppConfig wconfig = new WebAppConfig()
     ConfigUtils.complementProperties(wconfig, webAppConfig, project.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(project), new WebAppConfig(inplace: true))
-    ProjectUtils.resolveWebAppConfig(wconfig, project, sconfig.servletContainer)
+    ProjectUtils.resolveWebAppConfig(project, wconfig, sconfig.servletContainer)
     doPrepareWebAppConfig(wconfig)
 
     new StartConfig() {
