@@ -24,6 +24,8 @@ interface LauncherConfig {
   ServerConfig getServerConfig()
   
   String getStopTaskName()
+  
+  WebAppClassPathResolver getWebAppClassPathResolver()
 
   Iterable<WebAppConfig> getWebAppConfigs()
 }
