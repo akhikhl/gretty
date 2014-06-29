@@ -15,8 +15,6 @@ interface LauncherConfig {
 
   boolean getDebug()
   
-  boolean getIntegrationTest()
-  
   boolean getInteractive()
   
   def getJacocoConfig()

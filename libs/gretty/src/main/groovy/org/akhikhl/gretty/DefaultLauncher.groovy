@@ -118,13 +118,29 @@ class DefaultLauncher implements Launcher {
     project.configurations.grettySpringLoaded.singleFile
   }
 
-  final void launch() {
+  @Override
+  void launch() {
+    Thread thread = launchThread()
+
+    if(config.getInteractive()) {
+      System.out.println 'Press any key to stop the server.'
+      System.in.read()
+      log.debug 'Sending command: {}', 'stop'
+      ServiceProtocol.send(sconfig.servicePort, 'stop')
+    } else
+      System.out.println "Run 'gradle ${config.getStopTaskName()}' to stop the server."
+    thread.join()
+    log.warn '{} stopped.', getServletContainerConfig().fullName
+  }
+  
+  @Override
+  Thread launchThread() {
 
     for(WebAppConfig webAppConfig in webAppConfigs)
       prepareToRun(webAppConfig)
 
     Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
-    def runThread = Thread.start {
+    def thread = Thread.start {
       launchProcess()      
     }
     def status = futureStatus.get()
@@ -161,20 +177,8 @@ class DefaultLauncher implements Launcher {
         log.warn '{} runs at the address https://{}:{}{}', webappName, sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
     }
     log.info 'servicePort: {}, statusPort: {}', sconfig.servicePort, sconfig.statusPort
-
-    if(config.getIntegrationTest())
-      project.ext.grettyRunnerThread = runThread
-    else {
-      if(config.getInteractive()) {
-        System.out.println 'Press any key to stop the server.'
-        System.in.read()
-        log.debug 'Sending command: {}', 'stop'
-        ServiceProtocol.send(sconfig.servicePort, 'stop')
-      } else
-        System.out.println "Run 'gradle ${config.getStopTaskName()}' to stop the server."
-      runThread.join()
-      log.warn '{} stopped.', getServletContainerConfig().fullName
-    }
+    
+    thread
   }
 
   protected void launchProcess() {

@@ -34,7 +34,10 @@ abstract class StartBaseTask extends DefaultTask {
     CertificateGenerator.maybeGenerate(project, config.getServerConfig())
     Launcher launcher = anyWebAppUsesSpringBoot(config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
     launcher.scannerManager = new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
-    launcher.launch()
+    if(getIntegrationTest())
+      project.ext.grettyLaunchThread = launcher.launchThread()
+    else
+      launcher.launch()
   }
   
   protected final boolean anyWebAppUsesSpringBoot(Iterable<WebAppConfig> wconfigs) {
@@ -84,10 +87,6 @@ abstract class StartBaseTask extends DefaultTask {
         
       boolean getDebug() {
         self.debug
-      }
-
-      boolean getIntegrationTest() {
-        self.getIntegrationTest()
       }
   
       boolean getInteractive() {

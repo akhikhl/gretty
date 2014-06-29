@@ -17,5 +17,7 @@ interface Launcher {
 
   void launch()
   
+  Thread launchThread()
+  
   void setScannerManager(ScannerManager newValue)
 }

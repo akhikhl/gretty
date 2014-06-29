@@ -28,9 +28,9 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
   @TaskAction
   void action() {
     super.action()
-    if(project.ext.has('grettyRunnerThread') && project.ext.grettyRunnerThread != null) {
-      project.ext.grettyRunnerThread.join()
-      project.ext.grettyRunnerThread = null
+    if(project.ext.has('grettyLaunchThread') && project.ext.grettyLaunchThread != null) {
+      project.ext.grettyLaunchThread.join()
+      project.ext.grettyLaunchThread = null
     }
     System.out.println 'Jetty server stopped.'
   }
