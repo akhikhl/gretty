@@ -6,6 +6,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven' // need this for installing artifacts locally
 
 repositories {
+  mavenLocal()
   jcenter()
 }
   

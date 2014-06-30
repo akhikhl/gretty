@@ -36,10 +36,12 @@ class DefaultLauncher extends LauncherBase {
     ServletContainerConfig.getConfig(sconfig.servletContainer)
   }
 
+  @Override
   protected String getServletContainerName() {
     getServletContainerConfig().fullName
   }
 
+  @Override
   protected void javaExec(JavaExecParams params) {
     project.javaexec { JavaExecSpec spec ->
       spec.classpath = project.files(params.classpath)

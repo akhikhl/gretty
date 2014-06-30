@@ -123,10 +123,14 @@ class ServletContainerConfig {
     result
   }
 
+  static Set getConfigNames() {
+    configs.keySet().asImmutable()
+  }
+
   static Map getConfigs() {
     configs.asImmutable()
   }
-  
+
   static String getJettyCompatibleServletContainer(String servletContainer) {
     def config = getConfig(servletContainer)
     if(config.servletContainerType == 'jetty')

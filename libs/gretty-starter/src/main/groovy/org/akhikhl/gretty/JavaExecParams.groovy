@@ -7,21 +7,24 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.ToString
+
 /**
  *
  * @author akhikhl
  */
+@ToString
 class JavaExecParams {
-
-  List<String> args = []
 
   Collection<URL> classpath = []
 
-  boolean debug = false
+  String main
 
   List<String> jvmArgs = []
 
-  String main
+  List<String> args = []
+
+  boolean debug = false
 
   Map<String, String> systemProperties = [:]
 
