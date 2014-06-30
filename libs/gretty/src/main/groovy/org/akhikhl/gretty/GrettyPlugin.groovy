@@ -571,7 +571,10 @@ class GrettyPlugin implements Plugin<Project> {
       
       ServletContainerConfig.getConfigNames().each { servletContainer ->
         product configBaseName: 'gretty', suffix: servletContainer, launchers: [ 'shell', 'windows' ], 
-          productInfo: [ 'servletContainer': ServletContainerConfig.getConfig(servletContainer).fullName ]
+          productInfo: [ 'servletContainer': ServletContainerConfig.getConfig(servletContainer).fullName ],
+          additionalProductFiles: {
+            // TODO: implement additional product files
+          }
       }
       
       afterEvaluate {
@@ -589,6 +592,8 @@ class GrettyPlugin implements Plugin<Project> {
         WebAppConfig wconfig = new WebAppConfig()
         ConfigUtils.complementProperties(wconfig, project.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(project))
         ProjectUtils.resolveWebAppConfig(project, wconfig, sconfig.servletContainer)
+        
+        project.buildDir
       }
     }
   }
