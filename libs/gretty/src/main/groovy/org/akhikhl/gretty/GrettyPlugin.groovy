@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty
 
+import org.akhikhl.gradle.onejar.OneJarConfigurer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
@@ -44,6 +45,10 @@ class GrettyPlugin implements Plugin<Project> {
       grettySpringLoaded {
         transitive = false
       }
+      grettyStarter
+      grettyStarterMain {
+        transitive = false
+      }
     }
     if(!project.configurations.findByName('providedCompile'))
       project.configurations {
@@ -72,6 +77,8 @@ class GrettyPlugin implements Plugin<Project> {
         exclude group: 'javax.servlet', module: 'javax.servlet-api'
       }
       grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
+      grettyStarter "org.akhikhl.gretty:gretty-starter:$grettyVersion"
+      grettyStarterMain "org.akhikhl.gretty:gretty-starter:$grettyVersion"
     }
 
     ServletContainerConfig.getConfig(project.gretty.servletContainer).with { config ->
@@ -538,6 +545,8 @@ class GrettyPlugin implements Plugin<Project> {
 
     addTaskDependencies(project)
 
+    configureProducts(project)
+
     project.afterEvaluate {
 
       addRepositories(project)
@@ -547,4 +556,20 @@ class GrettyPlugin implements Plugin<Project> {
 
     } // afterEvaluate
   } // apply
+
+  private void configureProducts(Project project) {
+
+    new OneJarConfigurer([ runTaskName: 'runProduct', debugTaskName: 'debugProduct', suppressBuildTaskDependency: true, runtimeConfiguration: 'grettyStarter' ], project).apply()
+
+    project.onejar {
+      mainJar = { project.configurations.grettyStarterMain.singleFile }
+      mainClass = 'org.akhikhl.gretty.GrettyStarter'
+      product configBaseName: 'gretty', launchers: [ 'shell', 'windows' ]
+      product configBaseName: 'gretty', suffix: 'jetty7', launchers: [ 'shell', 'windows' ]
+      product configBaseName: 'gretty', suffix: 'jetty8', launchers: [ 'shell', 'windows' ]
+      product configBaseName: 'gretty', suffix: 'jetty9', launchers: [ 'shell', 'windows' ]
+      product configBaseName: 'gretty', suffix: 'tomcat7', launchers: [ 'shell', 'windows' ]
+      product configBaseName: 'gretty', suffix: 'tomcat8', launchers: [ 'shell', 'windows' ]
+    }
+  }
 }

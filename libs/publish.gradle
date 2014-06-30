@@ -1,11 +1,27 @@
 // include this file in subprojects:
 // apply from: rootProject.file('libs/publish.gradle')
 
-apply plugin: 'signing'
-apply plugin: 'maven-publish'
-apply plugin: 'bintray'
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
 
-import org.gradle.api.internal.artifacts.publish.DefaultPublishArtifact
+  dependencies {
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.4'
+  }
+}
+
+import com.jfrog.bintray.gradle.BintrayPlugin
+
+apply plugin: 'maven-publish'
+apply plugin: BintrayPlugin
+
+if( !hasProperty( 'bintrayUser' ) )
+  ext.bintrayUser = ''
+
+if( !hasProperty( 'bintrayKey' ) )
+  ext.bintrayKey = ''
 
 def thisProject = project
 
@@ -40,31 +56,19 @@ install.repositories.mavenInstaller.pom*.whenConfigured { pom ->
 }
 
 bintray {
-  user = project.hasProperty('bintrayUser') ? project.bintrayUser : ''
-  key = project.hasProperty('bintrayKey') ? project.bintrayKey : ''
+  user = project.bintrayUser
+  key = project.bintrayKey
   configurations = ['archives']
   pkg {
     repo = 'maven'
     name = thisProject.rootProject.project_id
     desc = thisProject.rootProject.description
-    licenses = ['MIT']
-    labels = ['gretty', 'jetty', 'gradle', 'plugin']
+    licenses = [ thisProject.rootProject.license ]
+    labels = thisProject.rootProject.labels
   }
   dryRun = false
 }
 
-bintrayUpload {
-  doFirst {
-    def signatureArtifacts = []
-    collectArtifacts(project.configurations.archives).each { a ->
-      def s = signing.sign(a.file)
-      s.signatureFiles.each { f ->
-        def fname = f.name
-        def ext = fname.substring(fname.lastIndexOf('.') + 1)
-        signatureArtifacts.add(new DefaultPublishArtifact(a.name, a.extension + '.' + ext, ext, a.classifier, new Date(), f, [] as Object[]))
-      }
-    }
-    project.configurations.archives.artifacts.addAll(signatureArtifacts)
-  }
-}
+bintrayUpload.dependsOn assemble
+bintrayUpload.finalizedBy parent.tasks.bintraySign
 

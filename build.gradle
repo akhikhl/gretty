@@ -1,12 +1,3 @@
-group = 'org.akhikhl.gretty'
-version = '1.0.0'
-
-repositories {
-  mavenLocal()
-  jcenter()
-  maven { url "http://repo.spring.io/release" }
-}
-
 ext {
   project_id = 'gretty'
   project_description = 'Advanced gradle plugin for running web-apps on jetty'
@@ -16,8 +7,11 @@ ext {
   project_scm = "scm:git@github.com:${developer_id}/${project_id}.git"
   license = 'The MIT License'
   license_url = "https://raw.github.com/${developer_id}/${project_id}/master/license.txt"
+  labels = ['gretty', 'jetty', 'gradle', 'plugin', 'spring', 'spring-boot']
 }
 
+group = 'org.akhikhl.gretty'
+version = '1.0.0'
 description = ext.project_description
 
 apply plugin: 'base' // import clean task

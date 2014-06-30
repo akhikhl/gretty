@@ -11,11 +11,10 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-class GrettyConfig {
+class GrettyStarter {
 
-  @Delegate
-  protected ServerConfig serverConfig = new ServerConfig()
-
-  @Delegate
-  protected WebAppConfig webAppConfig = new WebAppConfig()
+  static void main(String[] args) {
+    println 'Hello, world!'
+  }
 }
+

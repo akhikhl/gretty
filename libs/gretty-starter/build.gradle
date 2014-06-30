@@ -33,3 +33,7 @@ processResources {
     tomcat8ServletApiVersion: project.tomcat8_servlet_api_version
   ]
 }
+
+jar {
+  manifest { attributes 'Main-Class': 'org.akhikhl.gretty.GrettyStarter' }
+}

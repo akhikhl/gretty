@@ -1,0 +1,36 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+    maven { url 'http://dl.bintray.com/content/noamt/gradle-plugins' }
+  }
+
+  dependencies {
+    classpath 'org._10ne.gradle:rest-gradle-plugin:0.1.1'
+  }
+}
+
+import org._10ne.gradle.rest.RestPlugin
+import org._10ne.gradle.rest.RestTask
+
+apply plugin: RestPlugin
+
+if( !hasProperty( 'bintrayUser' ) )
+  ext.bintrayUser = ''
+
+if( !hasProperty( 'bintrayKey' ) )
+  ext.bintrayKey = ''
+
+if( !hasProperty( 'keyPhrase' ) )
+  ext.keyPhrase = ''
+
+task bintraySign(type: RestTask) {
+  description 'Push to bintray and sign it.'
+  httpMethod = 'post'
+  uri = "https://api.bintray.com/gpg/${rootProject.ext.developer_id}/maven/${rootProject.ext.project_id}/versions/${rootProject.version}"
+  username = project.bintrayUser
+  password = project.bintrayKey
+  requestBody = [ passphrase: project.keyPhrase ]
+  contentType = groovyx.net.http.ContentType.JSON  
+}
+
