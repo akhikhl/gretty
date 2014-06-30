@@ -24,14 +24,13 @@ abstract class StartBaseTask extends DefaultTask {
   boolean debug = false
 
   private JacocoHelper jacocoHelper
-  
+
   protected final List<Closure> prepareServerConfigClosures = []
   protected final List<Closure> prepareWebAppConfigClosures = []
 
   @TaskAction
   void action() {
     LauncherConfig config = getLauncherConfig()
-    CertificateGenerator.maybeGenerate(project, config.getServerConfig())
     Launcher launcher = anyWebAppUsesSpringBoot(config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
     launcher.scannerManager = new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
     if(getIntegrationTest())
@@ -39,21 +38,40 @@ abstract class StartBaseTask extends DefaultTask {
     else
       launcher.launch()
   }
-  
+
   protected final boolean anyWebAppUsesSpringBoot(Iterable<WebAppConfig> wconfigs) {
-    wconfigs.find { wconfig -> 
+    wconfigs.find { wconfig ->
       wconfig.springBoot || (wconfig.projectPath && ProjectUtils.isSpringBootApp(project.project(wconfig.projectPath)))
     }
   }
-  
+
   protected final void doPrepareServerConfig(ServerConfig sconfig) {
+
+    CertificateGenerator.maybeGenerate(project, sconfig)
+
+    String jacocoConfigJvmArg = getJacoco()?.getAsJvmArg()
+    if(jacocoConfigJvmArg) {
+      log.debug 'jacoco jvmArg: {}', jacocoConfigJvmArg
+      sconfig.getServerConfig().jvmArgs jacocoConfigJvmArg
+    }
+
+    if(getManagedClassReload(sconfig)) {
+      sconfig.jvmArgs '-javaagent:' + project.configurations.grettySpringLoaded.singleFile.absolutePath, '-noverify'
+      sconfig.systemProperty 'springloaded', 'exclusions=org.akhikhl.gretty..*'
+    }
+
+    // Speeding up tomcat startup, according to http://wiki.apache.org/tomcat/HowTo/FasterStartUp
+    // ATTENTION: replacing the blocking entropy source (/dev/random) with a non-blocking one
+    // actually reduces security because you are getting less-random data.
+    sconfig.systemProperty 'java.security.egd', 'file:/dev/./urandom'
+
     for(Closure c in prepareServerConfigClosures) {
       c = c.rehydrate(sconfig, c.owner, c.thisObject)
       c.resolveStrategy = Closure.DELEGATE_FIRST
       c()
     }
   }
-  
+
   protected final void doPrepareWebAppConfig(WebAppConfig wconfig) {
     for(Closure c in prepareWebAppConfigClosures) {
       c = c.rehydrate(wconfig, c.owner, c.thisObject)
@@ -79,22 +97,18 @@ abstract class StartBaseTask extends DefaultTask {
   }
 
   protected final LauncherConfig getLauncherConfig() {
-  
+
     def self = this
     def startConfig = getStartConfig()
 
     new LauncherConfig() {
-        
+
       boolean getDebug() {
         self.debug
       }
-  
+
       boolean getInteractive() {
         self.getInteractive()
-      }
-
-      def getJacocoConfig() {
-        self.jacoco
       }
 
       boolean getManagedClassReload() {
@@ -104,11 +118,11 @@ abstract class StartBaseTask extends DefaultTask {
       ServerConfig getServerConfig() {
         startConfig.getServerConfig()
       }
-  
+
       String getStopTaskName() {
         self.getStopTaskName()
       }
-      
+
       WebAppClassPathResolver getWebAppClassPathResolver() {
         new WebAppClassPathResolver() {
           Collection<URL> resolveWebAppClassPath(WebAppConfig wconfig) {
@@ -129,7 +143,7 @@ abstract class StartBaseTask extends DefaultTask {
       }
     }
   }
-  
+
   protected boolean getManagedClassReload(ServerConfig sconfig) {
     sconfig.managedClassReload
   }
@@ -141,11 +155,11 @@ abstract class StartBaseTask extends DefaultTask {
   final void jacoco(Closure configureClosure) {
     getJacoco()?.with configureClosure
   }
-  
+
   final void prepareServerConfig(Closure closure) {
     prepareServerConfigClosures.add(closure)
   }
-  
+
   final void prepareWebAppConfig(Closure closure) {
     prepareWebAppConfigClosures.add(closure)
   }

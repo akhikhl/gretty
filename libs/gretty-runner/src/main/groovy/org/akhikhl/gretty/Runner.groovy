@@ -19,8 +19,14 @@ final class Runner {
   protected boolean paramsLoaded = false
 
   static void main(String[] args) {
-    assert args.length != 0
-    Map params = new JsonSlurper().parseText(args[0])
+    def cli = new CliBuilder()
+    cli.with {
+      sv longOpt: 'servicePort', required: true, args: 1, argName: 'servicePort', type: Integer, 'service port'
+      st longOpt: 'statusPort', required: true, args: 1, argName: 'statusPort', type: Integer, 'status port'
+      smf longOpt: 'serverManagerFactory', required: true, args: 1, argName: 'serverManagerFactory', type: String, 'server manager factory'
+    }
+    def options = cli.parse(args)
+    Map params = [ servicePort: options.servicePort as int, statusPort: options.statusPort as int, serverManagerFactory: options.serverManagerFactory ]
     new Runner(params).run()
   }
 
@@ -63,5 +69,5 @@ final class Runner {
     } catch(Exception e) {
       throw new RuntimeException(e)
     }
-  }  
+  }
 }

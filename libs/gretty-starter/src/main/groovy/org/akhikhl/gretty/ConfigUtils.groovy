@@ -32,6 +32,8 @@ class ConfigUtils {
               dst[propName] = src[propName]
             else if(Collection.class.isAssignableFrom(prop.type))
               dst[propName].addAll(src[propName])
+            else if(Map.class.isAssignableFrom(prop.type))
+              dst[propName].putAll(src[propName])
           }
         }
       else
@@ -42,6 +44,8 @@ class ConfigUtils {
               dst[propName] = src[propName]
             else if(Collection.class.isAssignableFrom(prop.type))
               dst[propName].addAll(src[propName])
+            else if(Map.class.isAssignableFrom(prop.type))
+              dst[propName].putAll(src[propName])
           }
         }
     }

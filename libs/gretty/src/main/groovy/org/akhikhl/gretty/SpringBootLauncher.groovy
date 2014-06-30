@@ -23,15 +23,15 @@ import org.slf4j.LoggerFactory
 class SpringBootLauncher extends DefaultLauncher {
 
   protected static final Logger log = LoggerFactory.getLogger(SpringBootLauncher)
-  
+
   SpringBootLauncher(Project project, LauncherConfig config) {
     super(project, config)
   }
 
   @Override
-  protected FileCollection getRunnerClassPath() {
+  protected Collection<URL> getRunnerClassPath() {
     def servletContainerConfig = getServletContainerConfig()
-    def files = project.configurations.grettyNoSpringBoot.files + 
+    def files = project.configurations.grettyNoSpringBoot.files +
       project.configurations[servletContainerConfig.servletContainerRunnerConfig].files
     if(servletContainerConfig.servletContainerType == 'jetty')
       files += project.configurations.grettyRunnerSpringBootJetty.files
@@ -44,9 +44,9 @@ class SpringBootLauncher extends DefaultLauncher {
           files += resolveWebAppClassPath(wconfig)
       }
     }
-    project.files(files)
+    files.collect { it.toURL() }
   }
-  
+
   @Override
   protected String getServerManagerFactory() {
     'org.akhikhl.gretty.SpringBootServerManagerFactory'

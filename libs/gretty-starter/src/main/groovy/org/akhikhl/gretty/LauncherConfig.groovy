@@ -14,17 +14,15 @@ package org.akhikhl.gretty
 interface LauncherConfig {
 
   boolean getDebug()
-  
+
   boolean getInteractive()
-  
-  def getJacocoConfig()
-  
+
   boolean getManagedClassReload()
 
   ServerConfig getServerConfig()
-  
+
   String getStopTaskName()
-  
+
   WebAppClassPathResolver getWebAppClassPathResolver()
 
   Iterable<WebAppConfig> getWebAppConfigs()

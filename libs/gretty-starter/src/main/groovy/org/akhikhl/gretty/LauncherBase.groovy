@@ -28,7 +28,7 @@ abstract class LauncherBase implements Launcher {
   protected final Iterable<WebAppConfig> webAppConfigs
   protected final WebAppClassPathResolver classPathResolver
   protected final ExecutorService executorService
-  
+
   ScannerManager scannerManager
 
   LauncherBase(LauncherConfig config) {
@@ -39,16 +39,6 @@ abstract class LauncherBase implements Launcher {
     executorService = Executors.newSingleThreadExecutor()
   }
 
-  protected getCommandLineJson() {
-    def json = new JsonBuilder()
-    json {
-      servicePort sconfig.servicePort
-      statusPort sconfig.statusPort
-      serverManagerFactory getServerManagerFactory()
-    }
-    json
-  }
-
   private getRunConfigJson() {
     def json = new JsonBuilder()
     json {
@@ -56,6 +46,8 @@ abstract class LauncherBase implements Launcher {
     }
     json
   }
+
+  protected abstract Collection<URL> getRunnerClassPath()
 
   protected String getServerManagerFactory() {
     'org.akhikhl.gretty.ServerManagerFactory'
@@ -78,8 +70,19 @@ abstract class LauncherBase implements Launcher {
     log.warn '{} stopped.', getServletContainerName()
   }
 
-  protected abstract void launchProcess()
-  
+  protected abstract void javaExec(JavaExecParams params)
+
+  protected void launchProcess() {
+    JavaExecParams params = new JavaExecParams()
+    params.classpath = getRunnerClassPath()
+    params.main = 'org.akhikhl.gretty.Runner'
+    params.args = [ "--servicePort=${sconfig.servicePort}", "--statusPort=${sconfig.statusPort}", "--serverManagerFactory=${getServerManagerFactory()}" ]
+    params.debug = config.getDebug()
+    params.jvmArgs = sconfig.jvmArgs
+    params.systemProperties = sconfig.systemProperties
+    javaExec(params)
+  }
+
   @Override
   Thread launchThread() {
 
@@ -98,7 +101,7 @@ abstract class LauncherBase implements Launcher {
         }
       } finally {
         sconfig.onStop*.call()
-      }      
+      }
     }
     def status = futureStatus.get()
     log.debug 'Got init status: {}', status
@@ -134,7 +137,7 @@ abstract class LauncherBase implements Launcher {
         log.warn '{} runs at the address https://{}:{}{}', webappName, sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
     }
     log.info 'servicePort: {}, statusPort: {}', sconfig.servicePort, sconfig.statusPort
-    
+
     thread
   }
 

@@ -14,6 +14,7 @@ package org.akhikhl.gretty
 class ServerConfig {
 
   List<String> jvmArgs
+  Map<String, String> systemProperties
   String servletContainer
   Boolean managedClassReload
   String host
@@ -47,11 +48,11 @@ class ServerConfig {
     httpPort
   }
 
-  void jvmArg(Object... args) {
+  void jvmArg(Object a) {
     if(args) {
       if(jvmArgs == null)
         jvmArgs = []
-      jvmArgs.addAll(args)
+      jvmArgs.add(args)
     }
   }
 
@@ -89,5 +90,19 @@ class ServerConfig {
 
   void setPort(Integer newValue) {
     httpPort = newValue
+  }
+
+  void systemProperty(String name, Object value) {
+    if(systemProperties == null)
+      systemProperties = [:]
+    systemProperties[name] = value
+  }
+
+  void systemProperties(Map<String, Object> m) {
+    if(m) {
+      if(systemProperties == null)
+        systemProperties = [:]
+      systemProperties << m
+    }
   }
 }
