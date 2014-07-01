@@ -54,8 +54,8 @@ class FarmStartTask extends StartBaseTask {
   }
 
   @Override
-  protected String getStopTaskName() {
-    'farmStop' + farmName
+  protected String getStopCommand() {
+    "gradle farmStop${farmName}"
   }
 
   Iterable<WebAppConfig> getWebAppConfigsForProjects() {

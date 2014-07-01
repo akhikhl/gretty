@@ -30,11 +30,12 @@ class CertificateGenerator {
 
   protected static boolean providerAdded = false
 	
-  static void maybeGenerate(Project project, ServerConfig sconfig) {
+  // returns list of generated files
+  static List<File> maybeGenerate(Project project, ServerConfig sconfig) {
     
     if(!sconfig.httpsEnabled) {
       log.debug 'https not enabled, certificate generator will be disabled'
-      return 
+      return []
     }
     
     if(!providerAdded) {
@@ -44,13 +45,13 @@ class CertificateGenerator {
     
     if(sconfig.sslKeyStorePath) {
       log.warn 'Using cryptographic key and certificate from: {}', sconfig.sslKeyStorePath
-      return
+      return []
     }
     
     File dir = new File(project.buildDir, 'ssl')
     File keystoreFile = new File(dir, 'keystore')
     File certFile = new File(dir, 'cert')
-    File propertiesFile = new File(dir, 'properties')
+    File propertiesFile = new File(dir, 'properties')    
     String sslKeyStorePassword
     String sslKeyManagerPassword
     if(!keystoreFile.exists() || !certFile.exists() || !propertiesFile.exists()) {
@@ -105,6 +106,7 @@ class CertificateGenerator {
     sconfig.sslKeyStorePath = keystoreFile
     sconfig.sslKeyStorePassword = sslKeyStorePassword
     sconfig.sslKeyManagerPassword = sslKeyManagerPassword
+    return [keystoreFile, certFile]
   }
 }
 

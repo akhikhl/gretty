@@ -119,8 +119,8 @@ abstract class StartBaseTask extends DefaultTask {
         startConfig.getServerConfig()
       }
 
-      String getStopTaskName() {
-        self.getStopTaskName()
+      String getStopCommand() {
+        self.getStopCommand()
       }
 
       WebAppClassPathResolver getWebAppClassPathResolver() {
@@ -150,7 +150,7 @@ abstract class StartBaseTask extends DefaultTask {
 
   protected abstract StartConfig getStartConfig()
 
-  protected abstract String getStopTaskName()
+  protected abstract String getStopCommand()
 
   final void jacoco(Closure configureClosure) {
     getJacoco()?.with configureClosure

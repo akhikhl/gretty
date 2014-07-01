@@ -24,12 +24,18 @@ class StarterLauncher extends LauncherBase {
 
   @Override
   protected String getServletContainerName() {
-    'test'
+    config.getServerConfig().servletContainer
   }
 
   @Override
   protected void javaExec(JavaExecParams params) {
     println "javaExec $params"
+    def javaPath = new File(System.getProperty("java.home"), 'bin/java').absolutePath
+    def procParams = [ javaPath ] + params.jvmArgs + [ params.main ] + params.args
+    ProcessBuilder pb = new ProcessBuilder(procParams as String[])
+    Process proc = pb.start()
+    proc.consumeProcessOutput(System.out, System.err)
+    proc.waitFor()
   }
 }
 

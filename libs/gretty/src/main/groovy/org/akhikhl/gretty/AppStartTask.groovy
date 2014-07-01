@@ -62,7 +62,7 @@ class AppStartTask extends StartBaseTask {
   }
 
   @Override
-  protected String getStopTaskName() {
-    'appStop'
+  protected String getStopCommand() {
+    'gradle appStop'
   }
 }

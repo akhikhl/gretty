@@ -7,12 +7,14 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.ToString
 import org.apache.commons.io.FilenameUtils
 
 /**
  *
  * @author akhikhl
  */
+@ToString
 class WebAppConfig {
 
   def contextPath

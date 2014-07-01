@@ -65,7 +65,7 @@ abstract class LauncherBase implements Launcher {
       log.debug 'Sending command: {}', 'stop'
       ServiceProtocol.send(sconfig.servicePort, 'stop')
     } else
-      System.out.println "Run 'gradle ${config.getStopTaskName()}' to stop the server."
+      System.out.println "Run '${config.getStopCommand()}' to stop the server."
     thread.join()
     log.warn '{} stopped.', getServletContainerName()
   }
