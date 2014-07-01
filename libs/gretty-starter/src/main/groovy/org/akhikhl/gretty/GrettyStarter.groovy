@@ -14,38 +14,38 @@ package org.akhikhl.gretty
 class GrettyStarter {
 
   static void main(String[] args) {
-    
+
     def launcherConfig = new LauncherConfig() {
 
       boolean getDebug() {
-        
+        false
       }
 
       boolean getInteractive() {
-        
+
       }
 
       boolean getManagedClassReload() {
-        
+
       }
 
       ServerConfig getServerConfig() {
-        
+
       }
 
       String getStopTaskName() {
-        
+
       }
 
       WebAppClassPathResolver getWebAppClassPathResolver() {
-        
+
       }
 
       Iterable<WebAppConfig> getWebAppConfigs() {
-        
+
       }
     }
-    
+
     new StarterLauncher(launcherConfig).launch()
   }
 }

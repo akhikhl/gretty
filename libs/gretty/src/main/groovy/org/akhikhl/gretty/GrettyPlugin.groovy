@@ -545,7 +545,7 @@ class GrettyPlugin implements Plugin<Project> {
 
     addTaskDependencies(project)
 
-    configureProducts(project)
+    new ProductConfigurer(project).configureProducts()
 
     project.afterEvaluate {
 
@@ -556,45 +556,4 @@ class GrettyPlugin implements Plugin<Project> {
 
     } // afterEvaluate
   } // apply
-
-  private void configureProducts(Project project) {
-
-    new OneJarConfigurer([ runTaskName: 'runProduct', debugTaskName: 'debugProduct', suppressBuildTaskDependency: true, runtimeConfiguration: 'grettyStarter' ], project).apply()
-
-    ServerConfig defaultServerConfig = new ServerConfig()
-    ConfigUtils.complementProperties(defaultServerConfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
-
-    project.onejar {
-      
-      mainJar = { project.configurations.grettyStarterMain.singleFile }
-      mainClass = 'org.akhikhl.gretty.GrettyStarter'
-      
-      ServletContainerConfig.getConfigNames().each { servletContainer ->
-        product configBaseName: 'gretty', suffix: servletContainer, launchers: [ 'shell', 'windows' ], 
-          productInfo: [ 'servletContainer': ServletContainerConfig.getConfig(servletContainer).fullName ],
-          additionalProductFiles: {
-            // TODO: implement additional product files
-          }
-      }
-      
-      afterEvaluate {
-        project.task('buildProduct', dependsOn: 'buildProduct_' + defaultServerConfig.servletContainer)
-      }
-      
-      onProductGeneration { product, outputDir ->
-
-        ServerConfig sconfig = new ServerConfig()
-        ConfigUtils.complementProperties(sconfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
-        sconfig.servletContainer = product.suffix
-        ProjectUtils.resolveServerConfig(project, sconfig)
-        CertificateGenerator.maybeGenerate(project, sconfig)
-
-        WebAppConfig wconfig = new WebAppConfig()
-        ConfigUtils.complementProperties(wconfig, project.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(project))
-        ProjectUtils.resolveWebAppConfig(project, wconfig, sconfig.servletContainer)
-        
-        project.buildDir
-      }
-    }
-  }
 }
