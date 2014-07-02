@@ -7,7 +7,6 @@
  */
 package org.akhikhl.gretty
 
-import org.akhikhl.gradle.onejar.OneJarConfigurer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
@@ -110,10 +109,14 @@ class GrettyPlugin implements Plugin<Project> {
     project.extensions.create('gretty', GrettyExtension)
 
     project.extensions.create('farm', FarmExtension)
-    project.farm.integrationTestTask = 'integrationTest'
 
     project.extensions.create('farms', FarmsExtension)
     project.farms.farmsMap[''] = project.farm
+
+    project.extensions.create('product', ProductExtension)
+
+    project.extensions.create('products', ProductsExtension)
+    project.products.productsMap[''] = project.product
   }
 
   private void addRepositories(Project project) {

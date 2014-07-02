@@ -9,7 +9,6 @@ package org.akhikhl.gretty
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import org.akhikhl.gradle.onejar.OneJarConfigurer
 import org.gradle.api.Project
 
 /**
@@ -18,70 +17,55 @@ import org.gradle.api.Project
  */
 class ProductConfigurer {
 
-  protected Project project
-  protected AntBuilder ant = new AntBuilder()
+  protected final Project project
+  protected final File outputDir
+  protected final AntBuilder ant
 
   ProductConfigurer(Project project) {
     this.project = project
+    outputDir = new File(project.buildDir, 'output')
+    ant = new AntBuilder()
+  }
+
+  void configureProduct(String servletContainer) {
+
+    def buildProductTask = project.task('buildProduct_' + servletContainer, group: 'gretty') {
+
+      dependsOn project.tasks.build
+
+      doLast {
+        println "building product for $servletContainer"
+      }
+    }
+
+    project.task('archiveProduct_' + servletContainer, group: 'gretty') {
+
+      dependsOn buildProductTask
+
+      doLast {
+        println "archiving product for $servletContainer"
+      }
+    }
   }
 
   void configureProducts() {
 
-    new OneJarConfigurer([ runTaskName: 'runProduct', debugTaskName: 'debugProduct', suppressBuildTaskDependency: true, runtimeConfiguration: 'grettyStarter' ], project).apply()
+    project.afterEvaluate {
 
-    ServerConfig defaultServerConfig = new ServerConfig()
-    ConfigUtils.complementProperties(defaultServerConfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
+      for(String servletContainer in ServletContainerConfig.getConfigNames())
+        configureProduct(servletContainer)
 
-    project.onejar {
+      ServerConfig defaultServerConfig = new ServerConfig()
+      ConfigUtils.complementProperties(defaultServerConfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
 
-      mainJar = { project.configurations.grettyStarterMain.singleFile }
-      mainClass = 'org.akhikhl.gretty.GrettyStarter'
-
-      ServletContainerConfig.getConfigNames().each { servletContainer ->
-        def servletContainerConfig = ServletContainerConfig.getConfig(servletContainer)
-        product configBaseName: 'gretty', suffix: servletContainer, launchers: [ 'shell', 'windows' ],
-          productInfo: [ 'servletContainer': servletContainerConfig.fullName ],
-          additionalProductFiles: { Map product ->
-            //(project.configurations.gretty + project.configurations[servletContainerConfig.servletContainerRunnerConfig]).files
-            [ createStarterConfig(product) ]
-          }
+      project.task('buildProduct') {
+        dependsOn project.tasks['buildProduct_' + defaultServerConfig.servletContainer]
       }
 
-      afterEvaluate {
-        project.task('buildProduct', dependsOn: 'buildProduct_' + defaultServerConfig.servletContainer)
+      project.task('archiveProduct') {
+        dependsOn project.tasks.buildProduct
+        dependsOn project.tasks['archiveProduct_' + defaultServerConfig.servletContainer]
       }
     }
-  }
-
-  File createStarterConfig(Map product) {
-
-    File starterConfigDir = new File(project.buildDir, 'tmp/gretty-starter-config')
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().create()
-
-    ServerConfig sconfig = new ServerConfig()
-    ConfigUtils.complementProperties(sconfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
-    sconfig.servletContainer = product.suffix
-    ProjectUtils.resolveServerConfig(project, sconfig)
-
-    CertificateGenerator.maybeGenerate(project, sconfig).each {
-      ant.copy file: it, tofile: new File(starterConfigDir, "gretty-starter/ssl/${it.name}")
-    }
-
-    WebAppConfig wconfig = new WebAppConfig()
-    ConfigUtils.complementProperties(wconfig, project.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(project))
-    ProjectUtils.resolveWebAppConfig(project, wconfig, sconfig.servletContainer)
-
-    File starterConfig = new File(starterConfigDir, 'gretty-starter/gretty-starter-config.json')
-    starterConfig.withWriter {
-      gson.toJson([ sconfig: sconfig, webapps: [ wconfig ] ], it)
-    }
-
-    File starterConfigJar = new File(project.buildDir, 'tmp/gretty-starter-config.jar')
-    ant.jar destfile: starterConfigJar, {
-      fileset(dir: starterConfigDir, includes: '**')
-    }
-    starterConfigJar
   }
 }
-

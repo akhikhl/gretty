@@ -4,6 +4,5 @@ apply from: rootProject.file('libs/publish.gradle')
 dependencies {
   compile project(':libs:gretty-starter')
   compile "org.eclipse.jetty:jetty-util:$jetty9_version" // provides org.eclipse.jetty.util.Scanner
-  compile 'org.akhikhl.gradle-onejar:gradle-onejar:0.0.12'
   compile gradleApi()
 }
