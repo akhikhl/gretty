@@ -22,16 +22,15 @@ class FarmConfigurer {
 
   private final Project project
   private String servletContainer
-  private Boolean managedClassReload
 
   FarmConfigurer(Project project) {
     this.project = project
   }
 
   void configureFarm(FarmExtension dstFarm, FarmExtension[] srcFarms = []) {
+    srcFarms = srcFarms.findAll()
     ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ ProjectUtils.getDefaultServerConfig(project) ])
     servletContainer = dstFarm.serverConfig.servletContainer
-    managedClassReload = dstFarm.serverConfig.managedClassReload
     ProjectUtils.resolveServerConfig(project, dstFarm.serverConfig)
     for(def f in srcFarms)
       mergeWebAppRefMaps(dstFarm.webAppRefs, f.webAppRefs)
@@ -41,11 +40,17 @@ class FarmConfigurer {
       dstFarm.integrationTestTask = srcFarms.findResult { it.integrationTestTask }
   }
 
+  FarmExtension findProjectFarm(String sourceFarmName) {
+    project.farms.farmsMap[sourceFarmName]
+  }
+
   Map getDefaultWebAppRefMap() {
     Map result = [:]
     project.subprojects.findAll { it.extensions.findByName('gretty') }.each { p ->
       result[p.path] = [:]
     }
+    if(!result && project.extensions.findByName('gretty'))
+      result[project.path] = [:]
     result
   }
 

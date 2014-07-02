@@ -45,9 +45,6 @@ class GrettyPlugin implements Plugin<Project> {
         transitive = false
       }
       grettyStarter
-      grettyStarterMain {
-        transitive = false
-      }
     }
     if(!project.configurations.findByName('providedCompile'))
       project.configurations {
@@ -77,7 +74,6 @@ class GrettyPlugin implements Plugin<Project> {
       }
       grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
       grettyStarter "org.akhikhl.gretty:gretty-starter:$grettyVersion"
-      grettyStarterMain "org.akhikhl.gretty:gretty-starter:$grettyVersion"
     }
 
     ServletContainerConfig.getConfig(project.gretty.servletContainer).with { config ->
@@ -548,7 +544,7 @@ class GrettyPlugin implements Plugin<Project> {
 
     addTaskDependencies(project)
 
-    new ProductConfigurer(project).configureProducts()
+    new ProductsConfigurer(project).configureProducts()
 
     project.afterEvaluate {
 

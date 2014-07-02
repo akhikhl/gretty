@@ -7,7 +7,6 @@
  */
 package org.akhikhl.gretty
 
-import groovy.json.JsonBuilder
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.process.JavaExecSpec

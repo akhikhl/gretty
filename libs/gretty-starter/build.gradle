@@ -5,7 +5,6 @@ import org.apache.tools.ant.filters.*
 
 dependencies {
   compile "ch.qos.logback:logback-classic:$logback_version"
-  compile 'com.google.code.gson:gson:2.2.4'
   compile 'commons-cli:commons-cli:1.2'
   compile 'commons-configuration:commons-configuration:1.10'
   compile 'commons-io:commons-io:2.4'

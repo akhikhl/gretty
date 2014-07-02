@@ -70,25 +70,14 @@ class SpringBootLauncher extends DefaultLauncher {
     wconfig.springBootSources = springBootSources.join(',')
   }
 
+  @Override
   protected void writeLoggingConfig(json) {
     File logbackConfigFile
     if(sconfig.logbackConfigFile)
       logbackConfigFile = sconfig.logbackConfigFile
     else {
       logbackConfigFile = new File(project.buildDir, 'logging/logback.groovy')
-      logbackConfigFile.parentFile.mkdirs()
-      def binding = [
-        loggingLevel: sconfig.loggingLevel,
-        consoleLogEnabled: sconfig.consoleLogEnabled,
-        fileLogEnabled: sconfig.fileLogEnabled,
-        logFileName: sconfig.logFileName,
-        logDir: sconfig.logDir
-      ]
-      def template
-      getClass().getResourceAsStream('logback-groovy.template').withReader {
-        template = new GStringTemplateEngine().createTemplate(it).make(binding)
-      }
-      logbackConfigFile.text = template.toString()
+      LogbackUtils.generateLogbackConfig(logbackConfigFile, sconfig)
     }
     json.with {
       logbackConfig logbackConfigFile.absolutePath
