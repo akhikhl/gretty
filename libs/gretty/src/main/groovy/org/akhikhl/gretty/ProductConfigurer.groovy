@@ -38,9 +38,11 @@ class ProductConfigurer {
       mainClass = 'org.akhikhl.gretty.GrettyStarter'
 
       ServletContainerConfig.getConfigNames().each { servletContainer ->
+        def servletContainerConfig = ServletContainerConfig.getConfig(servletContainer)
         product configBaseName: 'gretty', suffix: servletContainer, launchers: [ 'shell', 'windows' ],
-          productInfo: [ 'servletContainer': ServletContainerConfig.getConfig(servletContainer).fullName ],
+          productInfo: [ 'servletContainer': servletContainerConfig.fullName ],
           additionalProductFiles: { Map product ->
+            //(project.configurations.gretty + project.configurations[servletContainerConfig.servletContainerRunnerConfig]).files
             [ createStarterConfig(product) ]
           }
       }
@@ -52,7 +54,7 @@ class ProductConfigurer {
   }
 
   File createStarterConfig(Map product) {
-        
+
     File starterConfigDir = new File(project.buildDir, 'tmp/gretty-starter-config')
 
     Gson gson = new GsonBuilder().setPrettyPrinting().create()
@@ -61,7 +63,7 @@ class ProductConfigurer {
     ConfigUtils.complementProperties(sconfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
     sconfig.servletContainer = product.suffix
     ProjectUtils.resolveServerConfig(project, sconfig)
-    
+
     CertificateGenerator.maybeGenerate(project, sconfig).each {
       ant.copy file: it, tofile: new File(starterConfigDir, "gretty-starter/ssl/${it.name}")
     }
@@ -69,12 +71,12 @@ class ProductConfigurer {
     WebAppConfig wconfig = new WebAppConfig()
     ConfigUtils.complementProperties(wconfig, project.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(project))
     ProjectUtils.resolveWebAppConfig(project, wconfig, sconfig.servletContainer)
-    
+
     File starterConfig = new File(starterConfigDir, 'gretty-starter/gretty-starter-config.json')
     starterConfig.withWriter {
       gson.toJson([ sconfig: sconfig, webapps: [ wconfig ] ], it)
     }
-    
+
     File starterConfigJar = new File(project.buildDir, 'tmp/gretty-starter-config.jar')
     ant.jar destfile: starterConfigJar, {
       fileset(dir: starterConfigDir, includes: '**')
