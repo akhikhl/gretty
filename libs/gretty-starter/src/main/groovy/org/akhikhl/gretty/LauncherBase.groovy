@@ -26,7 +26,6 @@ abstract class LauncherBase implements Launcher {
   protected final LauncherConfig config
   protected final ServerConfig sconfig
   protected final Iterable<WebAppConfig> webAppConfigs
-  protected final ExecutorService executorService
 
   ScannerManager scannerManager
 
@@ -34,7 +33,6 @@ abstract class LauncherBase implements Launcher {
     this.config = config
     sconfig = config.getServerConfig()
     webAppConfigs = config.getWebAppConfigs()
-    executorService = Executors.newSingleThreadExecutor()
   }
 
   private getRunConfigJson() {
@@ -67,70 +65,65 @@ abstract class LauncherBase implements Launcher {
     log.warn '{} stopped.', getServletContainerDescription()
   }
 
-  protected void launchProcess() {
-    JavaExecParams params = new JavaExecParams()
-    params.main = 'org.akhikhl.gretty.Runner'
-    params.args = [ "--servicePort=${sconfig.servicePort}", "--statusPort=${sconfig.statusPort}", "--serverManagerFactory=${getServerManagerFactory()}" ]
-    params.debug = config.getDebug()
-    params.jvmArgs = sconfig.jvmArgs
-    params.systemProperties = sconfig.systemProperties
-    javaExec(params)
-  }
-
   @Override
   Thread launchThread() {
 
     for(WebAppConfig webAppConfig in webAppConfigs)
       prepareToRun(webAppConfig)
 
-    Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
-    def thread = Thread.start {
-      sconfig.onStart*.call()
-      try {
-        scannerManager?.startScanner()
+    Thread thread
+    ExecutorService executorService = Executors.newSingleThreadExecutor()
+    try {
+      Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
+      thread = Thread.start {
+        sconfig.onStart*.call()
         try {
-          launchProcess()
+          scannerManager?.startScanner()
+          try {
+            JavaExecParams params = new JavaExecParams()
+            params.main = 'org.akhikhl.gretty.Runner'
+            params.args = [ "--servicePort=${sconfig.servicePort}", "--statusPort=${sconfig.statusPort}", "--serverManagerFactory=${getServerManagerFactory()}" ]
+            params.debug = config.getDebug()
+            params.jvmArgs = sconfig.jvmArgs
+            params.systemProperties = sconfig.systemProperties
+            javaExec(params)
+          } finally {
+            scannerManager?.stopScanner()
+          }
         } finally {
-          scannerManager?.stopScanner()
+          sconfig.onStop*.call()
         }
-      } finally {
-        sconfig.onStop*.call()
       }
-    }
-    def status = futureStatus.get()
-    log.debug 'Got init status: {}', status
+      def status = futureStatus.get()
+      log.debug 'Got init status: {}', status
 
-    futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
-    def runConfigJson = getRunConfigJson()
-    log.debug 'Sending parameters to port {}', sconfig.servicePort
-    log.debug runConfigJson.toPrettyString()
-    ServiceProtocol.send(sconfig.servicePort, runConfigJson.toString())
-    status = futureStatus.get()
-    log.debug 'Got start status: {}', status
+      futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
+      def runConfigJson = getRunConfigJson()
+      log.debug 'Sending parameters to port {}', sconfig.servicePort
+      log.debug runConfigJson.toPrettyString()
+      ServiceProtocol.send(sconfig.servicePort, runConfigJson.toString())
+      status = futureStatus.get()
+      log.debug 'Got start status: {}', status
 
-    System.out.println()
-    log.warn '{} started.', getServletContainerDescription()
-    for(WebAppConfig webAppConfig in webAppConfigs) {
-      String webappName
-      if(webAppConfig.inplace)
-        webappName = webAppConfig.projectPath
-      else {
-        def warFile = webAppConfig.warResourceBase
-        if(!(warFile instanceof File))
-          warFile = new File(warFile.toString())
-        webappName = warFile.name
+      log.warn '{} started.', getServletContainerDescription()
+      for(WebAppConfig webAppConfig in webAppConfigs) {
+        String webappName = webAppConfig.getWebAppName()
+        if(sconfig.httpEnabled && sconfig.httpsEnabled) {
+          log.warn '{} runs at the addresses:', webappName
+          log.warn '  http://{}:{}{}', sconfig.host, sconfig.httpPort, webAppConfig.contextPath
+          log.warn '  https://{}:{}{}', sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
+        }
+        else if(sconfig.httpEnabled)
+          log.warn '{} runs at the address http://{}:{}{}', webappName, sconfig.host, sconfig.httpPort, webAppConfig.contextPath
+        else if(sconfig.httpsEnabled)
+          log.warn '{} runs at the address https://{}:{}{}', webappName, sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
       }
-      if(sconfig.httpEnabled && sconfig.httpsEnabled) {
-        log.warn '{} runs at the addresses:', webappName
-        log.warn '  http://{}:{}{}', sconfig.host, sconfig.httpPort, webAppConfig.contextPath
-        log.warn '  https://{}:{}{}', sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
-      }
-      else if(sconfig.httpEnabled)
-        log.warn '{} runs at the address http://{}:{}{}', webappName, sconfig.host, sconfig.httpPort, webAppConfig.contextPath
-      else if(sconfig.httpsEnabled)
-        log.warn '{} runs at the address https://{}:{}{}', webappName, sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
+
+      log.info 'servicePort: {}, statusPort: {}', sconfig.servicePort, sconfig.statusPort
+
+    } finally {
+      executorService.shutdown()
     }
-    log.info 'servicePort: {}, statusPort: {}', sconfig.servicePort, sconfig.statusPort
 
     thread
   }

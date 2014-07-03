@@ -36,7 +36,6 @@ class StarterLauncher extends LauncherBase {
     def procParams = [ javaPath ] + params.jvmArgs + [ '-cp', classPath, params.main ] + params.args
     Process proc = procParams.execute()
     proc.waitForProcessOutput(System.out, System.err)
-    proc.closeStreams()
   }
 }
 

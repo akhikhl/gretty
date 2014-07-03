@@ -75,6 +75,17 @@ class WebAppConfig {
     return result
   }
 
+  String getWebAppName() {
+    if(inplace)
+      projectPath
+    else {
+      def warFile = warResourceBase
+      if(!(warFile instanceof File))
+        warFile = new File(warFile.toString())
+      warFile.name
+    }
+  }
+
   void initParameter(key, value) {
     if(initParameters == null)
       initParameters = [:]

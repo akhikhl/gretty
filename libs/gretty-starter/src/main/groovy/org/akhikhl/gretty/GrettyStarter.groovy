@@ -22,7 +22,7 @@ class GrettyStarter {
       r longOpt: 'run', 'run'
       s longOpt: 'start', 'start'
       st longOpt: 'stop', 'stop'
-      st longOpt: 'restart', 'restart'
+      re longOpt: 'restart', 'restart'
       d longOpt: 'basedir', args: 1, argName: 'basedir', type: String, required: true, 'basedir'
     }
     def options = cli.parse(args)
@@ -96,7 +96,7 @@ class GrettyStarter {
       }
 
       String getStopCommand() {
-        PlatformUtils.isWindows() ? 'stop.bat' : 'stop.sh'
+        PlatformUtils.isWindows() ? 'stop.bat' : './stop.sh'
       }
 
       WebAppClassPathResolver getWebAppClassPathResolver() {
