@@ -167,6 +167,7 @@ class ProductConfigurer {
 
     for(String cmd in ['run', 'start', 'stop', 'restart']) {
       launchScripts[cmd + '.sh'] = shellResolveDir + 'java -Dfile.encoding=UTF8 -cp "${DIR}/conf/:${DIR}/starter/*" ' + mainClass + ' --' + cmd + ' --basedir="${DIR}" "$@"'
+      launchScripts[cmd + '.bat'] = '@java.exe -Dfile.encoding=UTF8 -cp "%~dp0\\conf\\;%~dp0\\starter\\*" ' + mainClass + ' --' + cmd + ' --basedir="%~dp0" %*'
     }
   }
 
