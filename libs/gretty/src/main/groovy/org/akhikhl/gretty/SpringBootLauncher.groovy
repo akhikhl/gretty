@@ -8,11 +8,7 @@
 package org.akhikhl.gretty
 
 import groovy.text.GStringTemplateEngine
-import org.akhikhl.gretty.DefaultLauncher
-import org.akhikhl.gretty.WebAppConfig
 import org.gradle.api.Project
-import org.gradle.api.file.FileCollection
-import org.gradle.process.JavaExecSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

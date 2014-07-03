@@ -60,11 +60,6 @@ abstract class StartBaseTask extends DefaultTask {
       sconfig.systemProperty 'springloaded', 'exclusions=org.akhikhl.gretty..*'
     }
 
-    // Speeding up tomcat startup, according to http://wiki.apache.org/tomcat/HowTo/FasterStartUp
-    // ATTENTION: replacing the blocking entropy source (/dev/random) with a non-blocking one
-    // actually reduces security because you are getting less-random data.
-    sconfig.systemProperty 'java.security.egd', 'file:/dev/./urandom'
-
     for(Closure c in prepareServerConfigClosures) {
       c = c.rehydrate(sconfig, c.owner, c.thisObject)
       c.resolveStrategy = Closure.DELEGATE_FIRST
