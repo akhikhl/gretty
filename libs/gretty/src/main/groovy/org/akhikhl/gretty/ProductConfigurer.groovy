@@ -121,15 +121,37 @@ class ProductConfigurer {
   void copyRunner() {
     File destDir = new File(outputDir, 'runner')
     destDir.mkdirs()
-    for(File file in project.configurations[ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerRunnerConfig].files)
-      FileUtils.copyFileToDirectory(file, destDir)
+    Set destFiles = new HashSet()
+    for(File file in project.configurations[ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerRunnerConfig].files) {
+      File destFile = new File(destDir, file.name)
+      FileUtils.copyFile(file, destFile)
+      destFiles.add(destFile)
+    }
+    for(File f in destDir.listFiles())
+      if(!destFiles.contains(f)) {
+        if(f.isDirectory())
+          f.deleteDir()
+        else
+          f.delete()
+      }
   }
 
   void copyWebappFiles() {
     File destDir = new File(outputDir, 'webapps')
     destDir.mkdirs()
-    for(File file in getWebappFiles())
-      FileUtils.copyFileToDirectory(file, destDir)
+    Set destFiles = new HashSet()
+    for(File file in getWebappFiles()) {
+      File destFile = new File(destDir, file.name)
+      FileUtils.copyFile(file, destFile)
+      destFiles.add(destFile)
+    }
+    for(File f in destDir.listFiles())
+      if(!destFiles.contains(f)) {
+        if(f.isDirectory())
+          f.deleteDir()
+        else
+          f.delete()
+      }
   }
 
   protected void createLaunchScripts() {
