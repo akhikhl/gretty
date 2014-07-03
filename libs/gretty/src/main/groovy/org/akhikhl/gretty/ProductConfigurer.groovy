@@ -16,6 +16,8 @@ import org.gradle.api.Project
  * @author akhikhl
  */
 class ProductConfigurer {
+  
+  protected static final String mainClass = 'org.akhikhl.gretty.GrettyStarter'
 
   protected final Project project
   protected final File baseOutputDir
@@ -82,9 +84,10 @@ class ProductConfigurer {
         resolveConfig()
         writeConfig()
         writeLogbackConfig()
+        writeLaunchScripts()
         copyWebappFiles()
         copyStarter()
-        copyRunner()
+        copyRunner()        
       }
     }
     
@@ -168,38 +171,40 @@ class ProductConfigurer {
   
   protected void writeConfigToJson(json) {
     json.with {
-      if(sconfig.host)
-        host sconfig.host
-      if(sconfig.httpEnabled) {
-        httpPort sconfig.httpPort
-        if(sconfig.httpIdleTimeout)
-          httpIdleTimeout sconfig.httpIdleTimeout
+      serverConfig {
+        if(sconfig.host)
+          host sconfig.host
+        if(sconfig.httpEnabled) {
+          httpPort sconfig.httpPort
+          if(sconfig.httpIdleTimeout)
+            httpIdleTimeout sconfig.httpIdleTimeout
+        }
+        if(sconfig.httpsEnabled) {
+          httpsPort sconfig.httpsPort
+          if(sconfig.httpsIdleTimeout)
+            httpsIdleTimeout sconfig.httpsIdleTimeout
+          if(sconfig.sslKeyStorePath)
+            sslKeyStorePath sconfig.sslKeyStorePath.absolutePath
+          if(sconfig.sslKeyStorePassword)
+            sslKeyStorePassword sconfig.sslKeyStorePassword
+          if(sconfig.sslKeyManagerPassword)
+            sslKeyManagerPassword sconfig.sslKeyManagerPassword
+          if(sconfig.sslTrustStorePath)
+            sslTrustStorePath sconfig.sslTrustStorePath.absolutePath
+          if(sconfig.sslTrustStorePassword)
+            sslTrustStorePassword sconfig.sslTrustStorePassword
+        }
+        if(sconfig.jettyXmlFile)
+          jettyXmlFile sconfig.jettyXmlFile.absolutePath
+        logbackConfigFile 'conf/' + (sconfig.logbackConfigFile ? sconfig.logbackConfigFile.name : 'logback.groovy')
       }
-      if(sconfig.httpsEnabled) {
-        httpsPort sconfig.httpsPort
-        if(sconfig.httpsIdleTimeout)
-          httpsIdleTimeout sconfig.httpsIdleTimeout
-        if(sconfig.sslKeyStorePath)
-          sslKeyStorePath sconfig.sslKeyStorePath.absolutePath
-        if(sconfig.sslKeyStorePassword)
-          sslKeyStorePassword sconfig.sslKeyStorePassword
-        if(sconfig.sslKeyManagerPassword)
-          sslKeyManagerPassword sconfig.sslKeyManagerPassword
-        if(sconfig.sslTrustStorePath)
-          sslTrustStorePath sconfig.sslTrustStorePath.absolutePath
-        if(sconfig.sslTrustStorePassword)
-          sslTrustStorePassword sconfig.sslTrustStorePassword
-      }
-      if(sconfig.jettyXmlFile)
-        jettyXml sconfig.jettyXmlFile.absolutePath
-      logbackConfig 'conf/' + (sconfig.logbackConfigFile ? sconfig.logbackConfigFile.name : 'logback.groovy')
       webApps wconfigs.collect { WebAppConfig wconfig ->
         { ->
           contextPath wconfig.contextPath
           def warFile = wconfig.warResourceBase
           if(!(warFile instanceof File))
             warFile = new File(warFile.toString())
-          resourceBase "webapps/${warFile.name}"
+          warResourceBase "webapps/${warFile.name}"
           if(wconfig.initParameters)
             initParams wconfig.initParameters
           if(wconfig.realm)
@@ -207,12 +212,31 @@ class ProductConfigurer {
           if(wconfig.realmConfigFile)
             realmConfigFile wconfig.realmConfigFile.absolutePath
           if(wconfig.jettyEnvXmlFile)
-            jettyEnvXml wconfig.jettyEnvXmlFile.absolutePath
+            jettyEnvXmlFile wconfig.jettyEnvXmlFile.absolutePath
           if(wconfig.springBootSources)
             springBootSources wconfig.springBootSources
         }
       }
     }
+  }
+  
+  protected void writeLaunchScripts() {
+    
+    String resolveDir = '#!/bin/bash\n' +
+      'SOURCE="${BASH_SOURCE[0]}"\n' +
+      'while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink\n' +
+      'DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"\n' +
+      'SOURCE="$(readlink "$SOURCE")"\n' +
+      '[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"\n' +
+      'done\n' +
+      'DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"\n'
+
+    File launchScriptFile = new File(outputDir, 'run.sh')
+
+    launchScriptFile.text = resolveDir +
+      'java -Dfile.encoding=UTF8 -cp "${DIR}/starter/*" ' + mainClass + ' --run --basedir="${DIR}" "$@"'
+
+    launchScriptFile.setExecutable(true)    
   }
   
   protected void writeLogbackConfig() {

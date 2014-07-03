@@ -23,8 +23,10 @@ class GrettyStarter {
       s longOpt: 'start', 'start'
       st longOpt: 'stop', 'stop'
       st longOpt: 'restart', 'restart'
+      d longOpt: 'basedir', args: 1, argName: 'basedir', type: String, 'basedir'
     }
     def options = cli.parse(args)
+    String basedir = options.basedir
     String command
     if(options.start)
       command = 'start'
@@ -35,19 +37,28 @@ class GrettyStarter {
     else
       command = 'run'
 
-    Map starterConfig
-    GrettyStarter.getResourceAsStream('/gretty-starter/gretty-starter-config.json').withReader {
-      starterConfig = new JsonSlurper().parse(it)
+    Map config
+    new File(basedir, 'conf/server.json').withReader {
+      config = new JsonSlurper().parse(it)
     }
     
     ServerConfig sconfig = new ServerConfig()
-    starterConfig.sconfig.each { key, value ->
+    config.serverConfig.each { key, value ->
       sconfig[key] = value
     }
     
     if(command == 'stop' || command == 'restart') {
       ServiceProtocol.send(sconfig.servicePort, command)
       return
+    }
+    
+    List<WebAppConfig> wconfigs = []
+    config.webApps.each { w ->
+      WebAppConfig wconfig = new WebAppConfig()
+      w.each { key, value ->
+        wconfig[key] = value
+      }
+      wconfigs.add(wconfig)
     }
 
     def launcherConfig = new LauncherConfig() {
@@ -69,7 +80,7 @@ class GrettyStarter {
       }
 
       String getStopCommand() {
-        starterConfig.stopCommand
+        System.getProperty('os.name', 'generic').toLowerCase().indexOf('win') >= 0 ? 'stop.bat' : 'stop.sh'
       }
 
       WebAppClassPathResolver getWebAppClassPathResolver() {
@@ -77,7 +88,7 @@ class GrettyStarter {
       }
 
       Iterable<WebAppConfig> getWebAppConfigs() {
-
+        wconfigs
       }
     }
 

@@ -10,8 +10,6 @@ dependencies {
   compile 'commons-io:commons-io:2.4'
   compile 'org.apache.commons:commons-lang3:3.3.2'
   compile 'org.bouncycastle:bcprov-jdk16:1.46'
-  compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
-  compile "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"
 }
 
 processResources {
