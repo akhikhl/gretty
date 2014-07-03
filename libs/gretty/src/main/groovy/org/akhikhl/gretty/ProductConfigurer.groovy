@@ -16,7 +16,7 @@ import org.gradle.api.Project
  * @author akhikhl
  */
 class ProductConfigurer {
-  
+
   protected static final String mainClass = 'org.akhikhl.gretty.GrettyStarter'
 
   protected final Project project
@@ -24,11 +24,12 @@ class ProductConfigurer {
   protected final String productName
   protected final ProductExtension product
   protected final File outputDir
-  
+
   protected ServerConfig sconfig
   protected List<WebAppConfig> wconfigs
   protected String jsonConfig
   protected String logbackConfig
+  protected Map launchScripts = [:]
 
   ProductConfigurer(Project project, File baseOutputDir, String productName, ProductExtension product) {
     this.project = project
@@ -48,36 +49,41 @@ class ProductConfigurer {
           it.projectPath ? project.project(it.projectPath).tasks.build : null
         }
       }
-      
-      inputs.property 'config', { 
+
+      inputs.property 'config', {
         resolveConfig()
         jsonConfig
       }
-      
-      inputs.property 'logbackConfig', { 
+
+      inputs.property 'logbackConfig', {
         resolveConfig()
         logbackConfig
       }
-      
+
+      inputs.property 'launchScripts', {
+        resolveConfig()
+        launchScripts
+      }
+
       inputs.files {
         resolveConfig()
         wconfigs.findResults {
           it.projectPath ? null : it.warResourceBase
         }
       }
-      
+
       inputs.files {
         resolveConfig()
         sconfig.logbackConfigFile ? [ sconfig.logbackConfigFile ] : []
       }
-      
+
       inputs.files project.configurations.grettyStarter
-      
+
       inputs.files {
         resolveConfig()
-        project.configurations[ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerRunnerConfig]        
+        project.configurations[ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerRunnerConfig]
       }
-      
+
       outputs.dir outputDir
 
       doLast {
@@ -87,10 +93,10 @@ class ProductConfigurer {
         writeLaunchScripts()
         copyWebappFiles()
         copyStarter()
-        copyRunner()        
+        copyRunner()
       }
     }
-    
+
     project.tasks.buildAllProducts.dependsOn buildProductTask
 
     def archiveProductTask = project.task("archiveProduct${productName}", group: 'gretty') {
@@ -101,31 +107,47 @@ class ProductConfigurer {
         println "archiving product $productName"
       }
     }
-    
+
     project.tasks.archiveAllProducts.dependsOn archiveProductTask
   }
-  
+
   void copyStarter() {
     File destDir = new File(outputDir, 'starter')
     destDir.mkdirs()
     for(File file in project.configurations.grettyStarter.files)
       FileUtils.copyFileToDirectory(file, destDir)
   }
-  
+
   void copyRunner() {
     File destDir = new File(outputDir, 'runner')
     destDir.mkdirs()
     for(File file in project.configurations[ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerRunnerConfig].files)
       FileUtils.copyFileToDirectory(file, destDir)
   }
-  
+
   void copyWebappFiles() {
     File destDir = new File(outputDir, 'webapps')
     destDir.mkdirs()
     for(File file in getWebappFiles())
       FileUtils.copyFileToDirectory(file, destDir)
   }
-  
+
+  protected void createLaunchScripts() {
+
+    String shellResolveDir = '#!/bin/bash\n' +
+      'SOURCE="${BASH_SOURCE[0]}"\n' +
+      'while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink\n' +
+      'DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"\n' +
+      'SOURCE="$(readlink "$SOURCE")"\n' +
+      '[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"\n' +
+      'done\n' +
+      'DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"\n'
+
+    for(String cmd in ['run', 'start', 'stop', 'restart']) {
+      launchScripts[cmd + '.sh'] = shellResolveDir + 'java -Dfile.encoding=UTF8 -cp "${DIR}/conf/:${DIR}/starter/*" ' + mainClass + ' --' + cmd + ' --basedir="${DIR}" "$@"'
+    }
+  }
+
   Collection<File> getWebappFiles() {
     wconfigs.collect {
       def file = it.warResourceBase
@@ -134,15 +156,15 @@ class ProductConfigurer {
       file
     }
   }
-  
+
   protected resolveConfig() {
     if(sconfig != null)
       return
     FarmConfigurer configurer = new FarmConfigurer(project)
     FarmExtension productFarm = new FarmExtension()
-    configurer.configureFarm(productFarm, 
-      new FarmExtension(logDir: 'logs'), 
-      new FarmExtension(serverConfig: product.serverConfig, webAppRefs: product.webAppRefs), 
+    configurer.configureFarm(productFarm,
+      new FarmExtension(logDir: 'logs'),
+      new FarmExtension(serverConfig: product.serverConfig, webAppRefs: product.webAppRefs),
       configurer.findProjectFarm(productName)
     )
     sconfig = productFarm.serverConfig
@@ -153,24 +175,30 @@ class ProductConfigurer {
     jsonConfig = writeConfigToJson()
     if(!sconfig.logbackConfigFile)
       logbackConfig = LogbackUtils.generateLogbackConfig(sconfig)
+    createLaunchScripts()
   }
-  
+
   protected void writeConfig() {
     File configFile = new File(outputDir, 'conf/server.json')
     configFile.parentFile.mkdirs()
     configFile.text = jsonConfig
   }
-  
+
   protected String writeConfigToJson() {
     def json = new JsonBuilder()
     json {
       writeConfigToJson(delegate)
     }
-    json.toPrettyString()    
+    json.toPrettyString()
   }
-  
+
   protected void writeConfigToJson(json) {
+    def self = this
     json.with {
+      productName self.productName
+      servetContainer {
+        description ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerDescription
+      }
       serverConfig {
         if(sconfig.host)
           host sconfig.host
@@ -219,26 +247,16 @@ class ProductConfigurer {
       }
     }
   }
-  
+
   protected void writeLaunchScripts() {
-    
-    String resolveDir = '#!/bin/bash\n' +
-      'SOURCE="${BASH_SOURCE[0]}"\n' +
-      'while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink\n' +
-      'DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"\n' +
-      'SOURCE="$(readlink "$SOURCE")"\n' +
-      '[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"\n' +
-      'done\n' +
-      'DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"\n'
-
-    File launchScriptFile = new File(outputDir, 'run.sh')
-
-    launchScriptFile.text = resolveDir +
-      'java -Dfile.encoding=UTF8 -cp "${DIR}/starter/*" ' + mainClass + ' --run --basedir="${DIR}" "$@"'
-
-    launchScriptFile.setExecutable(true)    
+    launchScripts.each { scriptName, scriptText ->
+      File launchScriptFile = new File(outputDir, scriptName)
+      launchScriptFile.text = scriptText
+      if(scriptName.endsWith('.sh'))
+        launchScriptFile.setExecutable(true)
+    }
   }
-  
+
   protected void writeLogbackConfig() {
     // sconfig.logbackConfigFile, logbackConfig, outputDir
     if(sconfig.logbackConfigFile)

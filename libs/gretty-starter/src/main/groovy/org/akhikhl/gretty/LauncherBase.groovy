@@ -26,7 +26,6 @@ abstract class LauncherBase implements Launcher {
   protected final LauncherConfig config
   protected final ServerConfig sconfig
   protected final Iterable<WebAppConfig> webAppConfigs
-  protected final WebAppClassPathResolver classPathResolver
   protected final ExecutorService executorService
 
   ScannerManager scannerManager
@@ -35,7 +34,6 @@ abstract class LauncherBase implements Launcher {
     this.config = config
     sconfig = config.getServerConfig()
     webAppConfigs = config.getWebAppConfigs()
-    classPathResolver = config.getWebAppClassPathResolver()
     executorService = Executors.newSingleThreadExecutor()
   }
 
@@ -47,18 +45,17 @@ abstract class LauncherBase implements Launcher {
     json
   }
 
-  protected abstract Collection<URL> getRunnerClassPath()
-
   protected String getServerManagerFactory() {
     'org.akhikhl.gretty.ServerManagerFactory'
   }
 
-  protected abstract String getServletContainerName()
+  protected abstract String getServletContainerDescription()
+
+  protected abstract void javaExec(JavaExecParams params)
 
   @Override
   void launch() {
     Thread thread = launchThread()
-
     if(config.getInteractive()) {
       System.out.println 'Press any key to stop the server.'
       System.in.read()
@@ -67,14 +64,11 @@ abstract class LauncherBase implements Launcher {
     } else
       System.out.println "Run '${config.getStopCommand()}' to stop the server."
     thread.join()
-    log.warn '{} stopped.', getServletContainerName()
+    log.warn '{} stopped.', getServletContainerDescription()
   }
-
-  protected abstract void javaExec(JavaExecParams params)
 
   protected void launchProcess() {
     JavaExecParams params = new JavaExecParams()
-    params.classpath = getRunnerClassPath()
     params.main = 'org.akhikhl.gretty.Runner'
     params.args = [ "--servicePort=${sconfig.servicePort}", "--statusPort=${sconfig.statusPort}", "--serverManagerFactory=${getServerManagerFactory()}" ]
     params.debug = config.getDebug()
@@ -115,7 +109,7 @@ abstract class LauncherBase implements Launcher {
     log.debug 'Got start status: {}', status
 
     System.out.println()
-    log.warn '{} started.', getServletContainerName()
+    log.warn '{} started.', getServletContainerDescription()
     for(WebAppConfig webAppConfig in webAppConfigs) {
       String webappName
       if(webAppConfig.inplace)
@@ -210,8 +204,11 @@ abstract class LauncherBase implements Launcher {
   }
 
   protected void writeWebAppClassPath(json, WebAppConfig webAppConfig) {
-    def classPath = classPathResolver.resolveWebAppClassPath(webAppConfig)
-    if(classPath)
-      json.webappClassPath classPath
+    def classPathResolver = config.getWebAppClassPathResolver()
+    if(classPathResolver) {
+      def classPath = classPathResolver.resolveWebAppClassPath(webAppConfig)
+      if(classPath)
+        json.webappClassPath classPath
+    }
   }
 }

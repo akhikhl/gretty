@@ -13,29 +13,30 @@ package org.akhikhl.gretty
  */
 class StarterLauncher extends LauncherBase {
 
-  StarterLauncher(LauncherConfig config) {
+  private final File basedir
+  private final Map servetContainerInfo
+
+  StarterLauncher(File basedir, Map servetContainerInfo, LauncherConfig config) {
     super(config)
+    this.basedir = basedir
+    this.servetContainerInfo = servetContainerInfo
   }
 
   @Override
-  protected Collection<URL> getRunnerClassPath() {
-    []
-  }
-
-  @Override
-  protected String getServletContainerName() {
-    config.getServerConfig().servletContainer
+  protected String getServletContainerDescription() {
+    servetContainerInfo.description
   }
 
   @Override
   protected void javaExec(JavaExecParams params) {
-    println "javaExec $params"
-    def javaPath = new File(System.getProperty("java.home"), 'bin/java').absolutePath
-    def procParams = [ javaPath ] + params.jvmArgs + [ params.main ] + params.args
-    ProcessBuilder pb = new ProcessBuilder(procParams as String[])
-    Process proc = pb.start()
-    proc.consumeProcessOutput(System.out, System.err)
-    proc.waitFor()
+    String javaPath = new File(System.getProperty("java.home"), 'bin/java').absolutePath
+    String classPath1 = [ basedir.absolutePath, 'conf' ].join(File.separator)
+    String classPath2 = [ basedir.absolutePath, 'runner', '*' ].join(File.separator)
+    String classPath = classPath1 + System.getProperty('path.separator') + classPath2
+    def procParams = [ javaPath ] + params.jvmArgs + [ '-cp', classPath, params.main ] + params.args
+    Process proc = procParams.execute()
+    proc.waitForProcessOutput(System.out, System.err)
+    proc.closeStreams()
   }
 }
 

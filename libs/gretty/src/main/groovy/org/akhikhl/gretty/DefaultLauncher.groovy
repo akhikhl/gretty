@@ -26,7 +26,6 @@ class DefaultLauncher extends LauncherBase {
     this.project = project
   }
 
-  @Override
   protected Collection<URL> getRunnerClassPath() {
     (project.configurations.gretty + project.configurations[getServletContainerConfig().servletContainerRunnerConfig]).files.collect { it.toURL() }
   }
@@ -36,14 +35,14 @@ class DefaultLauncher extends LauncherBase {
   }
 
   @Override
-  protected String getServletContainerName() {
-    getServletContainerConfig().fullName
+  protected String getServletContainerDescription() {
+    getServletContainerConfig().servletContainerDescription
   }
 
   @Override
   protected void javaExec(JavaExecParams params) {
     project.javaexec { JavaExecSpec spec ->
-      spec.classpath = project.files(params.classpath)
+      spec.classpath = project.files(getRunnerClassPath())
       spec.debug = params.debug
       spec.jvmArgs = params.jvmArgs
       spec.systemProperties = params.systemProperties

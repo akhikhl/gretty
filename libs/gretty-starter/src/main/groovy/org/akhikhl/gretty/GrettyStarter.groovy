@@ -16,17 +16,17 @@ import groovy.json.JsonSlurper
 class GrettyStarter {
 
   static void main(String[] args) {
-    
+
     def cli = new CliBuilder()
     cli.with {
       r longOpt: 'run', 'run'
       s longOpt: 'start', 'start'
       st longOpt: 'stop', 'stop'
       st longOpt: 'restart', 'restart'
-      d longOpt: 'basedir', args: 1, argName: 'basedir', type: String, 'basedir'
+      d longOpt: 'basedir', args: 1, argName: 'basedir', type: String, required: true, 'basedir'
     }
     def options = cli.parse(args)
-    String basedir = options.basedir
+    File basedir = new File(options.basedir)
     String command
     if(options.start)
       command = 'start'
@@ -41,17 +41,33 @@ class GrettyStarter {
     new File(basedir, 'conf/server.json').withReader {
       config = new JsonSlurper().parse(it)
     }
-    
+
     ServerConfig sconfig = new ServerConfig()
     config.serverConfig.each { key, value ->
       sconfig[key] = value
     }
-    
+
+    ConfigUtils.complementProperties(sconfig, ServerConfig.getDefaultServerConfig(config.productName))
+
+    if(sconfig.jettyXmlFile) {
+      File jettyXmlFile = new File(sconfig.jettyXmlFile)
+      if(!jettyXmlFile.isAbsolute())
+        jettyXmlFile = new File(basedir, sconfig.jettyXmlFile)
+      sconfig.jettyXmlFile = jettyXmlFile.exists() ? jettyXmlFile : null
+    }
+
+    if(sconfig.logbackConfigFile) {
+      File logbackConfigFile = new File(sconfig.logbackConfigFile)
+      if(!logbackConfigFile.isAbsolute())
+        logbackConfigFile = new File(basedir, sconfig.logbackConfigFile)
+      sconfig.logbackConfigFile = logbackConfigFile.exists() ? logbackConfigFile : null
+    }
+
     if(command == 'stop' || command == 'restart') {
       ServiceProtocol.send(sconfig.servicePort, command)
       return
     }
-    
+
     List<WebAppConfig> wconfigs = []
     config.webApps.each { w ->
       WebAppConfig wconfig = new WebAppConfig()
@@ -80,11 +96,10 @@ class GrettyStarter {
       }
 
       String getStopCommand() {
-        System.getProperty('os.name', 'generic').toLowerCase().indexOf('win') >= 0 ? 'stop.bat' : 'stop.sh'
+        PlatformUtils.isWindows() ? 'stop.bat' : 'stop.sh'
       }
 
       WebAppClassPathResolver getWebAppClassPathResolver() {
-
       }
 
       Iterable<WebAppConfig> getWebAppConfigs() {
@@ -92,7 +107,7 @@ class GrettyStarter {
       }
     }
 
-    new StarterLauncher(launcherConfig).launch()
+    new StarterLauncher(basedir, config.servetContainer, launcherConfig).launch()
   }
 }
 

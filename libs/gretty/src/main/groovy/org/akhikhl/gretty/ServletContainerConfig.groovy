@@ -40,7 +40,7 @@ class ServletContainerConfig {
     [ 'jetty7': [
         servletContainerType: 'jetty',
         servletContainerVersion: jetty7Version,
-        fullName: "Jetty $jetty7Version",
+        servletContainerDescription: "Jetty $jetty7Version",
         servletContainerRunnerConfig: 'grettyRunnerJetty7',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-jetty7:$grettyVersion"
@@ -55,7 +55,7 @@ class ServletContainerConfig {
       'jetty8': [
         servletContainerType: 'jetty',
         servletContainerVersion: jetty8Version,
-        fullName: "Jetty $jetty8Version",
+        servletContainerDescription: "Jetty $jetty8Version",
         servletContainerRunnerConfig: 'grettyRunnerJetty8',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-jetty8:$grettyVersion"
@@ -70,7 +70,7 @@ class ServletContainerConfig {
       'jetty9': [
         servletContainerType: 'jetty',
         servletContainerVersion: jetty9Version,
-        fullName: "Jetty $jetty9Version",
+        servletContainerDescription: "Jetty $jetty9Version",
         servletContainerRunnerConfig: 'grettyRunnerJetty9',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-jetty9:$grettyVersion"
@@ -85,7 +85,7 @@ class ServletContainerConfig {
       'tomcat7': [
         servletContainerType: 'tomcat',
         servletContainerVersion: tomcat7Version,
-        fullName: "Tomcat $tomcat7Version",
+        servletContainerDescription: "Tomcat $tomcat7Version",
         servletContainerRunnerConfig: 'grettyRunnerTomcat7',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat7:$grettyVersion"
@@ -100,7 +100,7 @@ class ServletContainerConfig {
       'tomcat8': [
         servletContainerType: 'tomcat',
         servletContainerVersion: tomcat8Version,
-        fullName: "Tomcat $tomcat8Version",
+        servletContainerDescription: "Tomcat $tomcat8Version",
         servletContainerRunnerConfig: 'grettyRunnerTomcat8',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat8:$grettyVersion"
@@ -144,7 +144,7 @@ class ServletContainerConfig {
     log.warn 'Cannot find jetty container with compatible servlet-api to {}, defaulting to {}', servletContainer, defaultJettyServletContainer
     defaultJettyServletContainer
   }
-  
+
   static String getTomcatCompatibleServletContainer(String servletContainer) {
     def config = getConfig(servletContainer)
     if(config.servletContainerType == 'tomcat')

@@ -162,27 +162,7 @@ final class ProjectUtils {
   }
 
   static ServerConfig getDefaultServerConfig(Project project) {
-    ServerConfig result = new ServerConfig()
-    result.jvmArgs = []
-    result.servletContainer = 'jetty9'
-    result.managedClassReload = true
-    result.host = 'localhost'
-    result.httpEnabled = true
-    result.httpPort = 8080
-    // httpIdleTimeout defaults to null. This means: no idle timeout is set for http protocol.
-    result.httpsEnabled = false
-    result.httpsPort = 8443
-    // httpsIdleTimeout defaults to null. This means: no idle timeout is set for https protocol.
-    result.servicePort = 9900
-    result.statusPort = 9901
-    result.jettyXmlFile = 'jetty.xml'
-    result.scanInterval = 1
-    result.loggingLevel = 'INFO'
-    result.consoleLogEnabled = true
-    result.fileLogEnabled = true
-    result.logFileName = project.name
-    result.logDir = "${System.getProperty('user.home')}/logs" as String
-    return result
+    ServerConfig.getDefaultServerConfig(project.name)
   }
 
   static WebAppConfig getDefaultWebAppConfigForProject(Project project) {
@@ -265,7 +245,7 @@ final class ProjectUtils {
       into "${project.buildDir}/inplaceWebapp"
     }
   }
-  
+
   static Set<URL> resolveClassPath(Project project, Collection<URL> classPath) {
     def resolvedClassPath = new LinkedHashSet()
     if(classPath == null)
@@ -347,9 +327,9 @@ final class ProjectUtils {
   }
 
   static void resolveWebAppConfig(Project project, WebAppConfig wconfig, String servletContainer) {
-    
+
     String servletContainerType = ServletContainerConfig.getConfig(servletContainer).servletContainerType
-    
+
     boolean defaultRealmConfigFile = false
     if(!wconfig.realmConfigFile) {
       defaultRealmConfigFile = true
@@ -358,15 +338,15 @@ final class ProjectUtils {
       else
         wconfig.realmConfigFile = 'jetty-realm.properties'
     }
-    
+
     if(servletContainerType == 'jetty' && !defaultRealmConfigFile && !wconfig.realm)
       log.warn 'Realm config file is specified, but realm is not specified.'
-    
+
     def resolvedRealmConfigFile = ProjectUtils.resolveSingleFile(project, wconfig.realmConfigFile)
     if(!resolvedRealmConfigFile && !defaultRealmConfigFile)
       log.warn 'The realm config file {} does not exist.', wconfig.realmConfigFile
     wconfig.realmConfigFile = resolvedRealmConfigFile
-    
+
     if(servletContainerType == 'jetty')
       wconfig.jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, wconfig.jettyEnvXmlFile)
     else

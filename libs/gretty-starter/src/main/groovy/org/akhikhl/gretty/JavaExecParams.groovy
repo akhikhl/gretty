@@ -16,8 +16,6 @@ import groovy.transform.ToString
 @ToString
 class JavaExecParams {
 
-  Collection<URL> classpath = []
-
   String main
 
   List<String> jvmArgs = []

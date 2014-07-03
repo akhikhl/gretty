@@ -47,6 +47,30 @@ class ServerConfig {
   List<Closure> onScan
   List<Closure> onScanFilesChanged
 
+  static ServerConfig getDefaultServerConfig(String serverName) {
+    ServerConfig result = new ServerConfig()
+    result.jvmArgs = []
+    result.servletContainer = 'jetty9'
+    result.managedClassReload = true
+    result.host = 'localhost'
+    result.httpEnabled = true
+    result.httpPort = 8080
+    // httpIdleTimeout defaults to null. This means: no idle timeout is set for http protocol.
+    result.httpsEnabled = false
+    result.httpsPort = 8443
+    // httpsIdleTimeout defaults to null. This means: no idle timeout is set for https protocol.
+    result.servicePort = 9900
+    result.statusPort = 9901
+    result.jettyXmlFile = 'jetty.xml'
+    result.scanInterval = 1
+    result.loggingLevel = 'INFO'
+    result.consoleLogEnabled = true
+    result.fileLogEnabled = true
+    result.logFileName = serverName
+    result.logDir = "${System.getProperty('user.home')}/logs" as String
+    return result
+  }
+
   Integer getPort() {
     httpPort
   }
