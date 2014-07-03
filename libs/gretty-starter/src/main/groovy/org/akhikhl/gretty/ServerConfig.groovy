@@ -46,6 +46,7 @@ class ServerConfig {
   List<Closure> onStop
   List<Closure> onScan
   List<Closure> onScanFilesChanged
+  Boolean secureRandom
 
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()

@@ -225,6 +225,8 @@ class ProductConfigurer {
         if(sconfig.jettyXmlFile)
           jettyXmlFile sconfig.jettyXmlFile.absolutePath
         logbackConfigFile 'conf/' + (sconfig.logbackConfigFile ? sconfig.logbackConfigFile.name : 'logback.groovy')
+        if(sconfig.secureRandom != null)
+          secureRandom sconfig.secureRandom
       }
       webApps wconfigs.collect { WebAppConfig wconfig ->
         { ->
