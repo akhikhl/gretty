@@ -50,10 +50,8 @@ abstract class StartBaseTask extends DefaultTask {
     CertificateGenerator.maybeGenerate(project, sconfig)
 
     String jacocoConfigJvmArg = getJacoco()?.getAsJvmArg()
-    if(jacocoConfigJvmArg) {
-      log.debug 'jacoco jvmArg: {}', jacocoConfigJvmArg
-      sconfig.getServerConfig().jvmArgs jacocoConfigJvmArg
-    }
+    if(jacocoConfigJvmArg)
+      sconfig.jvmArgs jacocoConfigJvmArg
 
     if(getManagedClassReload(sconfig)) {
       sconfig.jvmArgs '-javaagent:' + project.configurations.grettySpringLoaded.singleFile.absolutePath, '-noverify'
