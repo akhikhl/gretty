@@ -61,6 +61,12 @@ final class ProjectUtils {
     }
   }
 
+  static boolean anyWebAppUsesSpringBoot(Project project, Iterable<WebAppConfig> wconfigs) {
+    wconfigs.find { wconfig ->
+      isSpringBootApp(project, wconfig)
+    }
+  }
+
   private static void collectFastReloads(List result, Project proj) {
     if(proj.gretty.fastReload != null)
       result.addAll(proj.gretty.fastReload)
@@ -209,9 +215,24 @@ final class ProjectUtils {
     project.hasProperty('webAppDir') ? project.webAppDir : new File(project.projectDir, 'src/main/webapp')
   }
 
+  static String getWebAppDestinationDirName(Project project, WebAppConfig wconfig) {
+    if(wconfig.projectPath)
+      project.project(wconfig.projectPath).name
+    else {
+      def warFile = wconfig.warResourceBase
+      if(!(warFile instanceof File))
+        warFile = new File(warFile.toString())
+      FilenameUtils.getBaseName(warFile.name).replaceAll(/([\da-zA-Z_.-]+?)-((\d+\.)+[\da-zA-Z_.-]*)/, '$1')
+    }
+  }
+
   // ATTENTION: this function resolves compile configuration!
   static boolean isSpringBootApp(Project project) {
     project.configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == 'org.springframework.boot' }
+  }
+
+  static boolean isSpringBootApp(Project project, WebAppConfig wconfig) {
+    wconfig.springBoot || (wconfig.projectPath && isSpringBootApp(project.project(wconfig.projectPath)))
   }
 
   static void prepareExplodedWebAppFolder(Project project) {
@@ -244,6 +265,23 @@ final class ProjectUtils {
       from getWebAppDir(project)
       into "${project.buildDir}/inplaceWebapp"
     }
+  }
+  
+  static void prepareToRun(Project project, WebAppConfig wconfig) {
+    wconfig.prepareToRun()
+    Set springBootSources = new LinkedHashSet()
+    if(wconfig.springBootSources) {
+      if(wconfig.springBootSources instanceof Collection)
+        springBootSources += wconfig.springBootSources
+      else
+        springBootSources += wconfig.springBootSources.toString().split(',').collect { it.trim() }
+    }
+    if(wconfig.projectPath && wconfig.projectPath != project.path && isSpringBootApp(project, wconfig)) {
+      String mainClass = SpringBootMainClassFinder.findMainClass(project.project(wconfig.projectPath))
+      if(mainClass && mainClass.contains('.'))
+        springBootSources += mainClass.substring(0, mainClass.lastIndexOf('.'))
+    }
+    wconfig.springBootSources = springBootSources.join(',')
   }
 
   static Set<URL> resolveClassPath(Project project, Collection<URL> classPath) {

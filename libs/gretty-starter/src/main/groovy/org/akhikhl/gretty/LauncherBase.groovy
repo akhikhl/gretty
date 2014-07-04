@@ -68,8 +68,8 @@ abstract class LauncherBase implements Launcher {
   @Override
   Thread launchThread() {
 
-    for(WebAppConfig webAppConfig in webAppConfigs)
-      prepareToRun(webAppConfig)
+    for(WebAppConfig wconfig in webAppConfigs)
+      prepareToRun(wconfig)
 
     Thread thread
     ExecutorService executorService = Executors.newSingleThreadExecutor()
@@ -113,7 +113,7 @@ abstract class LauncherBase implements Launcher {
 
       log.warn '{} started.', getServletContainerDescription()
       for(WebAppConfig webAppConfig in webAppConfigs) {
-        String webappName = webAppConfig.getWebAppName()
+        String webappName = webAppConfig.getWebAppLaunchName()
         if(sconfig.httpEnabled && sconfig.httpsEnabled) {
           log.warn '{} runs at the addresses:', webappName
           log.warn '  http://{}:{}{}', sconfig.host, sconfig.httpPort, webAppConfig.contextPath

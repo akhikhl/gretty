@@ -85,7 +85,7 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     configurer.configureFarm(tempFarm, new FarmExtension(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
     def options = tempFarm.webAppRefs.find { key, value -> configurer.resolveWebAppRefToProject(key) == webappProject }.value
     def webappConfig = configurer.getWebAppConfigForProject(options, webappProject, inplace)
-    webappConfig.prepareToRun()
+    ProjectUtils.prepareToRun(project, webappConfig)
 
     def host = tempFarm.serverConfig.host
 

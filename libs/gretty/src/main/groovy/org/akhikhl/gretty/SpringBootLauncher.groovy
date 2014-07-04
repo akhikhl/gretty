@@ -35,40 +35,18 @@ class SpringBootLauncher extends DefaultLauncher {
       files += project.configurations.grettyRunnerSpringBootTomcat.files
     def classPath = files.collect { it.toURL() } as LinkedHashSet
     def classPathResolver = config.getWebAppClassPathResolver()
-    for(def wconfig in webAppConfigs) {
-      if(wconfig.projectPath) {
-        def proj = project.project(wconfig.projectPath)
-        if(ProjectUtils.isSpringBootApp(proj) && classPathResolver) {
-          def cp = classPathResolver.resolveWebAppClassPath(wconfig)
-          if(cp)
-            classPath += cp
-        }
+    for(def wconfig in webAppConfigs)
+      if(wconfig.projectPath && ProjectUtils.isSpringBootApp(project, wconfig) && classPathResolver) {
+        def cp = classPathResolver.resolveWebAppClassPath(wconfig)
+        if(cp)
+          classPath += cp
       }
-    }
     classPath
   }
 
   @Override
   protected String getServerManagerFactory() {
     'org.akhikhl.gretty.SpringBootServerManagerFactory'
-  }
-
-  @Override
-  protected void prepareToRun(WebAppConfig wconfig) {
-    super.prepareToRun(wconfig)
-    Set springBootSources = new LinkedHashSet()
-    if(wconfig.springBootSources) {
-      if(wconfig.springBootSources instanceof Collection)
-        springBootSources += wconfig.springBootSources
-      else
-        springBootSources += wconfig.springBootSources.toString().split(',').collect { it.trim() }
-    }
-    if(wconfig.projectPath && wconfig.projectPath != project.path) {
-      String mainClass = SpringBootMainClassFinder.findMainClass(project.project(wconfig.projectPath))
-      if(mainClass && mainClass.contains('.'))
-        springBootSources += mainClass.substring(0, mainClass.lastIndexOf('.'))
-    }
-    wconfig.springBootSources = springBootSources.join(',')
   }
 
   @Override
@@ -94,12 +72,9 @@ class SpringBootLauncher extends DefaultLauncher {
   }
 
   protected void writeWebAppClassPath(json, WebAppConfig webAppConfig) {
-    if(webAppConfig.projectPath) {
-      def proj = project.project(webAppConfig.projectPath)
-      if(ProjectUtils.isSpringBootApp(proj)) {
-        json.springBoot true
-        return // webapp classpath is passed directly to the runner
-      }
+    if(ProjectUtils.isSpringBootApp(project, webAppConfig)) {
+      json.springBoot true
+      return // webapp classpath is passed directly to the runner
     }
     super.writeWebAppClassPath(json, webAppConfig)
   }

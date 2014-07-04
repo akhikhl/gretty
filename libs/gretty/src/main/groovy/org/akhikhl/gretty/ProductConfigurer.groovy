@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 import groovy.json.JsonBuilder
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 
 /**
  *
@@ -81,7 +82,7 @@ class ProductConfigurer {
 
       inputs.files {
         resolveConfig()
-        project.configurations[ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerRunnerConfig]
+        getRunnerFileCollection()
       }
 
       outputs.dir outputDir
@@ -111,46 +112,44 @@ class ProductConfigurer {
   }
 
   void copyRunner() {
-    File destDir = new File(outputDir, 'runner')
-    destDir.mkdirs()
-    Set destFiles = new HashSet()
-    for(File file in project.configurations[ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerRunnerConfig].files) {
-      File destFile = new File(destDir, file.name)
-      FileUtils.copyFile(file, destFile)
-      destFiles.add(destFile)
-    }
-    for(File f in destDir.listFiles())
-      if(!destFiles.contains(f)) {
-        if(f.isDirectory())
-          f.deleteDir()
-        else
-          f.delete()
-      }
+    
+    ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'runner'))
+    
+    for(File file in getRunnerFileCollection().files)
+      dir.add(file)
+      
+    dir.cleanup()
   }
 
   void copyStarter() {
-    File destDir = new File(outputDir, 'starter')
-    destDir.mkdirs()
+    
+    ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'starter'))
+    
     for(File file in project.configurations.grettyStarter.files)
-      FileUtils.copyFileToDirectory(file, destDir)
+      dir.add(file)
+      
+    dir.cleanup()
   }
 
   void copyWebappFiles() {
-    File destDir = new File(outputDir, 'webapps')
-    destDir.mkdirs()
-    Set destFiles = new HashSet()
-    for(File file in getWebappFiles()) {
-      File destFile = new File(destDir, file.name)
-      FileUtils.copyFile(file, destFile)
-      destFiles.add(destFile)
-    }
-    for(File f in destDir.listFiles())
-      if(!destFiles.contains(f)) {
-        if(f.isDirectory())
-          f.deleteDir()
-        else
-          f.delete()
+    
+    ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'webapps'))
+    
+    for(WebAppConfig wconfig in wconfigs) {
+      if(ProjectUtils.isSpringBootApp(project, wconfig)) {
+        def file = wconfig.warResourceBase
+        if(!(file instanceof File))
+          file = new File(file.toString())
+        dir.add(file, ProjectUtils.getWebAppDestinationDirName(project, wconfig))
+      } else {
+        def file = wconfig.warResourceBase
+        if(!(file instanceof File))
+          file = new File(file.toString())
+        dir.add(file)
       }
+    }
+    
+    dir.cleanup()
   }
 
   protected void createLaunchScripts() {
@@ -170,13 +169,19 @@ class ProductConfigurer {
     }
   }
 
-  Collection<File> getWebappFiles() {
-    wconfigs.collect {
-      def file = it.warResourceBase
-      if(!(file instanceof File))
-        file = new File(file.toString())
-      file
-    }
+  protected FileCollection getRunnerFileCollection() {
+    def servletContainerConfig = ServletContainerConfig.getConfig(sconfig.servletContainer)
+    def files
+    if(ProjectUtils.anyWebAppUsesSpringBoot(project, wconfigs)) {
+      files = project.configurations.grettyNoSpringBoot +
+        project.configurations[servletContainerConfig.servletContainerRunnerConfig]
+      if(servletContainerConfig.servletContainerType == 'jetty')
+        files += project.configurations.grettyRunnerSpringBootJetty
+      else if(servletContainerConfig.servletContainerType == 'tomcat')
+        files += project.configurations.grettyRunnerSpringBootTomcat
+    } else
+      files = project.configurations[servletContainerConfig.servletContainerRunnerConfig]        
+    files
   }
 
   protected resolveConfig() {
@@ -193,7 +198,7 @@ class ProductConfigurer {
     wconfigs = []
     configurer.resolveWebAppRefs(productFarm.webAppRefs, wconfigs, false)
     for(WebAppConfig wconfig in wconfigs)
-      wconfig.prepareToRun()
+      ProjectUtils.prepareToRun(project, wconfig)
     CertificateGenerator.maybeGenerate(project, sconfig)
     jsonConfig = writeConfigToJson()
     if(!sconfig.logbackConfigFile)
@@ -296,10 +301,16 @@ class ProductConfigurer {
       webApps wconfigs.collect { WebAppConfig wconfig ->
         { ->
           contextPath wconfig.contextPath
-          def warFile = wconfig.warResourceBase
-          if(!(warFile instanceof File))
-            warFile = new File(warFile.toString())
-          warResourceBase "webapps/${warFile.name}"
+          if(ProjectUtils.isSpringBootApp(project, webAppConfig)) {
+            springBoot true
+            inplaceResourceBase ProjectUtils.getWebAppDestinationDirName(project, webAppConfig)
+          }
+          else {
+            def warFile = wconfig.warResourceBase
+            if(!(warFile instanceof File))
+              warFile = new File(warFile.toString())
+            warResourceBase "webapps/${warFile.name}"            
+          }
           if(wconfig.initParameters)
             initParams wconfig.initParameters
           if(wconfig.realm)

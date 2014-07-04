@@ -75,7 +75,7 @@ class WebAppConfig {
     return result
   }
 
-  String getWebAppName() {
+  String getWebAppLaunchName() {
     if(inplace)
       projectPath
     else {

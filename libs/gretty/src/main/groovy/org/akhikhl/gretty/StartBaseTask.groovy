@@ -31,18 +31,12 @@ abstract class StartBaseTask extends DefaultTask {
   @TaskAction
   void action() {
     LauncherConfig config = getLauncherConfig()
-    Launcher launcher = anyWebAppUsesSpringBoot(config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
+    Launcher launcher = ProjectUtils.anyWebAppUsesSpringBoot(project, config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
     launcher.scannerManager = new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
     if(getIntegrationTest())
       project.ext.grettyLaunchThread = launcher.launchThread()
     else
       launcher.launch()
-  }
-
-  protected final boolean anyWebAppUsesSpringBoot(Iterable<WebAppConfig> wconfigs) {
-    wconfigs.find { wconfig ->
-      wconfig.springBoot || (wconfig.projectPath && ProjectUtils.isSpringBootApp(project.project(wconfig.projectPath)))
-    }
   }
 
   protected final void doPrepareServerConfig(ServerConfig sconfig) {

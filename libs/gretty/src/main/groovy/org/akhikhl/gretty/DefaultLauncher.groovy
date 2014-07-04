@@ -50,4 +50,9 @@ class DefaultLauncher extends LauncherBase {
       spec.args = params.args
     }
   }
+  
+  @Override
+  protected void prepareToRun(WebAppConfig wconfig) {
+    ProjectUtils.prepareToRun(project, wconfig)
+  }
 }
