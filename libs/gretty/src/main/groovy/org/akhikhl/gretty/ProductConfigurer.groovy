@@ -254,10 +254,13 @@ class ProductConfigurer {
 
   protected void writeConfigToJson(json) {
     def self = this
+    def servletContainerConfig = ServletContainerConfig.getConfig(sconfig.servletContainer)
     json.with {
-      productName self.productName
+      productName self.productName ?: project.name
       servetContainer {
-        description ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerDescription
+        id sconfig.servletContainer
+        version servletContainerConfig.servletContainerVersion
+        description servletContainerConfig.servletContainerDescription
       }
       serverConfig {
         if(sconfig.host)
