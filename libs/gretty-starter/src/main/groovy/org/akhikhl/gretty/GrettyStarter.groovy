@@ -17,25 +17,18 @@ class GrettyStarter {
 
   static void main(String[] args) {
 
+    File basedir = new File(GrettyStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath().toURI().getPath()).parentFile.parentFile
+
     def cli = new CliBuilder()
-    cli.with {
-      r longOpt: 'run', 'run'
-      s longOpt: 'start', 'start'
-      st longOpt: 'stop', 'stop'
-      re longOpt: 'restart', 'restart'
-      d longOpt: 'basedir', args: 1, argName: 'basedir', type: String, required: true, 'basedir'
-    }
+    // here we could define command-line parameters via CliBuilder DSL
+
     def options = cli.parse(args)
-    File basedir = new File(options.basedir)
-    String command
-    if(options.start)
-      command = 'start'
-    else if(options.stop)
-      command = 'stop'
-    else if(options.restart)
-      command = 'restart'
-    else
-      command = 'run'
+
+    String command = 'run'
+
+    def cliArgs = options.arguments()
+    if(cliArgs)
+      command = cliArgs[0]
 
     Map config
     new File(basedir, 'conf/server.json').withReader {
@@ -90,7 +83,7 @@ class GrettyStarter {
       }
 
       boolean getInteractive() {
-        command == 'run'
+        command != 'start'
       }
 
       boolean getManagedClassReload() {
