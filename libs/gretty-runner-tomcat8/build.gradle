@@ -10,6 +10,9 @@ dependencies {
   compile "org.apache.tomcat.embed:tomcat-embed-el:$tomcat8_version"
   compile "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat8_version"
   compile "org.apache.tomcat.embed:tomcat-embed-logging-juli:$tomcat8_version"
+  // this fixes incorrect dependency of tomcat-8.0.9 on ecj-4.4RC4
+  if(tomcat8_version == '8.0.9')
+    compile 'org.eclipse.jdt.core.compiler:ecj:4.4'
   compile tomcat8_servlet_api
 }
 
