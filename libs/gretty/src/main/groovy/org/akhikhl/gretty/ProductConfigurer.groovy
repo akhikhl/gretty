@@ -225,7 +225,7 @@ class ProductConfigurer {
     }
 
     if(sconfig.logbackConfigFile) {
-      FileUtils.copyFile(sconfig.logbackConfigFile, new File(outputDir, "conf/${logbackConfigFile.name}"))
+      FileUtils.copyFile(sconfig.logbackConfigFile, new File(outputDir, "conf/${sconfig.logbackConfigFile.name}"))
       destFiles.add(sconfig.logbackConfigFile)
     }
     else {
