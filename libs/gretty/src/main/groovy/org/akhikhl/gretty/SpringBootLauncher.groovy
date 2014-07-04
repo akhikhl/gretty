@@ -33,14 +33,19 @@ class SpringBootLauncher extends DefaultLauncher {
       files += project.configurations.grettyRunnerSpringBootJetty.files
     else if(servletContainerConfig.servletContainerType == 'tomcat')
       files += project.configurations.grettyRunnerSpringBootTomcat.files
+    def classPath = files.collect { it.toURL() } as LinkedHashSet
+    def classPathResolver = config.getWebAppClassPathResolver()
     for(def wconfig in webAppConfigs) {
       if(wconfig.projectPath) {
         def proj = project.project(wconfig.projectPath)
-        if(ProjectUtils.isSpringBootApp(proj))
-          files += resolveWebAppClassPath(wconfig)
+        if(ProjectUtils.isSpringBootApp(proj) && classPathResolver) {
+          def cp = classPathResolver.resolveWebAppClassPath(wconfig)
+          if(cp)
+            classPath += cp
+        }
       }
     }
-    files.collect { it.toURL() }
+    classPath
   }
 
   @Override
