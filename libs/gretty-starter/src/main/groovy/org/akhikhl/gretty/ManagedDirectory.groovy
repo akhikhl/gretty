@@ -7,15 +7,21 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.commons.io.FileUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 /**
  *
  * @author akhikhl
  */
 class ManagedDirectory {
 
-  File baseDir
-  Set addedDirs = new HashSet()
-  Set addedFiles = new HashSet()
+  protected static final Logger log = LoggerFactory.getLogger(ManagedDirectory)
+
+  final File baseDir
+  private final Set addedDirs = new HashSet()
+  private final Set addedFiles = new HashSet()
 
   ManagedDirectory(File baseDir) {
     this.baseDir = baseDir
@@ -34,14 +40,13 @@ class ManagedDirectory {
   private void add_(File srcFile, File dstFile) {
     if(srcFile.isDirectory()) {
       dstFile.mkdirs()
-      registerAddedDir(dstFile)
+      registerAdded(dstFile)
       for(File f in srcFile.listFiles())
         add_(f, new File(dstFile, f.name))
     } else {
       dstFile.parentFile.mkdirs()
-      registerAddedDir(dstFile.parentFile)
       FileUtils.copyFile(srcFile, dstFile)
-      addedFiles.add(dstFile)
+      registerAdded(dstFile)
     }
   }
   
@@ -53,19 +58,30 @@ class ManagedDirectory {
     if(addedDirs.contains(dir)) {
       for(File f in dir.listFiles()) {
         if(f.isFile()) {
-          if(!addedFiles.contains(f))
+          if(!addedFiles.contains(f)) {
+            log.warn 'deleting managed {}', f
             f.delete()
+          }
         } else
           cleanupFiles(f)
       }
-    } else
+    } else {
+      log.warn 'deleting managed {}', dir
       dir.deleteDir()
+    }
   }
   
-  private void registerAddedDir(File dir) {
-    while(dir != baseDir) {
-      addedDirs.add(dir)
-      dir = dir.parentFile
+  void registerAdded(File f) {
+    if(f.isDirectory()) {
+      while(f != baseDir) {
+        if(addedDirs.add(f))
+          log.warn 'added managed {}', f
+        f = f.parentFile
+      }
+    } else {
+      registerAdded(f.parentFile)
+      if(addedFiles.add(f))
+        log.warn 'added managed {}', f      
     }
   }
 }

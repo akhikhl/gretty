@@ -8,7 +8,6 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonBuilder
-import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
@@ -137,10 +136,22 @@ class ProductConfigurer {
     
     for(WebAppConfig wconfig in wconfigs) {
       if(ProjectUtils.isSpringBootApp(project, wconfig)) {
-        def file = wconfig.warResourceBase
-        if(!(file instanceof File))
-          file = new File(file.toString())
-        dir.add(file, ProjectUtils.getWebAppDestinationDirName(project, wconfig))
+        def files
+        if(wconfig.projectPath) {
+          def proj = project.project(wconfig.projectPath)
+          def resolvedClassPath = new LinkedHashSet<URL>()
+          resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, true, 'springBoot'))
+          resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
+          files = resolvedClassPath.collect { new File(it.path) }
+        } else {
+          def file = wconfig.warResourceBase
+          if(!(file instanceof File))
+            file = new File(file.toString())
+          files = [ file ]
+        }
+        String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
+        for(File file in files)
+          dir.add(file, appDir)          
       } else {
         def file = wconfig.warResourceBase
         if(!(file instanceof File))
@@ -207,46 +218,30 @@ class ProductConfigurer {
   }
 
   protected void writeConfigFiles() {
+    
+    ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'conf'))
 
-    File destDir = new File(outputDir, 'conf')
-    destDir.mkdirs()
-    Set destFiles = new HashSet()
-
-    File configFile = new File(destDir, 'server.json')
+    File configFile = new File(dir.baseDir, 'server.json')
     configFile.parentFile.mkdirs()
     configFile.text = jsonConfig
-    destFiles.add(configFile)
+    dir.registerAdded(configFile)
 
-    if(sconfig.sslKeyStorePath) {
-      File destFile = new File(destDir, sconfig.sslKeyStorePath.name)
-      FileUtils.copyFile(sconfig.sslKeyStorePath, destFile)
-      destFiles.add(destFile)
-    }
+    if(sconfig.sslKeyStorePath)
+      dir.add(sconfig.sslKeyStorePath)
 
-    if(sconfig.sslTrustStorePath) {
-      File destFile = new File(destDir, sconfig.sslTrustStorePath.name)
-      FileUtils.copyFile(sconfig.sslTrustStorePath, destFile)
-      destFiles.add(destFile)
-    }
+    if(sconfig.sslTrustStorePath)
+      dir.add(sconfig.sslTrustStorePath)
 
-    if(sconfig.logbackConfigFile) {
-      FileUtils.copyFile(sconfig.logbackConfigFile, new File(outputDir, "conf/${sconfig.logbackConfigFile.name}"))
-      destFiles.add(sconfig.logbackConfigFile)
-    }
+    if(sconfig.logbackConfigFile)
+      dir.add(sconfig.logbackConfigFile)
     else {
-      File logbackConfigFile = new File(outputDir, 'conf/logback.groovy')
+      File logbackConfigFile = new File(dir.baseDir, 'logback.groovy')
       logbackConfigFile.parentFile.mkdirs()
       logbackConfigFile.text = logbackConfig
-      destFiles.add(logbackConfigFile)
+      dir.registerAdded(logbackConfigFile)
     }
 
-    for(File f in destDir.listFiles())
-      if(!destFiles.contains(f)) {
-        if(f.isDirectory())
-          f.deleteDir()
-        else
-          f.delete()
-      }
+    dir.cleanup()
   }
 
   protected String writeConfigToJson() {
@@ -301,15 +296,15 @@ class ProductConfigurer {
       webApps wconfigs.collect { WebAppConfig wconfig ->
         { ->
           contextPath wconfig.contextPath
-          if(ProjectUtils.isSpringBootApp(project, webAppConfig)) {
+          if(ProjectUtils.isSpringBootApp(project, wconfig)) {
             springBoot true
-            inplaceResourceBase ProjectUtils.getWebAppDestinationDirName(project, webAppConfig)
+            inplaceResourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
           }
           else {
             def warFile = wconfig.warResourceBase
             if(!(warFile instanceof File))
               warFile = new File(warFile.toString())
-            warResourceBase "webapps/${warFile.name}"            
+            warResourceBase 'webapps/' + warFile.name            
           }
           if(wconfig.initParameters)
             initParams wconfig.initParameters
