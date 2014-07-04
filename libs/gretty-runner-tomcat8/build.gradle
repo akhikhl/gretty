@@ -15,4 +15,3 @@ dependencies {
     compile 'org.eclipse.jdt.core.compiler:ecj:4.4'
   compile tomcat8_servlet_api
 }
-
