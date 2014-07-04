@@ -88,8 +88,7 @@ class ProductConfigurer {
 
       doLast {
         resolveConfig()
-        writeConfig()
-        writeLogbackConfig()
+        writeConfigFiles()
         writeLaunchScripts()
         copyWebappFiles()
         copyStarter()
@@ -111,13 +110,6 @@ class ProductConfigurer {
     project.tasks.archiveAllProducts.dependsOn archiveProductTask
   }
 
-  void copyStarter() {
-    File destDir = new File(outputDir, 'starter')
-    destDir.mkdirs()
-    for(File file in project.configurations.grettyStarter.files)
-      FileUtils.copyFileToDirectory(file, destDir)
-  }
-
   void copyRunner() {
     File destDir = new File(outputDir, 'runner')
     destDir.mkdirs()
@@ -134,6 +126,13 @@ class ProductConfigurer {
         else
           f.delete()
       }
+  }
+
+  void copyStarter() {
+    File destDir = new File(outputDir, 'starter')
+    destDir.mkdirs()
+    for(File file in project.configurations.grettyStarter.files)
+      FileUtils.copyFileToDirectory(file, destDir)
   }
 
   void copyWebappFiles() {
@@ -195,16 +194,54 @@ class ProductConfigurer {
     configurer.resolveWebAppRefs(productFarm.webAppRefs, wconfigs, false)
     for(WebAppConfig wconfig in wconfigs)
       wconfig.prepareToRun()
+    CertificateGenerator.maybeGenerate(project, sconfig)
     jsonConfig = writeConfigToJson()
     if(!sconfig.logbackConfigFile)
       logbackConfig = LogbackUtils.generateLogbackConfig(sconfig)
     createLaunchScripts()
   }
 
-  protected void writeConfig() {
-    File configFile = new File(outputDir, 'conf/server.json')
+  protected void writeConfigFiles() {
+
+    File destDir = new File(outputDir, 'conf')
+    destDir.mkdirs()
+    Set destFiles = new HashSet()
+
+    File configFile = new File(destDir, 'server.json')
     configFile.parentFile.mkdirs()
     configFile.text = jsonConfig
+    destFiles.add(configFile)
+
+    if(sconfig.sslKeyStorePath) {
+      File destFile = new File(destDir, sconfig.sslKeyStorePath.name)
+      FileUtils.copyFile(sconfig.sslKeyStorePath, destFile)
+      destFiles.add(destFile)
+    }
+
+    if(sconfig.sslTrustStorePath) {
+      File destFile = new File(destDir, sconfig.sslTrustStorePath.name)
+      FileUtils.copyFile(sconfig.sslTrustStorePath, destFile)
+      destFiles.add(destFile)
+    }
+
+    if(sconfig.logbackConfigFile) {
+      FileUtils.copyFile(sconfig.logbackConfigFile, new File(outputDir, "conf/${logbackConfigFile.name}"))
+      destFiles.add(sconfig.logbackConfigFile)
+    }
+    else {
+      File logbackConfigFile = new File(outputDir, 'conf/logback.groovy')
+      logbackConfigFile.parentFile.mkdirs()
+      logbackConfigFile.text = logbackConfig
+      destFiles.add(logbackConfigFile)
+    }
+
+    for(File f in destDir.listFiles())
+      if(!destFiles.contains(f)) {
+        if(f.isDirectory())
+          f.deleteDir()
+        else
+          f.delete()
+      }
   }
 
   protected String writeConfigToJson() {
@@ -229,19 +266,21 @@ class ProductConfigurer {
           httpPort sconfig.httpPort
           if(sconfig.httpIdleTimeout)
             httpIdleTimeout sconfig.httpIdleTimeout
-        }
+        } else
+          httpEnabled false
         if(sconfig.httpsEnabled) {
+          httpsEnabled true
           httpsPort sconfig.httpsPort
           if(sconfig.httpsIdleTimeout)
             httpsIdleTimeout sconfig.httpsIdleTimeout
           if(sconfig.sslKeyStorePath)
-            sslKeyStorePath sconfig.sslKeyStorePath.absolutePath
+            sslKeyStorePath 'conf/' + sconfig.sslKeyStorePath.name
           if(sconfig.sslKeyStorePassword)
             sslKeyStorePassword sconfig.sslKeyStorePassword
           if(sconfig.sslKeyManagerPassword)
             sslKeyManagerPassword sconfig.sslKeyManagerPassword
           if(sconfig.sslTrustStorePath)
-            sslTrustStorePath sconfig.sslTrustStorePath.absolutePath
+            sslTrustStorePath 'conf/' + sconfig.sslTrustStorePath.name
           if(sconfig.sslTrustStorePassword)
             sslTrustStorePassword sconfig.sslTrustStorePassword
         }
@@ -279,17 +318,6 @@ class ProductConfigurer {
       launchScriptFile.text = scriptText
       if(scriptName.endsWith('.sh'))
         launchScriptFile.setExecutable(true)
-    }
-  }
-
-  protected void writeLogbackConfig() {
-    // sconfig.logbackConfigFile, logbackConfig, outputDir
-    if(sconfig.logbackConfigFile)
-      FileUtils.copyFile(sconfig.logbackConfigFile, new File(outputDir, "conf/${logbackConfigFile.name}"))
-    else {
-      File logbackConfigFile = new File(outputDir, 'conf/logback.groovy')
-      logbackConfigFile.parentFile.mkdirs()
-      logbackConfigFile.text = logbackConfig
     }
   }
 }

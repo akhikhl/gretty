@@ -42,19 +42,19 @@ class GrettyStarter {
 
     ConfigUtils.complementProperties(sconfig, ServerConfig.getDefaultServerConfig(config.productName))
 
-    if(sconfig.jettyXmlFile) {
-      File jettyXmlFile = new File(sconfig.jettyXmlFile)
-      if(!jettyXmlFile.isAbsolute())
-        jettyXmlFile = new File(basedir, sconfig.jettyXmlFile)
-      sconfig.jettyXmlFile = jettyXmlFile.exists() ? jettyXmlFile : null
+    def resolveFile = { f ->
+      if(f) {
+        File file = new File(f)
+        if(!file.isAbsolute())
+          file = new File(basedir, f)
+        file.exists() ? file : null
+      }
     }
 
-    if(sconfig.logbackConfigFile) {
-      File logbackConfigFile = new File(sconfig.logbackConfigFile)
-      if(!logbackConfigFile.isAbsolute())
-        logbackConfigFile = new File(basedir, sconfig.logbackConfigFile)
-      sconfig.logbackConfigFile = logbackConfigFile.exists() ? logbackConfigFile : null
-    }
+    sconfig.sslKeyStorePath = resolveFile(sconfig.sslKeyStorePath)
+    sconfig.sslTrustStorePath = resolveFile(sconfig.sslTrustStorePath)
+    sconfig.jettyXmlFile = resolveFile(sconfig.jettyXmlFile)
+    sconfig.logbackConfigFile = resolveFile(sconfig.logbackConfigFile)
 
     if(command == 'stop' || command == 'restart') {
       ServiceProtocol.send(sconfig.servicePort, command)
