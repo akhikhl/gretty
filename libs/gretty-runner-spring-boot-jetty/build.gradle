@@ -4,5 +4,8 @@ apply from: rootProject.file('libs/publish.gradle')
 dependencies {
   compile project(':libs:gretty-runner-spring-boot')
   compile project(':libs:gretty-runner-jetty9')
-  runtime "org.springframework.boot:spring-boot-starter-jetty:$springBootVersion"
+  runtime "org.springframework.boot:spring-boot-starter-jetty:$springBootVersion", {
+    exclude group: 'org.eclipse.jetty', module: 'jetty-webapp'
+    exclude group: 'org.eclipse.jetty', module: 'jetty-jsp'
+  }
 }
