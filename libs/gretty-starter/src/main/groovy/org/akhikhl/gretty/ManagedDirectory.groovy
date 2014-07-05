@@ -59,14 +59,14 @@ class ManagedDirectory {
       for(File f in dir.listFiles()) {
         if(f.isFile()) {
           if(!addedFiles.contains(f)) {
-            log.warn 'deleting managed {}', f
+            log.debug 'deleting managed {}', f
             f.delete()
           }
         } else
           cleanupFiles(f)
       }
     } else {
-      log.warn 'deleting managed {}', dir
+      log.debug 'deleting managed {}', dir
       dir.deleteDir()
     }
   }
@@ -75,13 +75,13 @@ class ManagedDirectory {
     if(f.isDirectory()) {
       while(f != baseDir) {
         if(addedDirs.add(f))
-          log.warn 'added managed {}', f
+          log.debug 'added managed {}', f
         f = f.parentFile
       }
     } else {
       registerAdded(f.parentFile)
       if(addedFiles.add(f))
-        log.warn 'added managed {}', f      
+        log.debug 'added managed {}', f      
     }
   }
 }

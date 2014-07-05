@@ -10,12 +10,16 @@ package org.akhikhl.gretty
 import groovy.json.JsonBuilder
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
  * @author akhikhl
  */
 class ProductConfigurer {
+
+  protected static final Logger log = LoggerFactory.getLogger(ProductConfigurer)
 
   protected static final String mainClass = 'org.akhikhl.gretty.GrettyStarter'
 
@@ -136,22 +140,31 @@ class ProductConfigurer {
     
     for(WebAppConfig wconfig in wconfigs) {
       if(ProjectUtils.isSpringBootApp(project, wconfig)) {
+        String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
         def files
         if(wconfig.projectPath) {
           def proj = project.project(wconfig.projectPath)
+          for(File webappDir in ProjectUtils.getWebAppDirs(proj))
+            for(File f in (webappDir.listFiles() ?: []))
+              dir.add(f, appDir)
           def resolvedClassPath = new LinkedHashSet<URL>()
-          resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, true, 'springBoot'))
+          resolvedClassPath.addAll(ProjectUtils.getClassPathJars(proj, 'runtimeNoSpringBoot'))
           resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
           files = resolvedClassPath.collect { new File(it.path) }
+          files -= getRunnerFileCollection().files
         } else {
           def file = wconfig.warResourceBase
           if(!(file instanceof File))
             file = new File(file.toString())
           files = [ file ]
         }
-        String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
-        for(File file in files)
-          dir.add(file, appDir)          
+        for(File file in files) {
+          if(file.isDirectory())
+            for(File f in (file.listFiles() ?: []))
+              dir.add(f, appDir + '/WEB-INF/classes')
+          else
+            dir.add(file, appDir + '/WEB-INF/lib')
+        }
       } else {
         def file = wconfig.warResourceBase
         if(!(file instanceof File))
@@ -193,6 +206,12 @@ class ProductConfigurer {
     } else
       files = project.configurations[servletContainerConfig.servletContainerRunnerConfig]        
     files
+  }
+  
+  protected String getSpringBootMainClass() {
+    sconfig.springBootMainClass ?: 
+    SpringBootMainClassFinder.findMainClass(project) ?: 
+    wconfigs.findResult { it.projectPath ? SpringBootMainClassFinder.findMainClass(project.project(it.projectPath)) : null }
   }
 
   protected resolveConfig() {
@@ -257,7 +276,7 @@ class ProductConfigurer {
     def servletContainerConfig = ServletContainerConfig.getConfig(sconfig.servletContainer)
     json.with {
       productName self.productName ?: project.name
-      servetContainer {
+      servletContainer {
         id sconfig.servletContainer
         version servletContainerConfig.servletContainerVersion
         description servletContainerConfig.servletContainerDescription
@@ -318,7 +337,9 @@ class ProductConfigurer {
             springBootSources wconfig.springBootSources
         }
       }
-    }
+      if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) })
+        springBootMainClass getSpringBootMainClass()
+    } // json
   }
 
   protected void writeLaunchScripts() {

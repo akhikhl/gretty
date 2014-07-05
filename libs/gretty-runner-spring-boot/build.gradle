@@ -3,5 +3,7 @@ apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
   compile project(':libs:gretty-runner')
-  compile "org.springframework.boot:spring-boot:$springBootVersion"
+  compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion", {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+  }
 }

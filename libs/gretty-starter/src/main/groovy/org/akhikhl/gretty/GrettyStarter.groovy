@@ -68,10 +68,17 @@ class GrettyStarter {
         wconfig[key] = value
       }
       if(wconfig.warResourceBase) {
-        File warFile = new File(wconfig.warResourceBase)
-        if(!warFile.isAbsolute())
-          warFile = new File(basedir, wconfig.warResourceBase)
-        wconfig.warResourceBase = warFile.absolutePath
+        File f = new File(wconfig.warResourceBase)
+        if(!f.isAbsolute())
+          f = new File(basedir, wconfig.warResourceBase)
+        wconfig.warResourceBase = f.absolutePath
+        wconfig.inplace = false
+      } else {
+        File f = new File(wconfig.inplaceResourceBase)
+        if(!f.isAbsolute())
+          f = new File(basedir, wconfig.inplaceResourceBase)
+        wconfig.inplaceResourceBase = f.absolutePath
+        wconfig.inplace = true
       }
       wconfigs.add(wconfig)
     }
@@ -106,7 +113,6 @@ class GrettyStarter {
       }
     }
 
-    new StarterLauncher(basedir, config.servetContainer, launcherConfig).launch()
+    new StarterLauncher(basedir, config, launcherConfig).launch()
   }
 }
-

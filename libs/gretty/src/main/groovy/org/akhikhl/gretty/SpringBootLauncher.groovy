@@ -48,6 +48,12 @@ class SpringBootLauncher extends DefaultLauncher {
   protected String getServerManagerFactory() {
     'org.akhikhl.gretty.SpringBootServerManagerFactory'
   }
+  
+  protected String getSpringBootMainClass() {
+    sconfig.springBootMainClass ?: 
+    SpringBootMainClassFinder.findMainClass(project) ?: 
+    webAppConfigs.findResult { it.projectPath ? SpringBootMainClassFinder.findMainClass(project.project(it.projectPath)) : null }
+  }
 
   @Override
   protected void writeLoggingConfig(json) {
@@ -66,8 +72,8 @@ class SpringBootLauncher extends DefaultLauncher {
   @Override
   protected void writeRunConfigJson(json) {
     super.writeRunConfigJson(json)
-    json.with {
-      springBootMainClass SpringBootMainClassFinder.findMainClass(project)
+    json.with {      
+      springBootMainClass getSpringBootMainClass()
     }
   }
 

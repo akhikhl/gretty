@@ -105,8 +105,8 @@ abstract class LauncherBase implements Launcher {
 
       futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
       def runConfigJson = getRunConfigJson()
-      log.debug 'Sending parameters to port {}', sconfig.servicePort
-      log.debug runConfigJson.toPrettyString()
+      log.warn 'Sending parameters to port {}', sconfig.servicePort
+      log.warn runConfigJson.toPrettyString()
       ServiceProtocol.send(sconfig.servicePort, runConfigJson.toString())
       status = futureStatus.get()
       log.debug 'Got start status: {}', status

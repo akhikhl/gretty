@@ -47,6 +47,7 @@ class ServerConfig {
   List<Closure> onScan
   List<Closure> onScanFilesChanged
   Boolean secureRandom
+  String springBootMainClass
 
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()

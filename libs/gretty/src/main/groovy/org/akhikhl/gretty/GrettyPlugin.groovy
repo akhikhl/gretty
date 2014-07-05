@@ -45,6 +45,10 @@ class GrettyPlugin implements Plugin<Project> {
         transitive = false
       }
       grettyStarter
+      runtimeNoSpringBoot {
+        extendsFrom project.configurations.runtime
+        exclude group: 'org.springframework.boot'
+      }
     }
     if(!project.configurations.findByName('providedCompile'))
       project.configurations {
@@ -92,7 +96,9 @@ class GrettyPlugin implements Plugin<Project> {
 
     if(project.gretty.springBoot)
       project.dependencies {
-        compile 'org.springframework.boot:spring-boot-starter-web'
+        compile 'org.springframework.boot:spring-boot-starter-web', {
+          exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+        }
         springBoot 'org.springframework.boot:spring-boot-starter-jetty'
       }
 

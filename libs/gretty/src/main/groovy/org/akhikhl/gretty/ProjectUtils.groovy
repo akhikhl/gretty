@@ -167,6 +167,28 @@ final class ProjectUtils {
     return urls
   }
 
+  static Set<URL> getClassPathJars(Project project, String dependencyConfig) {
+    Set<URL> urls = new LinkedHashSet()
+    if(project != null) {
+      def addProjectClassPath
+      addProjectClassPath = { Project proj ->
+        urls.addAll project.tasks.jar.archivePath.toURI().toURL()
+        urls.addAll proj.configurations[dependencyConfig].files.collect { it.toURI().toURL() }
+        // ATTENTION: order of overlay classpath is important!
+        if(proj.extensions.findByName('gretty'))
+          for(String overlay in proj.gretty.overlays.reverse())
+            addProjectClassPath(proj.project(overlay))
+      }
+      addProjectClassPath(project)
+      for(File overlayJar in collectOverlayJars(project))
+        if(urls.remove(overlayJar.toURI().toURL()))
+          log.debug '{} is overlay jar, exclude from classpath', overlayJar
+      for(URL url in urls)
+        log.debug 'classpath URL: {}', url
+    }
+    return urls
+  }
+
   static ServerConfig getDefaultServerConfig(Project project) {
     ServerConfig.getDefaultServerConfig(project.name)
   }
@@ -213,6 +235,22 @@ final class ProjectUtils {
 
   static File getWebAppDir(Project project) {
     project.hasProperty('webAppDir') ? project.webAppDir : new File(project.projectDir, 'src/main/webapp')
+  }
+
+  static Set<File> getWebAppDirs(Project project) {
+    Set files = new LinkedHashSet()
+    if(project != null) {
+      def addWebAppDir
+      addWebAppDir = { Project proj ->
+        // ATTENTION: order of overlay classpath is important!
+        if(proj.extensions.findByName('gretty'))
+          for(String overlay in proj.gretty.overlays)
+            addWebAppDir(proj.project(overlay))
+        files.add getWebAppDir(proj)
+      }
+      addWebAppDir(project)
+    }
+    return files
   }
 
   static String getWebAppDestinationDirName(Project project, WebAppConfig wconfig) {
