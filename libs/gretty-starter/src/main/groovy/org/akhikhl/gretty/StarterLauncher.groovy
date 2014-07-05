@@ -52,7 +52,7 @@ class StarterLauncher extends LauncherBase {
       }
     classPath = classPath.collect { it.absolutePath }.join(System.getProperty('path.separator'))
     def procParams = [ javaPath ] + params.jvmArgs + params.systemProperties.collect { k, v -> "-D$k=$v" } + [ '-cp', classPath, params.main ] + params.args
-    log.warn 'Launching runner process: {}', procParams.join(' ')
+    log.debug 'Launching runner process: {}', procParams.join(' ')
     Process proc = procParams.execute()
     proc.waitForProcessOutput(System.out, System.err)
   }
@@ -65,4 +65,12 @@ class StarterLauncher extends LauncherBase {
         springBootMainClass starterConfig.springBootMainClass
     }
   }
+
+  protected void writeWebAppClassPath(json, WebAppConfig wconfig) {
+    if(wconfig.springBoot) {
+      json.springBoot true
+      return // webapp classpath is passed directly to the runner
+    }
+    super.writeWebAppClassPath(json, webAppConfig)
+  }  
 }
