@@ -199,8 +199,9 @@ final class ProjectUtils {
     result.realmConfigFile = null
     result.jettyEnvXmlFile = 'jetty-env.xml'
     result.fastReload = true
-    result.inplaceResourceBase = "${project.buildDir}/inplaceWebapp/" as String
-    result.warResourceBase = ProjectUtils.getFinalArchivePath(project).toString()
+    result.resourceBase = { 
+      inplace ? "${project.buildDir}/inplaceWebapp/" as String : ProjectUtils.getFinalArchivePath(project).toString()
+    }
     result.projectPath = project.path
     return result
   }
@@ -208,12 +209,11 @@ final class ProjectUtils {
   static WebAppConfig getDefaultWebAppConfigForMavenDependency(Project project, String dependency) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + dependency.split(':')[1]
-    result.warResourceBase = {
+    result.resourceBase = {
       def gav = dependency.split(':')
       def artifact = project.configurations.farm.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1] }
       artifact.file.absolutePath
     }
-    result.inplace = false
     return result
   }
 
@@ -257,10 +257,10 @@ final class ProjectUtils {
     if(wconfig.projectPath)
       project.project(wconfig.projectPath).name
     else {
-      def warFile = wconfig.warResourceBase
-      if(!(warFile instanceof File))
-        warFile = new File(warFile.toString())
-      FilenameUtils.getBaseName(warFile.name).replaceAll(/([\da-zA-Z_.-]+?)-((\d+\.)+[\da-zA-Z_.-]*)/, '$1')
+      def file = wconfig.resourceBase
+      if(!(file instanceof File))
+        file = new File(file.toString())
+      FilenameUtils.getBaseName(file.name).replaceAll(/([\da-zA-Z_.-]+?)-((\d+\.)+[\da-zA-Z_.-]*)/, '$1')
     }
   }
 

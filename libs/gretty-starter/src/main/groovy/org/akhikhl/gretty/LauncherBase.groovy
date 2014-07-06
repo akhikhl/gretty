@@ -181,22 +181,22 @@ abstract class LauncherBase implements Launcher {
       if(sconfig.jettyXmlFile)
         jettyXml sconfig.jettyXmlFile.absolutePath
       writeLoggingConfig(json)
-      webApps webAppConfigs.collect { WebAppConfig webAppConfig ->
+      webApps webAppConfigs.collect { WebAppConfig wconfig ->
         { ->
-          inplace webAppConfig.inplace
-          self.writeWebAppClassPath(delegate, webAppConfig)
-          contextPath webAppConfig.contextPath
-          resourceBase (webAppConfig.inplace ? webAppConfig.inplaceResourceBase : webAppConfig.warResourceBase ?: webAppConfig.warResourceBase.toString() ?: '')
-          if(webAppConfig.initParameters)
-            initParams webAppConfig.initParameters
-          if(webAppConfig.realm)
-            realm webAppConfig.realm
-          if(webAppConfig.realmConfigFile)
-            realmConfigFile webAppConfig.realmConfigFile.absolutePath
-          if(webAppConfig.jettyEnvXmlFile)
-            jettyEnvXml webAppConfig.jettyEnvXmlFile.absolutePath
-          if(webAppConfig.springBootSources)
-            springBootSources webAppConfig.springBootSources
+          inplace wconfig.inplace
+          self.writeWebAppClassPath(delegate, wconfig)
+          contextPath wconfig.contextPath
+          resourceBase wconfig.resourceBase
+          if(wconfig.initParameters)
+            initParams wconfig.initParameters
+          if(wconfig.realm)
+            realm wconfig.realm
+          if(wconfig.realmConfigFile)
+            realmConfigFile wconfig.realmConfigFile.absolutePath
+          if(wconfig.jettyEnvXmlFile)
+            jettyEnvXml wconfig.jettyEnvXmlFile.absolutePath
+          if(wconfig.springBootSources)
+            springBootSources wconfig.springBootSources
         }
       }
     }

@@ -67,18 +67,10 @@ class GrettyStarter {
       w.each { key, value ->
         wconfig[key] = value
       }
-      if(wconfig.warResourceBase) {
-        File f = new File(wconfig.warResourceBase)
-        if(!f.isAbsolute())
-          f = new File(basedir, wconfig.warResourceBase)
-        wconfig.warResourceBase = f.absolutePath
-        wconfig.inplace = false
-      } else {
-        File f = new File(wconfig.inplaceResourceBase)
-        if(!f.isAbsolute())
-          f = new File(basedir, wconfig.inplaceResourceBase)
-        wconfig.inplaceResourceBase = f.absolutePath
-        wconfig.inplace = true
+      File f = new File(wconfig.resourceBase)
+      if(!f.isAbsolute()) {
+        f = new File(basedir, wconfig.resourceBase)
+        wconfig.resourceBase = f.absolutePath
       }
       wconfigs.add(wconfig)
     }

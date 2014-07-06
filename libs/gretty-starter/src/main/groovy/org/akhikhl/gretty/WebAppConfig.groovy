@@ -24,8 +24,7 @@ class WebAppConfig {
   def jettyEnvXmlFile
   def scanDirs
   def fastReload
-  def inplaceResourceBase
-  def warResourceBase
+  def resourceBase
 
   Set<URL> classPath
 
@@ -70,27 +69,20 @@ class WebAppConfig {
     // remove version suffix
     baseName = baseName.replaceAll(/([\da-zA-Z_.-]+?)-((\d+\.)+[\da-zA-Z_.-]*)/, '$1')
     result.contextPath = '/' + baseName
-    result.warResourceBase = warFile.absolutePath
-    result.inplace = false
+    result.resourceBase = warFile.absolutePath
     return result
   }
 
   String getWebAppLaunchName() {
-    if(inplace) {
-      if(projectPath)
-        return projectPath
-      def dir = inplaceResourceBase
-      if(dir) {
-        if(!(dir instanceof File))
-          dir = new File(dir)
-        return dir.name
-      }
-      return null
+    if(projectPath)
+      return projectPath
+    if(resourceBase) {
+      def dir = resourceBase
+      if(!(dir instanceof File))
+        dir = new File(dir)
+      return dir.name
     }
-    def file = warResourceBase
-    if(!(file instanceof File))
-      file = new File(file.toString())
-    return file.name
+    return null
   }
 
   void initParameter(key, value) {

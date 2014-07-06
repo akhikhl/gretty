@@ -42,11 +42,11 @@ class StarterLauncher extends LauncherBase {
     String javaPath = new File(System.getProperty("java.home"), "bin/$javaExe").absolutePath
     def classPath = [ new File(basedir, 'conf'), new File(basedir, 'runner/*') ]
     for(WebAppConfig wconfig in config.getWebAppConfigs())
-      if(wconfig.springBoot && wconfig.inplaceResourceBase) {
-        File classesDir = new File(wconfig.inplaceResourceBase, 'WEB-INF/classes')
+      if(wconfig.springBoot) {
+        File classesDir = new File(wconfig.resourceBase, 'WEB-INF/classes')
         if(classesDir.exists())
           classPath.add(classesDir)
-        File libDir = new File(wconfig.inplaceResourceBase, 'WEB-INF/lib')
+        File libDir = new File(wconfig.resourceBase, 'WEB-INF/lib')
         if(libDir.exists())
           classPath.add(new File(libDir, '*'))
       }

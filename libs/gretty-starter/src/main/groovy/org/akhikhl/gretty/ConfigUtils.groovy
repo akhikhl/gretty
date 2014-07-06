@@ -85,16 +85,19 @@ class ConfigUtils {
     }
   }
 
-  static resolveClosures(Object obj) {
+  static void resolveClosures(Object obj) {
     if(obj == null)
       return
     def props
     if(obj instanceof Map)
-      props = [] + obj.keySet()
+      props = obj.keySet()
     else
       props = obj.metaClass.properties.collect { it.name } - ['class']
     for(String propName in props)
-      if(obj[propName] instanceof Closure)
+      if(obj[propName] instanceof Closure) {
+        obj[propName].delegate = obj
+        obj[propName].resolveStrategy = Closure.DELEGATE_FIRST
         obj[propName] = obj[propName]()
+      }
   }
 }

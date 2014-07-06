@@ -79,7 +79,8 @@ class ProductConfigurer {
       inputs.files {
         resolveConfig()
         wconfigs.findResults {
-          it.projectPath ? null : it.warResourceBase
+          // projects are already set as input in dependsOn
+          it.projectPath ? null : it.resourceBase
         }
       }
 
@@ -160,7 +161,7 @@ class ProductConfigurer {
           files = resolvedClassPath.collect { new File(it.path) }
           files -= getRunnerFileCollection().files
         } else {
-          def file = wconfig.warResourceBase
+          def file = wconfig.resourceBase
           if(!(file instanceof File))
             file = new File(file.toString())
           files = [ file ]
@@ -173,7 +174,7 @@ class ProductConfigurer {
             dir.add(file, appDir + '/WEB-INF/lib')
         }
       } else {
-        def file = wconfig.warResourceBase
+        def file = wconfig.resourceBase
         if(!(file instanceof File))
           file = new File(file.toString())
         dir.add(file, appDir)
@@ -332,13 +333,13 @@ class ProductConfigurer {
           contextPath wconfig.contextPath
           if(ProjectUtils.isSpringBootApp(project, wconfig)) {
             springBoot true
-            inplaceResourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
+            resourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
           }
           else {
-            def warFile = wconfig.warResourceBase
-            if(!(warFile instanceof File))
-              warFile = new File(warFile.toString())
-            warResourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig) + '/' + warFile.name
+            def file = wconfig.resourceBase
+            if(!(file instanceof File))
+              file = new File(file.toString())
+            resourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig) + '/' + file.name
           }
           if(wconfig.initParameters)
             initParams wconfig.initParameters
