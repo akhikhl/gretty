@@ -31,7 +31,7 @@ class ProductConfigurer {
 
   protected ServerConfig sconfig
   protected List<WebAppConfig> wconfigs
-  protected String jsonConfig
+  protected jsonConfig
   protected String logbackConfig
   protected Map launchScripts = [:]
 
@@ -49,14 +49,21 @@ class ProductConfigurer {
 
       dependsOn {
         resolveConfig()
-        wconfigs.findResults {
-          it.projectPath ? project.project(it.projectPath).tasks.build : null
-        }
+        wconfigs.findResults { wconfig ->
+          def result = []
+          if(wconfig.projectPath) {
+            def proj = project.project(wconfig.projectPath)
+            result.add(proj.tasks.build)
+            if(ProjectUtils.isSpringBootApp(proj, wconfig))
+              result.add(proj.tasks.jar)
+          }
+          return result
+        }.flatten()
       }
 
       inputs.property 'config', {
         resolveConfig()
-        jsonConfig
+        jsonConfig.toString()
       }
 
       inputs.property 'logbackConfig', {
@@ -237,12 +244,20 @@ class ProductConfigurer {
   }
 
   protected void writeConfigFiles() {
+
+    // there are cases when springBootMainClass was accessed too early (in configuration phase),
+    // so we neeed to recalculate it
+    if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) } && jsonConfig.content.springBootMainClass == null) {
+      for(WebAppConfig wconfig in wconfigs)
+        ProjectUtils.prepareToRun(project, wconfig)
+      jsonConfig = writeConfigToJson()
+    }
     
     ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'conf'))
 
     File configFile = new File(dir.baseDir, 'server.json')
     configFile.parentFile.mkdirs()
-    configFile.text = jsonConfig
+    configFile.text = jsonConfig.toPrettyString()
     dir.registerAdded(configFile)
 
     if(sconfig.sslKeyStorePath)
@@ -263,12 +278,12 @@ class ProductConfigurer {
     dir.cleanup()
   }
 
-  protected String writeConfigToJson() {
+  protected writeConfigToJson() {
     def json = new JsonBuilder()
     json {
       writeConfigToJson(delegate)
     }
-    json.toPrettyString()
+    json
   }
 
   protected void writeConfigToJson(json) {
