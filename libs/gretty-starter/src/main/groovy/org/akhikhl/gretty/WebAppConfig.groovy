@@ -76,14 +76,21 @@ class WebAppConfig {
   }
 
   String getWebAppLaunchName() {
-    if(inplace)
-      projectPath
-    else {
-      def warFile = warResourceBase
-      if(!(warFile instanceof File))
-        warFile = new File(warFile.toString())
-      warFile.name
+    if(inplace) {
+      if(projectPath)
+        return projectPath
+      def dir = inplaceResourceBase
+      if(dir) {
+        if(!(dir instanceof File))
+          dir = new File(dir)
+        return dir.name
+      }
+      return null
     }
+    def file = warResourceBase
+    if(!(file instanceof File))
+      file = new File(file.toString())
+    return file.name
   }
 
   void initParameter(key, value) {
