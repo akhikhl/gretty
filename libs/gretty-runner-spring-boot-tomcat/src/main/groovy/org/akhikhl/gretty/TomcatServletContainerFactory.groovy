@@ -41,7 +41,10 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
     def tomcatConfigurer = Class.forName('org.akhikhl.gretty.TomcatConfigurerImpl', true, this.getClass().classLoader).newInstance()
     tomcatConfigurer.setLogger(log)
 
+    ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
+    
     def server = new TomcatServerConfigurer().createAndConfigureServer(tomcatConfigurer, params) { webapp, context ->
+      
       if(webapp.springBoot) {
         if (isRegisterDefaultServlet())
           addDefaultServlet(context)
@@ -51,10 +54,9 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
           addJasperInitializer(context)
           context.addLifecycleListener(new StoreMergedWebXmlListener())
         }
-
-        ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
-        configureContext(context, initializersToUse)
       }
+      
+      configureContext(context, initializersToUse)
     }
 
     return getTomcatEmbeddedServletContainer(server)
@@ -101,6 +103,7 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
 			// Probably not Tomcat 8
 		}
 	}
+  
 	private static class StoreMergedWebXmlListener implements LifecycleListener {
 
 		private final String MERGED_WEB_XML = org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML;
