@@ -71,6 +71,6 @@ class StarterLauncher extends LauncherBase {
       json.springBoot true
       return // webapp classpath is passed directly to the runner
     }
-    super.writeWebAppClassPath(json, webAppConfig)
+    super.writeWebAppClassPath(json, wconfig)
   }  
 }
