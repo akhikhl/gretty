@@ -146,8 +146,8 @@ class ProductConfigurer {
     ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'webapps'))
     
     for(WebAppConfig wconfig in wconfigs) {
+      String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
       if(ProjectUtils.isSpringBootApp(project, wconfig)) {
-        String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
         def files
         if(wconfig.projectPath) {
           def proj = project.project(wconfig.projectPath)
@@ -176,7 +176,7 @@ class ProductConfigurer {
         def file = wconfig.warResourceBase
         if(!(file instanceof File))
           file = new File(file.toString())
-        dir.add(file)
+        dir.add(file, appDir)
       }
     }
     
@@ -338,7 +338,7 @@ class ProductConfigurer {
             def warFile = wconfig.warResourceBase
             if(!(warFile instanceof File))
               warFile = new File(warFile.toString())
-            warResourceBase 'webapps/' + warFile.name            
+            warResourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig) + '/' + warFile.name
           }
           if(wconfig.initParameters)
             initParams wconfig.initParameters
