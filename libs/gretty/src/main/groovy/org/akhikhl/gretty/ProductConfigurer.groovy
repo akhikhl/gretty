@@ -78,15 +78,28 @@ class ProductConfigurer {
 
       inputs.files {
         resolveConfig()
-        wconfigs.findResults {
+        def result = []
+        for(WebAppConfig wconfig in wconfigs) {
           // projects are already set as input in dependsOn
-          it.projectPath ? null : it.resourceBase
+          if(!wconfig.projectPath)
+            result.add wconfig.resourceBase
+          if(wconfig.realmConfigFile)
+            result.add wconfig.realmConfigFile
+          if(wconfig.jettyEnvXmlFile)
+            result.add wconfig.jettyEnvXmlFile
+          result
         }
+        result
       }
 
       inputs.files {
         resolveConfig()
-        sconfig.logbackConfigFile ? [ sconfig.logbackConfigFile ] : []
+        def result = []
+        if(sconfig.jettyXmlFile)
+          result.add sconfig.jettyXmlFile
+        if(sconfig.logbackConfigFile)
+          result.add sconfig.logbackConfigFile
+        result
       }
 
       inputs.files project.configurations.grettyStarter
@@ -179,6 +192,10 @@ class ProductConfigurer {
           file = new File(file.toString())
         dir.add(file, appDir)
       }
+      if(wconfig.realmConfigFile)
+        dir.add(wconfig.realmConfigFile, appDir + '/WEB-INF')
+      if(wconfig.jettyEnvXmlFile)
+        dir.add(wconfig.jettyEnvXmlFile, appDir + '/WEB-INF')
     }
     
     dir.cleanup()
@@ -267,6 +284,9 @@ class ProductConfigurer {
     if(sconfig.sslTrustStorePath)
       dir.add(sconfig.sslTrustStorePath)
 
+    if(sconfig.jettyXmlFile)
+      dir.add(sconfig.jettyXmlFile)
+
     if(sconfig.logbackConfigFile)
       dir.add(sconfig.logbackConfigFile)
     else {
@@ -330,23 +350,28 @@ class ProductConfigurer {
       }
       webApps wconfigs.collect { WebAppConfig wconfig ->
         { ->
+          def appDir = 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
           contextPath wconfig.contextPath
           if(ProjectUtils.isSpringBootApp(project, wconfig)) {
             springBoot true
-            resourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
+            resourceBase appDir
           }
           else {
             def file = wconfig.resourceBase
             if(!(file instanceof File))
               file = new File(file.toString())
-            resourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig) + '/' + file.name
+            resourceBase appDir + '/' + file.name
           }
           if(wconfig.initParameters)
             initParams wconfig.initParameters
           if(wconfig.realm)
             realm wconfig.realm
-          if(wconfig.realmConfigFile)
-            realmConfigFile wconfig.realmConfigFile.absolutePath
+          if(wconfig.realmConfigFile) {
+            def file = wconfig.realmConfigFile
+            if(!(file instanceof File))
+              file = new File(file.toString())
+            realmConfigFile appDir + '/' + file.name
+          }
           if(wconfig.jettyEnvXmlFile)
             jettyEnvXmlFile wconfig.jettyEnvXmlFile.absolutePath
           if(wconfig.springBootSources)
