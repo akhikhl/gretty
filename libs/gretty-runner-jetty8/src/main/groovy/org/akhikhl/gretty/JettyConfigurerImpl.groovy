@@ -124,7 +124,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
   }
 
   @Override
-  createServer() {
+  def createServer() {
     // fix for issue https://github.com/akhikhl/gretty/issues/24
     org.eclipse.jetty.util.resource.Resource.defaultUseCaches = false
     return new Server()
