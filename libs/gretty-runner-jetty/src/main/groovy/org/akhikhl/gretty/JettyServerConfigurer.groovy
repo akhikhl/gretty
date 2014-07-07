@@ -23,10 +23,10 @@ class JettyServerConfigurer {
 
     for(def webapp in params.webApps) {
       def context = configurer.createWebAppContext(webapp.webappClassPath)
-      configurer.addConfigurationClasses(context, webapp.webappClassPath)
-      configurer.applyJettyEnvXml(context, webapp.jettyEnvXml)
-
       context.setContextPath(webapp.contextPath)
+      if(!params.supressSetConfigurations)
+        configurer.setConfigurationsToWebAppContext(context, configurer.getConfigurations(webapp.webappClassPath))
+      configurer.applyJettyEnvXml(context, webapp.jettyEnvXml)
 
       webapp.initParams?.each { key, value ->
         context.setInitParameter(key, value)

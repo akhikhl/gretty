@@ -24,20 +24,10 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
   ContextConfig createContextConfig(URL[] classpathUrls) {
 
     new ContextConfig() {
-       
-      protected void processAnnotationsFile(File file, WebXml fragment, boolean handlesTypesOnly) {
-        log.debug 'processAnnotationsFile file={}', file
-        super.processAnnotationsFile(file, fragment, handlesTypesOnly)
-      }
-
-      protected void processAnnotationsUrl(URL url, WebXml fragment, boolean handlesTypesOnly) {
-        log.debug 'processAnnotationsUrl url={}', url
-        super.processAnnotationsUrl(url, fragment, handlesTypesOnly)
-      }
 
       protected Map<String,WebXml> processJarsForWebFragments(WebXml application) {
         def fragments = super.processJarsForWebFragments(application)
-        // here we enable annotation processing for non-jar urls in the classpath
+        // here we enable annotation processing for non-jar urls on the classpath
         for(URL url in classpathUrls.findAll { !it.path.endsWith('.jar') && new File(it.path).exists() }) {
           WebXml fragment = new WebXml()
           fragment.setDistributable(true)
@@ -58,5 +48,3 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     log = logger
   }
 }
-
-

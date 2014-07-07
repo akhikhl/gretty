@@ -15,8 +15,6 @@ import org.slf4j.Logger
  */
 interface JettyConfigurer {
 
-  void addConfigurationClasses(webAppContext, List<String> webappClassPath)
-
   void applyJettyEnvXml(webAppContext, String jettyEnvXml)
 
   void applyJettyXml(server, String jettyXml)
@@ -28,9 +26,12 @@ interface JettyConfigurer {
   def createServer()
 
   def createWebAppContext(List<String> webappClassPath)
+  
+  List getConfigurations(List<String> webappClassPath)
+
+  void setConfigurationsToWebAppContext(webAppContext, List configurations)
 
   void setHandlersToServer(server, List handlers)
   
   void setLogger(Logger logger)
 }
-

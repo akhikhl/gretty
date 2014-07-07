@@ -32,6 +32,7 @@ class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory 
   public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
     def jettyConfigurer = Class.forName('org.akhikhl.gretty.JettyConfigurerImpl', true, this.getClass().classLoader).newInstance()
     jettyConfigurer.setLogger(log)
+    params.supressSetConfigurations = true
     def server = new JettyServerConfigurer().createAndConfigureServer(jettyConfigurer, params) { webapp, context ->
       if(webapp.springBoot) {
         if (isRegisterDefaultServlet())
@@ -41,6 +42,7 @@ class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory 
           addJspServlet(context)
 
         ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
+        setConfigurations(jettyConfigurer.getConfigurations(webapp.webappClassPath))
         def configurations = getWebAppContextConfigurations(context, initializersToUse)
         context.setConfigurations(configurations)
         context.getSessionHandler().getSessionManager().setMaxInactiveInterval(getSessionTimeout())

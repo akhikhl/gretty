@@ -42,20 +42,6 @@ class JettyConfigurerImpl implements JettyConfigurer {
   private Logger log
 
   @Override
-  void addConfigurationClasses(webAppContext, List<String> webappClassPath) {
-    webAppContext.setConfigurations([
-      new WebInfConfigurationEx(),
-      new WebXmlConfiguration(),
-      new MetaInfConfiguration(),
-      new FragmentConfiguration(),
-      new EnvConfiguration(),
-      new PlusConfiguration(),
-      new AnnotationConfigurationEx(webappClassPath),
-      new JettyWebXmlConfiguration()
-    ] as Configuration[])
-  }
-
-  @Override
   void applyJettyEnvXml(webAppContext, String jettyEnvXml) {
     if(jettyEnvXml) {
       log.warn 'Configuring webAppContext with {}', jettyEnvXml
@@ -137,6 +123,25 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
+  }
+  
+  @Override
+  List getConfigurations(List<String> webappClassPath) {
+    [
+      new WebInfConfigurationEx(),
+      new WebXmlConfiguration(),
+      new MetaInfConfiguration(),
+      new FragmentConfiguration(),
+      new EnvConfiguration(),
+      new PlusConfiguration(),
+      new AnnotationConfigurationEx(webappClassPath),
+      new JettyWebXmlConfiguration()
+    ]
+  }
+
+  @Override
+  void setConfigurationsToWebAppContext(webAppContext, List configurations) {
+    webAppContext.setConfigurations(configurations as Configuration[])
   }
 
   @Override

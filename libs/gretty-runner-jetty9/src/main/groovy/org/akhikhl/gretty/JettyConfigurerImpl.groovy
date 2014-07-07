@@ -25,6 +25,7 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
 import org.eclipse.jetty.server.SslConnectionFactory
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
+import org.eclipse.jetty.util.component.LifeCycle
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.webapp.Configuration
@@ -45,20 +46,6 @@ import org.slf4j.Logger
 class JettyConfigurerImpl implements JettyConfigurer {
   
   private Logger log
-
-  @Override
-  void addConfigurationClasses(webAppContext, List<String> webappClassPath) {
-    webAppContext.setConfigurations([
-      new WebInfConfiguration(),
-      new WebXmlConfiguration(),
-      new MetaInfConfiguration(),
-      new FragmentConfiguration(),
-      new EnvConfiguration(),
-      new PlusConfiguration(),
-      new AnnotationConfiguration(),
-      new JettyWebXmlConfiguration()
-    ] as Configuration[])
-  }
 
   @Override
   void applyJettyEnvXml(webAppContext, String jettyEnvXml) {
@@ -153,6 +140,25 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
+  }
+  
+  @Override
+  List getConfigurations(List<String> webappClassPath) {
+    [ 
+      new WebInfConfiguration(),
+      new WebXmlConfiguration(),
+      new MetaInfConfiguration(),
+      new FragmentConfiguration(),
+      new EnvConfiguration(),
+      new PlusConfiguration(),
+      new AnnotationConfiguration(),
+      new JettyWebXmlConfiguration()
+    ]
+  }
+
+  @Override
+  void setConfigurationsToWebAppContext(webAppContext, List configurations) {
+    webAppContext.setConfigurations(configurations as Configuration[])
   }
 
   @Override
