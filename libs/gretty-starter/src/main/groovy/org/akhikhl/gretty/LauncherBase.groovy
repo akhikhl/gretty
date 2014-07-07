@@ -34,6 +34,10 @@ abstract class LauncherBase implements Launcher {
     sconfig = config.getServerConfig()
     webAppConfigs = config.getWebAppConfigs()
   }
+  
+  protected static fileToString(file) {
+    file instanceof File ? file.absolutePath : file.toString()
+  }
 
   private getRunConfigJson() {
     def json = new JsonBuilder()
@@ -168,33 +172,33 @@ abstract class LauncherBase implements Launcher {
         if(sconfig.httpsIdleTimeout)
           httpsIdleTimeout sconfig.httpsIdleTimeout
         if(sconfig.sslKeyStorePath)
-          sslKeyStorePath sconfig.sslKeyStorePath.absolutePath
+          sslKeyStorePath self.fileToString(sconfig.sslKeyStorePath)
         if(sconfig.sslKeyStorePassword)
           sslKeyStorePassword sconfig.sslKeyStorePassword
         if(sconfig.sslKeyManagerPassword)
           sslKeyManagerPassword sconfig.sslKeyManagerPassword
         if(sconfig.sslTrustStorePath)
-          sslTrustStorePath sconfig.sslTrustStorePath.absolutePath
+          sslTrustStorePath self.fileToString(sconfig.sslTrustStorePath)
         if(sconfig.sslTrustStorePassword)
           sslTrustStorePassword sconfig.sslTrustStorePassword
       }
       if(sconfig.jettyXmlFile)
-        jettyXml sconfig.jettyXmlFile.absolutePath
+        jettyXml self.fileToString(sconfig.jettyXmlFile)
       writeLoggingConfig(json)
       webApps webAppConfigs.collect { WebAppConfig wconfig ->
         { ->
           inplace wconfig.inplace
           self.writeWebAppClassPath(delegate, wconfig)
           contextPath wconfig.contextPath
-          resourceBase wconfig.resourceBase
+          resourceBase self.fileToString(wconfig.resourceBase)
           if(wconfig.initParameters)
             initParams wconfig.initParameters
           if(wconfig.realm)
             realm wconfig.realm
           if(wconfig.realmConfigFile)
-            realmConfigFile wconfig.realmConfigFile.absolutePath
+            realmConfigFile self.fileToString(wconfig.realmConfigFile)
           if(wconfig.jettyEnvXmlFile)
-            jettyEnvXml wconfig.jettyEnvXmlFile.absolutePath
+            jettyEnvXml self.fileToString(wconfig.jettyEnvXmlFile)
           if(wconfig.springBootSources)
             springBootSources wconfig.springBootSources
         }

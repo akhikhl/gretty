@@ -69,6 +69,7 @@ class GrettyStarter {
       }
       wconfig.resourceBase = resolveFile(wconfig.resourceBase)
       wconfig.realmConfigFile = resolveFile(wconfig.realmConfigFile)
+      wconfig.jettyEnvXmlFile = resolveFile(wconfig.jettyEnvXmlFile)
       wconfigs.add(wconfig)
     }
 

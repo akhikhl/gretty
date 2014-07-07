@@ -342,9 +342,13 @@ class ProductConfigurer {
           if(sconfig.sslTrustStorePassword)
             sslTrustStorePassword sconfig.sslTrustStorePassword
         }
-        if(sconfig.jettyXmlFile)
-          jettyXmlFile sconfig.jettyXmlFile.absolutePath
-        logbackConfigFile 'conf/' + (sconfig.logbackConfigFile ? sconfig.logbackConfigFile.name : 'logback.groovy')
+        if(sconfig.jettyXmlFile) {
+          def file = sconfig.jettyXmlFile
+          if(!(file instanceof File))
+            file = new File(file.toString())
+          jettyXmlFile 'conf/' + file.name
+        }
+        logbackConfigFile 'conf/' + (sconfig.logbackConfigFile?.name ?: 'logback.groovy')
         if(sconfig.secureRandom != null)
           secureRandom sconfig.secureRandom
       }
@@ -372,8 +376,12 @@ class ProductConfigurer {
               file = new File(file.toString())
             realmConfigFile appDir + '/' + file.name
           }
-          if(wconfig.jettyEnvXmlFile)
-            jettyEnvXmlFile wconfig.jettyEnvXmlFile.absolutePath
+          if(wconfig.jettyEnvXmlFile) {
+            def file = wconfig.jettyEnvXmlFile
+            if(!(file instanceof File))
+              file = new File(file.toString())
+            jettyEnvXmlFile file
+          }
           if(wconfig.springBootSources)
             springBootSources wconfig.springBootSources
         }
