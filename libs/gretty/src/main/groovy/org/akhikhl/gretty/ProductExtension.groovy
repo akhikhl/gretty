@@ -6,6 +6,8 @@
 
 package org.akhikhl.gretty
 
+import org.gradle.api.Project
+
 /**
  *
  * @author ahi
@@ -19,6 +21,8 @@ class ProductExtension {
   Map webAppRefs = [:]
 
   void webapp(Map options = [:], w) {
+    if(w instanceof Project)
+      w = w.path
     webAppRefs[w] = options
   }
 }
