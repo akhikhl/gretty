@@ -25,7 +25,6 @@ class JettyServerConfigurer {
       def context = configurer.createWebAppContext(webapp.webappClassPath)
       configurer.addConfigurationClasses(context, webapp.webappClassPath)
       configurer.applyJettyEnvXml(context, webapp.jettyEnvXml)
-      configurer.configureRealm(context, webapp.realm, webapp.realmConfigFile)
 
       context.setContextPath(webapp.contextPath)
 
@@ -34,7 +33,7 @@ class JettyServerConfigurer {
       }
 
       if(webapp.resourceBase != null) {
-        if(webapp.inplace)
+        if(new File(webapp.resourceBase).isDirectory())
           context.setResourceBase(webapp.resourceBase)
         else
           context.setWar(webapp.resourceBase)
@@ -42,6 +41,8 @@ class JettyServerConfigurer {
 
       if(configureContext)
         configureContext(webapp, context)
+
+      configurer.configureRealm(context, webapp.realm, webapp.realmConfigFile)
 
       handlers.add(context)
     }
