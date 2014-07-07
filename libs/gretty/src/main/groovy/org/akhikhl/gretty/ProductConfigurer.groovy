@@ -136,29 +136,29 @@ class ProductConfigurer {
   }
 
   void copyRunner() {
-    
+
     ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'runner'))
-    
+
     for(File file in getRunnerFileCollection().files)
       dir.add(file)
-      
+
     dir.cleanup()
   }
 
   void copyStarter() {
-    
+
     ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'starter'))
-    
+
     for(File file in project.configurations.grettyStarter.files)
       dir.add(file)
-      
+
     dir.cleanup()
   }
 
   void copyWebappFiles() {
-    
+
     ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'webapps'))
-    
+
     for(WebAppConfig wconfig in wconfigs) {
       String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
       if(ProjectUtils.isSpringBootApp(project, wconfig)) {
@@ -197,7 +197,7 @@ class ProductConfigurer {
       if(wconfig.jettyEnvXmlFile)
         dir.add(wconfig.jettyEnvXmlFile, appDir + '/WEB-INF')
     }
-    
+
     dir.cleanup()
   }
 
@@ -229,13 +229,13 @@ class ProductConfigurer {
       else if(servletContainerConfig.servletContainerType == 'tomcat')
         files += project.configurations.grettyRunnerSpringBootTomcat
     } else
-      files = project.configurations[servletContainerConfig.servletContainerRunnerConfig]        
+      files = project.configurations[servletContainerConfig.servletContainerRunnerConfig]
     files
   }
-  
+
   protected String getSpringBootMainClass() {
-    sconfig.springBootMainClass ?: 
-    SpringBootMainClassFinder.findMainClass(project) ?: 
+    sconfig.springBootMainClass ?:
+    SpringBootMainClassFinder.findMainClass(project) ?:
     wconfigs.findResult { it.projectPath ? SpringBootMainClassFinder.findMainClass(project.project(it.projectPath)) : null }
   }
 
@@ -270,7 +270,7 @@ class ProductConfigurer {
         ProjectUtils.prepareToRun(project, wconfig)
       jsonConfig = writeConfigToJson()
     }
-    
+
     ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'conf'))
 
     File configFile = new File(dir.baseDir, 'server.json')
@@ -374,13 +374,13 @@ class ProductConfigurer {
             def file = wconfig.realmConfigFile
             if(!(file instanceof File))
               file = new File(file.toString())
-            realmConfigFile appDir + '/' + file.name
+            realmConfigFile appDir + '/WEB-INF/' + file.name
           }
           if(wconfig.jettyEnvXmlFile) {
             def file = wconfig.jettyEnvXmlFile
             if(!(file instanceof File))
               file = new File(file.toString())
-            jettyEnvXmlFile file
+            jettyEnvXmlFile appDir + '/WEB-INF/' + file.name
           }
           if(wconfig.springBootSources)
             springBootSources wconfig.springBootSources
