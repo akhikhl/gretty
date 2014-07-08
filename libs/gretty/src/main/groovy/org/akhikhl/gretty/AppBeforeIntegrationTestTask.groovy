@@ -81,6 +81,7 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
     def host = launcherConfig.serverConfig.host
 
     def contextPath = launcherConfig.webAppConfigs[0].contextPath
+    task.systemProperty 'gretty.host', host
     task.systemProperty 'gretty.contextPath', contextPath
 
     def httpPort = launcherConfig.serverConfig.httpPort

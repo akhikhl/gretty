@@ -90,6 +90,7 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     def host = tempFarm.serverConfig.host
 
     def contextPath = webappConfig.contextPath
+    task.systemProperty 'gretty.host', host
     task.systemProperty 'gretty.contextPath', contextPath
 
     def httpPort = tempFarm.serverConfig.httpPort
