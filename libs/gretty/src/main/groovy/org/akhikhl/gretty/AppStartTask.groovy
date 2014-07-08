@@ -19,7 +19,7 @@ class AppStartTask extends StartBaseTask {
 
   @Delegate
   private WebAppConfig webAppConfig = new WebAppConfig()
-  
+
   protected String getCompatibleServletContainer(String servletContainer) {
     servletContainer
   }
@@ -32,7 +32,7 @@ class AppStartTask extends StartBaseTask {
     else
       true
   }
-  
+
   @Override
   protected StartConfig getStartConfig() {
 
@@ -44,7 +44,7 @@ class AppStartTask extends StartBaseTask {
 
     WebAppConfig wconfig = new WebAppConfig()
     ConfigUtils.complementProperties(wconfig, webAppConfig, project.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(project), new WebAppConfig(inplace: true))
-    ProjectUtils.resolveWebAppConfig(project, wconfig, sconfig.servletContainer)
+    ProjectUtils.resolveWebAppConfig(project, wconfig, sconfig)
     doPrepareWebAppConfig(wconfig)
 
     new StartConfig() {

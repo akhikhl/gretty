@@ -104,7 +104,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     if(realm && realmConfigFile) {
       if(context.getSecurityHandler().getLoginService() != null)
         return
-      log.warn 'Configuring login service with realm \'{}\' and config {}', realm, realmConfigFile
+      log.warn '{} -> realm \'{}\', {}', context.contextPath, realm, realmConfigFile
       context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
     }
   }
@@ -124,7 +124,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
   }
-  
+
   @Override
   List getConfigurations(List<String> webappClassPath) {
     [

@@ -32,8 +32,8 @@ class ServerConfig {
   String sslKeyManagerPassword
   def sslTrustStorePath
   String sslTrustStorePassword
-  Integer servicePort
-  Integer statusPort
+  def realm
+  def realmConfigFile
   def jettyXmlFile
   Integer scanInterval
   def logbackConfigFile
@@ -46,6 +46,8 @@ class ServerConfig {
   List<Closure> onStop
   List<Closure> onScan
   List<Closure> onScanFilesChanged
+  Integer servicePort
+  Integer statusPort
   Boolean secureRandom
   String springBootMainClass
 

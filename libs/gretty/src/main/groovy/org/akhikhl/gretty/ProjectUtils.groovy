@@ -196,10 +196,9 @@ final class ProjectUtils {
   static WebAppConfig getDefaultWebAppConfigForProject(Project project) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + project.name
-    result.realmConfigFile = null
     result.jettyEnvXmlFile = 'jetty-env.xml'
     result.fastReload = true
-    result.resourceBase = { 
+    result.resourceBase = {
       inplace ? "${project.buildDir}/inplaceWebapp/" as String : ProjectUtils.getFinalArchivePath(project).toString()
     }
     result.projectPath = project.path
@@ -304,7 +303,7 @@ final class ProjectUtils {
       into "${project.buildDir}/inplaceWebapp"
     }
   }
-  
+
   static void prepareToRun(Project project, WebAppConfig wconfig) {
     wconfig.prepareToRun()
     Set springBootSources = new LinkedHashSet()
@@ -376,6 +375,29 @@ final class ProjectUtils {
     sconfig.sslKeyStorePath = resolveSingleFile(project, sconfig.sslKeyStorePath)
     sconfig.sslTrustStorePath = resolveSingleFile(project, sconfig.sslTrustStorePath)
 
+    String servletContainerType = ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerType
+
+    boolean defaultRealmConfigFile = false
+    if(!sconfig.realmConfigFile) {
+      defaultRealmConfigFile = true
+      if(servletContainerType == 'tomcat')
+        sconfig.realmConfigFile = 'tomcat-users.xml'
+      else
+        sconfig.realmConfigFile = 'jetty-realm.properties'
+    }
+
+    if(servletContainerType == 'jetty' && !defaultRealmConfigFile && !sconfig.realm)
+      log.warn 'Jetty realm file is specified, but realm is not specified.'
+
+    def resolvedRealmConfigFile = ProjectUtils.resolveSingleFile(project, sconfig.realmConfigFile, { Collection<File> result, Project proj, File file ->
+      for(File f in [ new File(proj.projectDir, file.path), new File(proj.projectDir, 'realm/' + file.path), new File(proj.projectDir, 'security/' + file.path) ])
+        if(f.exists())
+          result.add(f)
+    })
+    if(!resolvedRealmConfigFile && !defaultRealmConfigFile)
+      log.warn 'The realm file {} does not exist.', sconfig.realmConfigFile
+    sconfig.realmConfigFile = resolvedRealmConfigFile
+
     def f = resolveSingleFile(project, sconfig.jettyXmlFile)
     if(f == null && sconfig.jettyXmlFile) {
       def f2 = sconfig.jettyXmlFile
@@ -402,66 +424,71 @@ final class ProjectUtils {
     sconfig.logbackConfigFile = f
   }
 
-  static void resolveWebAppConfig(Project project, WebAppConfig wconfig, String servletContainer) {
+  static void resolveWebAppConfig(Project project, WebAppConfig wconfig, ServerConfig sconfig) {
+    if(sconfig != null) {
+      String servletContainerType = ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerType
 
-    String servletContainerType = ServletContainerConfig.getConfig(servletContainer).servletContainerType
+      boolean defaultRealmConfigFile = false
+      if(!wconfig.realmConfigFile) {
+        defaultRealmConfigFile = true
+        if(servletContainerType == 'tomcat')
+          wconfig.realmConfigFile = 'tomcat-users.xml'
+        else
+          wconfig.realmConfigFile = 'jetty-realm.properties'
+      }
 
-    boolean defaultRealmConfigFile = false
-    if(!wconfig.realmConfigFile) {
-      defaultRealmConfigFile = true
-      if(servletContainerType == 'tomcat')
-        wconfig.realmConfigFile = 'tomcat-users.xml'
+      if(servletContainerType == 'jetty' && !defaultRealmConfigFile && !wconfig.realm)
+        log.warn 'Jetty realm file is specified, but realm is not specified.'
+
+      def resolvedRealmConfigFile = ProjectUtils.resolveSingleFile(project, wconfig.realmConfigFile)
+      if(!resolvedRealmConfigFile && !defaultRealmConfigFile)
+        log.warn 'The realm file {} does not exist.', wconfig.realmConfigFile
+      wconfig.realmConfigFile = resolvedRealmConfigFile
+
+      if(servletContainerType == 'jetty')
+        wconfig.jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, wconfig.jettyEnvXmlFile)
       else
-        wconfig.realmConfigFile = 'jetty-realm.properties'
+        wconfig.jettyEnvXmlFile = null
     }
-
-    if(servletContainerType == 'jetty' && !defaultRealmConfigFile && !wconfig.realm)
-      log.warn 'Realm config file is specified, but realm is not specified.'
-
-    def resolvedRealmConfigFile = ProjectUtils.resolveSingleFile(project, wconfig.realmConfigFile)
-    if(!resolvedRealmConfigFile && !defaultRealmConfigFile)
-      log.warn 'The realm config file {} does not exist.', wconfig.realmConfigFile
-    wconfig.realmConfigFile = resolvedRealmConfigFile
-
-    if(servletContainerType == 'jetty')
-      wconfig.jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, wconfig.jettyEnvXmlFile)
-    else
-      wconfig.jettyEnvXmlFile = null
   }
 
-  static List<File> resolveFile(Project project, file) {
-    List<File> result = []
+  static Set<File> resolveFile(Project project, file, Closure resolveFileOnProject = ProjectUtils.&resolveFileOnProject) {
+    Set<File> result = new LinkedHashSet()
     if(file != null) {
-      resolveFile_(result, project, file)
+      resolveFile_(result, project, file, resolveFileOnProject)
       if(result.isEmpty())
         log.debug 'Could not resolve file \'{}\' in {}', file, project
     }
     return result
   }
 
-  private static void resolveFile_(List<File> result, Project project, file) {
+  private static void resolveFile_(Collection<File> result, Project project, file, Closure resolveFileOnProject) {
     if(!(file instanceof File))
-      file = new File(file)
+      file = new File(file.toString())
     if(file.isAbsolute()) {
       result.add(file.absoluteFile)
       return
     }
     if(project != null) {
-      File f = new File(project.projectDir, file.path)
-      if(f.exists())
-        result.add(f.absoluteFile)
-      f = new File(new File(getWebAppDir(project), 'WEB-INF'), file.path)
-      if(f.exists())
-        result.add(f.absoluteFile)
-      result.addAll(collectFilesInOutput(project, file.path, false))
+      resolveFileOnProject(result, project, file)
       if(project.extensions.findByName('gretty'))
         for(def overlay in project.gretty.overlays.reverse())
-          resolveFile_(result, project.project(overlay), file)
+          resolveFile_(result, project.project(overlay), file, resolveFileOnProject)
     }
   }
 
-  static File resolveSingleFile(Project project, file) {
-    List<File> list = resolveFile(project, file)
-    list ? list[0] : null
+  static void resolveFileOnProject(Collection<File> result, Project project, File file) {
+    File f = new File(project.projectDir, file.path)
+    if(f.exists())
+      result.add(f.absoluteFile)
+    f = new File(new File(getWebAppDir(project), 'WEB-INF'), file.path)
+    if(f.exists())
+      result.add(f.absoluteFile)
+    result.addAll(collectFilesInOutput(project, file.path, false))
+  }
+
+  static File resolveSingleFile(Project project, file, Closure resolveFileOnProject = ProjectUtils.&resolveFileOnProject) {
+    Set<File> files = resolveFile(project, file, resolveFileOnProject)
+    files ? files[0] : null
   }
 }

@@ -101,13 +101,12 @@ class TomcatServerConfigurer {
       loader.setDelegate(true)
       context.setLoader(loader)
 
-      if(webapp.realmConfigFile) {
-        if(new File(webapp.realmConfigFile).exists()) {
-          log.warn 'Configuring security realm with config {}', webapp.realmConfigFile
-          def realm = new MemoryRealm()
-          realm.setPathname(webapp.realmConfigFile)
-          context.setRealm(realm)
-        }
+      def realmConfigFile = webapp.realmConfigFile ?: params.realmConfigFile
+      if(realmConfigFile && new File(realmConfigFile).exists()) {
+        log.warn '{} -> realm config {}', webapp.contextPath, realmConfigFile
+        def realm = new MemoryRealm()
+        realm.setPathname(realmConfigFile)
+        context.setRealm(realm)
       } else
         context.addLifecycleListener(new FixContextListener())
 

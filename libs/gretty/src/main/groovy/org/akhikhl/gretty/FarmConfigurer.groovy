@@ -21,7 +21,7 @@ class FarmConfigurer {
   private static final Logger log = LoggerFactory.getLogger(FarmConfigurer)
 
   private final Project project
-  private String servletContainer
+  private ServerConfig sconfig
 
   FarmConfigurer(Project project) {
     this.project = project
@@ -30,13 +30,13 @@ class FarmConfigurer {
   void configureFarm(FarmExtension dstFarm, FarmExtension[] srcFarms = []) {
     srcFarms = srcFarms.findAll()
     ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ ProjectUtils.getDefaultServerConfig(project) ])
-    servletContainer = dstFarm.serverConfig.servletContainer
+    sconfig = dstFarm.serverConfig
     ProjectUtils.resolveServerConfig(project, dstFarm.serverConfig)
     for(def f in srcFarms)
       mergeWebAppRefMaps(dstFarm.webAppRefs, f.webAppRefs)
     if(!dstFarm.webAppRefs)
       dstFarm.webAppRefs = getDefaultWebAppRefMap()
-    if(dstFarm.integrationTestTask == null) 
+    if(dstFarm.integrationTestTask == null)
       dstFarm.integrationTestTask = srcFarms.findResult { it.integrationTestTask }
   }
 
@@ -65,7 +65,7 @@ class FarmConfigurer {
     WebAppConfig wconfig = new WebAppConfig()
     ConfigUtils.complementProperties(wconfig, options, ProjectUtils.getDefaultWebAppConfigForMavenDependency(project, dependency))
     wconfig.inplace = false // always war-file, ignore options.inplace
-    ProjectUtils.resolveWebAppConfig(null, wconfig, servletContainer)
+    ProjectUtils.resolveWebAppConfig(null, wconfig, sconfig)
     wconfig
   }
 
@@ -74,7 +74,7 @@ class FarmConfigurer {
     if(!proj.extensions.findByName('gretty'))
       throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
     ConfigUtils.complementProperties(wconfig, options, proj.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(proj), new WebAppConfig(inplace: inplace))
-    ProjectUtils.resolveWebAppConfig(proj, wconfig, servletContainer)
+    ProjectUtils.resolveWebAppConfig(proj, wconfig, sconfig)
     wconfig
   }
 
@@ -82,7 +82,7 @@ class FarmConfigurer {
     WebAppConfig wconfig = new WebAppConfig()
     ConfigUtils.complementProperties(wconfig, options, WebAppConfig.getDefaultWebAppConfigForWarFile(warFile))
     wconfig.inplace = false // always war-file, ignore options.inplace
-    ProjectUtils.resolveWebAppConfig(null, wconfig, servletContainer)
+    ProjectUtils.resolveWebAppConfig(null, wconfig, sconfig)
     wconfig
   }
 

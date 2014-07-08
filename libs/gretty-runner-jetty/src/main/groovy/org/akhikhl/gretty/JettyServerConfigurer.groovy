@@ -42,7 +42,10 @@ class JettyServerConfigurer {
       if(configureContext)
         configureContext(webapp, context)
 
-      configurer.configureRealm(context, webapp.realm, webapp.realmConfigFile)
+      if((webapp.realm || params.realm) && webapp.realmConfigFile)
+        configurer.configureRealm(context, webapp.realm ?: params.realm, webapp.realmConfigFile)
+      else if(params.realm && params.realmConfigFile)
+        configurer.configureRealm(context, params.realm, params.realmConfigFile)
 
       handlers.add(context)
     }

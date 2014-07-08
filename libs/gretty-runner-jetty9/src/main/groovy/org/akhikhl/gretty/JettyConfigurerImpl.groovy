@@ -44,7 +44,7 @@ import org.slf4j.Logger
  * @author akhikhl
  */
 class JettyConfigurerImpl implements JettyConfigurer {
-  
+
   private Logger log
 
   @Override
@@ -121,7 +121,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     if(realm && realmConfigFile) {
       if(context.getSecurityHandler().getLoginService() != null)
         return
-      log.warn 'Configuring login service with realm \'{}\' and config {}', realm, realmConfigFile
+      log.warn '{} -> realm \'{}\', {}', context.contextPath, realm, realmConfigFile
       context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
     }
   }
@@ -141,10 +141,10 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
   }
-  
+
   @Override
   List getConfigurations(List<String> webappClassPath) {
-    [ 
+    [
       new WebInfConfiguration(),
       new WebXmlConfiguration(),
       new MetaInfConfiguration(),
@@ -167,7 +167,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     contexts.setHandlers(handlers as Handler[])
     server.setHandler(contexts)
   }
-  
+
   @Override
   void setLogger(Logger log) {
     this.log = log

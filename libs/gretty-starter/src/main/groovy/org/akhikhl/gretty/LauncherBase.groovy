@@ -34,7 +34,7 @@ abstract class LauncherBase implements Launcher {
     sconfig = config.getServerConfig()
     webAppConfigs = config.getWebAppConfigs()
   }
-  
+
   protected static fileToString(file) {
     file instanceof File ? file.absolutePath : file.toString()
   }
@@ -182,6 +182,10 @@ abstract class LauncherBase implements Launcher {
         if(sconfig.sslTrustStorePassword)
           sslTrustStorePassword sconfig.sslTrustStorePassword
       }
+      if(sconfig.realm)
+        realm sconfig.realm
+      if(sconfig.realmConfigFile)
+        realmConfigFile self.fileToString(sconfig.realmConfigFile)
       if(sconfig.jettyXmlFile)
         jettyXml self.fileToString(sconfig.jettyXmlFile)
       writeLoggingConfig(json)

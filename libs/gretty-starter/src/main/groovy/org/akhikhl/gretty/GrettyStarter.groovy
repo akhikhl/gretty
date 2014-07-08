@@ -53,6 +53,7 @@ class GrettyStarter {
 
     sconfig.sslKeyStorePath = resolveFile(sconfig.sslKeyStorePath)
     sconfig.sslTrustStorePath = resolveFile(sconfig.sslTrustStorePath)
+    sconfig.realmConfigFile = resolveFile(sconfig.realmConfigFile)
     sconfig.jettyXmlFile = resolveFile(sconfig.jettyXmlFile)
     sconfig.logbackConfigFile = resolveFile(sconfig.logbackConfigFile)
 

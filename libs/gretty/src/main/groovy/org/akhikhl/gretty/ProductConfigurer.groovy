@@ -76,6 +76,11 @@ class ProductConfigurer {
         launchScripts
       }
 
+      inputs.property 'realms', {
+        resolveConfig()
+        [ '#server': sconfig.realm ] + wconfigs.collectEntries({ [ it.contextPath, it.realm ] })
+      }
+
       inputs.files {
         resolveConfig()
         def result = []
@@ -95,6 +100,8 @@ class ProductConfigurer {
       inputs.files {
         resolveConfig()
         def result = []
+        if(sconfig.realmConfigFile)
+          result.add sconfig.realmConfigFile
         if(sconfig.jettyXmlFile)
           result.add sconfig.jettyXmlFile
         if(sconfig.logbackConfigFile)
@@ -284,6 +291,9 @@ class ProductConfigurer {
     if(sconfig.sslTrustStorePath)
       dir.add(sconfig.sslTrustStorePath)
 
+    if(sconfig.realmConfigFile)
+      dir.add(sconfig.realmConfigFile)
+
     if(sconfig.jettyXmlFile)
       dir.add(sconfig.jettyXmlFile)
 
@@ -309,6 +319,13 @@ class ProductConfigurer {
 
   protected void writeConfigToJson(json) {
     def self = this
+    def getFileName = { file ->
+      if(file == null)
+        return null
+      if(!(file instanceof File))
+        file = new File(file.toString())
+      file.name
+    }
     def servletContainerConfig = ServletContainerConfig.getConfig(sconfig.servletContainer)
     json.with {
       productName self.productName ?: project.name
@@ -342,13 +359,13 @@ class ProductConfigurer {
           if(sconfig.sslTrustStorePassword)
             sslTrustStorePassword sconfig.sslTrustStorePassword
         }
-        if(sconfig.jettyXmlFile) {
-          def file = sconfig.jettyXmlFile
-          if(!(file instanceof File))
-            file = new File(file.toString())
-          jettyXmlFile 'conf/' + file.name
-        }
-        logbackConfigFile 'conf/' + (sconfig.logbackConfigFile?.name ?: 'logback.groovy')
+        if(sconfig.realm)
+          realm sconfig.realm
+        if(sconfig.realmConfigFile)
+          realmConfigFile 'conf/' + getFileName(sconfig.realmConfigFile)
+        if(sconfig.jettyXmlFile)
+          jettyXmlFile 'conf/' + getFileName(sconfig.jettyXmlFile)
+        logbackConfigFile 'conf/' + (getFileName(sconfig.logbackConfigFile) ?: 'logback.groovy')
         if(sconfig.secureRandom != null)
           secureRandom sconfig.secureRandom
       }
@@ -360,28 +377,16 @@ class ProductConfigurer {
             springBoot true
             resourceBase appDir
           }
-          else {
-            def file = wconfig.resourceBase
-            if(!(file instanceof File))
-              file = new File(file.toString())
-            resourceBase appDir + '/' + file.name
-          }
+          else
+            resourceBase appDir + '/' + getFileName(wconfig.resourceBase)
           if(wconfig.initParameters)
             initParams wconfig.initParameters
           if(wconfig.realm)
             realm wconfig.realm
-          if(wconfig.realmConfigFile) {
-            def file = wconfig.realmConfigFile
-            if(!(file instanceof File))
-              file = new File(file.toString())
-            realmConfigFile appDir + '/WEB-INF/' + file.name
-          }
-          if(wconfig.jettyEnvXmlFile) {
-            def file = wconfig.jettyEnvXmlFile
-            if(!(file instanceof File))
-              file = new File(file.toString())
-            jettyEnvXmlFile appDir + '/WEB-INF/' + file.name
-          }
+          if(wconfig.realmConfigFile)
+            realmConfigFile appDir + '/WEB-INF/' + getFileName(wconfig.realmConfigFile)
+          if(wconfig.jettyEnvXmlFile)
+            jettyEnvXmlFile appDir + '/WEB-INF/' + getFileName(wconfig.jettyEnvXmlFile)
           if(wconfig.springBootSources)
             springBootSources wconfig.springBootSources
         }
