@@ -57,6 +57,15 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
         }
       }
 
+      /*
+       * Cloning valves is needed to solve topological problem in spring-boot.
+       * Scenario:
+       * 1) org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat.customizeTomcat adds valves to this factory
+       * 2) this closure is being repeatedly invoked for multiple contexts
+       * 3) configureContext (below) adds this factory's valves to the given context
+       * Result: same valves are added to different contexts, effectively breaking valve chaining.
+       * Solution: clone valves, so that each context gets its own set of valves.
+       */
       if(!params.suppressCloneContextValves)
         setContextValves(getValves().collect { v ->
           RuntimeUtils.copy v, skipProperties: ['state', 'next']
