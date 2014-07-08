@@ -23,7 +23,7 @@ ext {
     groovy_version = '1.8.6'
     spock_version = '0.7-groovy-1.8'
   } else {
-    groovy_version = '2.3.3'
+    groovy_version = '2.3.4'
     spock_version = '0.7-groovy-2.0'
   }
   
