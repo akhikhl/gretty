@@ -14,6 +14,7 @@ import org.apache.catalina.Context
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
 import org.apache.catalina.LifecycleListener
+import org.apache.catalina.Valve
 import org.apache.catalina.Wrapper
 import org.springframework.boot.context.embedded.EmbeddedServletContainer
 import org.springframework.boot.context.embedded.ServletContextInitializer
@@ -42,9 +43,9 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
     tomcatConfigurer.setLogger(log)
 
     ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
-    
+
     def server = new TomcatServerConfigurer().createAndConfigureServer(tomcatConfigurer, params) { webapp, context ->
-      
+
       if(webapp.springBoot) {
         if (isRegisterDefaultServlet())
           addDefaultServlet(context)
@@ -55,7 +56,12 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
           context.addLifecycleListener(new StoreMergedWebXmlListener())
         }
       }
-      
+
+      if(!params.suppressCloneContextValves)
+        setContextValves(getValves().collect { v ->
+          RuntimeUtils.copy v, skipProperties: ['state', 'next']
+        })
+
       configureContext(context, initializersToUse)
     }
 
@@ -103,41 +109,29 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
 			// Probably not Tomcat 8
 		}
 	}
-  
+
 	private static class StoreMergedWebXmlListener implements LifecycleListener {
 
-		private final String MERGED_WEB_XML = org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML;
+		private final String MERGED_WEB_XML = org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML
 
 		@Override
 		public void lifecycleEvent(LifecycleEvent event) {
-			if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
-				onStart((Context) event.getLifecycle());
-			}
+			if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT))
+				onStart((Context) event.getLifecycle())
 		}
 
 		private void onStart(Context context) {
-			ServletContext servletContext = context.getServletContext();
-			if (servletContext.getAttribute(this.MERGED_WEB_XML) == null) {
-				servletContext.setAttribute(this.MERGED_WEB_XML, getEmptyWebXml());
-			}
+			ServletContext servletContext = context.getServletContext()
+			if (servletContext.getAttribute(this.MERGED_WEB_XML) == null)
+				servletContext.setAttribute(this.MERGED_WEB_XML, getEmptyWebXml())
 		}
 
 		private String getEmptyWebXml() {
-			InputStream stream = TomcatEmbeddedServletContainerFactory.class
-					.getResourceAsStream("empty-web.xml");
-			Assert.state(stream != null, "Unable to read empty web.xml");
-			try {
-				try {
-					return StreamUtils.copyToString(stream, Charset.forName("UTF-8"));
-				}
-				finally {
-					stream.close();
-				}
-			}
-			catch (IOException ex) {
-				throw new IllegalStateException(ex);
-			}
+			InputStream stream = TomcatEmbeddedServletContainerFactory.class.getResourceAsStream('empty-web.xml')
+			assert stream != null, 'Unable to read empty-web.xml'
+      stream.withStream {
+        it.getText('UTF-8')
+      }
 		}
-
-	}
+	} // StoreMergedWebXmlListener
 }

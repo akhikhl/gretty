@@ -7,6 +7,9 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.catalina.Lifecycle
+import org.apache.catalina.LifecycleEvent
+import org.apache.catalina.LifecycleListener
 import org.apache.catalina.connector.Connector
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.loader.WebappLoader
@@ -98,14 +101,6 @@ class TomcatServerConfigurer {
       loader.setDelegate(true)
       context.setLoader(loader)
 
-      context.addLifecycleListener(configurer.createContextConfig(classpathUrls))
-
-      if(configureContext)
-        configureContext(webapp, context)
-
-      if(!context.findChild('default'))
-        context.addLifecycleListener(new DefaultWebXmlListener())
-        
       if(webapp.realmConfigFile) {
         if(new File(webapp.realmConfigFile).exists()) {
           log.warn 'Configuring security realm with config {}', webapp.realmConfigFile
@@ -115,6 +110,28 @@ class TomcatServerConfigurer {
         }
       } else
         context.addLifecycleListener(new FixContextListener())
+
+      context.addLifecycleListener(configurer.createContextConfig(classpathUrls))
+
+      if(configureContext)
+        configureContext(webapp, context)
+
+      if(!context.findChild('default'))
+        context.addLifecycleListener(new DefaultWebXmlListener())
+
+      if(log.isDebugEnabled())
+        context.addLifecycleListener(new LifecycleListener() {
+          @Override
+          public void lifecycleEvent(LifecycleEvent event) {
+            if (event.type == Lifecycle.CONFIGURE_START_EVENT) {
+              def pipeline = context.getPipeline()
+              log.debug 'START: context={}, pipeline: {} #{}', context.getPath(), pipeline, System.identityHashCode(pipeline)
+              log.debug '  valves:'
+              for(def v in pipeline.getValves())
+                log.debug '    {} #{}', v, System.identityHashCode(v)
+            }
+          }
+        })
 
       tomcat.getHost().addChild(context)
     }
