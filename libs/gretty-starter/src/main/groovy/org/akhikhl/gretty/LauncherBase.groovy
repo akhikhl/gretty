@@ -80,7 +80,11 @@ abstract class LauncherBase implements Launcher {
     try {
       Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
       thread = Thread.start {
-        sconfig.onStart*.call()
+        for(Closure c in sconfig.onStart) {
+          c.delegate = sconfig
+          c.resolveStrategy = Closure.DELEGATE_FIRST
+          c()
+        }
         try {
           scannerManager?.startScanner()
           try {
@@ -101,7 +105,11 @@ abstract class LauncherBase implements Launcher {
             scannerManager?.stopScanner()
           }
         } finally {
-          sconfig.onStop*.call()
+          for(Closure c in sconfig.onStop) {
+            c.delegate = sconfig
+            c.resolveStrategy = Closure.DELEGATE_FIRST
+            c()
+          }
         }
       }
       def status = futureStatus.get()
