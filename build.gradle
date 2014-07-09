@@ -24,13 +24,13 @@ task('buildExamples', type: GradleBuild) {
   project.tasks.build.finalizedBy it
 }
 
-task('integrationTest', dependsOn: build)
+task('testAll', dependsOn: build)
 
-task('integrationTestExamples', type: GradleBuild) {
+task('testAllExamples', type: GradleBuild) {
   dependsOn buildExamples
   dir = file('examples')
-  tasks = [ 'integrationTest' ]
-  project.tasks.integrationTest.finalizedBy it
+  tasks = [ 'testAll' ]
+  project.tasks.testAll.finalizedBy it
 }
 
 task('cleanExamples', type: GradleBuild) {

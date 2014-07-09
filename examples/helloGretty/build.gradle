@@ -29,3 +29,4 @@ gretty {
   httpsEnabled = true
 }
 
+rootProject.tasks.testAll.dependsOn { project.tasks.integrationTest }

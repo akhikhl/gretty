@@ -18,3 +18,4 @@ gretty {
   overlay ':helloGretty'
 }
 
+rootProject.tasks.testAll.dependsOn { project.tasks.integrationTest }

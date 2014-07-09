@@ -33,3 +33,4 @@ gretty {
   }
 }
 
+rootProject.tasks.testAll.dependsOn { project.tasks.integrationTestAllContainers }

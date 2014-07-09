@@ -44,3 +44,5 @@ containers.eachWithIndex { container, i ->
     }
   }
 }
+
+rootProject.tasks.testAll.dependsOn tasks.farmIntegrationTestAllContainers

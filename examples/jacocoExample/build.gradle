@@ -87,3 +87,4 @@ task('integrationTestServerReport', type: JacocoReport) {
   }  
 }
 
+rootProject.tasks.testAll.dependsOn { project.tasks.integrationTest }
