@@ -1,0 +1,24 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty:1.0.0'
+  }
+}
+
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+
+dependencies {
+  compile project(':webfragment')
+  // We use UrlRewriteFilter for redirecting to the protected home page.
+  compile 'org.tuckey:urlrewritefilter:4.0.4'
+}
+
+ext {
+  supportedContainers = ['jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+}
