@@ -18,6 +18,7 @@ apply plugin: 'groovy' // this is needed for spock
 
 import org.akhikhl.gretty.AppAfterIntegrationTestTask
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
+import org.akhikhl.gretty.ServletContainerConfig
 
 ext {
   groovy_version = '2.3.3'
@@ -53,7 +54,7 @@ afterEvaluate {
 
   task 'integrationTestAllContainers'
 
-  def integrationTestContainers = ext.has('integrationTestContainers') ? ext.integrationTestContainers : ['jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+  def integrationTestContainers = ext.has('integrationTestContainers') ? ext.integrationTestContainers : ServletContainerConfig.getConfigNames()
 
   for(def container in integrationTestContainers) {
 
@@ -78,4 +79,3 @@ afterEvaluate {
   }
 
 } // afterEvaluate
-

@@ -24,3 +24,6 @@ gretty {
   springBoot = true
 }
 
+ext {
+  integrationTestContainers = ['jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+}

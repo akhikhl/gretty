@@ -19,3 +19,28 @@ farm {
   webapp ':spring-boot-farm:spring-boot-webservice'
   webapp ':spring-boot-farm:jee-webservice'
 }
+
+ext {
+  integrationTestContainers = ['jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+}
+
+task 'farmIntegrationTestAllContainers'
+
+def containers = ext.integrationTestContainers
+containers.eachWithIndex { container, i ->
+  farms.farm container, {
+    def prevContainer = i > 0 ? containers[i - 1] : null
+    servletContainer = container
+    webapp project
+    webapp ':spring-boot-farm:spring-boot-webservice'
+    webapp ':spring-boot-farm:jee-webservice'
+    afterEvaluate {
+      tasks['farmBeforeIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
+      tasks['farmAfterIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
+      tasks['farmIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
+      if(prevContainer != null)
+        tasks['farmBeforeIntegrationTest' + container].mustRunAfter tasks['farmAfterIntegrationTest' + prevContainer]
+      tasks.farmIntegrationTestAllContainers.dependsOn tasks['farmIntegrationTest' + container]
+    }
+  }
+}
