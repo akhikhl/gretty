@@ -1,0 +1,23 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty:1.0.0'
+  }
+}
+
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+
+apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+  
+gretty {
+  overlay ':testAnnotations'
+}
+
+ext {
+  supportedContainers = ['jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+}

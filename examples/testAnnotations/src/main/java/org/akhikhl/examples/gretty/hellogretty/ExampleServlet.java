@@ -2,6 +2,7 @@ package org.akhikhl.examples.gretty.hellogretty;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +13,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
+@WebServlet( name="AnnotatedServlet", displayName="Annotated Servlet", urlPatterns = {"/annotations/*"}, loadOnStartup=1 )
 public class ExampleServlet extends HttpServlet {
 
   private static final long serialVersionUID = -6506276378398106663L;
