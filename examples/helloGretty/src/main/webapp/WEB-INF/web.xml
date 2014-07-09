@@ -18,37 +18,16 @@
     <servlet-name>jsp</servlet-name>
     <url-pattern>*.html</url-pattern>
   </servlet-mapping>  
-       
+
   <servlet>
     <display-name>ExampleServlet</display-name>
     <servlet-name>ExampleServlet</servlet-name>
     <servlet-class>org.akhikhl.examples.gretty.hellogretty.ExampleServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
- 
+
   <servlet-mapping>
     <servlet-name>ExampleServlet</servlet-name>
-    <url-pattern>/content/dynamic</url-pattern>
+    <url-pattern>/dynamic</url-pattern>
   </servlet-mapping>
-
-  <security-constraint>
-    <web-resource-collection>
-      <web-resource-name>Protected Area</web-resource-name>
-      <url-pattern>/content/*</url-pattern>
-    </web-resource-collection>
-    <auth-constraint>
-      <role-name>testuser</role-name>
-    </auth-constraint>
-  </security-constraint>
-  <security-role>
-    <role-name>testuser</role-name>
-  </security-role>
-  <login-config>
-    <realm-name>auth</realm-name>
-    <auth-method>FORM</auth-method>
-    <form-login-config>
-      <form-login-page>/login.html</form-login-page>
-      <form-error-page>/login_fail.html</form-error-page>
-    </form-login-config>
-  </login-config>  
 </web-app>

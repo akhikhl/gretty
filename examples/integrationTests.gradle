@@ -3,7 +3,21 @@ Include this script in subprojects:
 apply from rootProject.file('integrationTests.gradle')
 */
 
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty:1.0.0'
+  }
+}
+
 apply plugin: 'groovy' // this is needed for spock
+
+import org.akhikhl.gretty.AppAfterIntegrationTestTask
+import org.akhikhl.gretty.AppBeforeIntegrationTestTask
 
 ext {
   groovy_version = '2.3.3'
@@ -33,5 +47,29 @@ task integrationTest(type: Test, dependsOn: 'test') {
   doFirst {
     systemProperty 'geb.build.reportsDir', reporting.file('geb')
   }
+}
+
+task 'integrationTestAllContainers'
+
+for(def container in ['jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8']) {
+
+  task('integrationTest_' + container, type: Test, dependsOn: 'test') {
+    outputs.upToDateWhen { false }
+    include '**/*IT.*'
+    doFirst {
+      systemProperty 'geb.build.reportsDir', reporting.file('geb')
+    }
+  }
+  
+  tasks.integrationTestAllContainers.dependsOn tasks['integrationTest_' + container]
+
+  task('beforeIntegrationTest_' + container, type: AppBeforeIntegrationTestTask) {
+    servletContainer = container
+    integrationTestTask 'integrationTest_' + container
+  }
+
+  task('afterIntegrationTest_' + container, type: AppAfterIntegrationTestTask) {
+    integrationTestTask 'integrationTest_' + container
+  }  
 }
 
