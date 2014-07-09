@@ -15,6 +15,10 @@ import org.gradle.api.file.FileTree
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+/**
+ *
+ * @author akhikhl
+ */
 final class ProjectUtils {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectUtils)
@@ -77,36 +81,6 @@ final class ProjectUtils {
     }
   }
 
-  static List<File> collectFilesInOutput(Project project, Object filePattern, boolean searchOverlays = true) {
-    List<File> result = []
-    def collectIt
-    collectIt = { Project proj ->
-      if(proj.hasProperty('sourceSets'))
-        proj.sourceSets.main.output.files.each { File sourceDir ->
-          def collectInDir
-          collectInDir = { File dir ->
-            dir.listFiles().each {
-              if(it.isFile()) {
-                String relPath = it.absolutePath - sourceDir.absolutePath - '/'
-                boolean match = (filePattern instanceof java.util.regex.Pattern) ? (relPath =~ filePattern) : (relPath == filePattern)
-                if(match)
-                  result.add(it)
-              }
-              else
-                collectInDir(it)
-            }
-          }
-          collectInDir(sourceDir)
-        }
-      if(searchOverlays && proj.extensions.findByName('gretty'))
-        for(String overlay in proj.gretty.overlays.reverse())
-          collectIt(proj.project(overlay))
-    }
-    collectIt(project)
-    log.debug 'collectFilesInOutput filePattern: {}, result: {}', filePattern, result
-    return result
-  }
-
   private static Set collectOverlayJars(Project project) {
     Set overlayJars = new HashSet()
     def addOverlayJars // separate declaration from init to enable recursion
@@ -122,11 +96,6 @@ final class ProjectUtils {
     }
     addOverlayJars(project)
     return overlayJars
-  }
-
-  static File findFileInOutput(Project project, Object filePattern, boolean searchOverlays = true) {
-    List files = collectFilesInOutput(project, filePattern, searchOverlays)
-    return files.isEmpty() ? null : files[0]
   }
 
   static String getContextPath(Project project) {
@@ -263,6 +232,10 @@ final class ProjectUtils {
     }
   }
 
+  static File getWebInfDir(Project project) {
+    new File(getWebAppDir(project), 'WEB-INF')
+  }
+
   // ATTENTION: this function resolves compile configuration!
   static boolean isSpringBootApp(Project project) {
     project.configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == 'org.springframework.boot' }
@@ -372,123 +345,64 @@ final class ProjectUtils {
     }
     sconfig.jvmArgs = resolvedJvmArgs
 
-    sconfig.sslKeyStorePath = resolveSingleFile(project, sconfig.sslKeyStorePath)
-    sconfig.sslTrustStorePath = resolveSingleFile(project, sconfig.sslTrustStorePath)
-
+    sconfig.sslKeyStorePath = new FileResolver(['security', 'config', '.']).resolveSingleFile(project, sconfig.sslKeyStorePath)
+    sconfig.sslTrustStorePath = new FileResolver(['security', 'config', '.']).resolveSingleFile(project, sconfig.sslTrustStorePath)
+    
     String servletContainerType = ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerType
 
-    boolean defaultRealmConfigFile = false
-    if(!sconfig.realmConfigFile) {
-      defaultRealmConfigFile = true
-      if(servletContainerType == 'tomcat')
-        sconfig.realmConfigFile = 'tomcat-users.xml'
-      else
-        sconfig.realmConfigFile = 'jetty-realm.properties'
+    def realmConfigFiles = [ sconfig.realmConfigFile ]
+    if(servletContainerType == 'tomcat') {
+      realmConfigFiles.add(sconfig.servletContainer + '-users.xml')
+      realmConfigFiles.add('tomcat-users.xml')
     }
-
-    if(servletContainerType == 'jetty' && !defaultRealmConfigFile && !sconfig.realm)
-      log.warn 'Jetty realm file is specified, but realm is not specified.'
-
-    def resolvedRealmConfigFile = ProjectUtils.resolveSingleFile(project, sconfig.realmConfigFile, { Collection<File> result, Project proj, File file ->
-      for(File f in [ new File(proj.projectDir, file.path), new File(proj.projectDir, 'realm/' + file.path), new File(proj.projectDir, 'security/' + file.path) ])
-        if(f.exists())
-          result.add(f)
-    })
-    if(!resolvedRealmConfigFile && !defaultRealmConfigFile)
-      log.warn 'The realm file {} does not exist.', sconfig.realmConfigFile
-    sconfig.realmConfigFile = resolvedRealmConfigFile
-
-    def f = resolveSingleFile(project, sconfig.jettyXmlFile)
-    if(f == null && sconfig.jettyXmlFile) {
-      def f2 = sconfig.jettyXmlFile
-      if(!(f2 instanceof File))
-        f2 = new File(f2)
-      if(!f2.isAbsolute()) {
-        String jettyHome = System.getenv('JETTY_HOME')
-        if(!jettyHome)
-          jettyHome = System.getProperty('jetty.home')
-        if(jettyHome != null) {
-          File f3 = new File(new File(jettyHome, 'etc'), f2.path)
-          if(f3.exists())
-            f = f3
-        }
-      }
+    else if(servletContainerType == 'jetty') {
+      realmConfigFiles.add(sconfig.servletContainer + '-realm.properties')
+      realmConfigFiles.add('jetty-realm.properties')
     }
-    sconfig.jettyXmlFile = f
+    realmConfigFiles = realmConfigFiles as LinkedHashSet
+    sconfig.realmConfigFile = new FileResolver(['realm', 'security', 'config', '.']).resolveSingleFile(project, realmConfigFiles)
 
-    f = ProjectUtils.resolveSingleFile(project, sconfig.logbackConfigFile)
-    if(f == null && sconfig.logbackConfigFile != 'logback.groovy')
-      f = ProjectUtils.resolveSingleFile(project, 'logback.groovy')
-    if(f == null && sconfig.logbackConfigFile != 'logback.xml')
-      f = ProjectUtils.resolveSingleFile(project, 'logback.xml')
-    sconfig.logbackConfigFile = f
+    if(servletContainerType == 'jetty') {
+      def jettyXmlFiles = [ sconfig.jettyXmlFile, sconfig.servletContainer + '.xml', 'jetty.xml' ] as LinkedHashSet
+      def jettySysDirs = []
+      String jettyHome = System.getenv('JETTY_HOME')
+      if(jettyHome)
+        jettySysDirs.add(new File(jettyHome, 'etc'))
+      jettyHome = System.getProperty('jetty.home')
+      if(jettyHome)
+        jettySysDirs.add(new File(jettyHome, 'etc'))
+      jettySysDirs = jettySysDirs as LinkedHashSet
+      sconfig.jettyXmlFile = new FileResolver(['jetty', 'security', 'config', '.'], jettySysDirs).resolveSingleFile(project, jettyXmlFiles)
+    } else
+      sconfig.jettyXmlFile = null
+
+    def logbackConfigFiles = [ sconfig.logbackConfigFile, 'logback.groovy', 'logback.xml' ] as LinkedHashSet
+    sconfig.logbackConfigFile = new FileResolver(['logback', 'config', '.', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, logbackConfigFiles)
   }
 
   static void resolveWebAppConfig(Project project, WebAppConfig wconfig, ServerConfig sconfig) {
-    if(sconfig != null) {
-      String servletContainerType = ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerType
-
-      boolean defaultRealmConfigFile = false
-      if(!wconfig.realmConfigFile) {
-        defaultRealmConfigFile = true
-        if(servletContainerType == 'tomcat')
-          wconfig.realmConfigFile = 'tomcat-users.xml'
-        else
-          wconfig.realmConfigFile = 'jetty-realm.properties'
-      }
-
-      if(servletContainerType == 'jetty' && !defaultRealmConfigFile && !wconfig.realm)
-        log.warn 'Jetty realm file is specified, but realm is not specified.'
-
-      def resolvedRealmConfigFile = ProjectUtils.resolveSingleFile(project, wconfig.realmConfigFile)
-      if(!resolvedRealmConfigFile && !defaultRealmConfigFile)
-        log.warn 'The realm file {} does not exist.', wconfig.realmConfigFile
-      wconfig.realmConfigFile = resolvedRealmConfigFile
-
-      if(servletContainerType == 'jetty')
-        wconfig.jettyEnvXmlFile = ProjectUtils.resolveSingleFile(project, wconfig.jettyEnvXmlFile)
-      else
-        wconfig.jettyEnvXmlFile = null
-    }
-  }
-
-  static Set<File> resolveFile(Project project, file, Closure resolveFileOnProject = ProjectUtils.&resolveFileOnProject) {
-    Set<File> result = new LinkedHashSet()
-    if(file != null) {
-      resolveFile_(result, project, file, resolveFileOnProject)
-      if(result.isEmpty())
-        log.debug 'Could not resolve file \'{}\' in {}', file, project
-    }
-    return result
-  }
-
-  private static void resolveFile_(Collection<File> result, Project project, file, Closure resolveFileOnProject) {
-    if(!(file instanceof File))
-      file = new File(file.toString())
-    if(file.isAbsolute()) {
-      result.add(file.absoluteFile)
+    
+    if(sconfig == null)
       return
-    }
-    if(project != null) {
-      resolveFileOnProject(result, project, file)
-      if(project.extensions.findByName('gretty'))
-        for(def overlay in project.gretty.overlays.reverse())
-          resolveFile_(result, project.project(overlay), file, resolveFileOnProject)
-    }
-  }
 
-  static void resolveFileOnProject(Collection<File> result, Project project, File file) {
-    File f = new File(project.projectDir, file.path)
-    if(f.exists())
-      result.add(f.absoluteFile)
-    f = new File(new File(getWebAppDir(project), 'WEB-INF'), file.path)
-    if(f.exists())
-      result.add(f.absoluteFile)
-    result.addAll(collectFilesInOutput(project, file.path, false))
-  }
+    String servletContainerType = ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerType
 
-  static File resolveSingleFile(Project project, file, Closure resolveFileOnProject = ProjectUtils.&resolveFileOnProject) {
-    Set<File> files = resolveFile(project, file, resolveFileOnProject)
-    files ? files[0] : null
+    def realmConfigFiles = [ wconfig.realmConfigFile ]
+    if(servletContainerType == 'tomcat') {
+      realmConfigFiles.add(sconfig.servletContainer + '-users.xml')
+      realmConfigFiles.add('tomcat-users.xml')
+    }
+    else if(servletContainerType == 'jetty') {
+      realmConfigFiles.add(sconfig.servletContainer + '-realm.properties')
+      realmConfigFiles.add('jetty-realm.properties')
+    }
+    realmConfigFiles = realmConfigFiles as LinkedHashSet
+    wconfig.realmConfigFile = new FileResolver(['webapp-realm', 'webapp-security', 'webapp-config']).resolveSingleFile(project, realmConfigFiles)
+
+    if(servletContainerType == 'jetty') {
+      def jettyEnvXmlFiles = [ wconfig.jettyEnvXmlFile, sconfig.servletContainer + '-env.xml', 'jetty-env.xml' ] as LinkedHashSet
+      wconfig.jettyEnvXmlFile = new FileResolver(['webapp-jetty', 'webapp-config', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, jettyEnvXmlFiles)
+    } else
+      wconfig.jettyEnvXmlFile = null
   }
 }

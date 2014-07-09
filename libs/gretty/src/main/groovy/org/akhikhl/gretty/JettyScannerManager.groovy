@@ -20,6 +20,13 @@ import org.slf4j.LoggerFactory
 final class JettyScannerManager implements ScannerManager {
 
   private static final Logger log = LoggerFactory.getLogger(JettyScannerManager)
+  
+  private static final webConfigFiles = [
+    'web.xml', 'web-fragment.xml',
+    'jetty.xml', 'jetty7.xml', 'jetty8.xml', 'jetty9.xml',
+    'jetty-env.xml', 'jetty7-env.xml', 'jetty8-env.xml', 'jetty9-env.xml',
+    'tomcat-users.xml'
+  ] as HashSet
 
   protected Project project
   protected ServerConfig sconfig
@@ -92,6 +99,10 @@ final class JettyScannerManager implements ScannerManager {
       log.debug 'scanDir: {}', f
     return scanDirs as List
   }
+  
+  protected static isWebConfigFile(File f) {
+    webConfigFiles.contains(f.name)
+  }
 
   protected void scanFilesChanged(Collection<String> changedFiles) {
 
@@ -141,7 +152,7 @@ final class JettyScannerManager implements ScannerManager {
             log.debug 'file {} is in output of {}, servlet-container will be restarted', f, wconfig.projectPath
             shouldRestart = true
           }
-        } else if (new File(f).name in ['web.xml', 'web-fragment.xml', 'jetty.xml', 'jetty-env.xml', 'tomcat-users.xml']) {
+        } else if (isWebConfigFile(new File(f))) {
           log.debug 'file {} is configuration file, servlet-container will be restarted', f
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true

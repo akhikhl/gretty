@@ -28,8 +28,8 @@ ext {
 
 gretty {
   onStart {  
-    println '*** ATTENTION ***: the real (augmented by "jetty-env.xml") uri is:'
-    println "http://${host}:${httpPort}/abc/"
+    println '*** ATTENTION ***: the real (augmented by "jetty.xml") uri is:'
+    println "http://${host}:7777/testJettyXml/"
   }
 }
 

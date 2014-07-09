@@ -65,7 +65,6 @@ class ServerConfig {
     // httpsIdleTimeout defaults to null. This means: no idle timeout is set for https protocol.
     result.servicePort = 9900
     result.statusPort = 9901
-    result.jettyXmlFile = 'jetty.xml'
     result.scanInterval = 1
     result.loggingLevel = 'INFO'
     result.consoleLogEnabled = true

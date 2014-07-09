@@ -49,27 +49,33 @@ task integrationTest(type: Test, dependsOn: 'test') {
   }
 }
 
-task 'integrationTestAllContainers'
+afterEvaluate {
 
-for(def container in ['jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8']) {
+  task 'integrationTestAllContainers'
 
-  task('integrationTest_' + container, type: Test, dependsOn: 'test') {
-    outputs.upToDateWhen { false }
-    include '**/*IT.*'
-    doFirst {
-      systemProperty 'geb.build.reportsDir', reporting.file('geb')
+  def supportedContainers = ext.has('supportedContainers') ? ext.supportedContainers : ['jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+
+  for(def container in supportedContainers) {
+
+    task('integrationTest_' + container, type: Test, dependsOn: 'test') {
+      outputs.upToDateWhen { false }
+      include '**/*IT.*'
+      doFirst {
+        systemProperty 'geb.build.reportsDir', reporting.file('geb')
+      }
     }
-  }
-  
-  tasks.integrationTestAllContainers.dependsOn tasks['integrationTest_' + container]
+    
+    tasks.integrationTestAllContainers.dependsOn tasks['integrationTest_' + container]
 
-  task('beforeIntegrationTest_' + container, type: AppBeforeIntegrationTestTask) {
-    servletContainer = container
-    integrationTestTask 'integrationTest_' + container
+    task('beforeIntegrationTest_' + container, type: AppBeforeIntegrationTestTask) {
+      servletContainer = container
+      integrationTestTask 'integrationTest_' + container
+    }
+
+    task('afterIntegrationTest_' + container, type: AppAfterIntegrationTestTask) {
+      integrationTestTask 'integrationTest_' + container
+    }  
   }
 
-  task('afterIntegrationTest_' + container, type: AppAfterIntegrationTestTask) {
-    integrationTestTask 'integrationTest_' + container
-  }  
-}
+} // afterEvaluate
 
