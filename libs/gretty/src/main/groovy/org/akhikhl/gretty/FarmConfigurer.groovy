@@ -29,7 +29,7 @@ class FarmConfigurer {
 
   void configureFarm(FarmExtension dstFarm, FarmExtension[] srcFarms = []) {
     srcFarms = srcFarms.findAll()
-    ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ ProjectUtils.getDefaultServerConfig(project) ])
+    ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project) ])
     sconfig = dstFarm.serverConfig
     ProjectUtils.resolveServerConfig(project, dstFarm.serverConfig)
     for(def f in srcFarms)
