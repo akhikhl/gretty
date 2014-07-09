@@ -53,9 +53,9 @@ afterEvaluate {
 
   task 'integrationTestAllContainers'
 
-  def supportedContainers = ext.has('supportedContainers') ? ext.supportedContainers : ['jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+  def integrationTestContainers = ext.has('integrationTestContainers') ? ext.integrationTestContainers : ['jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8']
 
-  for(def container in supportedContainers) {
+  for(def container in integrationTestContainers) {
 
     task('integrationTest_' + container, type: Test, dependsOn: 'test') {
       outputs.upToDateWhen { false }

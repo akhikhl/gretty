@@ -19,5 +19,5 @@ gretty {
 }
 
 ext {
-  supportedContainers = ['jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+  integrationTestContainers = ['jetty8', 'jetty9', 'tomcat7', 'tomcat8']
 }

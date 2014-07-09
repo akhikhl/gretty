@@ -23,7 +23,7 @@ dependencies {
 }
 
 ext {
-  supportedContainers = ['jetty7', 'jetty8', 'jetty9']
+  integrationTestContainers = ['jetty7', 'jetty8', 'jetty9']
 }
 
 gretty {
