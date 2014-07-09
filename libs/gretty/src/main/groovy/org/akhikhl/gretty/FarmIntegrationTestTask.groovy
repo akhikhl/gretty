@@ -9,12 +9,16 @@ package org.akhikhl.gretty
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
  * @author akhikhl
  */
 class FarmIntegrationTestTask extends DefaultTask {
+
+  private static final Logger log = LoggerFactory.getLogger(FarmIntegrationTestTask)
 
   String farmName = ''
 
@@ -48,8 +52,8 @@ class FarmIntegrationTestTask extends DefaultTask {
     }
     integrationTestTask_ = integrationTestTask
     def thisTask = this
-    getWebAppProjects().each {
-      it.tasks.all { t ->
+    getWebAppProjects().each { proj ->
+      proj.tasks.all { t ->
         if(t.name == thisTask.integrationTestTask)
           thisTask.dependsOn t
       }

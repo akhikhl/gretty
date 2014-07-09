@@ -24,10 +24,11 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
   private boolean integrationTestTaskAssigned
 
   FarmBeforeIntegrationTestTask() {
-    doFirst {
-      getWebAppProjects().each {
-        it.tasks.each { t ->
-          if(t instanceof AppBeforeIntegrationTestTask || t instanceof AppAfterIntegrationTestTask)
+    def thisTask = this
+    doFirst {      
+      getWebAppProjects().each { proj ->
+        proj.tasks.each { t ->
+          if((t instanceof AppBeforeIntegrationTestTask || t instanceof AppAfterIntegrationTestTask) && t.integrationTestTask == thisTask.integrationTestTask)
             t.enabled = false
         }
       }
@@ -59,20 +60,20 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     }
     integrationTestTask_ = integrationTestTask
     def thisTask = this
-    getWebAppProjects().each { webappProject ->
-      webappProject.tasks.all { t ->
+    getWebAppProjects().each { proj ->
+      proj.tasks.all { t ->
         if(t.name == thisTask.integrationTestTask) {
           t.mustRunAfter thisTask
-          thisTask.mustRunAfter webappProject.tasks.testClasses
+          thisTask.mustRunAfter proj.tasks.testClasses
           if(t.name != 'test' && project.tasks.findByName('test'))
             thisTask.mustRunAfter project.tasks.test
           if(t instanceof JavaForkOptions) {
             t.doFirst {
               if(thisTask.didWork)
-                passSystemPropertiesToIntegrationTask(webappProject, t)
+                passSystemPropertiesToIntegrationTask(proj, t)
             }
           }
-        } else if(t instanceof AppBeforeIntegrationTestTask)
+        } else if(t instanceof AppBeforeIntegrationTestTask && t.integrationTestTask == thisTask.integrationTestTask)
           t.mustRunAfter thisTask // need this to be able to disable AppBeforeIntegrationTestTask in doFirst
       }
     }

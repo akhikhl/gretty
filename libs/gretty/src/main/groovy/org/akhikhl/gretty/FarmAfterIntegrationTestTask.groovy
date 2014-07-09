@@ -60,11 +60,11 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     }
     integrationTestTask_ = integrationTestTask
     def thisTask = this
-    getWebAppProjects().each {
-      it.tasks.all { t ->
+    getWebAppProjects().each { proj ->
+      proj.tasks.all { t ->
         if(t.name == thisTask.integrationTestTask)
           thisTask.mustRunAfter t
-        else if(t instanceof AppAfterIntegrationTestTask)
+        else if(t instanceof AppAfterIntegrationTestTask && t.integrationTestTask == thisTask.integrationTestTask)
           thisTask.mustRunAfter t
       }
     }
