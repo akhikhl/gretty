@@ -29,7 +29,7 @@ class AppAfterIntegrationTestTask extends AppStopTask {
       project.ext.grettyLaunchThread.join()
       project.ext.grettyLaunchThread = null
     }
-    System.out.println 'Jetty server stopped.'
+    System.out.println 'Server stopped.'
   }
 
   String getIntegrationTestTask() {
