@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
 import org.apache.catalina.LifecycleListener
+import org.apache.catalina.authenticator.SingleSignOn
 import org.apache.catalina.connector.Connector
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.loader.WebappLoader
@@ -38,15 +39,17 @@ class TomcatServerConfigurer {
     Tomcat tomcat = new Tomcat()
     File tempDir = params.tempDir ? new File(params.tempDir) : null
     if(tempDir) {
-      tempDir.mkdirs()
+      new File(tempDir, 'webapps').mkdirs()
       tomcat.setBaseDir(tempDir.absolutePath)
     }
 
-		tomcat.host.autoDeploy = true
 		tomcat.engine.backgroundProcessorDelay = -1
 
+		tomcat.host.autoDeploy = true
+    tomcat.host.addValve(new SingleSignOn())
+
     if(params.host)
-      tomcat.setHostname(params.host)
+      tomcat.hostname = params.host
 
     if(params.httpPort) {
       final Connector httpConn = new Connector('HTTP/1.1')
