@@ -155,6 +155,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     ClassLoader classLoader = new URLClassLoader(classpathUrls, this.getClass().getClassLoader())
     WebAppContext context = new WebAppContext()
     context.setClassLoader(new WebAppClassLoader(classLoader, context))
+    context.setOverrideDescriptor('/org/akhikhl/gretty/override-web.xml')
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
