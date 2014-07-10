@@ -271,7 +271,7 @@ class ProductConfigurer {
   protected void writeConfigFiles() {
 
     // there are cases when springBootMainClass was accessed too early (in configuration phase),
-    // so we neeed to recalculate it
+    // so we neeed to recalculate it.
     if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) } && jsonConfig.content.springBootMainClass == null) {
       for(WebAppConfig wconfig in wconfigs)
         ProjectUtils.prepareToRun(project, wconfig)
@@ -368,6 +368,10 @@ class ProductConfigurer {
         logbackConfigFile 'conf/' + (getFileName(sconfig.logbackConfigFile) ?: 'logback.groovy')
         if(sconfig.secureRandom != null)
           secureRandom sconfig.secureRandom
+        if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) })
+          springBootMainClass getSpringBootMainClass()
+        if(sconfig.singleSignOn != null)
+          singleSignOn sconfig.singleSignOn
       }
       webApps wconfigs.collect { WebAppConfig wconfig ->
         { ->
@@ -391,8 +395,6 @@ class ProductConfigurer {
             springBootSources wconfig.springBootSources
         }
       }
-      if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) })
-        springBootMainClass getSpringBootMainClass()
       tempDir 'temp'
     } // json
   }

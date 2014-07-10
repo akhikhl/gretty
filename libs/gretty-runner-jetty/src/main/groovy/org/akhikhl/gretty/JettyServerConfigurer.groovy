@@ -39,13 +39,12 @@ class JettyServerConfigurer {
           context.setWar(webapp.resourceBase)
       }
 
+      configurer.configureSecurity(context, params, webapp)
+
+      configurer.configureSessionManager(server, context, params, webapp)
+
       if(configureContext)
         configureContext(webapp, context)
-
-      if((webapp.realm || params.realm) && webapp.realmConfigFile)
-        configurer.configureRealm(context, webapp.realm ?: params.realm, webapp.realmConfigFile)
-      else if(params.realm && params.realmConfigFile)
-        configurer.configureRealm(context, params.realm, params.realmConfigFile)
 
       handlers.add(context)
     }

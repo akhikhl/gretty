@@ -19,19 +19,21 @@ interface JettyConfigurer {
 
   void applyJettyXml(server, String jettyXml)
 
-  void configureConnectors(server, Map params)
+  void configureConnectors(server, Map serverParams)
 
-  void configureRealm(context, String realm, String realmConfigFile)
+  void configureSecurity(context, Map serverParams, Map webappParams)
+
+  void configureSessionManager(server, context, Map serverParams, Map webappParams)
 
   def createServer()
 
   def createWebAppContext(List<String> webappClassPath)
-  
+
   List getConfigurations(List<String> webappClassPath)
 
-  void setConfigurationsToWebAppContext(webAppContext, List configurations)
+  void setConfigurationsToWebAppContext(context, List configurations)
 
   void setHandlersToServer(server, List handlers)
-  
+
   void setLogger(Logger logger)
 }

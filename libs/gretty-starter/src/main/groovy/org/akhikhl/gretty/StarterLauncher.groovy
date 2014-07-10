@@ -61,8 +61,8 @@ class StarterLauncher extends LauncherBase {
   protected void writeRunConfigJson(json) {
     super.writeRunConfigJson(json)
     json.with {
-      if(starterConfig.springBootMainClass)
-        springBootMainClass starterConfig.springBootMainClass
+      if(config.getServerConfig().springBootMainClass)
+        springBootMainClass config.getServerConfig().springBootMainClass
     }
   }
 
@@ -72,5 +72,5 @@ class StarterLauncher extends LauncherBase {
       return // webapp classpath is passed directly to the runner
     }
     super.writeWebAppClassPath(json, wconfig)
-  }  
+  }
 }

@@ -197,6 +197,10 @@ abstract class LauncherBase implements Launcher {
       if(sconfig.jettyXmlFile)
         jettyXml self.fileToString(sconfig.jettyXmlFile)
       writeLoggingConfig(json)
+      if(config.tempDir)
+        tempDir config.tempDir.absolutePath
+      if(sconfig.singleSignOn != null)
+        singleSignOn sconfig.singleSignOn
       webApps webAppConfigs.collect { WebAppConfig wconfig ->
         { ->
           inplace wconfig.inplace
@@ -215,8 +219,6 @@ abstract class LauncherBase implements Launcher {
             springBootSources wconfig.springBootSources
         }
       }
-      if(config.tempDir)
-        tempDir config.tempDir.absolutePath
     }
   }
 

@@ -15,8 +15,11 @@ import org.eclipse.jetty.security.LoginService
 import org.eclipse.jetty.server.Connector
 import org.eclipse.jetty.server.Handler
 import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.server.SessionManager
 import org.eclipse.jetty.server.bio.SocketConnector
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
+import org.eclipse.jetty.server.session.HashSessionManager
+import org.eclipse.jetty.server.session.SessionHandler
 import org.eclipse.jetty.server.ssl.SslSocketConnector
 import org.eclipse.jetty.util.resource.FileResource
 import org.eclipse.jetty.util.ssl.SslContextFactory
@@ -40,6 +43,8 @@ import org.slf4j.Logger
 class JettyConfigurerImpl implements JettyConfigurer {
 
   private Logger log
+  private SSOAuthenticatorFactory ssoAuthenticatorFactory
+  private HashSessionManager sharedSessionManager
 
   @Override
   void applyJettyEnvXml(webAppContext, String jettyEnvXml) {
@@ -100,13 +105,42 @@ class JettyConfigurerImpl implements JettyConfigurer {
   }
 
   @Override
-  void configureRealm(context, String realm, String realmConfigFile) {
+  void configureSecurity(context, Map serverParams, Map webappParams) {
+    String realm = webappParams.realm ?: serverParams.realm
+    String realmConfigFile = webappParams.realmConfigFile ?: serverParams.realmConfigFile
     if(realm && realmConfigFile) {
       if(context.getSecurityHandler().getLoginService() != null)
         return
       log.warn '{} -> realm \'{}\', {}', context.contextPath, realm, realmConfigFile
       context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
+      if(serverParams.singleSignOn) {
+        if(ssoAuthenticatorFactory == null)
+          ssoAuthenticatorFactory = new SSOAuthenticatorFactory()
+        context.getSecurityHandler().setAuthenticatorFactory(ssoAuthenticatorFactory)
+      }
     }
+  }
+
+  @Override
+  void configureSessionManager(server, context, Map serverParams, Map webappParams) {
+    HashSessionManager sessionManager
+    if(serverParams.singleSignOn) {
+      sessionManager = sharedSessionManager
+      if(sessionManager == null) {
+        sessionManager = sharedSessionManager = new HashSessionManager() {
+
+        }
+        sessionManager.setMaxInactiveInterval(60 * 30) // 30 minutes
+        sessionManager.getSessionCookieConfig().setPath('/')
+      }
+    } else {
+      sessionManager = new HashSessionManager()
+      sessionManager.setMaxInactiveInterval(60 * 30) // 30 minutes
+    }
+    def sessionHandler = new SessionHandler(sessionManager)
+    // By setting server we fix bug with older jetty versions: sessionHandler produces NullPointerException, when session manager is reassigned.
+    sessionHandler.setServer(server)
+    context.setSessionHandler(sessionHandler)
   }
 
   @Override

@@ -46,7 +46,9 @@ class TomcatServerConfigurer {
 		tomcat.engine.backgroundProcessorDelay = -1
 
 		tomcat.host.autoDeploy = true
-    tomcat.host.addValve(new SingleSignOn())
+
+    if(params.singleSignOn)
+      tomcat.host.addValve(new SingleSignOn())
 
     if(params.host)
       tomcat.hostname = params.host

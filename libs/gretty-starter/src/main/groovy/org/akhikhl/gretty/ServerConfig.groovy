@@ -50,6 +50,7 @@ class ServerConfig {
   Integer statusPort
   Boolean secureRandom
   String springBootMainClass
+  Boolean singleSignOn
 
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
