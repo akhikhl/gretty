@@ -11,7 +11,7 @@ buildscript {
 
 apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
-apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+apply from: rootProject.file('integrationTests.gradle')
 apply plugin: 'jacoco'
 
 dependencies {
@@ -88,3 +88,4 @@ task('integrationTestServerReport', type: JacocoReport) {
 }
 
 rootProject.tasks.testAll.dependsOn { project.tasks.integrationTest }
+
