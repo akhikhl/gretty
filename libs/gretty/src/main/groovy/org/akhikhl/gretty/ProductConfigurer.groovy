@@ -393,6 +393,7 @@ class ProductConfigurer {
       }
       if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) })
         springBootMainClass getSpringBootMainClass()
+      tempDir 'temp'
     } // json
   }
 

@@ -96,6 +96,10 @@ class GrettyStarter {
         PlatformUtils.isWindows() ? 'stop.bat' : './stop.sh'
       }
 
+      File getTempDir() {
+        config.tempDir ? new File(basedir, config.tempDir) : null
+      }
+
       WebAppClassPathResolver getWebAppClassPathResolver() {
       }
 

@@ -36,13 +36,14 @@ class TomcatServerConfigurer {
   Tomcat createAndConfigureServer(TomcatConfigurer configurer, Map params, Closure configureContext = null) {
 
     Tomcat tomcat = new Tomcat()
-    File tempDir = new File(System.getProperty('java.io.tmpdir'), 'tomcat-' + UUID.randomUUID().toString())
-    new File(tempDir, 'webapps').mkdirs()
-    tempDir.deleteOnExit()
-    tomcat.setBaseDir(tempDir.absolutePath)
+    File tempDir = params.tempDir ? new File(params.tempDir) : null
+    if(tempDir) {
+      tempDir.mkdirs()
+      tomcat.setBaseDir(tempDir.absolutePath)
+    }
 
-		tomcat.getHost().setAutoDeploy(true)
-		tomcat.getEngine().setBackgroundProcessorDelay(-1)
+		tomcat.host.autoDeploy = true
+		tomcat.engine.backgroundProcessorDelay = -1
 
     if(params.host)
       tomcat.setHostname(params.host)

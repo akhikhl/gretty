@@ -215,6 +215,8 @@ abstract class LauncherBase implements Launcher {
             springBootSources wconfig.springBootSources
         }
       }
+      if(config.tempDir)
+        tempDir config.tempDir.absolutePath
     }
   }
 

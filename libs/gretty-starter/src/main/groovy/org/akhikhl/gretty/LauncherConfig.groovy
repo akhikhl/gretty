@@ -23,6 +23,8 @@ interface LauncherConfig {
 
   String getStopCommand()
 
+  File getTempDir()
+
   WebAppClassPathResolver getWebAppClassPathResolver()
 
   Iterable<WebAppConfig> getWebAppConfigs()
