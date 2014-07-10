@@ -56,13 +56,13 @@ afterEvaluate {
 
   def integrationTestContainers = ext.has('integrationTestContainers') ? ext.integrationTestContainers : ServletContainerConfig.getConfigNames()
 
-  for(def container in integrationTestContainers) {
+  integrationTestContainers.each { container ->
 
     task('integrationTest_' + container, type: Test, dependsOn: 'test') {
       outputs.upToDateWhen { false }
       include '**/*IT.*'
       doFirst {
-        systemProperty 'geb.build.reportsDir', reporting.file('geb')
+        systemProperty 'geb.build.reportsDir', reporting.file('geb_' + container)
       }
     }
     
@@ -79,3 +79,4 @@ afterEvaluate {
   }
 
 } // afterEvaluate
+
