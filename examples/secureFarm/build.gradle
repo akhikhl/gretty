@@ -9,7 +9,3 @@ buildscript {
   }
 }
 
-task 'listFarms', {
-  doLast {
-  }
-}
