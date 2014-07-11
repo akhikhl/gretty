@@ -1,0 +1,53 @@
+apply plugin: 'groovy'
+apply plugin: 'org.akhikhl.gretty'
+apply from: rootProject.file('integrationTests.gradle')
+
+version = '1.0.0'
+
+dependencies {
+  compile 'org.codehaus.groovy:groovy-all:2.3.3'
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+  // We use UrlRewriteFilter for redirecting to the home page.
+  compile 'org.tuckey:urlrewritefilter:4.0.4'
+}
+
+gretty {
+  springBoot = true
+  httpEnabled = false
+  httpsEnabled = true
+  servletContainer = 'jetty9'
+  realm = 'auth'
+  realmConfigFile = '../security'
+  singleSignOn = true
+}
+
+farm {
+  webapp project
+  webapp ':spring-boot-farm-secure:spring-boot-webservice'
+  webapp ':spring-boot-farm-secure:jee-webservice'
+}
+
+ext {
+  integrationTestContainers = ['jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+}
+
+task 'farmIntegrationTestAllContainers'
+
+def containers = ext.integrationTestContainers
+containers.each { container ->
+  farms.farm container, {
+    servletContainer = container
+    webapp project
+    webapp ':spring-boot-farm-secure:spring-boot-webservice'
+    webapp ':spring-boot-farm-secure:jee-webservice'
+    afterEvaluate {
+      tasks['farmBeforeIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
+      tasks['farmAfterIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
+      tasks['farmIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
+      tasks.farmIntegrationTestAllContainers.dependsOn tasks['farmIntegrationTest' + container]
+    }
+  }
+}
+
+rootProject.tasks.testAll.dependsOn tasks.farmIntegrationTestAllContainers

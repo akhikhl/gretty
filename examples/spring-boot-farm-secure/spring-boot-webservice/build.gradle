@@ -1,0 +1,23 @@
+apply plugin: 'groovy'
+apply plugin: 'org.akhikhl.gretty'
+apply from: rootProject.file('integrationTests.gradle')
+
+group = 'org.akhikhl.gretty.examples'
+version = '1.0'
+
+dependencies {
+  compile 'org.codehaus.groovy:groovy-all:2.3.3'
+  testCompile 'org.akhikhl.gretty:gretty-spock:1.0.0'
+}
+
+gretty {
+  springBoot = true
+  httpEnabled = false
+  httpsEnabled = true
+  realm = 'auth'
+  realmConfigFile = '../security'
+}
+
+ext {
+  integrationTestContainers = ['jetty8', 'jetty9', 'tomcat7', 'tomcat8']
+}
