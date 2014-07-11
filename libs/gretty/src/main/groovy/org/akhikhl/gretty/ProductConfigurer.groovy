@@ -197,12 +197,8 @@ class ProductConfigurer {
         def file = wconfig.resourceBase
         if(!(file instanceof File))
           file = new File(file.toString())
-        dir.add(file, appDir)
+        dir.add(file)
       }
-      if(wconfig.realmConfigFile)
-        dir.add(wconfig.realmConfigFile, appDir)
-      if(wconfig.jettyEnvXmlFile)
-        dir.add(wconfig.jettyEnvXmlFile, appDir)
     }
 
     dir.cleanup()
@@ -314,6 +310,14 @@ class ProductConfigurer {
       logbackConfigFile.text = logbackConfig
       dir.registerAdded(logbackConfigFile)
     }
+    
+    for(WebAppConfig wconfig in wconfigs) {
+      String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)    
+      if(wconfig.realmConfigFile)
+        dir.add(wconfig.realmConfigFile, appDir)
+      if(wconfig.jettyEnvXmlFile)
+        dir.add(wconfig.jettyEnvXmlFile, appDir)
+    }
 
     dir.cleanup()
   }
@@ -384,22 +388,22 @@ class ProductConfigurer {
       }
       webApps wconfigs.collect { WebAppConfig wconfig ->
         { ->
-          def appDir = 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
+          def appConfigDir = 'conf/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
           contextPath wconfig.contextPath
-          if(ProjectUtils.isSpringBootApp(project, wconfig)) {
-            springBoot true
-            resourceBase appDir
-          }
+          if(ProjectUtils.isSpringBootApp(project, wconfig))
+            resourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
           else
-            resourceBase appDir + '/' + getFileName(wconfig.resourceBase)
+            resourceBase 'webapps/' + getFileName(wconfig.resourceBase)
           if(wconfig.initParameters)
             initParams wconfig.initParameters
           if(wconfig.realm)
             realm wconfig.realm
           if(wconfig.realmConfigFile)
-            realmConfigFile appDir + '/' + getFileName(wconfig.realmConfigFile)
+            realmConfigFile appConfigDir + '/' + getFileName(wconfig.realmConfigFile)
           if(wconfig.jettyEnvXmlFile)
-            jettyEnvXmlFile appDir + '/' + getFileName(wconfig.jettyEnvXmlFile)
+            jettyEnvXmlFile appConfigDir + '/' + getFileName(wconfig.jettyEnvXmlFile)
+          if(ProjectUtils.isSpringBootApp(project, wconfig))
+            springBoot true
           if(wconfig.springBootSources)
             springBootSources wconfig.springBootSources
         }

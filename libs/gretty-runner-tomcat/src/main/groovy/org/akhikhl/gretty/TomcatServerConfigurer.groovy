@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory
 
 /**
  *
- * @author ahi
+ * @author akhikhl
  */
 class TomcatServerConfigurer {
 
@@ -38,11 +38,9 @@ class TomcatServerConfigurer {
 
     Tomcat tomcat = new Tomcat()
     
-    File baseDir = params.baseDir ? new File(params.baseDir) : null
-    if(baseDir) {
-      new File(baseDir, 'webapps').mkdirs()
-      tomcat.setBaseDir(baseDir.absolutePath)
-    }
+    File baseDir = new File(params.baseDir)
+    new File(baseDir, 'webapps').mkdirs()
+    tomcat.setBaseDir(baseDir.absolutePath)
 
 		tomcat.engine.backgroundProcessorDelay = -1
 
