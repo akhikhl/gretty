@@ -6,7 +6,7 @@ Simple gretty example.
 
 ```bash
 cd examples/helloGretty
-gradle farmRun
+gradle appRun
 ```
 
 ## How to test
