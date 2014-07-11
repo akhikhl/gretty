@@ -84,6 +84,9 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
     task.systemProperty 'gretty.host', host
     task.systemProperty 'gretty.contextPath', contextPath
 
+    String preferredProtocol
+    String preferredBaseURI
+
     def httpPort = launcherConfig.serverConfig.httpPort
     String httpBaseURI
     if(httpPort && launcherConfig.serverConfig.httpEnabled) {
@@ -92,6 +95,8 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
       httpBaseURI = "http://${host}:${httpPort}${contextPath}"
       task.systemProperty 'gretty.baseURI', httpBaseURI
       task.systemProperty 'gretty.httpBaseURI', httpBaseURI
+      preferredProtocol = 'http'
+      preferredBaseURI = httpBaseURI
     }
 
     def httpsPort = launcherConfig.serverConfig.httpsPort
@@ -100,8 +105,13 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
       task.systemProperty 'gretty.httpsPort', httpsPort
       httpsBaseURI = "https://${host}:${httpsPort}${contextPath}"
       task.systemProperty 'gretty.httpsBaseURI', httpsBaseURI
+      preferredProtocol = 'https'
+      preferredBaseURI = httpsBaseURI
     }
 
-    task.systemProperty 'gretty.preferredBaseURI', (httpsBaseURI ?: httpBaseURI)
+    if(preferredProtocol)
+      task.systemProperty 'gretty.preferredProtocol', preferredProtocol
+    if(preferredBaseURI)
+      task.systemProperty 'gretty.preferredBaseURI', preferredBaseURI
   }
 }
