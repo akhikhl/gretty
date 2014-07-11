@@ -11,13 +11,18 @@ buildscript {
 
 apply plugin: 'groovy'
 apply plugin: 'org.akhikhl.gretty'
-
-apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+apply from: rootProject.file('integrationTests.gradle')
 
 version = '1.0.0'
 
 dependencies {
   compile 'org.codehaus.groovy:groovy-all:2.3.3'
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+  // We use UrlRewriteFilter for redirecting to the home page.
+  compile 'org.tuckey:urlrewritefilter:4.0.4'
+  // We use Velocity for example of template processing within the webapp.
+  compile 'org.apache.velocity:velocity:1.7'
 }
 
 gretty {
