@@ -1,51 +1,20 @@
 apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
-apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+apply from: rootProject.file('integrationTests.gradle')
 
 import org.akhikhl.gretty.ServletContainerConfig
 
-/*
-  This is default farm.
-  It provides farm-specific tasks, for example farmRun, farmStart, farmStop.
-  If you completely omit farm specification, gretty automatically includes
-  all subprojects of current project into farm.
-*/
-farm {
-  // can add this project
-  webapp project
-
-  // can add another project in the same project tree
-  webapp ':farm:MyWebService'
-
-  // same as before
-  // webapp project(':farm:MyWebService')
-
-  // can override any gretty properties by passing them as hashmap parameters
-  //webapp ':farm:MyWebService2', contextPath: '/specialContextPath'
-
-  // can add maven dependency
-  // webapp 'org.akhikhl.gretty.examples:MyWebService:1.0'
-
-  // can add absolute path to war-file
-  //webapp '/home/user/someDir/MyWebService-1.0.war'
-
-  // can add absolute file to war-file
-  //webapp new File('/home/user/someDir/MyWebService-1.0.war')
-
-  // can add relative (to this project) path to war-file
-  //webapp 'someDir/MyWebService-1.0.war'
-
-  // can add relative (to this project) file to war-file
-  //webapp new File('someDir/MyWebService-1.0.war')
+dependencies {
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+  // We use UrlRewriteFilter for redirecting to the protected home page.
+  compile 'org.tuckey:urlrewritefilter:4.0.4'
 }
 
-/*
-  You can define multiple farms, using "farms" configuration.
-  Each farm should get unique name.
-  Each farm gets farm-specific tasks, for example farmRunA, farmStartA, farmStopA.
-  You can even run multiple farms on the same project tree in parallel,
-  provided that they have non-conflicting triads port/servicePort/statusPort.
-*/
+farm {
+  webapp project
+  webapp ':farm:MyWebService'
+}
 
 task 'farmIntegrationTestAllContainers'
 

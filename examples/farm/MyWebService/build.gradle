@@ -1,15 +1,15 @@
 apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
 
-// this is for installing war-file into local maven repository
+// this is only needed for installing war-file into local maven repository
 // and consequent testing of maven-dependency webapp in farm
-apply plugin: 'maven' 
+// apply plugin: 'maven' 
 
-apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+apply from: rootProject.file('integrationTests.gradle')
 
 group = 'org.akhikhl.gretty.examples'
 version = '1.0'
 
 dependencies {
-  testCompile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+  testCompile 'org.akhikhl.gretty:gretty-spock:1.0.0'
 }
