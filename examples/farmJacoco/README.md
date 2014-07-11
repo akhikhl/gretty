@@ -1,6 +1,6 @@
 # farmJacoco
 
-Example of webapp farm with enabled Jacoco code coverage.
+Example of client-side and server-side Jacoco code coverage with webapp farm.
 
 ## How to test
 
