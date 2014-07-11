@@ -22,7 +22,7 @@ gretty {
 
 farm {
   webapp project
-  webapp ':secureFarm:MyWebService'
+  webapp ':farmSecure:MyWebService'
 }
 
 task 'farmIntegrationTestAllContainers'
@@ -32,7 +32,7 @@ containers.each { container ->
   farms.farm container, {
     servletContainer = container
     webapp project
-    webapp ':secureFarm:MyWebService'
+    webapp ':farmSecure:MyWebService'
     afterEvaluate {
       tasks['farmBeforeIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
       tasks['farmAfterIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
