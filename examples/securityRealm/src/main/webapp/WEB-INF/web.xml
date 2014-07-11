@@ -50,5 +50,5 @@
       <form-login-page>/login.html</form-login-page>
       <form-error-page>/login_fail.html</form-error-page>
     </form-login-config>
-  </login-config>  
+  </login-config>
 </web-app>
