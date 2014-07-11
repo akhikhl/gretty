@@ -21,7 +21,7 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
 
   private String integrationTestTask_
   private boolean integrationTestTaskAssigned
-  
+
   AppBeforeIntegrationTestTask() {
     scanInterval = 0 // disable scanning on integration tests
   }
@@ -43,7 +43,7 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
   boolean getIntegrationTestTaskAssigned() {
     integrationTestTaskAssigned
   }
-  
+
   @Override
   protected boolean getManagedClassReload(ServerConfig sconfig) {
     // disable managed class reloads on integration tests
@@ -85,20 +85,23 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
     task.systemProperty 'gretty.contextPath', contextPath
 
     def httpPort = launcherConfig.serverConfig.httpPort
-
+    String httpBaseURI
     if(httpPort && launcherConfig.serverConfig.httpEnabled) {
       task.systemProperty 'gretty.port', httpPort
       task.systemProperty 'gretty.httpPort', httpPort
-      def baseURI = "http://${host}:${httpPort}${contextPath}"
-      task.systemProperty 'gretty.baseURI', baseURI
-      task.systemProperty 'gretty.httpBaseURI', baseURI
+      httpBaseURI = "http://${host}:${httpPort}${contextPath}"
+      task.systemProperty 'gretty.baseURI', httpBaseURI
+      task.systemProperty 'gretty.httpBaseURI', httpBaseURI
     }
 
     def httpsPort = launcherConfig.serverConfig.httpsPort
-
+    String httpsBaseURI
     if(httpsPort && launcherConfig.serverConfig.httpsEnabled) {
       task.systemProperty 'gretty.httpsPort', httpsPort
-      task.systemProperty 'gretty.httpsBaseURI', "https://${host}:${httpsPort}${contextPath}"
+      httpsBaseURI = "https://${host}:${httpsPort}${contextPath}"
+      task.systemProperty 'gretty.httpsBaseURI', httpsBaseURI
     }
+
+    task.systemProperty 'gretty.preferredBaseURI', (httpsBaseURI ?: httpBaseURI)
   }
 }

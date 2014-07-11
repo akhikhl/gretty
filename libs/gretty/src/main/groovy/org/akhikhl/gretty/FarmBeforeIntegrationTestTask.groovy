@@ -25,7 +25,7 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
 
   FarmBeforeIntegrationTestTask() {
     def thisTask = this
-    doFirst {      
+    doFirst {
       getWebAppProjects().each { proj ->
         proj.tasks.each { t ->
           if((t instanceof AppBeforeIntegrationTestTask || t instanceof AppAfterIntegrationTestTask) && t.integrationTestTask == thisTask.integrationTestTask)
@@ -95,20 +95,24 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     task.systemProperty 'gretty.contextPath', contextPath
 
     def httpPort = tempFarm.serverConfig.httpPort
+    String httpBaseURI
     if(httpPort && tempFarm.serverConfig.httpEnabled) {
       task.systemProperty 'gretty.port', httpPort
       task.systemProperty 'gretty.httpPort', httpPort
-      def baseURI = "http://${host}:${httpPort}${contextPath}"
-      task.systemProperty 'gretty.baseURI', baseURI
-      task.systemProperty 'gretty.httpBaseURI', baseURI
+      httpBaseURI = "http://${host}:${httpPort}${contextPath}"
+      task.systemProperty 'gretty.baseURI', httpBaseURI
+      task.systemProperty 'gretty.httpBaseURI', httpBaseURI
     }
 
     def httpsPort = tempFarm.serverConfig.httpsPort
+    String httpsBaseURI
     if(httpsPort && tempFarm.serverConfig.httpsEnabled) {
       task.systemProperty 'gretty.httpsPort', httpsPort
-      task.systemProperty 'gretty.httpsBaseURI', "https://${host}:${httpsPort}${contextPath}"
+      httpsBaseURI = "https://${host}:${httpsPort}${contextPath}"
+      task.systemProperty 'gretty.httpsBaseURI', httpsBaseURI
     }
 
+    task.systemProperty 'gretty.preferredBaseURI', (httpsBaseURI ?: httpBaseURI)
     task.systemProperty 'gretty.farm', (farmName ?: 'default')
   }
 }
