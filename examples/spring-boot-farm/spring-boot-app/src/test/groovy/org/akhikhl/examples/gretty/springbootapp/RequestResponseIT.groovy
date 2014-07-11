@@ -1,4 +1,4 @@
-package org.akhikhl.examples.gretty.springbootsimple
+package org.akhikhl.examples.gretty.springbootapp
 
 import geb.spock.GebReportingSpec
 
