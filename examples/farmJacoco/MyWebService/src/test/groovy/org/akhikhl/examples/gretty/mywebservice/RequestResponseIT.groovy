@@ -1,32 +1,20 @@
 package org.akhikhl.examples.gretty.mywebservice
 
-import spock.lang.Specification
-import groovyx.net.http.*
+import org.akhikhl.gretty.GrettyAjaxSpec
 import static groovyx.net.http.ContentType.*
 import static groovyx.net.http.Method.*
 
-class RequestResponseIT extends Specification {
+class RequestResponseIT extends GrettyAjaxSpec {
 
-  private static int grettyPort
-  private static String contextPath
-
-  void setupSpec() {
-    grettyPort = System.getProperty('gretty.port') as int
-    contextPath = System.getProperty('gretty.contextPath')
-  }
-
-  def http
-
-  def setup() {
-    http = new HTTPBuilder("http://localhost:${grettyPort}")
-  }
-
-  def 'should get expected response'() {
+  def 'should handle requests'() {
   when:
-    def result = http.request(POST, JSON) {
+    def result = conn.request(POST, JSON) {
       uri.path = "${contextPath}/getdate"
       response.success = { resp, json ->
         json.date
+      }
+      response.failure = { resp ->
+        resp.statusLine.statusCode
       }
     }
   then:

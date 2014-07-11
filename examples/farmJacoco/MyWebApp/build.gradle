@@ -1,12 +1,23 @@
 apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
-
-apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
+apply from: rootProject.file('integrationTests.gradle')
 
 apply plugin: 'jacoco'
 
+dependencies {
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+  // We use UrlRewriteFilter for redirecting to the home page.
+  compile 'org.tuckey:urlrewritefilter:4.0.4'
+}
+
 jacoco {
   toolVersion = '+'
+}
+
+gretty {
+  // springloaded should not be used at the same time with jacoco
+  managedClassReload = false
 }
 
 farm {

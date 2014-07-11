@@ -18,22 +18,14 @@ class RequestResponseIT extends GebReportingSpec {
     $('p', 0).text() == /This is static HTML page./
   }
 
-  def 'should get ajax response from MyWebApp'() {
-  when:
-    go baseURI
-    $('#sendRequestMyWebApp').click()
-  then:
-    $('#result').text() == 'Got from MyWebApp: Hello, world!'
-  }
-
-  def 'should get ajax response from MyWebService'() {
+  def 'should get response from MyWebService'() {
     if(!System.getProperty('gretty.farm'))
       return
   when:
     go baseURI
-    $('#sendRequestMyWebService').click()
+    $('#sendRequest').click()
   then:
-    $('#result').text() == 'Got from MyWebService: ' + new Date().format('EEE, d MMM yyyy')
-  }  
+    $('#result').text() == 'Got from server: ' + new Date().format('EEE, d MMM yyyy')
+  }
 }
 
