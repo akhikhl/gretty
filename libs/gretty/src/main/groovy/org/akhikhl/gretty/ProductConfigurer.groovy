@@ -369,7 +369,7 @@ class ProductConfigurer {
         if(sconfig.secureRandom != null)
           secureRandom sconfig.secureRandom
         if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) })
-          springBootMainClass getSpringBootMainClass()
+          springBootMainClass self.getSpringBootMainClass()
         if(sconfig.singleSignOn != null)
           singleSignOn sconfig.singleSignOn
       }
