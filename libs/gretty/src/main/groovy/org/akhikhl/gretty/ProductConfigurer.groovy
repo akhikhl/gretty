@@ -200,9 +200,9 @@ class ProductConfigurer {
         dir.add(file, appDir)
       }
       if(wconfig.realmConfigFile)
-        dir.add(wconfig.realmConfigFile, appDir + '/WEB-INF')
+        dir.add(wconfig.realmConfigFile, appDir)
       if(wconfig.jettyEnvXmlFile)
-        dir.add(wconfig.jettyEnvXmlFile, appDir + '/WEB-INF')
+        dir.add(wconfig.jettyEnvXmlFile, appDir)
     }
 
     dir.cleanup()
@@ -397,9 +397,9 @@ class ProductConfigurer {
           if(wconfig.realm)
             realm wconfig.realm
           if(wconfig.realmConfigFile)
-            realmConfigFile appDir + '/WEB-INF/' + getFileName(wconfig.realmConfigFile)
+            realmConfigFile appDir + '/' + getFileName(wconfig.realmConfigFile)
           if(wconfig.jettyEnvXmlFile)
-            jettyEnvXmlFile appDir + '/WEB-INF/' + getFileName(wconfig.jettyEnvXmlFile)
+            jettyEnvXmlFile appDir + '/' + getFileName(wconfig.jettyEnvXmlFile)
           if(wconfig.springBootSources)
             springBootSources wconfig.springBootSources
         }
