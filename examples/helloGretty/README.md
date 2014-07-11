@@ -2,17 +2,25 @@
 
 Simple gretty example.
 
-## Usage
+## How to run
 
-- Run from command-line:
-
+```bash
+cd examples/helloGretty
+gradle farmRun
 ```
-gradle appRun
+
+## How to test
+
+```bash
+cd examples/helloGretty
+gradle integrationTest
 ```
 
-- Open in browser:
+## How to build a product
 
-```
-http://localhost:8080/helloGretty/
+
+```bash
+cd examples/helloGretty
+gradle buildProduct
 ```
 
