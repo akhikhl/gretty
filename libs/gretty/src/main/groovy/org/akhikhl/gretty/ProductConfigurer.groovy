@@ -262,13 +262,22 @@ class ProductConfigurer {
     for(WebAppConfig wconfig in wconfigs)
       ProjectUtils.prepareToRun(project, wconfig)
     CertificateGenerator.maybeGenerate(project, sconfig)
-    jsonConfig = writeConfigToJson()
     if(!sconfig.logbackConfigFile)
       logbackConfig = LogbackUtils.generateLogbackConfig(sconfig)
+    jsonConfig = writeConfigToJson()
     createLaunchScripts()
   }
 
   protected void writeConfigFiles() {
+
+    // certificate files might be deleted by clean task
+    if(sconfig.sslKeyStorePath instanceof File &&
+       sconfig.sslKeyStorePath.absolutePath.startsWith(new File(project.buildDir, 'ssl').absolutePath) &&
+       !sconfig.sslKeyStorePath.exists()) {
+      sconfig.sslKeyStorePath = null
+      CertificateGenerator.maybeGenerate(project, sconfig)
+      jsonConfig = writeConfigToJson()
+    }
 
     // there are cases when springBootMainClass was accessed too early (in configuration phase),
     // so we neeed to recalculate it.
