@@ -76,6 +76,12 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     integrationTestTaskAssigned
   }
 
+  @Override
+  protected boolean getManagedClassReload(ServerConfig sconfig) {
+    // disable managed class reloads on integration tests
+    false
+  }
+
   void integrationTestTask(String integrationTestTask) {
     if(integrationTestTaskAssigned) {
       log.warn '{}.integrationTestTask is already set to "{}", so "{}" is ignored', name, getIntegrationTestTask(), integrationTestTask
