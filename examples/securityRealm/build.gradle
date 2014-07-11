@@ -11,7 +11,6 @@ buildscript {
 
 apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
-
 apply from: rootProject.file('integrationTests.gradle') // remove this to disable integration tests
 
 dependencies {
@@ -24,8 +23,10 @@ dependencies {
 }
 
 gretty {
+  httpEnabled = false
+  httpsEnabled = true
   // Possible servletContainer values are 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8'. Default is 'jetty9'.
-  servletContainer = 'tomcat8'
+  // servletContainer = 'tomcat8'
   realm 'auth'
   // realmConfigFile is optional. When omitted, 'jetty-realm.properties' or 'tomcat-users.xml' is assumed.
   // If path is relative, the file will be searched in projectDir, build/resources/main and src/main/webapp/WEB-INF.
