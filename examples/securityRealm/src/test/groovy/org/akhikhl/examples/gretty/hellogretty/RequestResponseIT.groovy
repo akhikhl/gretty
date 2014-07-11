@@ -7,7 +7,7 @@ class RequestResponseIT extends GebReportingSpec {
   private static String baseURI
 
   void setupSpec() {
-    baseURI = System.getProperty('gretty.baseURI')
+    baseURI = System.getProperty('gretty.preferredBaseURI')
   }
 
   def 'should reject invalid credentials'() {
