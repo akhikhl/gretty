@@ -50,9 +50,8 @@ farm {
 task 'farmIntegrationTestAllContainers'
 
 def containers = ServletContainerConfig.getConfigNames()
-containers.eachWithIndex { container, i ->
+containers.each { container ->
   farms.farm container, {
-    def prevContainer = i > 0 ? containers[i - 1] : null
     servletContainer = container
     webapp project
     webapp ':farm:MyWebService'
@@ -60,11 +59,10 @@ containers.eachWithIndex { container, i ->
       tasks['farmBeforeIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
       tasks['farmAfterIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
       tasks['farmIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
-      if(prevContainer != null)
-        tasks['farmBeforeIntegrationTest' + container].mustRunAfter tasks['farmAfterIntegrationTest' + prevContainer]
       tasks.farmIntegrationTestAllContainers.dependsOn tasks['farmIntegrationTest' + container]
     }
   }
 }
 
 rootProject.tasks.testAll.dependsOn tasks.farmIntegrationTestAllContainers
+
