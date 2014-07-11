@@ -2,10 +2,10 @@ package org.akhikhl.examples.gretty.hellogretty;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -22,6 +22,7 @@ public class ExampleServlet extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     Template template = ve.getTemplate("/org/akhikhl/examples/gretty/hellogretty/templates/servletpage.html", "UTF-8");
     VelocityContext context = new VelocityContext();
+    context.put("contextPath", request.getContextPath());
     context.put("today", new java.util.Date());
     PrintWriter out = response.getWriter();
     try {

@@ -1,12 +1,8 @@
 package org.akhikhl.examples.gretty.hellogretty
 
 import geb.spock.GebReportingSpec
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class RequestResponseIT extends GebReportingSpec {
-
-  private static final Logger log = LoggerFactory.getLogger(RequestResponseIT)
 
   private static String baseURI
 
