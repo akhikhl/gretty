@@ -15,11 +15,6 @@ jacoco {
   toolVersion = '+'
 }
 
-gretty {
-  // springloaded should not be used at the same time with jacoco
-  managedClassReload = false
-}
-
 farm {
   webapp project
   webapp ':farmJacoco:MyWebService'
