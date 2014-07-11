@@ -14,15 +14,17 @@ import org.gradle.api.Project
  * @author akhikhl
  */
 final class FileResolver {
-  
+
   Iterable projectSearchDirs
   Iterable globalSearchDirs
-  
+  boolean acceptFiles = true
+  boolean acceptDirs = false
+
   FileResolver(Iterable projectSearchDirs, Iterable globalSearchDirs = null) {
     this.projectSearchDirs = projectSearchDirs
     this.globalSearchDirs = globalSearchDirs
   }
-  
+
   private Iterable<File> realizeFiles(Project project, Iterable filesOrDirs) {
     def result = []
     def realizeFile
@@ -51,7 +53,7 @@ final class FileResolver {
     Set<File> result = new LinkedHashSet()
     if(file != null) {
       if(file instanceof Iterable || file.getClass().isArray())
-        // findResults filters out all null values
+        // findResults excludes null values
         for(def f in file.findResults({ it }))
           resolveFile_(result, project, f)
       else
@@ -59,8 +61,8 @@ final class FileResolver {
     }
     return result
   }
-  
-  private resolveFile_(Collection<File> result, Project project, file) {    
+
+  private resolveFile_(Collection<File> result, Project project, file) {
     if(!(file instanceof File))
       file = new File(file.toString())
     if(file.isAbsolute())
@@ -73,15 +75,15 @@ final class FileResolver {
         result.add(f)
     }
   }
-  
+
   protected resolveFileOnProject(Collection<File> result, Project project, File file) {
     for(File dir in realizeFiles(project, projectSearchDirs)) {
       File f = new File(dir, file.path)
-      if(f.exists())
+      if(f.exists() && ((acceptFiles && f.isFile()) || (acceptDirs && f.isDirectory())))
         result.add(f)
     }
   }
-  
+
   protected resolveFileOnProjectAndOverlays(Collection<File> result, Project project, File file) {
     resolveFileOnProject(result, project, file)
     if(project.extensions.findByName('gretty'))

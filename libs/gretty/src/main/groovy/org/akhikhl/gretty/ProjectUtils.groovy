@@ -347,17 +347,30 @@ final class ProjectUtils {
 
     sconfig.sslKeyStorePath = new FileResolver(['security', 'config', '.']).resolveSingleFile(project, sconfig.sslKeyStorePath)
     sconfig.sslTrustStorePath = new FileResolver(['security', 'config', '.']).resolveSingleFile(project, sconfig.sslTrustStorePath)
-    
+
     String servletContainerType = ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerType
 
     def realmConfigFiles = [ sconfig.realmConfigFile ]
     if(servletContainerType == 'tomcat') {
       realmConfigFiles.add(sconfig.servletContainer + '-users.xml')
       realmConfigFiles.add('tomcat-users.xml')
-    }
-    else if(servletContainerType == 'jetty') {
+      if(sconfig.realmConfigFile) {
+        def f = sconfig.realmConfigFile
+        if(!(f instanceof File))
+          f = new File(f.toString())
+        realmConfigFiles.add(new File(f, sconfig.servletContainer + '-users.xml'))
+        realmConfigFiles.add(new File(f, 'tomcat-users.xml'))
+      }
+    } else if(servletContainerType == 'jetty') {
       realmConfigFiles.add(sconfig.servletContainer + '-realm.properties')
       realmConfigFiles.add('jetty-realm.properties')
+      if(sconfig.realmConfigFile) {
+        def f = sconfig.realmConfigFile
+        if(!(f instanceof File))
+          f = new File(f.toString())
+        realmConfigFiles.add(new File(f, sconfig.servletContainer + '-realm.properties'))
+        realmConfigFiles.add(new File(f, 'jetty-realm.properties'))
+      }
     }
     realmConfigFiles = realmConfigFiles as LinkedHashSet
     sconfig.realmConfigFile = new FileResolver(['realm', 'security', 'config', '.']).resolveSingleFile(project, realmConfigFiles)
@@ -381,7 +394,7 @@ final class ProjectUtils {
   }
 
   static void resolveWebAppConfig(Project project, WebAppConfig wconfig, ServerConfig sconfig) {
-    
+
     if(sconfig == null)
       return
 
@@ -391,10 +404,23 @@ final class ProjectUtils {
     if(servletContainerType == 'tomcat') {
       realmConfigFiles.add(sconfig.servletContainer + '-users.xml')
       realmConfigFiles.add('tomcat-users.xml')
-    }
-    else if(servletContainerType == 'jetty') {
+      if(wconfig.realmConfigFile) {
+        def f = wconfig.realmConfigFile
+        if(!(f instanceof File))
+          f = new File(f.toString())
+        realmConfigFiles.add(new File(f, sconfig.servletContainer + '-users.xml'))
+        realmConfigFiles.add(new File(f, 'tomcat-users.xml'))
+      }
+    } else if(servletContainerType == 'jetty') {
       realmConfigFiles.add(sconfig.servletContainer + '-realm.properties')
       realmConfigFiles.add('jetty-realm.properties')
+      if(wconfig.realmConfigFile) {
+        def f = wconfig.realmConfigFile
+        if(!(f instanceof File))
+          f = new File(f.toString())
+        realmConfigFiles.add(new File(f, sconfig.servletContainer + '-realm.properties'))
+        realmConfigFiles.add(new File(f, 'jetty-realm.properties'))
+      }
     }
     realmConfigFiles = realmConfigFiles as LinkedHashSet
     wconfig.realmConfigFile = new FileResolver(['webapp-realm', 'webapp-security', 'webapp-config']).resolveSingleFile(project, realmConfigFiles)
