@@ -197,8 +197,8 @@ abstract class LauncherBase implements Launcher {
       if(sconfig.jettyXmlFile)
         jettyXml self.fileToString(sconfig.jettyXmlFile)
       writeLoggingConfig(json)
-      if(config.tempDir)
-        tempDir config.tempDir.absolutePath
+      if(config.baseDir)
+        baseDir config.baseDir.absolutePath
       if(sconfig.singleSignOn != null)
         singleSignOn sconfig.singleSignOn
       webApps webAppConfigs.collect { WebAppConfig wconfig ->

@@ -110,8 +110,8 @@ abstract class StartBaseTask extends DefaultTask {
         self.getStopCommand()
       }
 
-      File getTempDir() {
-        new File(project.buildDir, 'temp_' + getServerConfig().servletContainer)
+      File getBaseDir() {
+        new File(project.buildDir, 'serverBaseDir_' + getServerConfig().servletContainer)
       }
 
       WebAppClassPathResolver getWebAppClassPathResolver() {

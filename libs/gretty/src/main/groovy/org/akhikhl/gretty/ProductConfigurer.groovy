@@ -404,7 +404,6 @@ class ProductConfigurer {
             springBootSources wconfig.springBootSources
         }
       }
-      tempDir 'temp'
     } // json
   }
 

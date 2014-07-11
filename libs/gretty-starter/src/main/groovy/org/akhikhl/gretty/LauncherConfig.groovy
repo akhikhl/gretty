@@ -23,7 +23,7 @@ interface LauncherConfig {
 
   String getStopCommand()
 
-  File getTempDir()
+  File getBaseDir()
 
   WebAppClassPathResolver getWebAppClassPathResolver()
 

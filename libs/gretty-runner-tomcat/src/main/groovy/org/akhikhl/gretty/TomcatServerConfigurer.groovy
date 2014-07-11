@@ -37,10 +37,11 @@ class TomcatServerConfigurer {
   Tomcat createAndConfigureServer(TomcatConfigurer configurer, Map params, Closure configureContext = null) {
 
     Tomcat tomcat = new Tomcat()
-    File tempDir = params.tempDir ? new File(params.tempDir) : null
-    if(tempDir) {
-      new File(tempDir, 'webapps').mkdirs()
-      tomcat.setBaseDir(tempDir.absolutePath)
+    
+    File baseDir = params.baseDir ? new File(params.baseDir) : null
+    if(baseDir) {
+      new File(baseDir, 'webapps').mkdirs()
+      tomcat.setBaseDir(baseDir.absolutePath)
     }
 
 		tomcat.engine.backgroundProcessorDelay = -1
