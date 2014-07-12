@@ -30,12 +30,13 @@ class JettyServerConfigurer {
     for(def webapp in params.webApps) {
       def context = configurer.createWebAppContext(webapp.webappClassPath)
       context.setContextPath(webapp.contextPath)
-      context.setTempDirectory(new File(baseDir, 'webapps/' + WebappUtils.getWebAppDestinationDirName(webapp.resourceBase)))
-      context.setPersistTempDirectory(true)
       
       if(!params.supressSetConfigurations)
         configurer.setConfigurationsToWebAppContext(context, configurer.getConfigurations(webapp.webappClassPath))
       configurer.applyJettyEnvXml(context, webapp.jettyEnvXml)
+      
+      context.setTempDirectory(new File(baseDir, 'webapps' + context.getContextPath()))
+      context.setPersistTempDirectory(true)
 
       webapp.initParams?.each { key, value ->
         context.setInitParameter(key, value)
