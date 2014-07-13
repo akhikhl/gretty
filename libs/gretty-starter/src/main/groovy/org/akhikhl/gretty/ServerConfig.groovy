@@ -34,7 +34,7 @@ class ServerConfig {
   String sslTrustStorePassword
   def realm
   def realmConfigFile
-  def jettyXmlFile
+  def serverConfigFile
   Integer scanInterval
   def logbackConfigFile
   String loggingLevel
@@ -57,13 +57,8 @@ class ServerConfig {
     result.jvmArgs = []
     result.servletContainer = 'jetty9'
     result.managedClassReload = true
-    result.host = 'localhost'
     result.httpEnabled = true
-    result.httpPort = 8080
-    // httpIdleTimeout defaults to null. This means: no idle timeout is set for http protocol.
     result.httpsEnabled = false
-    result.httpsPort = 8443
-    // httpsIdleTimeout defaults to null. This means: no idle timeout is set for https protocol.
     result.servicePort = 9900
     result.statusPort = 9901
     result.scanInterval = 1
@@ -73,6 +68,12 @@ class ServerConfig {
     result.logFileName = serverName
     result.logDir = "${System.getProperty('user.home')}/logs" as String
     return result
+  }
+  
+  // use serverConfigFile instead
+  @Deprecated
+  def getJettyXmlFile() {
+    serverConfigFile
   }
 
   Integer getPort() {
@@ -117,6 +118,12 @@ class ServerConfig {
     if(onStop == null)
       onStop = []
     onStop.add newValue
+  }
+  
+  // use serverConfigFile instead
+  @Deprecated
+  void setJettyXmlFile(newValue) {
+    serverConfigFile = newValue
   }
 
   void setPort(Integer newValue) {

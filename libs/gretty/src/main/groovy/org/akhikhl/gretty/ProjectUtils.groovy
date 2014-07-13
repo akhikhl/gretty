@@ -373,24 +373,19 @@ final class ProjectUtils {
       }
     }
     realmConfigFiles = realmConfigFiles as LinkedHashSet
-    sconfig.realmConfigFile = new FileResolver(['realm', 'security', 'config', '.']).resolveSingleFile(project, realmConfigFiles)
+    sconfig.realmConfigFile = new FileResolver(['realm', 'security', 'server', 'config', '.']).resolveSingleFile(project, realmConfigFiles)
 
     if(servletContainerType == 'jetty') {
-      def jettyXmlFiles = [ sconfig.jettyXmlFile, sconfig.servletContainer + '.xml', 'jetty.xml' ] as LinkedHashSet
-      def jettySysDirs = []
-      String jettyHome = System.getenv('JETTY_HOME')
-      if(jettyHome)
-        jettySysDirs.add(new File(jettyHome, 'etc'))
-      jettyHome = System.getProperty('jetty.home')
-      if(jettyHome)
-        jettySysDirs.add(new File(jettyHome, 'etc'))
-      jettySysDirs = jettySysDirs as LinkedHashSet
-      sconfig.jettyXmlFile = new FileResolver(['jetty', 'security', 'config', '.'], jettySysDirs).resolveSingleFile(project, jettyXmlFiles)
+      def serverConfigFiles = [ sconfig.serverConfigFile, sconfig.servletContainer + '.xml', 'jetty.xml' ] as LinkedHashSet
+      sconfig.serverConfigFile = new FileResolver(['jetty', 'server', 'config', '.']).resolveSingleFile(project, serverConfigFiles)
+    } else if(servletContainerType == 'tomcat') {
+      def serverConfigFiles = [ sconfig.serverConfigFile, sconfig.servletContainer + '.xml', 'tomcat.xml', sconfig.servletContainer + '-server.xml', 'server.xml' ] as LinkedHashSet
+      sconfig.serverConfigFile = new FileResolver(['jetty', 'server', 'config', '.']).resolveSingleFile(project, serverConfigFiles)
     } else
-      sconfig.jettyXmlFile = null
+      sconfig.serverConfigFile = null
 
     def logbackConfigFiles = [ sconfig.logbackConfigFile, 'logback.groovy', 'logback.xml' ] as LinkedHashSet
-    sconfig.logbackConfigFile = new FileResolver(['logback', 'config', '.', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, logbackConfigFiles)
+    sconfig.logbackConfigFile = new FileResolver(['logback', 'server', 'config', '.', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, logbackConfigFiles)
   }
 
   static void resolveWebAppConfig(Project project, WebAppConfig wconfig, ServerConfig sconfig) {

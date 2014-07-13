@@ -66,23 +66,46 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   void configureConnectors(server, Map params) {
-    if(server.getConnectors() != null && server.getConnectors().length != 0)
-      return
-    log.info 'Auto-configuring server connectors'
+    
+    def connectors = server.getConnectors()
+    
+    Connector httpConn = connectors.find { it.protocols.contains('http') }
 
-    if(params.httpPort) {
-      SocketConnector http = new SocketConnector()
+    if(params.httpEnabled) {
+      boolean newConnector = false
+      if(httpConn) {
+        if(params.httpPort)
+          httpConn.port = params.httpPort
+      } else {
+        newConnector = true
+        httpConn = new SocketConnector()
+        httpConn.port = params.httpPort ?: 8080
+        httpConn.soLingerTime = -1
+      }
+      
       if(params.host)
-        http.setHost(params.host)
-      http.setPort(params.httpPort)
+        httpConn.host = params.host
       if(params.httpIdleTimeout)
-        http.setMaxIdleTime(params.httpIdleTimeout)
-      http.setSoLingerTime(-1)
-      server.addConnector(http)
-    }
+        httpConn.maxIdleTime = params.httpIdleTimeout
 
-    if(params.httpsPort) {
-      SslContextFactory sslContextFactory = new SslContextFactory()
+      if(newConnector)
+        server.addConnector(httpConn)
+    }
+    
+    Connector httpsConn = connectors.find { it.protocols.contains('https') }
+
+    if(params.httpsEnabled) {
+      boolean newConnector = false
+      if(httpsConn) {
+        if(params.httpsPort)
+          httpsConn.port = params.httpsPort
+      } else {
+        newConnector = true
+        httpsConn = new SslSocketConnector(new SslContextFactory())
+        httpsConn.port = params.httpsPort ?: 8443
+      }
+      
+      def sslContextFactory = httpsConn.getSslContextFactory()
       if(params.sslKeyStorePath)
         sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
       if(params.sslKeyStorePassword)
@@ -94,13 +117,13 @@ class JettyConfigurerImpl implements JettyConfigurer {
       if(params.sslTrustStorePassword)
         sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
 
-      SslSocketConnector https = new SslSocketConnector(sslContextFactory)
       if(params.host)
-        https.setHost(params.host)
-      https.setPort(params.httpsPort)
+        httpsConn.host = params.host
       if(params.httpsIdleTimeout)
-        https.setMaxIdleTime(params.httpsIdleTimeout)
-      server.addConnector(https)
+        httpsConn.maxIdleTime = params.httpsIdleTimeout
+        
+      if(newConnector)
+        server.addConnector(httpsConn)
     }
   }
 

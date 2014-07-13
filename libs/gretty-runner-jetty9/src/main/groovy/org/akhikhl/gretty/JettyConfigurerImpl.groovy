@@ -70,52 +70,77 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   void configureConnectors(server, Map params) {
-    if(server.getConnectors() != null && server.getConnectors().length != 0)
-      return
-    log.info 'Auto-configuring server connectors'
 
     HttpConfiguration http_config = new HttpConfiguration()
     if(params.httpsPort) {
       http_config.setSecureScheme('https')
       http_config.setSecurePort(params.httpsPort)
     }
+    
+    def connectors = server.getConnectors()
+    
+    Connector httpConn = connectors.find { it.protocols.contains('http') }
 
-    if(params.httpPort) {
-      ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config))
+    if(params.httpEnabled) {
+      boolean newConnector = false
+      if(httpConn) {
+        if(params.httpPort)
+          httpConn.port = params.httpPort
+      } else {
+        newConnector = true
+        httpConn = new ServerConnector(server, new HttpConnectionFactory(http_config))
+        httpConn.port = params.httpPort ?: 8080
+        httpConn.soLingerTime = -1
+      }
       if(params.host)
-        http.setHost(params.host)
-      http.setPort(params.httpPort)
+        httpConn.host = params.host
       if(params.httpIdleTimeout)
-        http.setIdleTimeout(params.httpIdleTimeout)
-      http.setSoLingerTime(-1)
-      server.addConnector(http)
+        httpConn.idleTimeout = params.httpIdleTimeout
+        
+      if(newConnector)
+        server.addConnector(httpConn)
     }
+    
+    Connector httpsConn = connectors.find { it.protocols.contains('https') }
 
-    if(params.httpsPort) {
-      SslContextFactory sslContextFactory = new SslContextFactory()
-      if(params.sslKeyStorePath)
-        sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
-      if(params.sslKeyStorePassword)
-        sslContextFactory.setKeyStorePassword(params.sslKeyStorePassword)
-      if(params.sslKeyManagerPassword)
-        sslContextFactory.setKeyManagerPassword(params.sslKeyManagerPassword)
-      if(params.sslTrustStorePath)
-        sslContextFactory.setTrustStorePath(params.sslTrustStorePath)
-      if(params.sslTrustStorePassword)
-        sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
+    if(params.httpsEnabled) {
+      boolean newConnector = false
+      if(httpsConn) {
+        if(params.httpsPort)
+          httpsConn.port = params.httpsPort
+      } else {
+        newConnector = true
+        HttpConfiguration https_config = new HttpConfiguration(http_config)
+        https_config.addCustomizer(new SecureRequestCustomizer())
 
-      HttpConfiguration https_config = new HttpConfiguration(http_config)
-      https_config.addCustomizer(new SecureRequestCustomizer())
-
-      ServerConnector https = new ServerConnector(server,
-        new SslConnectionFactory(sslContextFactory, 'http/1.1'),
-        new HttpConnectionFactory(https_config))
+        httpsConn = new ServerConnector(server,
+          new SslConnectionFactory(new SslContextFactory(), 'http/1.1'),
+          new HttpConnectionFactory(https_config))
+        
+        httpsConn.port = params.httpsPort ?: 8443
+      }
+      
+      def sslContextFactory = httpsConn.getConnectionFactories().find { it instanceof SslConnectionFactory }?.getSslContextFactory()
+      if(sslContextFactory) {
+        if(params.sslKeyStorePath)
+          sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
+        if(params.sslKeyStorePassword)
+          sslContextFactory.setKeyStorePassword(params.sslKeyStorePassword)
+        if(params.sslKeyManagerPassword)
+          sslContextFactory.setKeyManagerPassword(params.sslKeyManagerPassword)
+        if(params.sslTrustStorePath)
+          sslContextFactory.setTrustStorePath(params.sslTrustStorePath)
+        if(params.sslTrustStorePassword)
+          sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
+      }
+      
       if(params.host)
-        https.setHost(params.host)
-      https.setPort(params.httpsPort)
+        httpsConn.host = params.host
       if(params.httpsIdleTimeout)
-        https.setIdleTimeout(params.httpsIdleTimeout)
-      server.addConnector(https)
+        httpsConn.idleTimeout = params.httpsIdleTimeout
+        
+      if(newConnector)
+        server.addConnector(httpsConn)
     }
   }
 

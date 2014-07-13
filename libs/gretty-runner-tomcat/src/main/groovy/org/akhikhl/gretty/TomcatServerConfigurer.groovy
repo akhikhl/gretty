@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.catalina.Host
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
 import org.apache.catalina.LifecycleListener
@@ -15,12 +16,14 @@ import org.apache.catalina.connector.Connector
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.loader.WebappLoader
 import org.apache.catalina.realm.MemoryRealm
+import org.apache.catalina.startup.Catalina
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
 import org.apache.catalina.startup.Tomcat.DefaultWebXmlListener
 import org.apache.catalina.startup.Tomcat.FixContextListener
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.xml.sax.InputSource
 
 /**
  *
@@ -37,41 +40,82 @@ class TomcatServerConfigurer {
   Tomcat createAndConfigureServer(TomcatConfigurer configurer, Map params, Closure configureContext = null) {
 
     Tomcat tomcat = new Tomcat()
-    
+
     File baseDir = new File(params.baseDir)
     new File(baseDir, 'webapps').mkdirs()
     tomcat.setBaseDir(baseDir.absolutePath)
-
-		tomcat.engine.backgroundProcessorDelay = -1
-
-		tomcat.host.autoDeploy = true
-
-    if(params.singleSignOn)
-      tomcat.host.addValve(new SingleSignOn())
-
-    if(params.host)
-      tomcat.hostname = params.host
-
-    if(params.httpPort) {
-      final Connector httpConn = new Connector('HTTP/1.1')
-      httpConn.setScheme('http')
-      httpConn.setPort(params.httpPort)
-      httpConn.setProperty('maxPostSize', '0')  // unlimited
-      if(params.httpIdleTimeout)
-        httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout)
-      if(params.httpsPort)
-        httpConn.setRedirectPort(params.httpsPort)
-      tomcat.getService().addConnector(httpConn)
-      tomcat.setConnector(httpConn)
+    
+    def service
+    def connectors
+    
+    if(params.serverConfigFile) {
+      def catalina = new Catalina()
+      def digester = catalina.createStartDigester()
+      new File(params.serverConfigFile).withInputStream {
+        def inputSource = new InputSource(params.serverConfigFile)
+        inputSource.setByteStream(it)
+        digester.push(catalina)
+        digester.parse(inputSource)
+      }
+      def server = tomcat.server = catalina.getServer()
+      def services = server.findServices()
+      assert services.length == 1
+      service = services[0]
+      tomcat.service = service
+      tomcat.engine = service.getContainer()
+      connectors = service.findConnectors()
+      tomcat.host = service.getContainer().findChildren().find { it instanceof Host }
+      tomcat.port = connectors[0].port
+      tomcat.hostname = tomcat.host.name
+      server.setCatalina(catalina)
+      server.setCatalinaHome(baseDir)
+      server.setCatalinaBase(baseDir)
+    } else {
+      tomcat.engine.backgroundProcessorDelay = -1
+      tomcat.host.autoDeploy = true
+      service = tomcat.service
+      connectors = service.findConnectors()
     }
 
-    if(params.httpsPort) {
-      final Connector httpsConn = new Connector('HTTP/1.1')
-      httpsConn.setScheme('https')
-      httpsConn.setPort(params.httpsPort)
-      httpsConn.setProperty('maxPostSize', '0')  // unlimited
-      httpsConn.setSecure(true)
-      httpsConn.setProperty('SSLEnabled', 'true')
+    if(!tomcat.hostname)
+      tomcat.hostname = params.host ?: 'localhost'
+    
+    Connector httpConn = connectors.find { it.scheme == 'http' }
+    
+    if(params.httpEnabled) {
+      boolean newConnector = false
+      if(httpConn) {
+        if(params.httpPort)
+          httpConn.port = params.httpPort
+      } else {
+        newConnector = true
+        httpConn = new Connector('HTTP/1.1')
+        httpConn.scheme = 'http'
+        httpConn.setProperty('maxPostSize', '0')  // unlimited
+        httpConn.port = params.httpPort ?: 8080
+      }
+      if(params.httpIdleTimeout)
+        httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout)
+      if(newConnector)
+        service.addConnector(httpConn)
+    }
+    
+    Connector httpsConn = service.findConnectors().find { it.scheme == 'https' }
+
+    if(params.httpsEnabled) {
+      boolean newConnector = false
+      if(httpsConn) {
+        if(params.httpsPort)
+          httpsConn.port = params.httpsPort
+      } else {
+        newConnector = true
+        httpsConn = new Connector('HTTP/1.1')
+        httpsConn.scheme = 'https'
+        httpsConn.secure = true
+        httpsConn.setProperty('SSLEnabled', 'true')
+        httpsConn.setProperty('maxPostSize', '0')  // unlimited
+        httpsConn.port = params.httpsPort ?: 8443
+      }
       if(params.sslKeyManagerPassword)
         httpsConn.setProperty('keyPass', params.sslKeyManagerPassword)
       if(params.sslKeyStorePath)
@@ -84,10 +128,22 @@ class TomcatServerConfigurer {
         httpsConn.setProperty('truststorePass', params.sslTrustStorePassword)
       if(params.httpsIdleTimeout)
         httpsConn.setProperty('keepAliveTimeout', params.httpsIdleTimeout)
-      tomcat.getService().addConnector(httpsConn)
-      if(!params.httpPort)
-        tomcat.setConnector(httpsConn)
+      if(newConnector)
+        service.addConnector(httpsConn)
     }
+
+    if(httpConn && httpsConn)
+      httpConn.redirectPort = httpsConn.port
+    
+    if(httpConn)
+      tomcat.setConnector(httpConn)
+    else if(httpsConn)
+      tomcat.setConnector(httpsConn)
+    else if(connectors.length != 0)
+      tomcat.setConnector(connectors[0])
+
+    if(params.singleSignOn && !tomcat.host.getValves().find { it instanceof SingleSignOn })
+      tomcat.host.addValve(new SingleSignOn())
 
     for(def webapp in params.webApps) {
       StandardContext context = params.contextClass ? params.contextClass.newInstance() : new StandardContext()
@@ -129,7 +185,7 @@ class TomcatServerConfigurer {
           public void lifecycleEvent(LifecycleEvent event) {
             if (event.type == Lifecycle.CONFIGURE_START_EVENT) {
               def pipeline = context.getPipeline()
-              log.debug 'START: context={}, pipeline: {} #{}', context.getPath(), pipeline, System.identityHashCode(pipeline)
+              log.debug 'START: context={}, pipeline: {} #{}', context.path, pipeline, System.identityHashCode(pipeline)
               log.debug '  valves:'
               for(def v in pipeline.getValves())
                 log.debug '    {} #{}', v, System.identityHashCode(v)
@@ -137,7 +193,7 @@ class TomcatServerConfigurer {
           }
         })
 
-      tomcat.getHost().addChild(context)
+      tomcat.host.addChild(context)
     }
 
     tomcat

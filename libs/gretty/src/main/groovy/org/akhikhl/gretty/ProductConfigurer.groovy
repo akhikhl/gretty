@@ -102,8 +102,8 @@ class ProductConfigurer {
         def result = []
         if(sconfig.realmConfigFile)
           result.add sconfig.realmConfigFile
-        if(sconfig.jettyXmlFile)
-          result.add sconfig.jettyXmlFile
+        if(sconfig.serverConfigFile)
+          result.add sconfig.serverConfigFile
         if(sconfig.logbackConfigFile)
           result.add sconfig.logbackConfigFile
         result
@@ -299,8 +299,8 @@ class ProductConfigurer {
     if(sconfig.realmConfigFile)
       dir.add(sconfig.realmConfigFile)
 
-    if(sconfig.jettyXmlFile)
-      dir.add(sconfig.jettyXmlFile)
+    if(sconfig.serverConfigFile)
+      dir.add(sconfig.serverConfigFile)
 
     if(sconfig.logbackConfigFile)
       dir.add(sconfig.logbackConfigFile)
@@ -376,8 +376,8 @@ class ProductConfigurer {
           realm sconfig.realm
         if(sconfig.realmConfigFile)
           realmConfigFile 'conf/' + getFileName(sconfig.realmConfigFile)
-        if(sconfig.jettyXmlFile)
-          jettyXmlFile 'conf/' + getFileName(sconfig.jettyXmlFile)
+        if(sconfig.serverConfigFile)
+          serverConfigFile 'conf/' + getFileName(sconfig.serverConfigFile)
         logbackConfigFile 'conf/' + (getFileName(sconfig.logbackConfigFile) ?: 'logback.groovy')
         if(sconfig.secureRandom != null)
           secureRandom sconfig.secureRandom

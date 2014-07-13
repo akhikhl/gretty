@@ -66,7 +66,6 @@ abstract class LauncherBase implements Launcher {
     } else
       System.out.println "Run '${config.getStopCommand()}' to stop the server."
     thread.join()
-    log.warn '{} stopped.', getServletContainerDescription()
   }
 
   @Override
@@ -74,6 +73,8 @@ abstract class LauncherBase implements Launcher {
 
     for(WebAppConfig wconfig in webAppConfigs)
       prepareToRun(wconfig)
+
+    log.debug 'servicePort: {}, statusPort: {}', sconfig.servicePort, sconfig.statusPort
 
     Thread thread
     ExecutorService executorService = Executors.newSingleThreadExecutor()
@@ -123,22 +124,6 @@ abstract class LauncherBase implements Launcher {
       status = futureStatus.get()
       log.debug 'Got start status: {}', status
 
-      log.warn '{} started.', getServletContainerDescription()
-      for(WebAppConfig webAppConfig in webAppConfigs) {
-        String webappName = webAppConfig.getWebAppLaunchName()
-        if(sconfig.httpEnabled && sconfig.httpsEnabled) {
-          log.warn '{} runs at the addresses:', webappName
-          log.warn '  http://{}:{}{}', sconfig.host, sconfig.httpPort, webAppConfig.contextPath
-          log.warn '  https://{}:{}{}', sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
-        }
-        else if(sconfig.httpEnabled)
-          log.warn '{} runs at the address http://{}:{}{}', webappName, sconfig.host, sconfig.httpPort, webAppConfig.contextPath
-        else if(sconfig.httpsEnabled)
-          log.warn '{} runs at the address https://{}:{}{}', webappName, sconfig.host, sconfig.httpsPort, webAppConfig.contextPath
-      }
-
-      log.info 'servicePort: {}, statusPort: {}', sconfig.servicePort, sconfig.statusPort
-
     } finally {
       executorService.shutdown()
     }
@@ -168,15 +153,20 @@ abstract class LauncherBase implements Launcher {
   protected void writeRunConfigJson(json) {
     def self = this
     json.with {
+      servletContainerDescription self.getServletContainerDescription()
       if(sconfig.host)
         host sconfig.host
       if(sconfig.httpEnabled) {
-        httpPort sconfig.httpPort
+        httpEnabled sconfig.httpEnabled
+        if(sconfig.httpPort)
+          httpPort sconfig.httpPort
         if(sconfig.httpIdleTimeout)
           httpIdleTimeout sconfig.httpIdleTimeout
       }
       if(sconfig.httpsEnabled) {
-        httpsPort sconfig.httpsPort
+        httpsEnabled sconfig.httpsEnabled
+        if(sconfig.httpsPort)
+          httpsPort sconfig.httpsPort
         if(sconfig.httpsIdleTimeout)
           httpsIdleTimeout sconfig.httpsIdleTimeout
         if(sconfig.sslKeyStorePath)
@@ -194,8 +184,8 @@ abstract class LauncherBase implements Launcher {
         realm sconfig.realm
       if(sconfig.realmConfigFile)
         realmConfigFile self.fileToString(sconfig.realmConfigFile)
-      if(sconfig.jettyXmlFile)
-        jettyXml self.fileToString(sconfig.jettyXmlFile)
+      if(sconfig.serverConfigFile)
+        serverConfigFile self.fileToString(sconfig.serverConfigFile)
       writeLoggingConfig(json)
       if(config.baseDir)
         baseDir config.baseDir.absolutePath
