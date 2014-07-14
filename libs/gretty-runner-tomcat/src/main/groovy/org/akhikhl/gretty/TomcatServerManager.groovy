@@ -36,7 +36,7 @@ class TomcatServerManager implements ServerManager {
   }
 
   @Override
-  void startServer() {
+  void startServer(ServerStartEvent startEvent) {
     assert tomcat == null
 
     if(params.logging)
@@ -53,22 +53,7 @@ class TomcatServerManager implements ServerManager {
     tomcat = new TomcatServerConfigurer().createAndConfigureServer(configurer, params)
     tomcat.start()
 
-    def connectors = tomcat.service.findConnectors()
-    
-    def portsInfo = connectors.findConnectors().collect { it.port }
-    portsInfo = (portsInfo.size() == 1 ? 'port ' : 'ports ') + portsInfo.join(', ')
-    log.warn '{} started and listening on {}', params.servletContainerDescription, portsInfo
-    
-    Connector httpConn = connectors.find { it.scheme == 'http' }
-    Connector httpsConn = connectors.find { it.scheme == 'https' }
-    
-    for(Context context in tomcat.host.findChildren().findAll { it instanceof Context }) {
-      log.warn '{} runs at:', (context.name - '/')
-      if(httpConn)
-        log.warn '  http://{}:{}{}', tomcat.hostname, httpConn.port, context.path
-      if(httpsConn)
-        log.warn '  https://{}:{}{}', tomcat.hostname, httpsConn.port, context.path
-    }
+    startEvent.onServerStart(new TomcatServerStartInfo().getInfo(tomcat, null, params))
   }
 
   @Override

@@ -78,18 +78,23 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
 
     def launcherConfig = getLauncherConfig()
 
-    def host = launcherConfig.serverConfig.host
+    def host = serverStartInfo.host
 
-    def contextPath = launcherConfig.webAppConfigs[0].contextPath
     task.systemProperty 'gretty.host', host
+
+    def contextPath
+
+    if(serverStartInfo.contexts)
+      contextPath = serverStartInfo.contexts[0].contextPath
+
     task.systemProperty 'gretty.contextPath', contextPath
 
     String preferredProtocol
     String preferredBaseURI
 
-    def httpPort = launcherConfig.serverConfig.httpPort
+    def httpPort = serverStartInfo.httpPort
     String httpBaseURI
-    if(httpPort && launcherConfig.serverConfig.httpEnabled) {
+    if(httpPort) {
       task.systemProperty 'gretty.port', httpPort
       task.systemProperty 'gretty.httpPort', httpPort
       httpBaseURI = "http://${host}:${httpPort}${contextPath}"
@@ -99,9 +104,9 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
       preferredBaseURI = httpBaseURI
     }
 
-    def httpsPort = launcherConfig.serverConfig.httpsPort
+    def httpsPort = serverStartInfo.httpsPort
     String httpsBaseURI
-    if(httpsPort && launcherConfig.serverConfig.httpsEnabled) {
+    if(httpsPort) {
       task.systemProperty 'gretty.httpsPort', httpsPort
       httpsBaseURI = "https://${host}:${httpsPort}${contextPath}"
       task.systemProperty 'gretty.httpsBaseURI', httpsBaseURI

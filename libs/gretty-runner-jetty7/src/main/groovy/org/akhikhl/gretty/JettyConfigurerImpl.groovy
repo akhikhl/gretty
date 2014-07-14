@@ -20,6 +20,7 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.server.session.HashSessionManager
 import org.eclipse.jetty.server.session.SessionHandler
 import org.eclipse.jetty.server.ssl.SslSocketConnector
+import org.eclipse.jetty.util.component.LifeCycle
 import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
@@ -44,6 +45,11 @@ class JettyConfigurerImpl implements JettyConfigurer {
   private Logger log
   private SSOAuthenticatorFactory ssoAuthenticatorFactory
   private HashSessionManager sharedSessionManager
+
+  @Override
+  void addLifeCycleListener(server, listener) {
+    server.addLifeCycleListener(listener as LifeCycle.Listener)
+  }
 
   @Override
   void applyJettyEnvXml(webAppContext, String jettyEnvXml) {

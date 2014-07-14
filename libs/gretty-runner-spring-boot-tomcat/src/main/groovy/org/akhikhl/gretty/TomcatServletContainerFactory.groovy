@@ -16,6 +16,8 @@ import org.apache.catalina.LifecycleEvent
 import org.apache.catalina.LifecycleListener
 import org.apache.catalina.Valve
 import org.apache.catalina.Wrapper
+import org.apache.catalina.connector.Connector
+import org.apache.catalina.startup.Tomcat
 import org.springframework.boot.context.embedded.EmbeddedServletContainer
 import org.springframework.boot.context.embedded.ServletContextInitializer
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedContext
@@ -44,7 +46,7 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
 
     ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
 
-    def server = new TomcatServerConfigurer().createAndConfigureServer(tomcatConfigurer, params) { webapp, context ->
+    Tomcat tomcat = new TomcatServerConfigurer().createAndConfigureServer(tomcatConfigurer, params) { webapp, context ->
 
       if(webapp.springBoot) {
         if (isRegisterDefaultServlet())
@@ -74,7 +76,9 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
       configureContext(context, initializersToUse)
     }
 
-    return getTomcatEmbeddedServletContainer(server)
+    tomcat.service.addLifecycleListener(new StartEventListener(tomcat, tomcat.service.findConnectors(), params))
+
+    return getTomcatEmbeddedServletContainer(tomcat)
   }
 
   public void setParams(Map params) {
@@ -118,6 +122,28 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
 			// Probably not Tomcat 8
 		}
 	}
+
+	private static class StartEventListener implements LifecycleListener {
+
+    // need to pass connectors separately from tomcat, because TomcatEmbeddedServletContainer
+    // nullifies connectors in ctor >> initialize >> removeServiceConnectors
+
+    private final Tomcat tomcat
+    private final Connector[] connectors
+    private final Map params
+
+    StartEventListener(Tomcat tomcat, Connector[] connectors, Map params) {
+      this.tomcat = tomcat
+      this.connectors = connectors
+      this.params = params
+    }
+
+		@Override
+		public void lifecycleEvent(LifecycleEvent event) {
+			if (event.type == Lifecycle.AFTER_START_EVENT)
+        params.startEvent.onServerStart(new TomcatServerStartInfo().getInfo(tomcat, connectors, params))
+		}
+  }
 
 	private static class StoreMergedWebXmlListener implements LifecycleListener {
 

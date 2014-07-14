@@ -7,6 +7,8 @@
  */
 package org.akhikhl.gretty
 
+import java.beans.PropertyChangeEvent
+import java.beans.PropertyChangeListener
 import org.apache.catalina.Host
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
@@ -14,6 +16,7 @@ import org.apache.catalina.LifecycleListener
 import org.apache.catalina.authenticator.SingleSignOn
 import org.apache.catalina.connector.Connector
 import org.apache.catalina.core.StandardContext
+import org.apache.catalina.core.StandardService
 import org.apache.catalina.loader.WebappLoader
 import org.apache.catalina.realm.MemoryRealm
 import org.apache.catalina.startup.Catalina
@@ -77,6 +80,18 @@ class TomcatServerConfigurer {
       connectors = service.findConnectors()
     }
 
+    /* service.addPropertyChangeListener(new PropertyChangeListener() {
+      void propertyChange(PropertyChangeEvent evt) {
+        log.warn 'service.{} : {} -> {}', evt.propertyName, evt.oldValue, evt.newValue
+        if(evt.propertyName == 'connector' && evt.oldValue instanceof Connector && evt.newValue == null)
+        try {
+          throw new Exception('Show me stacktrace!')
+        } catch(Exception e) {
+          e.printStackTrace()
+        }
+      }
+    }) */
+
     if(!tomcat.hostname)
       tomcat.hostname = params.host ?: 'localhost'
 
@@ -90,7 +105,7 @@ class TomcatServerConfigurer {
     }
 
     if(httpConn) {
-      if(!httpConn.port)
+      if(!httpConn.port || httpConn.port < 0)
         httpConn.port = params.httpPort ?: 8080
 
       if(params.httpIdleTimeout)
@@ -98,11 +113,13 @@ class TomcatServerConfigurer {
 
       httpConn.setProperty('maxPostSize', '0') // unlimited post size
 
-      if(newHttpConnector)
+      if(newHttpConnector) {
         service.addConnector(httpConn)
+        connectors = service.findConnectors()
+      }
     }
 
-    Connector httpsConn = service.findConnectors().find { it.scheme == 'https' }
+    Connector httpsConn = connectors.find { it.scheme == 'https' }
 
     boolean newHttpsConnector = false
     if(params.httpsEnabled && !httpsConn) {
@@ -114,8 +131,8 @@ class TomcatServerConfigurer {
     }
 
     if(httpsConn) {
-      if(!httpConn.port)
-        httpsConn.port = params.httpPort ?: 8443
+      if(!httpsConn.port || httpsConn.port < 0)
+        httpsConn.port = params.httpsPort ?: 8443
 
       if(params.sslKeyManagerPassword)
         httpsConn.setProperty('keyPass', params.sslKeyManagerPassword)
@@ -133,8 +150,10 @@ class TomcatServerConfigurer {
 
       httpsConn.setProperty('maxPostSize', '0')  // unlimited
 
-      if(newHttpsConnector)
+      if(newHttpsConnector) {
         service.addConnector(httpsConn)
+        connectors = service.findConnectors()
+      }
     }
 
     if(httpConn && httpsConn)

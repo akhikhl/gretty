@@ -28,6 +28,8 @@ abstract class StartBaseTask extends DefaultTask {
   protected final List<Closure> prepareServerConfigClosures = []
   protected final List<Closure> prepareWebAppConfigClosures = []
 
+  def serverStartInfo
+
   @TaskAction
   void action() {
     LauncherConfig config = getLauncherConfig()
@@ -37,6 +39,7 @@ abstract class StartBaseTask extends DefaultTask {
       project.ext.grettyLaunchThread = launcher.launchThread()
     else
       launcher.launch()
+    serverStartInfo = launcher.serverStartInfo
   }
 
   protected final void doPrepareServerConfig(ServerConfig sconfig) {

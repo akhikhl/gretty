@@ -30,11 +30,12 @@ final class SpringBootServerManager implements ServerManager {
   }
 
   @Override
-  void startServer() {
+  void startServer(ServerStartEvent startEvent) {
 
     if(params.logbackConfig)
       System.setProperty('logging.config', params.logbackConfig)
 
+    params.startEvent = startEvent
     ServletContainerCustomizer.params = params
 
     def springBootMainClass = Class.forName(params.springBootMainClass, true, this.getClass().classLoader)

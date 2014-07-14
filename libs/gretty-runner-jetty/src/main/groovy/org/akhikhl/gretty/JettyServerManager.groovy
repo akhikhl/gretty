@@ -31,7 +31,7 @@ final class JettyServerManager implements ServerManager {
   }
 
   @Override
-  void startServer() {
+  void startServer(ServerStartEvent startEvent) {
     assert server == null
 
     if(params.logging)
@@ -54,13 +54,37 @@ final class JettyServerManager implements ServerManager {
     def httpConn = configurer.findHttpConnector(server)
     def httpsConn = configurer.findHttpsConnector(server)
 
+    List contextInfo = []
+
     for(def context in server.handler.handlers) {
       log.warn '{} runs at:', (context.displayName - '/')
-      if(httpConn)
+      if(httpConn) {
         log.warn '  http://{}:{}{}', httpConn.host, httpConn.port, context.contextPath
-      if(httpsConn)
+        httpConn.with {
+          contextInfo.add([ protocol: 'http', host: host, port: port, contextPath: context.contextPath, baseURI: "http://${host}:${port}${context.contextPath}" ])
+        }
+      }
+      if(httpsConn) {
         log.warn '  https://{}:{}{}', httpsConn.host, httpsConn.port, context.contextPath
+        httpsConn.with {
+          contextInfo.add([ protocol: 'https', host: host, port: port, contextPath: context.contextPath, baseURI: "https://${host}:${port}${context.contextPath}" ])
+        }
+      }
     }
+
+    def serverStartInfo = [ status: 'successfully started' ]
+
+    serverStartInfo.host = httpConn?.host ?: httpsConn?.host
+
+    if(httpConn)
+      serverStartInfo.httpPort = httpConn.port
+
+    if(httpsConn)
+      serverStartInfo.httpsPort = httpsConn.port
+
+    serverStartInfo.contexts = contextInfo
+
+    startEvent.onServerStart(serverStartInfo)
   }
 
   @Override

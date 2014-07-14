@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
@@ -26,6 +27,7 @@ abstract class LauncherBase implements Launcher {
   protected final LauncherConfig config
   protected final ServerConfig sconfig
   protected final Iterable<WebAppConfig> webAppConfigs
+  protected serverStartInfo
 
   ScannerManager scannerManager
 
@@ -52,6 +54,10 @@ abstract class LauncherBase implements Launcher {
   }
 
   protected abstract String getServletContainerDescription()
+
+  def getServerStartInfo() {
+    serverStartInfo
+  }
 
   protected abstract void javaExec(JavaExecParams params)
 
@@ -123,6 +129,7 @@ abstract class LauncherBase implements Launcher {
       ServiceProtocol.send(sconfig.servicePort, runConfigJson.toString())
       status = futureStatus.get()
       log.debug 'Got start status: {}', status
+      serverStartInfo = new JsonSlurper().parseText(status)
 
     } finally {
       executorService.shutdown()

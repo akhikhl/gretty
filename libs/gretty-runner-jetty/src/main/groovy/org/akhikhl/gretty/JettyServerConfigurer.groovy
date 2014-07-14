@@ -26,10 +26,10 @@ class JettyServerConfigurer {
   def createAndConfigureServer(JettyConfigurer configurer, Map params, Closure configureContext = null) {
 
     def server = configurer.createServer()
-    
+
     File baseDir = new File(params.baseDir)
     new File(baseDir, 'webapps').mkdirs()
-    
+
     configurer.applyJettyXml(server, params.serverConfigFile)
     configurer.configureConnectors(server, params)
 
@@ -39,11 +39,11 @@ class JettyServerConfigurer {
       def context = configurer.createWebAppContext(webapp.webappClassPath)
       context.setDisplayName(webapp.contextPath)
       context.setContextPath(webapp.contextPath)
-      
+
       if(!params.supressSetConfigurations)
         configurer.setConfigurationsToWebAppContext(context, configurer.getConfigurations(webapp.webappClassPath))
       configurer.applyJettyEnvXml(context, webapp.jettyEnvXml)
-      
+
       log.warn 'jetty context temp directory: {}', new File(baseDir, 'webapps' + context.getContextPath())
       //context.setTempDirectory(new File(baseDir, 'webapps' + context.getContextPath()))
       //context.setPersistTempDirectory(true)

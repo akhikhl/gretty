@@ -11,9 +11,8 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-interface ServerManager {
-	void setParams(Map params)
-  void startServer(ServerStartEvent startEvent)
-  void stopServer()
+interface ServerStartEvent {
+
+  void onServerStart(Map serverStartInfo)
 }
 

@@ -15,6 +15,8 @@ import org.slf4j.Logger
  */
 interface JettyConfigurer {
 
+  void addLifeCycleListener(server, listener)
+
   void applyJettyEnvXml(webAppContext, String jettyEnvXml)
 
   void applyJettyXml(server, String jettyXml)

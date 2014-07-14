@@ -51,6 +51,11 @@ class JettyConfigurerImpl implements JettyConfigurer {
   private HashSessionManager sharedSessionManager
 
   @Override
+  void addLifeCycleListener(server, listener) {
+    server.addLifeCycleListener(listener as LifeCycle.Listener)
+  }
+
+  @Override
   void applyJettyEnvXml(webAppContext, String jettyEnvXml) {
     if(jettyEnvXml) {
       log.warn 'Configuring webAppContext with {}', jettyEnvXml
@@ -116,7 +121,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     if(httpsConn) {
       if(!httpsConn.host)
         httpsConn.host = params.host ?: 'localhost'
-        
+
       if(!httpsConn.port)
         httpsConn.port = params.httpsPort ?: 8443
 

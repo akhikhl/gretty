@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty
 
+import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 
 /**
@@ -17,6 +18,16 @@ final class Runner {
 
   protected final Map params
   protected boolean paramsLoaded = false
+
+  class ServerStartEventImpl implements ServerStartEvent {
+
+    @Override
+    void onServerStart(Map serverStartInfo) {
+      JsonBuilder json = new JsonBuilder()
+      json serverStartInfo
+      ServiceProtocol.send(params.statusPort, json.toString())
+    }
+  }
 
   static void main(String[] args) {
     def cli = new CliBuilder()
@@ -35,8 +46,10 @@ final class Runner {
   }
 
   private void run() {
+
     def ServerManagerFactory = Class.forName(params.serverManagerFactory, true, this.getClass().classLoader)
     ServerManager serverManager = ServerManagerFactory.createServerManager()
+
     ServerSocket socket = new ServerSocket(params.servicePort, 1, InetAddress.getByName('127.0.0.1'))
     try {
       ServiceProtocol.send(params.statusPort, 'init')
@@ -46,8 +59,7 @@ final class Runner {
           params << new JsonSlurper().parseText(data)
           paramsLoaded = true
           serverManager.setParams(params)
-          serverManager.startServer()
-          ServiceProtocol.send(params.statusPort, 'started')
+          serverManager.startServer(new ServerStartEventImpl())
           // Note that server is already in listening state.
           // If client sends a command immediately after 'started' signal,
           // the command is queued, so that socket.accept gets it anyway.
@@ -59,7 +71,7 @@ final class Runner {
         }
         else if(data == 'restart') {
           serverManager.stopServer()
-          serverManager.startServer()
+          serverManager.startServer(new ServerStartEventImpl())
         }
       }
     } finally {
