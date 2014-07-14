@@ -44,47 +44,8 @@ final class JettyServerManager implements ServerManager {
 
     server = new JettyServerConfigurer().createAndConfigureServer(configurer, params)
     server.start()
-
-    def connectors = server.getConnectors()
-
-    def portsInfo = connectors.collect { it.port }
-    portsInfo = (portsInfo.size() == 1 ? 'port ' : 'ports ') + portsInfo.join(', ')
-    log.warn '{} started and listening on {}', params.servletContainerDescription, portsInfo
-
-    def httpConn = configurer.findHttpConnector(server)
-    def httpsConn = configurer.findHttpsConnector(server)
-
-    List contextInfo = []
-
-    for(def context in server.handler.handlers) {
-      log.warn '{} runs at:', (context.displayName - '/')
-      if(httpConn) {
-        log.warn '  http://{}:{}{}', httpConn.host, httpConn.port, context.contextPath
-        httpConn.with {
-          contextInfo.add([ protocol: 'http', host: host, port: port, contextPath: context.contextPath, baseURI: "http://${host}:${port}${context.contextPath}" ])
-        }
-      }
-      if(httpsConn) {
-        log.warn '  https://{}:{}{}', httpsConn.host, httpsConn.port, context.contextPath
-        httpsConn.with {
-          contextInfo.add([ protocol: 'https', host: host, port: port, contextPath: context.contextPath, baseURI: "https://${host}:${port}${context.contextPath}" ])
-        }
-      }
-    }
-
-    def serverStartInfo = [ status: 'successfully started' ]
-
-    serverStartInfo.host = httpConn?.host ?: httpsConn?.host
-
-    if(httpConn)
-      serverStartInfo.httpPort = httpConn.port
-
-    if(httpsConn)
-      serverStartInfo.httpsPort = httpsConn.port
-
-    serverStartInfo.contexts = contextInfo
-
-    startEvent.onServerStart(serverStartInfo)
+    
+    startEvent.onServerStart(new JettyServerStartInfo().getInfo(server, configurer, params))
   }
 
   @Override

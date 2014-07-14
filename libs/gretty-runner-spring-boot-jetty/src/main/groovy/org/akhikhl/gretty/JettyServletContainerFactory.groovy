@@ -53,9 +53,15 @@ class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory 
     for (JettyServerCustomizer customizer : getServerCustomizers())
       customizer.customize(server)
 
-    jettyConfigurer.addLifeCycleListener(server, { event ->
-      log.warn '*** server lifecycle event: {}'
-    })
+    jettyConfigurer.addLifeCycleListener(server, [ 
+      lifeCycleFailure: {},
+      lifeCycleStarted: { event ->
+        params.startEvent.onServerStart(new JettyServerStartInfo().getInfo(server, jettyConfigurer, params))
+      },
+      lifeCycleStarting: {},
+      lifeCycleStopped: {},
+      lifeCycleStopping: {}
+    ])
 
     return getJettyEmbeddedServletContainer(server)
   }
