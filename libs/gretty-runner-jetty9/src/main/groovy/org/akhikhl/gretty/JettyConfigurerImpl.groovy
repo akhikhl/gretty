@@ -76,50 +76,50 @@ class JettyConfigurerImpl implements JettyConfigurer {
       http_config.setSecureScheme('https')
       http_config.setSecurePort(params.httpsPort)
     }
-    
-    def connectors = server.getConnectors()
-    
-    Connector httpConn = connectors.find { it.protocols.contains('http') }
 
-    if(params.httpEnabled) {
-      boolean newConnector = false
-      if(httpConn) {
-        if(params.httpPort)
-          httpConn.port = params.httpPort
-      } else {
-        newConnector = true
-        httpConn = new ServerConnector(server, new HttpConnectionFactory(http_config))
+    Connector httpConn = findHttpConnector(server)
+
+    boolean newHttpConnector = false
+    if(params.httpEnabled && !httpConn) {
+      newHttpConnector = true
+      httpConn = new ServerConnector(server, new HttpConnectionFactory(http_config))
+      httpConn.soLingerTime = -1
+    }
+
+    if(httpConn) {
+      if(!httpConn.host)
+        httpConn.host = params.host ?: 'localhost'
+
+      if(!httpConn.port)
         httpConn.port = params.httpPort ?: 8080
-        httpConn.soLingerTime = -1
-      }
-      if(params.host)
-        httpConn.host = params.host
+
       if(params.httpIdleTimeout)
         httpConn.idleTimeout = params.httpIdleTimeout
-        
-      if(newConnector)
+
+      if(newHttpConnector)
         server.addConnector(httpConn)
     }
-    
-    Connector httpsConn = connectors.find { it.protocols.contains('https') }
 
-    if(params.httpsEnabled) {
-      boolean newConnector = false
-      if(httpsConn) {
-        if(params.httpsPort)
-          httpsConn.port = params.httpsPort
-      } else {
-        newConnector = true
-        HttpConfiguration https_config = new HttpConfiguration(http_config)
-        https_config.addCustomizer(new SecureRequestCustomizer())
+    Connector httpsConn = findHttpsConnector(server)
 
-        httpsConn = new ServerConnector(server,
-          new SslConnectionFactory(new SslContextFactory(), 'http/1.1'),
-          new HttpConnectionFactory(https_config))
+    boolean newHttpsConnector = false
+    if(params.httpsEnabled && !httpsConn) {
+      newHttpsConnector = true
+      HttpConfiguration https_config = new HttpConfiguration(http_config)
+      https_config.addCustomizer(new SecureRequestCustomizer())
+      httpsConn = new ServerConnector(server,
+        new SslConnectionFactory(new SslContextFactory(), 'http/1.1'),
+        new HttpConnectionFactory(https_config))
+      httpsConn.soLingerTime = -1
+    }
+
+    if(httpsConn) {
+      if(!httpsConn.host)
+        httpsConn.host = params.host ?: 'localhost'
         
+      if(!httpsConn.port)
         httpsConn.port = params.httpsPort ?: 8443
-      }
-      
+
       def sslContextFactory = httpsConn.getConnectionFactories().find { it instanceof SslConnectionFactory }?.getSslContextFactory()
       if(sslContextFactory) {
         if(params.sslKeyStorePath)
@@ -133,13 +133,11 @@ class JettyConfigurerImpl implements JettyConfigurer {
         if(params.sslTrustStorePassword)
           sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
       }
-      
-      if(params.host)
-        httpsConn.host = params.host
+
       if(params.httpsIdleTimeout)
         httpsConn.idleTimeout = params.httpsIdleTimeout
-        
-      if(newConnector)
+
+      if(newHttpsConnector)
         server.addConnector(httpsConn)
     }
   }
@@ -192,6 +190,16 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
+  }
+
+  @Override
+  def findHttpConnector(server) {
+    server.connectors.find { it.connectionFactories.find { it.protocol.startsWith('HTTP') } && !it.connectionFactories.find { it.protocol.startsWith('SSL') } }
+  }
+
+  @Override
+  def findHttpsConnector(server) {
+    server.connectors.find { it.connectionFactories.find { it.protocol.startsWith('HTTP') } && it.connectionFactories.find { it.protocol.startsWith('SSL') } }
   }
 
   @Override

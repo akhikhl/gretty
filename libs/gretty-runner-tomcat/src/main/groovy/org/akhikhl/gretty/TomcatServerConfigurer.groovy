@@ -44,10 +44,10 @@ class TomcatServerConfigurer {
     File baseDir = new File(params.baseDir)
     new File(baseDir, 'webapps').mkdirs()
     tomcat.setBaseDir(baseDir.absolutePath)
-    
+
     def service
     def connectors
-    
+
     if(params.serverConfigFile) {
       def catalina = new Catalina()
       def digester = catalina.createStartDigester()
@@ -79,43 +79,44 @@ class TomcatServerConfigurer {
 
     if(!tomcat.hostname)
       tomcat.hostname = params.host ?: 'localhost'
-    
+
     Connector httpConn = connectors.find { it.scheme == 'http' }
-    
-    if(params.httpEnabled) {
-      boolean newConnector = false
-      if(httpConn) {
-        if(params.httpPort)
-          httpConn.port = params.httpPort
-      } else {
-        newConnector = true
-        httpConn = new Connector('HTTP/1.1')
-        httpConn.scheme = 'http'
-        httpConn.setProperty('maxPostSize', '0')  // unlimited
+
+    boolean newHttpConnector = false
+    if(params.httpEnabled && !httpConn) {
+      newHttpConnector = true
+      httpConn = new Connector('HTTP/1.1')
+      httpConn.scheme = 'http'
+    }
+
+    if(httpConn) {
+      if(!httpConn.port)
         httpConn.port = params.httpPort ?: 8080
-      }
+
       if(params.httpIdleTimeout)
         httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout)
-      if(newConnector)
+
+      httpConn.setProperty('maxPostSize', '0') // unlimited post size
+
+      if(newHttpConnector)
         service.addConnector(httpConn)
     }
-    
+
     Connector httpsConn = service.findConnectors().find { it.scheme == 'https' }
 
-    if(params.httpsEnabled) {
-      boolean newConnector = false
-      if(httpsConn) {
-        if(params.httpsPort)
-          httpsConn.port = params.httpsPort
-      } else {
-        newConnector = true
+    boolean newHttpsConnector = false
+    if(params.httpsEnabled && !httpsConn) {
+        newHttpsConnector = true
         httpsConn = new Connector('HTTP/1.1')
         httpsConn.scheme = 'https'
         httpsConn.secure = true
         httpsConn.setProperty('SSLEnabled', 'true')
-        httpsConn.setProperty('maxPostSize', '0')  // unlimited
-        httpsConn.port = params.httpsPort ?: 8443
-      }
+    }
+
+    if(httpsConn) {
+      if(!httpConn.port)
+        httpsConn.port = params.httpPort ?: 8443
+
       if(params.sslKeyManagerPassword)
         httpsConn.setProperty('keyPass', params.sslKeyManagerPassword)
       if(params.sslKeyStorePath)
@@ -126,15 +127,19 @@ class TomcatServerConfigurer {
         httpsConn.setProperty('truststoreFile', params.sslTrustStorePath)
       if(params.sslTrustStorePassword)
         httpsConn.setProperty('truststorePass', params.sslTrustStorePassword)
+
       if(params.httpsIdleTimeout)
         httpsConn.setProperty('keepAliveTimeout', params.httpsIdleTimeout)
-      if(newConnector)
+
+      httpsConn.setProperty('maxPostSize', '0')  // unlimited
+
+      if(newHttpsConnector)
         service.addConnector(httpsConn)
     }
 
     if(httpConn && httpsConn)
       httpConn.redirectPort = httpsConn.port
-    
+
     if(httpConn)
       tomcat.setConnector(httpConn)
     else if(httpsConn)

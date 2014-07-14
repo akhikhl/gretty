@@ -46,20 +46,20 @@ final class JettyServerManager implements ServerManager {
     server.start()
 
     def connectors = server.getConnectors()
-    
+
     def portsInfo = connectors.collect { it.port }
     portsInfo = (portsInfo.size() == 1 ? 'port ' : 'ports ') + portsInfo.join(', ')
     log.warn '{} started and listening on {}', params.servletContainerDescription, portsInfo
-    
-    def httpConn = connectors.find { it.protocols.contains('http') }
-    def httpsConn = connectors.find { it.protocols.contains('https') }
-    
+
+    def httpConn = configurer.findHttpConnector(server)
+    def httpsConn = configurer.findHttpsConnector(server)
+
     for(def context in server.handler.handlers) {
       log.warn '{} runs at:', (context.displayName - '/')
       if(httpConn)
-        log.warn '  http://{}:{}{}', tomcat.hostname, httpConn.port, context.contextPath
+        log.warn '  http://{}:{}{}', httpConn.host, httpConn.port, context.contextPath
       if(httpsConn)
-        log.warn '  https://{}:{}{}', tomcat.hostname, httpsConn.port, context.contextPath
+        log.warn '  https://{}:{}{}', httpsConn.host, httpsConn.port, context.contextPath
     }
   }
 

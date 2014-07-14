@@ -66,45 +66,46 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   void configureConnectors(server, Map params) {
-    
-    def connectors = server.getConnectors()
-    
-    Connector httpConn = connectors.find { it.protocols.contains('http') }
 
-    if(params.httpEnabled) {
-      boolean newConnector = false
-      if(httpConn) {
-        if(params.httpPort)
-          httpConn.port = params.httpPort
-      } else {
-        newConnector = true
-        httpConn = new SocketConnector()
+    Connector httpConn = findHttpConnector(server)
+
+    boolean newConnector = false
+    if(params.httpEnabled && !httpConn) {
+      newConnector = true
+      httpConn = new SocketConnector()
+      httpConn.soLingerTime = -1
+    }
+
+    if(httpConn) {
+      if(!httpConn.host)
+        httpConn.host = params.host ?: 'localhost'
+
+      if(!httpConn.port)
         httpConn.port = params.httpPort ?: 8080
-        httpConn.soLingerTime = -1
-      }
-      
-      if(params.host)
-        httpConn.host = params.host
+
       if(params.httpIdleTimeout)
         httpConn.maxIdleTime = params.httpIdleTimeout
 
       if(newConnector)
         server.addConnector(httpConn)
     }
-    
-    Connector httpsConn = connectors.find { it.protocols.contains('https') }
 
-    if(params.httpsEnabled) {
-      boolean newConnector = false
-      if(httpsConn) {
-        if(params.httpsPort)
-          httpsConn.port = params.httpsPort
-      } else {
-        newConnector = true
-        httpsConn = new SslSocketConnector(new SslContextFactory())
+    Connector httpsConn = findHttpsConnector(server)
+
+    boolean newHttpsConnector = false
+    if(params.httpsEnabled && !httpsConn) {
+      newHttpsConnector = true
+      httpsConn = new SslSocketConnector(new SslContextFactory())
+      httpsConn.soLingerTime = -1
+    }
+
+    if(httpsConn) {
+      if(!httpsConn.host)
+        httpsConn.host = params.host ?: 'localhost'
+
+      if(!httpsConn.port)
         httpsConn.port = params.httpsPort ?: 8443
-      }
-      
+
       def sslContextFactory = httpsConn.getSslContextFactory()
       if(params.sslKeyStorePath)
         sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
@@ -117,12 +118,10 @@ class JettyConfigurerImpl implements JettyConfigurer {
       if(params.sslTrustStorePassword)
         sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
 
-      if(params.host)
-        httpsConn.host = params.host
       if(params.httpsIdleTimeout)
         httpsConn.maxIdleTime = params.httpsIdleTimeout
-        
-      if(newConnector)
+
+      if(newHttpsConnector)
         server.addConnector(httpsConn)
     }
   }
@@ -180,6 +179,16 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
+  }
+
+  @Override
+  def findHttpConnector(server) {
+    server.connectors.find { (it instanceof SocketConnector) && !(it instanceof SslSocketConnector) }
+  }
+
+  @Override
+  def findHttpsConnector(server) {
+    server.connectors.find { it instanceof SslSocketConnector }
   }
 
   @Override

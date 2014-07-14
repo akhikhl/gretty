@@ -29,6 +29,10 @@ interface JettyConfigurer {
 
   def createWebAppContext(List<String> webappClassPath)
 
+  def findHttpConnector(server)
+
+  def findHttpsConnector(server)
+
   List getConfigurations(List<String> webappClassPath)
 
   void setConfigurationsToWebAppContext(context, List configurations)
