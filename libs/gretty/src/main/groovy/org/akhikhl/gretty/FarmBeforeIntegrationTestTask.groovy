@@ -110,6 +110,11 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
   }
 
   protected void passSystemPropertiesToIntegrationTask(Project webappProject, JavaForkOptions task) {
+
+    def host = serverStartInfo.host
+
+    task.systemProperty 'gretty.host', host
+    
     FarmConfigurer configurer = new FarmConfigurer(project)
     FarmExtension tempFarm = new FarmExtension()
     configurer.configureFarm(tempFarm, new FarmExtension(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
@@ -117,18 +122,15 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     def webappConfig = configurer.getWebAppConfigForProject(options, webappProject, inplace)
     ProjectUtils.prepareToRun(project, webappConfig)
 
-    def host = tempFarm.serverConfig.host
-
     def contextPath = webappConfig.contextPath
-    task.systemProperty 'gretty.host', host
     task.systemProperty 'gretty.contextPath', contextPath
 
     String preferredProtocol
     String preferredBaseURI
 
-    def httpPort = tempFarm.serverConfig.httpPort
+    def httpPort = serverStartInfo.httpPort
     String httpBaseURI
-    if(httpPort && tempFarm.serverConfig.httpEnabled) {
+    if(httpPort) {
       task.systemProperty 'gretty.port', httpPort
       task.systemProperty 'gretty.httpPort', httpPort
       httpBaseURI = "http://${host}:${httpPort}${contextPath}"
@@ -138,9 +140,9 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
       preferredBaseURI = httpBaseURI
     }
 
-    def httpsPort = tempFarm.serverConfig.httpsPort
+    def httpsPort = serverStartInfo.httpsPort
     String httpsBaseURI
-    if(httpsPort && tempFarm.serverConfig.httpsEnabled) {
+    if(httpsPort) {
       task.systemProperty 'gretty.httpsPort', httpsPort
       httpsBaseURI = "https://${host}:${httpsPort}${contextPath}"
       task.systemProperty 'gretty.httpsBaseURI', httpsBaseURI

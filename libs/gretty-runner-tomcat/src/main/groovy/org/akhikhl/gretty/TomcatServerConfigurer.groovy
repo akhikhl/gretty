@@ -9,6 +9,7 @@ package org.akhikhl.gretty
 
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
+import org.apache.catalina.Globals
 import org.apache.catalina.Host
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
@@ -46,7 +47,7 @@ class TomcatServerConfigurer {
 
     File baseDir = new File(params.baseDir)
     new File(baseDir, 'webapps').mkdirs()
-    tomcat.setBaseDir(baseDir.absolutePath)
+    tomcat.baseDir = baseDir.absolutePath
 
     def service
     def connectors
@@ -71,8 +72,17 @@ class TomcatServerConfigurer {
       tomcat.port = connectors[0].port
       tomcat.hostname = tomcat.host.name
       server.setCatalina(catalina)
-      server.setCatalinaHome(baseDir)
-      server.setCatalinaBase(baseDir)
+      // specific to tomcat 8+
+      if(server.respondsTo('setCatalinaHome'))
+        server.setCatalinaHome(baseDir)
+      // specific to tomcat 8+
+      if(server.respondsTo('setCatalinaBase'))
+        server.setCatalinaBase(baseDir)
+      // specific to tomcat 7+
+      if(tomcat.engine.respondsTo(MetaProperty.getSetterName('baseDir')))
+        tomcat.engine.baseDir = baseDir.absolutePath
+      // specific to tomcat 7+
+      System.setProperty(Globals.CATALINA_BASE_PROP, baseDir.absolutePath)
     } else {
       tomcat.engine.backgroundProcessorDelay = -1
       tomcat.host.autoDeploy = true
@@ -166,7 +176,7 @@ class TomcatServerConfigurer {
     else if(connectors.length != 0)
       tomcat.setConnector(connectors[0])
 
-    if(params.singleSignOn && !tomcat.host.getValves().find { it instanceof SingleSignOn })
+    if(params.singleSignOn && !tomcat.host.pipeline.valves.find { it instanceof SingleSignOn })
       tomcat.host.addValve(new SingleSignOn())
 
     for(def webapp in params.webApps) {

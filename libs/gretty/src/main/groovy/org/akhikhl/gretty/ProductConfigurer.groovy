@@ -90,8 +90,8 @@ class ProductConfigurer {
             result.add wconfig.resourceBase
           if(wconfig.realmConfigFile)
             result.add wconfig.realmConfigFile
-          if(wconfig.jettyEnvXmlFile)
-            result.add wconfig.jettyEnvXmlFile
+          if(wconfig.contextConfigFile)
+            result.add wconfig.contextConfigFile
           result
         }
         result
@@ -315,8 +315,8 @@ class ProductConfigurer {
       String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)    
       if(wconfig.realmConfigFile)
         dir.add(wconfig.realmConfigFile, appDir)
-      if(wconfig.jettyEnvXmlFile)
-        dir.add(wconfig.jettyEnvXmlFile, appDir)
+      if(wconfig.contextConfigFile)
+        dir.add(wconfig.contextConfigFile, appDir)
     }
 
     dir.cleanup()
@@ -400,8 +400,8 @@ class ProductConfigurer {
             realm wconfig.realm
           if(wconfig.realmConfigFile)
             realmConfigFile appConfigDir + '/' + getFileName(wconfig.realmConfigFile)
-          if(wconfig.jettyEnvXmlFile)
-            jettyEnvXmlFile appConfigDir + '/' + getFileName(wconfig.jettyEnvXmlFile)
+          if(wconfig.contextConfigFile)
+            contextConfigFile appConfigDir + '/' + getFileName(wconfig.contextConfigFile)
           if(ProjectUtils.isSpringBootApp(project, wconfig))
             springBoot true
           if(wconfig.springBootSources)

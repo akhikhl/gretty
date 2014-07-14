@@ -27,7 +27,7 @@ class ConfigUtils {
       if(src instanceof Map)
         for(def prop in dstProps) {
           def propName = prop.name
-          if(src[propName] != null) {
+          if(src[propName] != null && (dst instanceof Map || dst.respondsTo(MetaProperty.getSetterName(propName)))) {
             if(dst[propName] == null)
               dst[propName] = src[propName]
             else if(Collection.class.isAssignableFrom(prop.type))
@@ -39,7 +39,8 @@ class ConfigUtils {
       else
         for(def prop in dstProps) {
           def propName = prop.name
-          if(src.metaClass.properties.find { it.name == propName } && src[propName] != null) {
+          if(src.metaClass.properties.find { it.name == propName } && src[propName] != null &&
+             (dst instanceof Map || dst.respondsTo(MetaProperty.getSetterName(propName)))) {
             if(dst[propName] == null)
               dst[propName] = src[propName]
             else if(Collection.class.isAssignableFrom(prop.type))

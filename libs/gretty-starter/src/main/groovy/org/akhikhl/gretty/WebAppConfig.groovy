@@ -21,7 +21,7 @@ class WebAppConfig {
   def initParameters
   def realm
   def realmConfigFile
-  def jettyEnvXmlFile
+  def contextConfigFile
   def scanDirs
   def fastReload
   def resourceBase
@@ -72,17 +72,11 @@ class WebAppConfig {
     result.resourceBase = warFile.absolutePath
     return result
   }
-
-  String getWebAppLaunchName() {
-    if(projectPath)
-      return projectPath
-    if(resourceBase) {
-      def dir = resourceBase
-      if(!(dir instanceof File))
-        dir = new File(dir)
-      return dir.name
-    }
-    return null
+  
+  // use contextConfigFile instead 
+  @Deprecated
+  def getJettyEnvXmlFile() {
+    contextConfigFile
   }
 
   void initParameter(key, value) {
@@ -128,5 +122,11 @@ class WebAppConfig {
       fastReload = newValue
     else
       fastReload = [ newValue ]
+  }
+  
+  // use contextConfigFile instead 
+  @Deprecated
+  void setJettyEnvXmlFile(newValue) {
+    contextConfigFile = newValue
   }
 }

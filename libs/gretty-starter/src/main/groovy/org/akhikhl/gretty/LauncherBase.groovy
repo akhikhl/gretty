@@ -210,8 +210,8 @@ abstract class LauncherBase implements Launcher {
             realm wconfig.realm
           if(wconfig.realmConfigFile)
             realmConfigFile self.fileToString(wconfig.realmConfigFile)
-          if(wconfig.jettyEnvXmlFile)
-            jettyEnvXml self.fileToString(wconfig.jettyEnvXmlFile)
+          if(wconfig.contextConfigFile)
+            contextConfigFile self.fileToString(wconfig.contextConfigFile)
           if(wconfig.springBootSources)
             springBootSources wconfig.springBootSources
         }

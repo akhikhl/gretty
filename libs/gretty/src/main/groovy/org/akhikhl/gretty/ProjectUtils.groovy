@@ -165,7 +165,6 @@ final class ProjectUtils {
   static WebAppConfig getDefaultWebAppConfigForProject(Project project) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + project.name
-    result.jettyEnvXmlFile = 'jetty-env.xml'
     result.fastReload = true
     result.resourceBase = {
       inplace ? "${project.buildDir}/inplaceWebapp/" as String : ProjectUtils.getFinalArchivePath(project).toString()
@@ -421,9 +420,12 @@ final class ProjectUtils {
     wconfig.realmConfigFile = new FileResolver(['webapp-realm', 'webapp-security', 'webapp-config']).resolveSingleFile(project, realmConfigFiles)
 
     if(servletContainerType == 'jetty') {
-      def jettyEnvXmlFiles = [ wconfig.jettyEnvXmlFile, sconfig.servletContainer + '-env.xml', 'jetty-env.xml' ] as LinkedHashSet
-      wconfig.jettyEnvXmlFile = new FileResolver(['webapp-jetty', 'webapp-config', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, jettyEnvXmlFiles)
+      def contextConfigFiles = [ wconfig.contextConfigFile, sconfig.servletContainer + '-env.xml', 'jetty-env.xml' ] as LinkedHashSet
+      wconfig.contextConfigFile = new FileResolver(['webapp-jetty', 'webapp-config', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, contextConfigFiles)
+    } else if(servletContainerType == 'tomcat') {
+      def contextConfigFiles = [ wconfig.contextConfigFile, sconfig.servletContainer + '-context.xml', 'tomcat-context.xml', 'context.xml' ] as LinkedHashSet
+      wconfig.contextConfigFile = new FileResolver(['webapp-tomcat', 'webapp-config', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, contextConfigFiles)
     } else
-      wconfig.jettyEnvXmlFile = null
+      wconfig.contextConfigFile = null
   }
 }

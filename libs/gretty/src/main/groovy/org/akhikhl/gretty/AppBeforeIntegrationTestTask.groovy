@@ -76,8 +76,6 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
 
   protected void passSystemPropertiesToIntegrationTask(JavaForkOptions task) {
 
-    def launcherConfig = getLauncherConfig()
-
     def host = serverStartInfo.host
 
     task.systemProperty 'gretty.host', host
