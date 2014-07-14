@@ -44,9 +44,10 @@ class JettyServerConfigurer {
         configurer.setConfigurationsToWebAppContext(context, configurer.getConfigurations(webapp.webappClassPath))
       configurer.applyJettyEnvXml(context, webapp.jettyEnvXml)
 
-      log.warn 'jetty context temp directory: {}', new File(baseDir, 'webapps' + context.getContextPath())
-      //context.setTempDirectory(new File(baseDir, 'webapps' + context.getContextPath()))
-      //context.setPersistTempDirectory(true)
+      File tempDir = new File(baseDir, 'webapps-exploded' + context.getContextPath())
+      log.warn 'jetty context temp directory: {}', tempDir
+      context.setTempDirectory(tempDir)
+      context.setPersistTempDirectory(true)
 
       webapp.initParams?.each { key, value ->
         context.setInitParameter(key, value)
