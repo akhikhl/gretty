@@ -26,12 +26,5 @@ ext {
   integrationTestContainers = ['jetty7', 'jetty8', 'jetty9']
 }
 
-gretty {
-  onStart {  
-    println '*** ATTENTION ***: the real (augmented by "jetty-env.xml") uri is:'
-    println "http://${host}:${httpPort}/abc/"
-  }
-}
-
 rootProject.tasks.testAll.dependsOn { project.tasks.integrationTestAllContainers }
 
