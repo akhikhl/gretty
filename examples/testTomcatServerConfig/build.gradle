@@ -22,8 +22,11 @@ dependencies {
   compile 'org.apache.velocity:velocity:1.7'
 }
 
+ext {
+  integrationTestContainers = ['tomcat7', 'tomcat8']
+}
+
 gretty {
-  // Possible servletContainer values are 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8'. Default is 'jetty9'.
   servletContainer = 'tomcat8'
   // httpsEnabled = true
 }
