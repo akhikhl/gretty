@@ -61,14 +61,28 @@ class JettyServerConfigurer {
       else
         context.setWar(webapp.resourceBase)
 
-      configurer.configureSecurity(context, params, webapp)
-
-      configurer.configureSessionManager(server, context, params, webapp)
-
       URL contextConfigFile = getContextConfigFile(params.servletContainerId, webapp.resourceBase)
       if(!contextConfigFile && webapp.contextConfigFile)
         contextConfigFile = new File(webapp.contextConfigFile).toURI().toURL()
       configurer.applyContextConfigFile(context, contextConfigFile)
+
+      String realm = webapp.realm ?: params.realm
+      URL realmConfigFile = getRealmFile(params.servletContainerId, webapp.resourceBase)
+      if(!realmConfigFile) {
+        if(webapp.realmConfigFile)
+          realmConfigFile = new File(webapp.realmConfigFile).toURI().toURL()
+        else if(params.realmConfigFile)
+          realmConfigFile = new File(params.realmConfigFile).toURI().toURL()
+      }
+      if(realm && realmConfigFile) {
+        if(context.securityHandler.loginService == null) {
+          log.info 'Configuring {} with realm \'{}\', {}', context.contextPath, realm, realmConfigFile
+          configurer.configureSecurity(context, realm, realmConfigFile, params.singleSignOn)
+        } else
+          log.warn 'loginService is already configured, ignoring realm \'{}\', {}', realm, realmConfigFile
+      }
+
+      configurer.configureSessionManager(server, context, params, webapp)
 
       if(configureContext)
         configureContext(webapp, context)
@@ -83,6 +97,15 @@ class JettyServerConfigurer {
 
   URL getContextConfigFile(String servletContainer, String resourceBase) {
     for(def possibleFileName in [ servletContainer + '-env.xml', 'jetty-env.xml' ]) {
+      URL url = resolveContextFile(resourceBase, 'META-INF/' + possibleFileName)
+      if(url)
+        return url
+    }
+    null
+  }
+
+  URL getRealmFile(String servletContainer, String resourceBase) {
+    for(def possibleFileName in [ servletContainer + '-realm.properties', 'jetty-realm.properties' ]) {
       URL url = resolveContextFile(resourceBase, 'META-INF/' + possibleFileName)
       if(url)
         return url

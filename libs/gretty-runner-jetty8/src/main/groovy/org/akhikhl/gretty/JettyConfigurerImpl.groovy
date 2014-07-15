@@ -133,19 +133,12 @@ class JettyConfigurerImpl implements JettyConfigurer {
   }
 
   @Override
-  void configureSecurity(context, Map serverParams, Map webappParams) {
-    String realm = webappParams.realm ?: serverParams.realm
-    String realmConfigFile = webappParams.realmConfigFile ?: serverParams.realmConfigFile
-    if(realm && realmConfigFile) {
-      if(context.getSecurityHandler().getLoginService() != null)
-        return
-      log.warn '{} -> realm \'{}\', {}', context.contextPath, realm, realmConfigFile
-      context.getSecurityHandler().setLoginService(new HashLoginService(realm, realmConfigFile))
-      if(serverParams.singleSignOn) {
-        if(ssoAuthenticatorFactory == null)
-          ssoAuthenticatorFactory = new SSOAuthenticatorFactory()
-        context.getSecurityHandler().setAuthenticatorFactory(ssoAuthenticatorFactory)
-      }
+  void configureSecurity(context, String realm, String realmConfigFile, boolean singleSignOn) {
+    context.securityHandler.loginService = new HashLoginService(realm, realmConfigFile)
+    if(serverParams.singleSignOn) {
+      if(ssoAuthenticatorFactory == null)
+        ssoAuthenticatorFactory = new SSOAuthenticatorFactory()
+      context.securityHandler.authenticatorFactory = ssoAuthenticatorFactory
     }
   }
 

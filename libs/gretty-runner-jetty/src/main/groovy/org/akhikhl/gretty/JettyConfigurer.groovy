@@ -23,7 +23,7 @@ interface JettyConfigurer {
 
   void configureConnectors(server, Map serverParams)
 
-  void configureSecurity(context, Map serverParams, Map webappParams)
+  void configureSecurity(context, String realm, String realmConfigFile, boolean singleSignOn)
 
   void configureSessionManager(server, context, Map serverParams, Map webappParams)
 
