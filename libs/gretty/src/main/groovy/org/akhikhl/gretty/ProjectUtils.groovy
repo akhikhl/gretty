@@ -421,10 +421,10 @@ final class ProjectUtils {
 
     if(servletContainerType == 'jetty') {
       def contextConfigFiles = [ wconfig.contextConfigFile, sconfig.servletContainer + '-env.xml', 'jetty-env.xml' ] as LinkedHashSet
-      wconfig.contextConfigFile = new FileResolver(['webapp-jetty', 'webapp-config', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, contextConfigFiles)
+      wconfig.contextConfigFile = new FileResolver(['webapp-jetty', 'webapp-config' ]).resolveSingleFile(project, contextConfigFiles)
     } else if(servletContainerType == 'tomcat') {
       def contextConfigFiles = [ wconfig.contextConfigFile, sconfig.servletContainer + '-context.xml', 'tomcat-context.xml', 'context.xml' ] as LinkedHashSet
-      wconfig.contextConfigFile = new FileResolver(['webapp-tomcat', 'webapp-config', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, contextConfigFiles)
+      wconfig.contextConfigFile = new FileResolver(['webapp-tomcat', 'webapp-config' ]).resolveSingleFile(project, contextConfigFiles)
     } else
       wconfig.contextConfigFile = null
   }

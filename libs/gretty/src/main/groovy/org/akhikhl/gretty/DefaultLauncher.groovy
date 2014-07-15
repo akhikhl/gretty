@@ -35,6 +35,11 @@ class DefaultLauncher extends LauncherBase {
   }
 
   @Override
+  protected String getServletContainerId() {
+    sconfig.servletContainer
+  }
+
+  @Override
   protected String getServletContainerDescription() {
     getServletContainerConfig().servletContainerDescription
   }
@@ -50,7 +55,7 @@ class DefaultLauncher extends LauncherBase {
       spec.args = params.args
     }
   }
-  
+
   @Override
   protected void prepareToRun(WebAppConfig wconfig) {
     ProjectUtils.prepareToRun(project, wconfig)

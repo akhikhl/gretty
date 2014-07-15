@@ -65,7 +65,7 @@ class JettyServerConfigurer {
 
       configurer.configureSessionManager(server, context, params, webapp)
 
-      URL contextConfigFile = getContextConfigFile(params.servletContainer.id, webapp.resourceBase)
+      URL contextConfigFile = getContextConfigFile(params.servletContainerId, webapp.resourceBase)
       if(!contextConfigFile && webapp.contextConfigFile)
         contextConfigFile = new File(webapp.contextConfigFile).toURI().toURL()
       configurer.applyContextConfigFile(context, contextConfigFile)
@@ -82,14 +82,11 @@ class JettyServerConfigurer {
   }
 
   URL getContextConfigFile(String servletContainer, String resourceBase) {
-    def possibleSubDirs = [ 'META-INF', 'WEB-INF' ]
-    def possibleFileNames = [ servletContainer + '-env.xml', 'jetty-env.xml' ]
-    for(def possibleSubDir in possibleSubDirs)
-      for(def possibleFileName in possibleFileNames) {
-        URL url = resolveContextFile(resourceBase, possibleSubDir + '/' + possibleFileName)
-        if(url)
-          return url
-      }
+    for(def possibleFileName in [ servletContainer + '-env.xml', 'jetty-env.xml' ]) {
+      URL url = resolveContextFile(resourceBase, 'META-INF/' + possibleFileName)
+      if(url)
+        return url
+    }
     null
   }
 

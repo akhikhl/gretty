@@ -28,6 +28,11 @@ class StarterLauncher extends LauncherBase {
   }
 
   @Override
+  protected String getServletContainerId() {
+    starterConfig.servletContainer.id
+  }
+
+  @Override
   protected String getServletContainerDescription() {
     starterConfig.servletContainer.description
   }

@@ -53,6 +53,8 @@ abstract class LauncherBase implements Launcher {
     'org.akhikhl.gretty.ServerManagerFactory'
   }
 
+  protected abstract String getServletContainerId()
+
   protected abstract String getServletContainerDescription()
 
   def getServerStartInfo() {
@@ -160,6 +162,7 @@ abstract class LauncherBase implements Launcher {
   protected void writeRunConfigJson(json) {
     def self = this
     json.with {
+      servletContainerId self.getServletContainerId()
       servletContainerDescription self.getServletContainerDescription()
       if(sconfig.host)
         host sconfig.host
