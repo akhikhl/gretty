@@ -1,6 +1,6 @@
 # testTomcatContextConfig
 
-Example of configuring webapp context with the help of tomcat-specific file "context.xml".
+Example of configuring webapp context via tomcat-specific configuration file "context.xml".
 
 ## How to run
 

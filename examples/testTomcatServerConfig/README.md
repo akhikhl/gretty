@@ -1,6 +1,6 @@
 # testTomcatServerConfig
 
-Example of how Gretty uses tomcat-specific configuration file "server.xml".
+Example of configuring tomcat server via tomcat-specific configuration file "server.xml".
 
 ## How to run
 
