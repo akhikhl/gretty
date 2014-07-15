@@ -150,7 +150,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
   @Override
   void configureSecurity(context, String realm, String realmConfigFile, boolean singleSignOn) {
     context.securityHandler.loginService = new HashLoginService(realm, realmConfigFile)
-    if(serverParams.singleSignOn) {
+    if(singleSignOn) {
       if(ssoAuthenticatorFactory == null)
         ssoAuthenticatorFactory = new SSOAuthenticatorFactory()
       context.securityHandler.authenticatorFactory = ssoAuthenticatorFactory

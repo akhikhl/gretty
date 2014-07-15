@@ -77,7 +77,7 @@ class JettyServerConfigurer {
       if(realm && realmConfigFile) {
         if(context.securityHandler.loginService == null) {
           log.info 'Configuring {} with realm \'{}\', {}', context.contextPath, realm, realmConfigFile
-          configurer.configureSecurity(context, realm, realmConfigFile, params.singleSignOn)
+          configurer.configureSecurity(context, realm, realmConfigFile.toString(), params.singleSignOn)
         } else
           log.warn 'loginService is already configured, ignoring realm \'{}\', {}', realm, realmConfigFile
       }
