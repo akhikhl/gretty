@@ -33,7 +33,7 @@ final class SpringBootServerManager implements ServerManager {
   void startServer(ServerStartEvent startEvent) {
 
     if(params.logbackConfig)
-      System.setProperty('logging.config', params.logbackConfig)
+      System.setProperty('logging.config', new File(params.logbackConfig).toURI().toURL().toString())
 
     params.startEvent = startEvent
     ServletContainerCustomizer.params = params
