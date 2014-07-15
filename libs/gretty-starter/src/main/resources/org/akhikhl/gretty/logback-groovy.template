@@ -1,12 +1,10 @@
 scan '30 seconds'
 
-String encoderPattern = '%-12date{HH:mm:ss} %-5level %logger{35} - %msg%n'
-
 def appenders = []
 <% if(consoleLogEnabled) { %>
 appender('CONSOLE', ConsoleAppender) {
   encoder(PatternLayoutEncoder) {
-    pattern = encoderPattern
+    pattern = '%-24date{ISO8601} %-5level - %msg%n'
   }
 }
 appenders += 'CONSOLE'
@@ -20,7 +18,7 @@ appender('FILE', RollingFileAppender) {
     maxHistory = 7
   }
   encoder(PatternLayoutEncoder) {
-    pattern = encoderPattern
+    pattern = '%-24date{ISO8601} %-5level %logger{35} - %msg%n'
   }
 }
 appenders += 'FILE'
