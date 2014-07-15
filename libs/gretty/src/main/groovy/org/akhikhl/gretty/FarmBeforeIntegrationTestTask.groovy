@@ -38,13 +38,8 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
       def thisFarmIndex = farms.indexOf(farmName)
       if(thisFarmIndex > 0)
         result.addAll farms[0..thisFarmIndex - 1].collect { project.tasks['farmAfterIntegrationTest' + it] }
-      //def collectIntegrationTaskKeys = { it.getWebAppProjects().findResults { it.tasks.findByName(thisTask.integrationTestTask) ? it.path + ':' + thisTask.integrationTestTask : null } }
-      result.each { fait ->
-        if(thisTask.integrationTestTask == fait.integrationTestTask) {
-          def intersection = thisTask.getWebAppProjects().intersect(fait.getWebAppProjects())
-          if(intersection)
-            throw new GradleException("Could not properly order farm tasks: $thisTask intersects with $fait over projects ${intersection.collect { it.path } }")
-        }
+      result = result.findAll { otherTask ->
+        thisTask.integrationTestTask != otherTask.integrationTestTask || !thisTask.getWebAppProjects().intersect(otherTask.getWebAppProjects())
       }
       result
     }
@@ -114,7 +109,7 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     def host = serverStartInfo.host
 
     task.systemProperty 'gretty.host', host
-    
+
     FarmConfigurer configurer = new FarmConfigurer(project)
     FarmExtension tempFarm = new FarmExtension()
     configurer.configureFarm(tempFarm, new FarmExtension(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
