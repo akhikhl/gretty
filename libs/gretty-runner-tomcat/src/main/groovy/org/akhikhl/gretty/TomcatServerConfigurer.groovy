@@ -175,12 +175,18 @@ class TomcatServerConfigurer {
 
       def realmConfigFile = webapp.realmConfigFile ?: params.realmConfigFile
       if(realmConfigFile && new File(realmConfigFile).exists()) {
-        log.warn '{} -> realm config {}', webapp.contextPath, realmConfigFile
+        log.info '{} -> realm config {}', webapp.contextPath, realmConfigFile
         def realm = new MemoryRealm()
         realm.setPathname(realmConfigFile)
         context.setRealm(realm)
       } else
         context.addLifecycleListener(new FixContextListener())
+
+      context.configFile = tomcat.getWebappConfigFile(webapp.resourceBase, webapp.contextPath)
+      if(!context.configFile && webapp.contextConfigFile)
+        context.configFile = new File(webapp.contextConfigFile).toURI().toURL()
+      if(context.configFile)
+        log.warn '{} -> context config file {}', webapp.contextPath, context.configFile
 
       context.addLifecycleListener(configurer.createContextConfig(classpathUrls))
 
