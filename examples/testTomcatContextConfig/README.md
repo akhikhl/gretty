@@ -1,18 +1,18 @@
-# helloGretty
+# testTomcatContextConfig
 
-Simple gretty example.
+Example of configuring webapp context with the help of tomcat-specific file "context.xml".
 
 ## How to run
 
 ```bash
-cd examples/helloGretty
+cd examples/testTomcatContextConfig
 gradle appRun
 ```
 
 ## How to test
 
 ```bash
-cd examples/helloGretty
+cd examples/testTomcatContextConfig
 gradle integrationTest
 ```
 
@@ -20,7 +20,7 @@ gradle integrationTest
 
 
 ```bash
-cd examples/helloGretty
+cd examples/testTomcatContextConfig
 gradle buildProduct
 ```
 
