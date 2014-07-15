@@ -186,7 +186,7 @@ class TomcatServerConfigurer {
       if(!context.configFile && webapp.contextConfigFile)
         context.configFile = new File(webapp.contextConfigFile).toURI().toURL()
       if(context.configFile)
-        log.warn '{} -> context config file {}', webapp.contextPath, context.configFile
+        log.info 'Configuring {} with {}', webapp.contextPath, context.configFile
 
       context.addLifecycleListener(configurer.createContextConfig(classpathUrls))
 

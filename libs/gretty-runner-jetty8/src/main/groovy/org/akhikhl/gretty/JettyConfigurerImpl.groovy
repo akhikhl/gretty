@@ -53,10 +53,10 @@ class JettyConfigurerImpl implements JettyConfigurer {
   }
 
   @Override
-  void applyJettyEnvXml(webAppContext, String jettyEnvXml) {
-    if(jettyEnvXml) {
-      log.warn 'Configuring webAppContext with {}', jettyEnvXml
-      XmlConfiguration xmlConfiguration = new XmlConfiguration(new File(jettyEnvXml).toURI().toURL())
+  void applyContextConfigFile(webAppContext, URL contextConfigFile) {
+    if(contextConfigFile) {
+      log.warn 'Configuring {} with {}', webAppContext.contextPath, contextConfigFile
+      XmlConfiguration xmlConfiguration = new XmlConfiguration(contextConfigFile)
       xmlConfiguration.configure(webAppContext)
     }
   }

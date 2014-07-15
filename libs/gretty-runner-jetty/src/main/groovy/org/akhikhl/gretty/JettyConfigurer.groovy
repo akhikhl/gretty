@@ -17,7 +17,7 @@ interface JettyConfigurer {
 
   void addLifeCycleListener(server, listener)
 
-  void applyJettyEnvXml(webAppContext, String jettyEnvXml)
+  void applyContextConfigFile(webAppContext, URL contextConfigFile)
 
   void applyJettyXml(server, String jettyXml)
 

@@ -7,6 +7,8 @@
  */
 package org.akhikhl.gretty
 
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -37,14 +39,13 @@ class JettyServerConfigurer {
 
     for(def webapp in params.webApps) {
       def context = configurer.createWebAppContext(webapp.webappClassPath)
-      context.setDisplayName(webapp.contextPath)
-      context.setContextPath(webapp.contextPath)
+      context.displayName = webapp.contextPath
+      context.contextPath = webapp.contextPath
 
       if(!params.supressSetConfigurations)
         configurer.setConfigurationsToWebAppContext(context, configurer.getConfigurations(webapp.webappClassPath))
-      configurer.applyJettyEnvXml(context, webapp.contextConfigFile)
 
-      File tempDir = new File(baseDir, 'webapps-exploded' + context.getContextPath())
+      File tempDir = new File(baseDir, 'webapps-exploded' + context.contextPath)
       tempDir.mkdirs()
       log.debug 'jetty context temp directory: {}', tempDir
       context.setTempDirectory(tempDir)
@@ -64,6 +65,11 @@ class JettyServerConfigurer {
 
       configurer.configureSessionManager(server, context, params, webapp)
 
+      URL contextConfigFile = getContextConfigFile(params.servletContainer.id, webapp.resourceBase)
+      if(!contextConfigFile && webapp.contextConfigFile)
+        contextConfigFile = new File(webapp.contextConfigFile).toURI().toURL()
+      configurer.applyContextConfigFile(context, contextConfigFile)
+
       if(configureContext)
         configureContext(webapp, context)
 
@@ -73,5 +79,36 @@ class JettyServerConfigurer {
     configurer.setHandlersToServer(server, handlers)
 
     return server
+  }
+
+  URL getContextConfigFile(String servletContainer, String resourceBase) {
+    def possibleSubDirs = [ 'META-INF', 'WEB-INF' ]
+    def possibleFileNames = [ servletContainer + '-env.xml', 'jetty-env.xml' ]
+    for(def possibleSubDir in possibleSubDirs)
+      for(def possibleFileName in possibleFileNames) {
+        URL url = resolveContextFile(resourceBase, possibleSubDir + '/' + possibleFileName)
+        if(url)
+          return url
+      }
+    null
+  }
+
+  URL resolveContextFile(String resourceBase, String file) {
+    File docBase = new File(resourceBase)
+    if (docBase.isDirectory()) {
+      File configFile = new File(docBase, file)
+      if(configFile.exists())
+        return configFile.toURI().toURL()
+    } else {
+      JarFile jar = new JarFile(docBase)
+      try {
+        JarEntry entry = jar.getJarEntry(file)
+        if (entry != null)
+          return new URL('jar:' + docBase.toURI().toString() + '!/' + file)
+      } finally {
+        jar.close()
+      }
+    }
+    null
   }
 }
