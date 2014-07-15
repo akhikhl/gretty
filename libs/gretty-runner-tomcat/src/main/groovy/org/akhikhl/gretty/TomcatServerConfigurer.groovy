@@ -9,7 +9,6 @@ package org.akhikhl.gretty
 
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
-import org.apache.catalina.Globals
 import org.apache.catalina.Host
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
@@ -47,7 +46,6 @@ class TomcatServerConfigurer {
 
     File baseDir = new File(params.baseDir)
     new File(baseDir, 'webapps').mkdirs()
-    tomcat.baseDir = baseDir.absolutePath
 
     def service
     def connectors
@@ -72,35 +70,14 @@ class TomcatServerConfigurer {
       tomcat.port = connectors[0].port
       tomcat.hostname = tomcat.host.name
       server.setCatalina(catalina)
-      // specific to tomcat 8+
-      if(server.respondsTo('setCatalinaHome'))
-        server.setCatalinaHome(baseDir)
-      // specific to tomcat 8+
-      if(server.respondsTo('setCatalinaBase'))
-        server.setCatalinaBase(baseDir)
-      // specific to tomcat 7+
-      if(tomcat.engine.respondsTo(MetaProperty.getSetterName('baseDir')))
-        tomcat.engine.baseDir = baseDir.absolutePath
-      // specific to tomcat 7+
-      System.setProperty(Globals.CATALINA_BASE_PROP, baseDir.absolutePath)
+      configurer.setBaseDir(tomcat, baseDir)
     } else {
+      configurer.setBaseDir(tomcat, baseDir)
       tomcat.engine.backgroundProcessorDelay = -1
       tomcat.host.autoDeploy = true
       service = tomcat.service
       connectors = service.findConnectors()
     }
-
-    /* service.addPropertyChangeListener(new PropertyChangeListener() {
-      void propertyChange(PropertyChangeEvent evt) {
-        log.warn 'service.{} : {} -> {}', evt.propertyName, evt.oldValue, evt.newValue
-        if(evt.propertyName == 'connector' && evt.oldValue instanceof Connector && evt.newValue == null)
-        try {
-          throw new Exception('Show me stacktrace!')
-        } catch(Exception e) {
-          e.printStackTrace()
-        }
-      }
-    }) */
 
     if(!tomcat.hostname)
       tomcat.hostname = params.host ?: 'localhost'

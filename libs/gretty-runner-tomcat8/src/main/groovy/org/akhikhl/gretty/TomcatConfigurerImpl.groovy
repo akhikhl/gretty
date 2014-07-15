@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import org.apache.catalina.startup.ContextConfig
+import org.apache.catalina.startup.Tomcat
 import org.apache.tomcat.JarScanner
 import org.apache.tomcat.util.descriptor.web.WebXml
 import org.slf4j.Logger
@@ -42,6 +43,12 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns) {
     new SkipPatternJarScanner(jarScanner, skipPatterns)
+  }
+
+  void setBaseDir(Tomcat tomcat, File baseDir) {
+    tomcat.baseDir = baseDir.absolutePath
+    tomcat.server.setCatalinaHome(baseDir)
+    tomcat.server.setCatalinaBase(baseDir)
   }
 
   void setLogger(Logger logger) {

@@ -8,6 +8,7 @@
 package org.akhikhl.gretty
 
 import org.apache.catalina.startup.ContextConfig
+import org.apache.catalina.startup.Tomcat
 import org.apache.tomcat.JarScanner
 import org.slf4j.Logger
 
@@ -20,6 +21,8 @@ interface TomcatConfigurer {
   ContextConfig createContextConfig(URL[] classpathUrls)
 
   JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns)
+
+  void setBaseDir(Tomcat tomcat, File baseDir)
 
   void setLogger(Logger logger)
 }
