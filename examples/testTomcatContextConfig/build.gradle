@@ -22,6 +22,10 @@ dependencies {
   compile 'org.apache.velocity:velocity:1.7'
 }
 
+ext {
+  integrationTestContainers = ['tomcat7', 'tomcat8']
+}
+
 gretty {
   servletContainer = 'tomcat8'
 }
