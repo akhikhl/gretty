@@ -24,6 +24,8 @@ class WebAppConfig {
   def contextConfigFile
   def scanDirs
   def fastReload
+  def sourceReload
+  def classReload
   def resourceBase
 
   Set<URL> classPath
@@ -43,6 +45,24 @@ class WebAppConfig {
           classPath.add(arg)
       }
     }
+  }
+
+  void classReload(String arg) {
+    if(classReload == null)
+      classReload = []
+    classReload.add(arg)
+  }
+
+  void classReload(File arg) {
+    if(classReload == null)
+      classReload = []
+    classReload.add(arg)
+  }
+
+  void classReload(Map map) {
+    if(classReload == null)
+      classReload = []
+    classReload.add(map)
   }
 
   void fastReload(String arg) {
@@ -117,6 +137,13 @@ class WebAppConfig {
       }
   }
 
+  void setClassReload(newValue) {
+    if(newValue == null || Collection.class.isAssignableFrom(newValue.getClass()))
+      classReload = newValue
+    else
+      classReload = [ newValue ]
+  }
+
   void setFastReload(newValue) {
     if(newValue == null || Collection.class.isAssignableFrom(newValue.getClass()))
       fastReload = newValue
@@ -128,5 +155,30 @@ class WebAppConfig {
   @Deprecated
   void setJettyEnvXmlFile(newValue) {
     contextConfigFile = newValue
+  }
+
+  void setSourceReload(newValue) {
+    if(newValue == null || Collection.class.isAssignableFrom(newValue.getClass()))
+      sourceReload = newValue
+    else
+      sourceReload = [ newValue ]
+  }
+
+  void sourceReload(String arg) {
+    if(sourceReload == null)
+      sourceReload = []
+    sourceReload.add(arg)
+  }
+
+  void sourceReload(File arg) {
+    if(sourceReload == null)
+      sourceReload = []
+    sourceReload.add(arg)
+  }
+
+  void sourceReload(Map map) {
+    if(sourceReload == null)
+      sourceReload = []
+    sourceReload.add(map)
   }
 }

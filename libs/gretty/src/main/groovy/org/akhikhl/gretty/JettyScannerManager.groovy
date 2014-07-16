@@ -32,7 +32,9 @@ final class JettyScannerManager implements ScannerManager {
   protected ServerConfig sconfig
   protected List<WebAppConfig> webapps
   protected Scanner scanner
+  protected Map classReloadMap
   protected Map fastReloadMap
+  protected Map sourceReloadMap
   protected boolean managedClassReload
   
   JettyScannerManager(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean managedClassReload) {
@@ -50,12 +52,25 @@ final class JettyScannerManager implements ScannerManager {
       collectScanDirs(scanDirs, inplace, proj.project(overlay))
   }
 
+  private void configureClassReload() {
+    classReloadMap = [:]
+    for(WebAppConfig webapp in webapps)
+      if(webapp.inplace && webapp.projectPath) {
+        def proj = project.project(webapp.projectPath)
+        classReloadMap[webapp.projectPath] = ProjectUtils.getReloadSpecs(proj, 'classReload', webapp.classReload) { p ->
+          proj.sourceSets.main.output.files.collect { new FileReloadSpec(baseDir: it) }
+        }
+      }
+  }
+
   private void configureFastReload() {
     fastReloadMap = [:]
     for(WebAppConfig webapp in webapps)
       if(webapp.inplace && webapp.projectPath) {
         def proj = project.project(webapp.projectPath)
-        fastReloadMap[webapp.projectPath] = ProjectUtils.getFastReload(proj, webapp.fastReload)
+        fastReloadMap[webapp.projectPath] = ProjectUtils.getReloadSpecs(proj, 'fastReload', webapp.fastReload) { p ->
+          [ new FileReloadSpec(baseDir: getWebAppDir(p)) ]
+        }
       }
   }
 
@@ -80,6 +95,17 @@ final class JettyScannerManager implements ScannerManager {
         sconfig.onScan*.call(cycle)
       }
     });
+  }
+
+  private void configureSourceReload() {
+    sourceReloadMap = [:]
+    for(WebAppConfig webapp in webapps)
+      if(webapp.inplace && webapp.projectPath) {
+        def proj = project.project(webapp.projectPath)
+        sourceReloadMap[webapp.projectPath] = ProjectUtils.getReloadSpecs(proj, 'sourceReload', webapp.sourceReload) { p ->
+          proj.sourceSets.main.allSource.srcDirs.collect { new FileReloadSpec(baseDir: it) }
+        }
+      }
   }
 
   private List<File> getEffectiveScanDirs() {
@@ -142,10 +168,11 @@ final class JettyScannerManager implements ScannerManager {
         log.debug 'changed file {} affects project {}', f, wconfig.projectPath
         def proj = project.project(wconfig.projectPath)
 
-        if (proj.sourceSets.main.allSource.srcDirs.find { f.startsWith(it.absolutePath) }) {
+        if(ProjectUtils.satisfiesOneOfReloadSpecs(f, sourceReloadMap[proj.path])) {
           reloadProject(wconfig.projectPath, 'compile')
           // restart is done when reacting in output change, not source change
-        } else if (proj.sourceSets.main.output.files.find { f.startsWith(it.absolutePath) }) {
+          // proj.sourceSets.main.output.files.find { f.startsWith(it.absolutePath) }
+        } else if (ProjectUtils.satisfiesOneOfReloadSpecs(f, classReloadMap[proj.path])) {
           if(managedClassReload) {
             log.debug 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
           } else {
@@ -162,11 +189,7 @@ final class JettyScannerManager implements ScannerManager {
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true
         } else {
-          List<FastReloadStruct> fastReloadDirs = fastReloadMap[proj.path]
-          if(fastReloadDirs?.find { FastReloadStruct s ->
-            String relPath = f - s.baseDir.absolutePath - File.separator
-            f.startsWith(s.baseDir.absolutePath) && (s.pattern == null || relPath =~ s.pattern) && (s.excludesPattern == null || !(relPath =~ s.excludesPattern))
-          }) {
+          if(ProjectUtils.satisfiesOneOfReloadSpecs(f, fastReloadMap[proj.path])) {
             log.debug 'file {} is in fastReload directories', f
             reloadProject(wconfig.projectPath, 'fastReload')
           } else {
@@ -210,7 +233,9 @@ final class JettyScannerManager implements ScannerManager {
     }
     scanner = new Scanner()
     scanner.scanDirs = getEffectiveScanDirs()
+    configureClassReload()
     configureFastReload()
+    configureSourceReload()
     configureScanner()
     log.debug 'Enabling hot deployment with interval of {} second(s)', sconfig.scanInterval
     scanner.start()

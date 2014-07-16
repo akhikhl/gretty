@@ -23,25 +23,19 @@ final class ProjectUtils {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectUtils)
 
-  private static void addDefaultFastReloadDirs(List<FastReloadStruct> result, Project proj) {
-    result.add(new FastReloadStruct(baseDir: getWebAppDir(proj)))
-    for(def overlay in proj.gretty.overlays)
-      addDefaultFastReloadDirs(result, proj.project(overlay))
-  }
-
-  private static void addFastReloadDirs(List<FastReloadStruct> result, Project proj, List fastReloads) {
-    for(def f in fastReloads) {
-      if(f instanceof Boolean)
+  private static void addReloadDirs(List<FileReloadSpec> result, Project proj, List reloadSpecs) {
+    for(def spec in reloadSpecs) {
+      if(spec instanceof Boolean)
         continue
       File baseDir
       def pattern
       def excludesPattern
-      if(f instanceof String)
-        baseDir = new File(f)
-      else if(f instanceof File)
-        baseDir = f
-      else if(f instanceof Map) {
-        f.each { key, value ->
+      if(spec instanceof String)
+        baseDir = new File(spec)
+      else if(spec instanceof File)
+        baseDir = spec
+      else if(spec instanceof Map) {
+        spec.each { key, value ->
           if(key == 'baseDir')
             baseDir = value instanceof File ? value : new File(value.toString())
           else if(key == 'pattern')
@@ -49,18 +43,18 @@ final class ProjectUtils {
           else if(key == 'excludesPattern')
             excludesPattern = value
           else
-            log.warn 'Unknown fastReload property: {}', key
+            log.warn 'Unknown reload property: {}', key
         }
         if(!baseDir) {
-          log.warn 'fastReload property baseDir is not specified'
+          log.warn 'reload property baseDir is not specified'
           continue
         }
       } else {
-        log.warn 'fastReload argument must be String, File or Map'
+        log.warn 'reload argument must be String, File or Map'
         continue
       }
       resolveFile(proj, baseDir).each {
-        result.add(new FastReloadStruct(baseDir: it, pattern: pattern, excludesPattern: excludesPattern))
+        result.add(new FileReloadSpec(baseDir: it, pattern: pattern, excludesPattern: excludesPattern))
       }
     }
   }
@@ -68,16 +62,6 @@ final class ProjectUtils {
   static boolean anyWebAppUsesSpringBoot(Project project, Iterable<WebAppConfig> wconfigs) {
     wconfigs.find { wconfig ->
       isSpringBootApp(project, wconfig)
-    }
-  }
-
-  private static void collectFastReloads(List result, Project proj) {
-    if(proj.gretty.fastReload != null)
-      result.addAll(proj.gretty.fastReload)
-    for(def overlay in proj.gretty.overlays.reverse()) {
-      overlay = proj.project(overlay)
-      if(overlay.extensions.findByName('gretty'))
-        collectFastReloads(result, overlay)
     }
   }
 
@@ -165,7 +149,9 @@ final class ProjectUtils {
   static WebAppConfig getDefaultWebAppConfigForProject(Project project) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + project.name
+    result.classReload = true
     result.fastReload = true
+    result.sourceReload = true
     result.resourceBase = {
       inplace ? "${project.buildDir}/inplaceWebapp/" as String : ProjectUtils.getFinalArchivePath(project).toString()
     }
@@ -184,20 +170,37 @@ final class ProjectUtils {
     return result
   }
 
-  static List<FastReloadStruct> getFastReload(Project project, List fastReloads = null) {
-    if(fastReloads == null)
-      fastReloads = []
-    collectFastReloads(fastReloads, project)
-    List<FastReloadStruct> result = []
-    if(fastReloads.find { (it instanceof Boolean) && it })
-      addDefaultFastReloadDirs(result, project)
-    addFastReloadDirs(result, project, fastReloads)
-    log.debug '{} fastReload: {}', project, result
-    return result
-  }
-
   static File getFinalArchivePath(Project project) {
     project.ext.properties.containsKey('finalArchivePath') ? project.ext.finalArchivePath : (project.tasks.findByName('war') ?: project.tasks.jar).archivePath
+  }
+
+  static List<FileReloadSpec> getReloadSpecs(Project project, String reloadProperty, List reloadSpecs, Closure defaultReloadSpecsForProject) {
+    reloadSpecs = [] << (reloadSpecs ?: [])
+    def collectReloadSpecs
+    collectReloadSpecs = { Project proj ->
+      if(proj.gretty[reloadProperty] != null)
+        reloadSpecs.addAll(proj.gretty[reloadProperty])
+      for(def overlay in proj.gretty.overlays.reverse()) {
+        overlay = proj.project(overlay)
+        if(overlay.extensions.findByName('gretty'))
+          collectReloadSpecs(overlay)
+      }
+    }
+    collectReloadSpecs(project)
+    List<FileReloadSpec> result = []
+    if(reloadSpecs.find { (it instanceof Boolean) && it }) {
+      def addDefaultReloadSpecs
+      addDefaultReloadSpecs = { Project proj ->
+        def projectReloadSpecs = defaultReloadSpecsForProject(proj) ?: []
+        result.addAll(projectReloadSpecs)
+        for(def overlay in proj.gretty.overlays)
+          addDefaultReloadSpecs(proj.project(overlay))        
+      }
+      addDefaultReloadSpecs(result, project)
+    }
+    addReloadDirs(result, project, reloadSpecs)
+    log.warn '{} : {} reloadSpecs: {}', project, reloadProperty, result
+    return result
   }
 
   static File getWebAppDir(Project project) {
@@ -427,5 +430,14 @@ final class ProjectUtils {
       wconfig.contextConfigFile = new FileResolver(['webapp-tomcat', 'webapp-config' ]).resolveSingleFile(project, contextConfigFiles)
     } else
       wconfig.contextConfigFile = null
+  }
+  
+  static boolean satisfiesOneOfReloadSpecs(String filePath, List<FileReloadSpec> reloadSpecs) {
+    reloadSpecs?.find { FileReloadSpec s ->
+      if(!filePath.startsWith(s.baseDir.absolutePath))
+        return false
+      String relPath = filePath - s.baseDir.absolutePath - File.separator
+      return (s.pattern == null || relPath =~ s.pattern) && (s.excludesPattern == null || !(relPath =~ s.excludesPattern))
+    }
   }
 }

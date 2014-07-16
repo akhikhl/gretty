@@ -14,7 +14,7 @@ import groovy.transform.ToString
  * @author akhikhl
  */
 @ToString
-class FastReloadStruct {
+class FileReloadSpec {
   File baseDir
   def pattern
   def excludesPattern
