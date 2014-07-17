@@ -57,7 +57,7 @@ final class JettyScannerManager implements ScannerManager {
     for(WebAppConfig webapp in webapps)
       if(webapp.inplace && webapp.projectPath) {
         def proj = project.project(webapp.projectPath)
-        classReloadMap[webapp.projectPath] = ProjectUtils.getReloadSpecs(proj, 'classReload', webapp.classReload) { p ->
+        classReloadMap[webapp.projectPath] = ProjectReloadUtils.getReloadSpecs(proj, 'classReload', webapp.classReload) { p ->
           proj.sourceSets.main.output.files.collect { new FileReloadSpec(baseDir: it) }
         }
       }
@@ -68,8 +68,8 @@ final class JettyScannerManager implements ScannerManager {
     for(WebAppConfig webapp in webapps)
       if(webapp.inplace && webapp.projectPath) {
         def proj = project.project(webapp.projectPath)
-        fastReloadMap[webapp.projectPath] = ProjectUtils.getReloadSpecs(proj, 'fastReload', webapp.fastReload) { p ->
-          [ new FileReloadSpec(baseDir: getWebAppDir(p)) ]
+        fastReloadMap[webapp.projectPath] = ProjectReloadUtils.getReloadSpecs(proj, 'fastReload', webapp.fastReload) { p ->
+          [ new FileReloadSpec(baseDir: ProjectUtils.getWebAppDir(p)) ]
         }
       }
   }
@@ -102,7 +102,7 @@ final class JettyScannerManager implements ScannerManager {
     for(WebAppConfig webapp in webapps)
       if(webapp.inplace && webapp.projectPath) {
         def proj = project.project(webapp.projectPath)
-        sourceReloadMap[webapp.projectPath] = ProjectUtils.getReloadSpecs(proj, 'sourceReload', webapp.sourceReload) { p ->
+        sourceReloadMap[webapp.projectPath] = ProjectReloadUtils.getReloadSpecs(proj, 'sourceReload', webapp.sourceReload) { p ->
           proj.sourceSets.main.allSource.srcDirs.collect { new FileReloadSpec(baseDir: it) }
         }
       }
@@ -168,11 +168,10 @@ final class JettyScannerManager implements ScannerManager {
         log.debug 'changed file {} affects project {}', f, wconfig.projectPath
         def proj = project.project(wconfig.projectPath)
 
-        if(ProjectUtils.satisfiesOneOfReloadSpecs(f, sourceReloadMap[proj.path])) {
+        if(ProjectReloadUtils.satisfiesOneOfReloadSpecs(f, sourceReloadMap[proj.path])) {
           reloadProject(wconfig.projectPath, 'compile')
-          // restart is done when reacting in output change, not source change
-          // proj.sourceSets.main.output.files.find { f.startsWith(it.absolutePath) }
-        } else if (ProjectUtils.satisfiesOneOfReloadSpecs(f, classReloadMap[proj.path])) {
+          // restart is done when reacting to class change, not source change
+        } else if (ProjectReloadUtils.satisfiesOneOfReloadSpecs(f, classReloadMap[proj.path])) {
           if(managedClassReload) {
             log.debug 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
           } else {
@@ -183,20 +182,17 @@ final class JettyScannerManager implements ScannerManager {
           log.debug 'file {} is configuration file, servlet-container will be restarted', f
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true
-        }
-        else if(f.startsWith(new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/lib').absolutePath)) {
+        } else if(f.startsWith(new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/lib').absolutePath)) {
           log.debug 'file {} is in WEB-INF/lib, servlet-container will be restarted', f
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true
+        } else if(ProjectReloadUtils.satisfiesOneOfReloadSpecs(f, fastReloadMap[proj.path])) {
+          log.debug 'file {} is in fastReload directories', f
+          reloadProject(wconfig.projectPath, 'fastReload')
         } else {
-          if(ProjectUtils.satisfiesOneOfReloadSpecs(f, fastReloadMap[proj.path])) {
-            log.debug 'file {} is in fastReload directories', f
-            reloadProject(wconfig.projectPath, 'fastReload')
-          } else {
-            log.debug 'file {} is not in fastReload directories, switching to fullReload', f
-            reloadProject(wconfig.projectPath, 'compile')
-            shouldRestart = true
-          }
+          log.debug 'file {} is not in fastReload directories, switching to fullReload', f
+          reloadProject(wconfig.projectPath, 'compile')
+          shouldRestart = true
         }
       }
     }
