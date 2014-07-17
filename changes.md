@@ -4,6 +4,10 @@
 
 ### What's new:
 
+#### Version 1.1.0
+
+- New feature: [generation of self-contained runnable products](http://akhikhl.github.io/gretty-doc/Product-generation.html).
+
 #### Version 1.0.0
  
 - Unified all Gretty plugins to a single plugin "org.akhikhl.gretty".

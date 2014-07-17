@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) 
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
-[![Latest Version](http://img.shields.io/badge/latest_version-1.0.0-47b31f.svg)](https://github.com/akhikhl/gretty/tree/v1.0.0) 
+[![Latest Version](http://img.shields.io/badge/latest_version-1.1.0-47b31f.svg)](https://github.com/akhikhl/gretty/tree/v1.1.0)
 [![License](http://img.shields.io/badge/license-MIT-949494.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
@@ -15,19 +15,15 @@ A complete list of Gretty features is available in [feature overview](http://akh
 
 If you are new with Gretty, good starting point would be [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
 
-#### :bell: Attention
-
-Since version 1.0.0 Gretty is represented as single gradle plugin. The right way to apply the plugin is `apply plugin: 'org.akhikhl.gretty'`. Buildscript instruction to include Gretty also has changed, see more information at [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
-
 #### :star: What's new
 
-- [Support of Tomcat 7 and 8](http://akhikhl.github.io/gretty-doc/Switching-between-servlet-containers.html).
+- [Generation of self-contained runnable products](http://akhikhl.github.io/gretty-doc/Product-generation.html).
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
 #### Documentation
 
-You can learn all about nice Gretty features in [online documentation](http://akhikhl.github.io/gretty-doc/).
+You can learn about all Gretty features in [online documentation](http://akhikhl.github.io/gretty-doc/).
 
 #### System requirements
 

@@ -11,5 +11,5 @@ group = 'org.akhikhl.gretty.examples'
 version = '1.0'
 
 dependencies {
-  testCompile 'org.akhikhl.gretty:gretty-spock:1.0.0'
+  testCompile 'org.akhikhl.gretty:gretty-spock:1.1.0'
 }
