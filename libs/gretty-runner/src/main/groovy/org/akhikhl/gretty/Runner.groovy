@@ -71,7 +71,7 @@ final class Runner {
         }
         else if(data == 'restart') {
           serverManager.stopServer()
-          serverManager.startServer(new ServerStartEventImpl())
+          serverManager.startServer()
         }
       }
     } finally {

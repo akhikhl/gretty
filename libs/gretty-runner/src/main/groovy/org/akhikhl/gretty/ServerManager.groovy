@@ -13,6 +13,7 @@ package org.akhikhl.gretty
  */
 interface ServerManager {
 	void setParams(Map params)
+  void startServer()
   void startServer(ServerStartEvent startEvent)
   void stopServer()
 }

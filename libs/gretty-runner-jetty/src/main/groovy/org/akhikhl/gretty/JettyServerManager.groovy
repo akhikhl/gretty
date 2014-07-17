@@ -31,6 +31,11 @@ final class JettyServerManager implements ServerManager {
   }
 
   @Override
+  void startServer() {
+    startServer(null)
+  }
+
+  @Override
   void startServer(ServerStartEvent startEvent) {
     assert server == null
 
@@ -44,8 +49,9 @@ final class JettyServerManager implements ServerManager {
 
     server = new JettyServerConfigurer().createAndConfigureServer(configurer, params)
     server.start()
-    
-    startEvent.onServerStart(new JettyServerStartInfo().getInfo(server, configurer, params))
+
+    if(startEvent)
+      startEvent.onServerStart(new JettyServerStartInfo().getInfo(server, configurer, params))
   }
 
   @Override

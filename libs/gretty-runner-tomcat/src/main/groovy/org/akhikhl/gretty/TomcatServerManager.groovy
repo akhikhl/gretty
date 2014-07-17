@@ -36,6 +36,11 @@ class TomcatServerManager implements ServerManager {
   }
 
   @Override
+  void startServer() {
+    startServer(null)
+  }
+
+  @Override
   void startServer(ServerStartEvent startEvent) {
     assert tomcat == null
 
@@ -53,7 +58,8 @@ class TomcatServerManager implements ServerManager {
     tomcat = new TomcatServerConfigurer().createAndConfigureServer(configurer, params)
     tomcat.start()
 
-    startEvent.onServerStart(new TomcatServerStartInfo().getInfo(tomcat, null, params))
+    if(startEvent)
+      startEvent.onServerStart(new TomcatServerStartInfo().getInfo(tomcat, null, params))
   }
 
   @Override

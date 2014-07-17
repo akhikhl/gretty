@@ -76,7 +76,8 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
       configureContext(context, initializersToUse)
     }
 
-    tomcat.service.addLifecycleListener(new StartEventListener(tomcat, tomcat.service.findConnectors(), params))
+    if(params.startEvent)
+      tomcat.service.addLifecycleListener(new StartEventListener(tomcat, tomcat.service.findConnectors(), params))
 
     return getTomcatEmbeddedServletContainer(tomcat)
   }

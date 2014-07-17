@@ -30,6 +30,11 @@ final class SpringBootServerManager implements ServerManager {
   }
 
   @Override
+  void startServer() {
+    startServer(null)
+  }
+
+  @Override
   void startServer(ServerStartEvent startEvent) {
 
     if(params.logbackConfig)
