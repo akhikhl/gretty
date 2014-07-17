@@ -310,9 +310,9 @@ class ProductConfigurer {
       logbackConfigFile.text = logbackConfig
       dir.registerAdded(logbackConfigFile)
     }
-    
+
     for(WebAppConfig wconfig in wconfigs) {
-      String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)    
+      String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
       if(wconfig.realmConfigFile)
         dir.add(wconfig.realmConfigFile, appDir)
       if(wconfig.contextConfigFile)
@@ -351,14 +351,16 @@ class ProductConfigurer {
         if(sconfig.host)
           host sconfig.host
         if(sconfig.httpEnabled) {
-          httpPort sconfig.httpPort
+          if(sconfig.httpPort)
+            httpPort sconfig.httpPort
           if(sconfig.httpIdleTimeout)
             httpIdleTimeout sconfig.httpIdleTimeout
         } else
           httpEnabled false
         if(sconfig.httpsEnabled) {
           httpsEnabled true
-          httpsPort sconfig.httpsPort
+          if(sconfig.httpsPort)
+            httpsPort sconfig.httpsPort
           if(sconfig.httpsIdleTimeout)
             httpsIdleTimeout sconfig.httpsIdleTimeout
           if(sconfig.sslKeyStorePath)
