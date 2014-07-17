@@ -113,9 +113,11 @@ final class ProjectUtils {
   static WebAppConfig getDefaultWebAppConfigForProject(Project project) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + project.name
-    result.classReload = true
     result.fastReload = true
-    result.sourceReload = true
+    result.recompileOnSourceChange = true
+    result.reloadOnClassChange = true
+    result.reloadOnConfigChange = true
+    result.reloadOnLibChange = true
     result.resourceBase = {
       inplace ? "${project.buildDir}/inplaceWebapp/" as String : ProjectUtils.getFinalArchivePath(project).toString()
     }

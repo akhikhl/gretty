@@ -24,8 +24,10 @@ class WebAppConfig {
   def contextConfigFile
   def scanDirs
   def fastReload
-  def sourceReload
-  def classReload
+  Boolean recompileOnSourceChange
+  Boolean reloadOnClassChange
+  Boolean reloadOnConfigChange
+  Boolean reloadOnLibChange
   def resourceBase
 
   Set<URL> classPath
@@ -45,24 +47,6 @@ class WebAppConfig {
           classPath.add(arg)
       }
     }
-  }
-
-  void classReload(String arg) {
-    if(classReload == null)
-      classReload = []
-    classReload.add(arg)
-  }
-
-  void classReload(File arg) {
-    if(classReload == null)
-      classReload = []
-    classReload.add(arg)
-  }
-
-  void classReload(Map map) {
-    if(classReload == null)
-      classReload = []
-    classReload.add(map)
   }
 
   void fastReload(String arg) {
@@ -92,8 +76,8 @@ class WebAppConfig {
     result.resourceBase = warFile.absolutePath
     return result
   }
-  
-  // use contextConfigFile instead 
+
+  // use contextConfigFile instead
   @Deprecated
   def getJettyEnvXmlFile() {
     contextConfigFile
@@ -137,48 +121,16 @@ class WebAppConfig {
       }
   }
 
-  void setClassReload(newValue) {
-    if(newValue == null || Collection.class.isAssignableFrom(newValue.getClass()))
-      classReload = newValue
-    else
-      classReload = [ newValue ]
-  }
-
   void setFastReload(newValue) {
     if(newValue == null || Collection.class.isAssignableFrom(newValue.getClass()))
       fastReload = newValue
     else
       fastReload = [ newValue ]
   }
-  
-  // use contextConfigFile instead 
+
+  // use contextConfigFile instead
   @Deprecated
   void setJettyEnvXmlFile(newValue) {
     contextConfigFile = newValue
-  }
-
-  void setSourceReload(newValue) {
-    if(newValue == null || Collection.class.isAssignableFrom(newValue.getClass()))
-      sourceReload = newValue
-    else
-      sourceReload = [ newValue ]
-  }
-
-  void sourceReload(String arg) {
-    if(sourceReload == null)
-      sourceReload = []
-    sourceReload.add(arg)
-  }
-
-  void sourceReload(File arg) {
-    if(sourceReload == null)
-      sourceReload = []
-    sourceReload.add(arg)
-  }
-
-  void sourceReload(Map map) {
-    if(sourceReload == null)
-      sourceReload = []
-    sourceReload.add(map)
   }
 }
