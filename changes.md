@@ -8,6 +8,8 @@
 
 - New feature: [generation of self-contained runnable products](http://akhikhl.github.io/gretty-doc/Product-generation.html).
 
+- New feature: support of [tomcat.xml](http://akhikhl.github.io/gretty-doc/tomcat.xml-support.html) and [tomcat-context.xml](http://akhikhl.github.io/gretty-doc/tomcat-context.xml-support.html).
+
 #### Version 1.0.0
  
 - Unified all Gretty plugins to a single plugin "org.akhikhl.gretty".
