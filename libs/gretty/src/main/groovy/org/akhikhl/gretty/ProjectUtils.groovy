@@ -319,7 +319,7 @@ final class ProjectUtils {
       sconfig.serverConfigFile = new FileResolver(['jetty', 'server', 'config', '.']).resolveSingleFile(project, serverConfigFiles)
     } else if(servletContainerType == 'tomcat') {
       def serverConfigFiles = [ sconfig.serverConfigFile, sconfig.servletContainer + '.xml', 'tomcat.xml', sconfig.servletContainer + '-server.xml', 'server.xml' ] as LinkedHashSet
-      sconfig.serverConfigFile = new FileResolver(['jetty', 'server', 'config', '.']).resolveSingleFile(project, serverConfigFiles)
+      sconfig.serverConfigFile = new FileResolver(['tomcat', 'server', 'config', '.']).resolveSingleFile(project, serverConfigFiles)
     } else
       sconfig.serverConfigFile = null
 
