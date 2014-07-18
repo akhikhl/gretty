@@ -14,6 +14,8 @@
 
 - New properties for finer control of hot deployment feature: recompileOnSourceChange, reloadOnClassChange, reloadOnConfigChange, reloadOnLibChange. See more information at [hot deployment](http://akhikhl.github.io/gretty-doc/Hot-deployment.html)
 
+- Upgraded Gretty to Jetty 7.6.15.v20140411, Jetty 9.2.1.v20140609, Tomcat 8.0.9 and Spring Boot 1.1.4.RELEASE. Note that Gretty *was not* upgraded to Jetty 8.1.15.v20140411 because this release brings some strange errors not reproducible with other releases of Jetty 8.
+
 #### Version 1.0.0
  
 - Unified all Gretty plugins to a single plugin "org.akhikhl.gretty".
