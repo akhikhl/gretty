@@ -8,7 +8,11 @@
 
 - New feature: [generation of self-contained runnable products](http://akhikhl.github.io/gretty-doc/Product-generation.html).
 
-- New feature: support of [tomcat.xml](http://akhikhl.github.io/gretty-doc/tomcat.xml-support.html) and [tomcat-context.xml](http://akhikhl.github.io/gretty-doc/tomcat-context.xml-support.html).
+- New feature: support of tomcat-specific [server.xml](http://akhikhl.github.io/gretty-doc/tomcat.xml-support.html) and [context.xml](http://akhikhl.github.io/gretty-doc/tomcat-context.xml-support.html) - in Gretty tasks as well as in generated products.
+
+- New feature: [single sign-on](http://akhikhl.github.io/gretty-doc/single-sign-on.html) with Jetty security realms and Tomcat security realms.
+
+- New properties for finer control of hot deployment feature: recompileOnSourceChange, reloadOnClassChange, reloadOnConfigChange, reloadOnLibChange. See more information at [hot deployment](http://akhikhl.github.io/gretty-doc/Hot-deployment.html)
 
 #### Version 1.0.0
  
