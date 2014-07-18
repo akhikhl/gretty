@@ -49,7 +49,7 @@ class ProjectReloadUtils {
         log.warn 'Reload argument is {}. It must be String, File or Map.', spec?.getClass()?.getName()
         continue
       }
-      resolveFile(proj, baseDir).each {
+      new FileResolver([ '.', ProjectUtils.getWebAppDir(proj), { it.sourceSets.main.output.files } ]).resolveFile(proj, baseDir) {
         result.add(new FileReloadSpec(baseDir: it, pattern: pattern, excludesPattern: excludesPattern))
       }
     }
@@ -75,7 +75,7 @@ class ProjectReloadUtils {
         def projectReloadSpecs = defaultReloadSpecsForProject(proj) ?: []
         result.addAll(projectReloadSpecs)
         for(def overlay in proj.gretty.overlays)
-          addDefaultReloadSpecs(proj.project(overlay))        
+          addDefaultReloadSpecs(proj.project(overlay))
       }
       addDefaultReloadSpecs(project)
     }
@@ -83,7 +83,7 @@ class ProjectReloadUtils {
     log.warn '{} : {} reloadSpecs: {}', project, reloadProperty, result
     return result
   }
-  
+
   static boolean satisfiesOneOfReloadSpecs(String filePath, List<FileReloadSpec> reloadSpecs) {
     reloadSpecs?.find { FileReloadSpec s ->
       if(!filePath.startsWith(s.baseDir.absolutePath))
