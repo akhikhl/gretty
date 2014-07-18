@@ -80,7 +80,7 @@ class ProjectReloadUtils {
       addDefaultReloadSpecs(project)
     }
     addReloadDirs(result, project, reloadSpecs)
-    log.warn '{} : {} reloadSpecs: {}', project, reloadProperty, result
+    log.debug '{} : {} reloadSpecs: {}', project, reloadProperty, result
     return result
   }
 
