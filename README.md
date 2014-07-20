@@ -15,6 +15,10 @@ A complete list of Gretty features is available in [feature overview](http://akh
 
 If you are new with Gretty, good starting point would be [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
 
+#### :bell: Attention
+
+Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed to jettyEnvXmlFile. If you are using jettyEnvXml, please adjust your gradle scripts accordingly.
+
 #### :star: What's new
 
 - [Generation of self-contained runnable products](http://akhikhl.github.io/gretty-doc/Product-generation.html).
