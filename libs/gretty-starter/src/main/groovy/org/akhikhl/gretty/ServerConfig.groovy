@@ -56,7 +56,7 @@ class ServerConfig {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
     result.servletContainer = 'jetty9'
-    result.managedClassReload = true
+    result.managedClassReload = false
     result.httpEnabled = true
     result.httpsEnabled = false
     result.servicePort = 9900
@@ -69,7 +69,7 @@ class ServerConfig {
     result.logDir = "${System.getProperty('user.home')}/logs" as String
     return result
   }
-  
+
   // use serverConfigFile instead
   @Deprecated
   def getJettyXmlFile() {
@@ -119,7 +119,7 @@ class ServerConfig {
       onStop = []
     onStop.add newValue
   }
-  
+
   // use serverConfigFile instead
   @Deprecated
   void setJettyXmlFile(newValue) {
