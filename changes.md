@@ -4,6 +4,12 @@
 
 ### What's new:
 
+#### Version 1.1.1
+
+- Fixed breaking change in 1.1.0: properties jettyXmlFile and jettyEnvXmlFile are supported again (although deprecated).
+
+- Changed the default value of [managedClassReload property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_managedclassreload) to false. Please set it to true, if you need springloaded integration.
+
 #### Version 1.1.0
 
 - New feature: [generation of self-contained runnable products](http://akhikhl.github.io/gretty-doc/Product-generation.html).
