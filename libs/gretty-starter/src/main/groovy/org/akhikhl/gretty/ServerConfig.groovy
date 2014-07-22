@@ -81,10 +81,10 @@ class ServerConfig {
   }
 
   void jvmArg(Object a) {
-    if(args) {
+    if(a) {
       if(jvmArgs == null)
         jvmArgs = []
-      jvmArgs.add(args)
+      jvmArgs.add(a)
     }
   }
 
