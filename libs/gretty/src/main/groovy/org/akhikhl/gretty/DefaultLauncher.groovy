@@ -49,8 +49,8 @@ class DefaultLauncher extends LauncherBase {
     project.javaexec { JavaExecSpec spec ->
       spec.classpath = project.files(getRunnerClassPath())
       spec.debug = params.debug
-      spec.jvmArgs = params.jvmArgs
-      spec.systemProperties = params.systemProperties
+      spec.jvmArgs params.jvmArgs
+      spec.systemProperties params.systemProperties
       spec.main = params.main
       spec.args = params.args
     }
