@@ -1,5 +1,6 @@
 buildscript {
   repositories {
+    mavenLocal()
     jcenter()
   }
   
@@ -9,6 +10,7 @@ buildscript {
 }
 
 repositories {
+  mavenLocal()
   jcenter()
 }
 

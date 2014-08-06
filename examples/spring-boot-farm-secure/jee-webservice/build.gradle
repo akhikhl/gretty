@@ -2,11 +2,8 @@ apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle')
 
-group = 'org.akhikhl.gretty.examples'
-version = '1.0'
-
 dependencies {
-  testCompile 'org.akhikhl.gretty:gretty-spock:1.1.1'
+  testCompile "org.akhikhl.gretty:gretty-spock:$gretty_version"
 }
 
 gretty {

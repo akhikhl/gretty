@@ -2,10 +2,8 @@ apply plugin: 'groovy'
 apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle')
 
-version = '1.1.1'
-
 dependencies {
-  compile 'org.codehaus.groovy:groovy-all:2.3.3'
+  compile "org.codehaus.groovy:groovy-all:$groovy_version"
   compile 'org.webjars:bootstrap:3.2.0'
   compile 'org.webjars:jquery:2.1.1'
   // We use UrlRewriteFilter for redirecting to the home page.

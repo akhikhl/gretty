@@ -12,6 +12,7 @@ buildscript {
 
 import org._10ne.gradle.rest.RestPlugin
 import org._10ne.gradle.rest.RestTask
+import groovyx.net.http.ContentType
 
 apply plugin: RestPlugin
 
@@ -27,10 +28,10 @@ if( !hasProperty( 'keyPhrase' ) )
 task bintraySign(type: RestTask) {
   description 'Push to bintray and sign it.'
   httpMethod = 'post'
-  uri = "https://api.bintray.com/gpg/${rootProject.ext.developer_id}/maven/${rootProject.ext.project_id}/versions/${rootProject.version}"
+  uri = "https://api.bintray.com/gpg/${project.developerId}/maven/${project.projectId}/versions/${project.version}"
   username = project.bintrayUser
   password = project.bintrayKey
   requestBody = [ passphrase: project.keyPhrase ]
-  contentType = groovyx.net.http.ContentType.JSON  
+  contentType = ContentType.JSON  
 }
 

@@ -2,12 +2,9 @@ apply plugin: 'groovy'
 apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle')
 
-group = 'org.akhikhl.gretty.examples'
-version = '1.0'
-
 dependencies {
-  compile 'org.codehaus.groovy:groovy-all:2.3.3'
-  testCompile 'org.akhikhl.gretty:gretty-spock:1.1.1'
+  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+  testCompile "org.akhikhl.gretty:gretty-spock:$gretty_version"
 }
 
 gretty {

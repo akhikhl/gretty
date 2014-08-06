@@ -1,35 +1,18 @@
 apply from: 'sign.gradle'
 
 ext {
-  jetty7_version = '7.6.15.v20140411'
-  jetty7_servlet_api_version = '2.5'
   jetty7_servlet_api = "javax.servlet:servlet-api:$jetty7_servlet_api_version" as String
-  jetty8_version = '8.1.8.v20121106'
-  jetty8_servlet_api_version = '3.0.1'
   jetty8_servlet_api = "javax.servlet:javax.servlet-api:$jetty8_servlet_api_version" as String
-  jetty9_version = '9.2.1.v20140609'
-  jetty9_servlet_api_version = '3.1.0'
   jetty9_servlet_api = "javax.servlet:javax.servlet-api:$jetty9_servlet_api_version" as String
-  tomcat7_version = '7.0.54'
-  tomcat7_servlet_api_version = '3.0.1'
   tomcat7_servlet_api = "javax.servlet:javax.servlet-api:$tomcat7_servlet_api_version" as String
-  tomcat8_version = '8.0.9'
-  tomcat8_servlet_api_version = '3.1.0'
   tomcat8_servlet_api = "javax.servlet:javax.servlet-api:$tomcat8_servlet_api_version" as String
   
-  asm_version = '5.0.1'
-  
   if(gradle.gradleVersion.startsWith('1.')) {
-    groovy_version = '1.8.6'
-    spock_version = '0.7-groovy-1.8'
+    groovy_version = gradle_1x_groovy_version
+    spock_version = gradle_1x_spock_version
   } else {
-    groovy_version = '2.3.6'
-    spock_version = '0.7-groovy-2.0'
+    groovy_version = gradle_2x_groovy_version
+    spock_version = gradle_2x_spock_version
   }
-  
-  logback_version = '1.1.2'
-  slf4j_version = '1.7.7'
-  
-  springBootVersion = '1.1.4.RELEASE'
 }
 

@@ -1,18 +1,8 @@
 ext {
-  project_id = 'gretty'
-  project_description = 'Advanced gradle plugin for running web-apps on jetty'
-  developer_id = 'akhikhl'
-  developer_name = 'Andrey Hihlovskiy'
-  project_website = "https://github.com/${developer_id}/${project_id}"
-  project_scm = "scm:git@github.com:${developer_id}/${project_id}.git"
-  license = 'The MIT License'
-  license_url = "https://raw.github.com/${developer_id}/${project_id}/master/license.txt"
-  labels = ['gretty', 'jetty', 'gradle', 'plugin', 'spring', 'spring-boot']
+  project_website = "https://github.com/${developerId}/${projectId}"
+  project_scm = "scm:git@github.com:${developerId}/${projectId}.git"
+  license_url = "https://raw.github.com/${developerId}/${projectId}/master/license.txt"
 }
-
-group = 'org.akhikhl.gretty'
-version = '1.1.1'
-description = ext.project_description
 
 apply plugin: 'base' // import clean task
 
