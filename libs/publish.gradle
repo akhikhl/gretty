@@ -1,27 +1,9 @@
 // include this file in subprojects:
 // apply from: rootProject.file('libs/publish.gradle')
 
-buildscript {
-  repositories {
-    mavenLocal()
-    jcenter()
-  }
-
-  dependencies {
-    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.4'
-  }
-}
-
-import com.jfrog.bintray.gradle.BintrayPlugin
-
 apply plugin: 'maven-publish'
-apply plugin: BintrayPlugin
-
-if( !hasProperty( 'bintrayUser' ) )
-  ext.bintrayUser = ''
-
-if( !hasProperty( 'bintrayKey' ) )
-  ext.bintrayKey = ''
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'com.jfrog.bintray'
 
 def thisProject = project
 
@@ -71,4 +53,12 @@ bintray {
 
 bintrayUpload.dependsOn assemble
 bintrayUpload.finalizedBy parent.tasks.bintraySign
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+    }
+  }
+}
 

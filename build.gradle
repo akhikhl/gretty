@@ -1,10 +1,32 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.4'
+    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.1'
+  }
+}
+
+//import org.jfrog.gradle.plugin.artifactory.ArtifactoryPublicationsPlugin
+
+apply plugin: 'base' // import clean task
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.artifactory'
+
 ext {
   project_website = "https://github.com/${developerId}/${projectId}"
   project_scm = "scm:git@github.com:${developerId}/${projectId}.git"
   license_url = "https://raw.github.com/${developerId}/${projectId}/master/license.txt"
 }
 
-apply plugin: 'base' // import clean task
+if( !hasProperty( 'bintrayUser' ) )
+  ext.bintrayUser = ''
+
+if( !hasProperty( 'bintrayKey' ) )
+  ext.bintrayKey = ''
 
 task('build')
 
@@ -27,5 +49,27 @@ task('cleanExamples', type: GradleBuild) {
   dir = file('examples')
   tasks = [ 'clean' ]
   project.tasks.clean.dependsOn it
+}
+
+artifactory {
+  contextUrl = 'https://oss.jfrog.org/artifactory'
+  publish {
+    repository {
+      if (project.version.endsWith('-SNAPSHOT'))
+        repoKey = 'oss-snapshot-local'
+      else
+        repoKey = 'oss-release-local'
+      username = project.bintrayUser
+      password = project.bintrayKey
+    }
+    defaults {
+      publications 'mavenJava'
+    }
+  }
+  resolve {
+    repository {
+      repoKey = 'repo'
+    }
+  }
 }
 
