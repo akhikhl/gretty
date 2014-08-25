@@ -18,7 +18,7 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- From now on snapshot versions of Gretty will be published to jfrog snapshot repository. If you want to use snapshot versions, please add the following to your build script:
+- From now on I'll push snapshot versions of Gretty to jfrog snapshot repository. If you want to use snapshot versions, please add the following to your build script:
   ```groovy
   buildscript {
     repositories {
