@@ -211,7 +211,7 @@ final class ProjectUtils {
     }
     new File(project.buildDir, 'inplaceWebapp').mkdirs()
     project.copy {
-      from getWebAppDir(project)
+      from getWebAppDir(project), project.gretty.webappCopy
       into "${project.buildDir}/inplaceWebapp"
     }
   }

@@ -19,6 +19,8 @@ class GrettyExtension extends GrettyConfig {
 
   protected afterEvaluate = []
 
+  Closure webappCopy = {}
+
   void afterEvaluate(Closure closure) {
     afterEvaluate.add(closure)
   }

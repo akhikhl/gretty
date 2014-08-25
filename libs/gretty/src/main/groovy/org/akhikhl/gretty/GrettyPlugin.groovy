@@ -178,6 +178,8 @@ class GrettyPlugin implements Plugin<Project> {
 
       def archiveTask = project.tasks.findByName('war') ?: project.tasks.jar
 
+      archiveTask.configure project.gretty.webappCopy
+
       if(project.gretty.overlays) {
 
         project.ext.finalArchivePath = archiveTask.archivePath
