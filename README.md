@@ -1,9 +1,9 @@
 ![logo](http://akhikhl.github.io/gretty/media/gretty_logo_1.x.png "gretty logo")
 
-[![Build Status](https://travis-ci.org/akhikhl/gretty.png?branch=master)](https://travis-ci.org/akhikhl/gretty) 
+[![Build Status](http://img.shields.io/travis/akhikhl/gretty.svg)](https://travis-ci.org/akhikhl/gretty)
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
-[![Latest Stable Version](http://img.shields.io/badge/latest_version-1.1.1-47b31f.svg)](https://github.com/akhikhl/gretty/tree/v1.1.1)
-[![Actual Version](http://img.shields.io/badge/latest_version-1.1.2-SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
+[![Release](http://img.shields.io/github/release/akhikhl/gretty.svg)](https://github.com/akhikhl/gretty/releases/latest)
+[![Snapshot](http://img.shields.io/badge/current-1.1.2--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
