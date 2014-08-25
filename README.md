@@ -18,6 +18,16 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
+- From now on snapshot versions of Gretty will be published to jfrog snapshot repository. If you want to use snapshot versions, please add the following to your build script:
+  ```groovy
+  buildscript {
+    repositories {
+      // ...
+      maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
+    }
+  }
+  ```
+
 - Version 1.1.1: Fixed breaking change in 1.1.0: properties jettyXmlFile and jettyEnvXmlFile are supported again (although deprecated, please use serverConfigFile and contextConfigFile properties instead).
 
 - Version 1.1.1: Changed the default value of [managedClassReload property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_managedclassreload) to false. Please set it to true, if you need springloaded integration.
