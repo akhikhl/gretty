@@ -18,6 +18,8 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
+- Gretty 1.1.2-SNAPSHOT now supports [webapp filtering](http://akhikhl.github.io/gretty-doc/Web-app-filtering.html).
+
 - From now on I'll push snapshot versions of Gretty to jfrog snapshot repository. If you want to use snapshot versions, please add the following to your build script:
   ```groovy
   buildscript {
