@@ -243,7 +243,7 @@ abstract class LauncherBase implements Launcher {
           contextPath wconfig.contextPath
           resourceBase self.fileToString(wconfig.resourceBase)
           if(wconfig.extraResourceBases)
-            extraResourceBases(wconfig.extraResourceBases.collect { self.fileToString(it) })
+            extraResourceBases wconfig.extraResourceBases.collect({ self.fileToString(it) })
           if(wconfig.initParameters)
             initParams wconfig.initParameters
           if(wconfig.realm)
