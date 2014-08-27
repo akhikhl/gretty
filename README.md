@@ -2,7 +2,7 @@
 
 [![Build Status](http://img.shields.io/travis/akhikhl/gretty.svg)](https://travis-ci.org/akhikhl/gretty)
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
-[![Release](http://img.shields.io/github/release/akhikhl/gretty.svg)](https://github.com/akhikhl/gretty/releases/latest)
+[![Release](http://img.shields.io/badge/release-1.1.1-47b31f.svg)](https://github.com/akhikhl/gretty/releases/latest)
 [![Snapshot](http://img.shields.io/badge/current-1.1.2--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
@@ -17,6 +17,21 @@ A complete list of Gretty features is available in [feature overview](http://akh
 If you are new with Gretty, good starting point would be [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
 
 #### :star: What's new
+
+- Gretty 1.1.2-SNAPSHOT now supports [webapp filtering](http://akhikhl.github.io/gretty-doc/Web-app-filtering.html).
+
+- From now on I'll push snapshot versions of Gretty to jfrog snapshot repository. If you want to use snapshot versions, please add the following to your build script:
+  ```groovy
+  buildscript {
+    repositories {
+      // ...
+      maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
+    }
+    dependencies {
+      classpath 'org.akhikhl.gretty:gretty:1.1.2-SNAPSHOT'
+    }
+  }
+  ```
 
 - Version 1.1.1: Fixed breaking change in 1.1.0: properties jettyXmlFile and jettyEnvXmlFile are supported again (although deprecated, please use serverConfigFile and contextConfigFile properties instead).
 
