@@ -47,7 +47,9 @@ class DefaultLauncher extends LauncherBase {
   @Override
   protected void javaExec(JavaExecParams params) {
     project.javaexec { JavaExecSpec spec ->
-      spec.classpath = project.files(getRunnerClassPath())
+      def runnerClasspath = getRunnerClassPath()
+      log.debug 'Runner classpath: {}', runnerClasspath
+      spec.classpath = project.files(runnerClasspath)
       spec.debug = params.debug
       spec.jvmArgs params.jvmArgs
       spec.systemProperties params.systemProperties

@@ -17,7 +17,6 @@ import groovy.json.JsonSlurper
 final class Runner {
 
   protected final Map params
-  protected boolean paramsLoaded = false
 
   class ServerStartEventImpl implements ServerStartEvent {
 
@@ -47,6 +46,7 @@ final class Runner {
 
   private void run() {
 
+    boolean paramsLoaded = false
     def ServerManagerFactory = Class.forName(params.serverManagerFactory, true, this.getClass().classLoader)
     ServerManager serverManager = ServerManagerFactory.createServerManager()
 
@@ -65,7 +65,9 @@ final class Runner {
           // the command is queued, so that socket.accept gets it anyway.
           continue
         }
-        if(data == 'stop') {
+        if(data == 'status')
+          ServiceProtocol.send(params.statusPort, 'started')
+        else if(data == 'stop') {
           serverManager.stopServer()
           break
         }

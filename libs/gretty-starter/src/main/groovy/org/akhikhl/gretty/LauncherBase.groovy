@@ -88,6 +88,23 @@ abstract class LauncherBase implements Launcher {
     ExecutorService executorService = Executors.newSingleThreadExecutor()
     try {
       Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
+      try {
+        log.debug 'Sending "status" command to (probably) running server...'
+        ServiceProtocol.send(sconfig.servicePort, 'status')
+      } catch(java.net.ConnectException e) {
+        log.debug 'Got java.net.ConnectException'
+        log.debug 'Sending "notStarted" to status port...'
+        ServiceProtocol.send(sconfig.statusPort, 'notStarted')
+      }
+
+      log.debug 'Reading response...'
+      def status = futureStatus.get()
+      log.debug 'Got response: {}', status
+
+      if(status == 'started')
+        throw new RuntimeException('Web-server is already running.')
+
+      futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
       thread = Thread.start {
         for(Closure c in sconfig.onStart) {
           c.delegate = sconfig
@@ -121,8 +138,10 @@ abstract class LauncherBase implements Launcher {
           }
         }
       }
-      def status = futureStatus.get()
-      log.debug 'Got init status: {}', status
+
+      log.debug 'Reading response...'
+      status = futureStatus.get()
+      log.debug 'Got response: {}', status
 
       futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
       def runConfigJson = getRunConfigJson()
