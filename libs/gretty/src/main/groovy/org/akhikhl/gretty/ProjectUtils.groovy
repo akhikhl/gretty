@@ -335,7 +335,9 @@ final class ProjectUtils {
     String servletContainerType = ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerType
 
     if(wconfig.extraResourceBases) {
-      def resolver = new FileResolver([])
+      def resolver = new FileResolver(['.'])
+      resolver.acceptFiles = false
+      resolver.acceptDirs = true
       wconfig.extraResourceBases = wconfig.extraResourceBases.findResults { resolver.resolveSingleFile(project, it) }
     }
 

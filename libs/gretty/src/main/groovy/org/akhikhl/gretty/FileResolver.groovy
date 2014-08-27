@@ -41,7 +41,7 @@ final class FileResolver {
           if(file.isAbsolute())
             result.add(file)
           else if(project != null)
-            result.add(new File(project.projectDir, file.path))
+            result.add(new File(project.projectDir, file.path).canonicalFile)
         }
       }
     }

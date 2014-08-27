@@ -26,6 +26,8 @@ interface JettyConfigurer {
   void configureSecurity(context, String realm, String realmConfigFile, boolean singleSignOn)
 
   void configureSessionManager(server, context, Map serverParams, Map webappParams)
+  
+  def createResourceCollection(List paths)
 
   def createServer()
 
@@ -34,6 +36,8 @@ interface JettyConfigurer {
   def findHttpConnector(server)
 
   def findHttpsConnector(server)
+  
+  URL findResourceURL(baseResource, String path)
 
   List getConfigurations(List<String> webappClassPath)
 

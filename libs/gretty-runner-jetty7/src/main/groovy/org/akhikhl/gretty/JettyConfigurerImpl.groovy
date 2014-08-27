@@ -21,6 +21,8 @@ import org.eclipse.jetty.server.session.HashSessionManager
 import org.eclipse.jetty.server.session.SessionHandler
 import org.eclipse.jetty.server.ssl.SslSocketConnector
 import org.eclipse.jetty.util.component.LifeCycle
+import org.eclipse.jetty.util.resource.Resource
+import org.eclipse.jetty.util.resource.ResourceCollection
 import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
@@ -162,6 +164,11 @@ class JettyConfigurerImpl implements JettyConfigurer {
     sessionHandler.setServer(server)
     context.setSessionHandler(sessionHandler)
   }
+  
+  @Override
+  def createResourceCollection(List paths) {
+    new ResourceCollection(paths as String[])
+  }
 
   @Override
   def createServer() {
@@ -190,6 +197,18 @@ class JettyConfigurerImpl implements JettyConfigurer {
   @Override
   def findHttpsConnector(server) {
     server.connectors.find { it instanceof SslSocketConnector }
+  }
+  
+  @Override
+  URL findResourceURL(baseResource, String path) {
+    Resource res
+    if(baseResource instanceof ResourceCollection)
+      res = baseResource.findResource(path)
+    else
+      res = baseResource.addPath(path)
+    if(res.exists())
+      return res.getURL()
+    null
   }
 
   @Override
