@@ -18,7 +18,9 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- Gretty 1.1.2-SNAPSHOT now supports [webapp filtering](http://akhikhl.github.io/gretty-doc/Web-app-filtering.html).
+- Gretty 1.1.2-SNAPSHOT implements better start/stop protocol, gracefully handling attempts to start Gretty twice (on the same ports). There should be no hanging processes after such attempts anymore.
+
+- Gretty 1.1.2-SNAPSHOT supports [webapp filtering](http://akhikhl.github.io/gretty-doc/Web-app-filtering.html).
 
 - From now on I'll push snapshot versions of Gretty to jfrog snapshot repository. If you want to use snapshot versions, please add the following to your build script:
   ```groovy
@@ -32,12 +34,6 @@ If you are new with Gretty, good starting point would be [getting started](http:
     }
   }
   ```
-
-- Version 1.1.1: Fixed breaking change in 1.1.0: properties jettyXmlFile and jettyEnvXmlFile are supported again (although deprecated, please use serverConfigFile and contextConfigFile properties instead).
-
-- Version 1.1.1: Changed the default value of [managedClassReload property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_managedclassreload) to false. Please set it to true, if you need springloaded integration.
-
-- Version 1.1.0: [Generation of self-contained runnable products](http://akhikhl.github.io/gretty-doc/Product-generation.html).
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
