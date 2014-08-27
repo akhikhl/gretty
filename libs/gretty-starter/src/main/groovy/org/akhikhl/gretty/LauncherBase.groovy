@@ -87,12 +87,28 @@ abstract class LauncherBase implements Launcher {
     Thread thread
     ExecutorService executorService = Executors.newSingleThreadExecutor()
     try {
-      Future futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
+      def listeningForStatusLock = new Object()
+      boolean listeningForStatus = false
+
+      Future futureStatus = executorService.submit({
+        synchronized(listeningForStatusLock) {
+          listeningForStatus = true
+        }
+        ServiceProtocol.readMessage(sconfig.statusPort)
+      } as Callable)
+
       try {
         log.debug 'Sending "status" command to (probably) running server...'
         ServiceProtocol.send(sconfig.servicePort, 'status')
       } catch(java.net.ConnectException e) {
         log.debug 'Got java.net.ConnectException'
+        while(true) {
+          Thread.sleep(100)
+          synchronized(listeningForStatusLock) {
+            if(listeningForStatus)
+              break
+          }
+        }
         log.debug 'Sending "notStarted" to status port...'
         ServiceProtocol.send(sconfig.statusPort, 'notStarted')
       }
