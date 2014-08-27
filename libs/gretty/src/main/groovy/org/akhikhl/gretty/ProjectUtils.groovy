@@ -334,6 +334,11 @@ final class ProjectUtils {
 
     String servletContainerType = ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerType
 
+    if(wconfig.extraResourceBases) {
+      def resolver = new FileResolver([])
+      wconfig.extraResourceBases = wconfig.extraResourceBases.findResults { resolver.resolveSingleFile(project, it) }
+    }
+
     def realmConfigFiles = [ wconfig.realmConfigFile ]
     if(servletContainerType == 'tomcat') {
       realmConfigFiles.add(sconfig.servletContainer + '-users.xml')

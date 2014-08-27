@@ -28,7 +28,9 @@ class WebAppConfig {
   Boolean reloadOnClassChange
   Boolean reloadOnConfigChange
   Boolean reloadOnLibChange
+
   def resourceBase
+  List extraResourceBases
 
   Set<URL> classPath
 
@@ -45,6 +47,22 @@ class WebAppConfig {
       for(def arg in args) {
         if(arg != null)
           classPath.add(arg)
+      }
+    }
+  }
+
+  void extraResourceBase(arg) {
+    if(extraResourceBases == null)
+      extraResourceBases = []
+    extraResourceBases.add(arg)
+  }
+
+  void extraResourceBases(Object... args) {
+    for(def arg in args) {
+      if(arg != null) {
+        if(extraResourceBases == null)
+          extraResourceBases = []
+        extraResourceBases.add(arg)
       }
     }
   }

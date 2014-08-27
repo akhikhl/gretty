@@ -56,18 +56,22 @@ class JettyServerConfigurer {
         context.setInitParameter(key, value)
       }
 
-      if(new File(webapp.resourceBase).isDirectory())
-        context.setResourceBase(webapp.resourceBase)
+      if(new File(webapp.resourceBase).isDirectory()) {
+        if(webapp.extraResourceBases)
+          context.setBaseResource(configurer.createResourceCollection([ webapp.resourceBase ] + webapp.extraResourceBases))
+        else
+          context.setResourceBase(webapp.resourceBase)
+      }
       else
         context.setWar(webapp.resourceBase)
 
-      URL contextConfigFile = getContextConfigFile(params.servletContainerId, webapp.resourceBase)
+      URL contextConfigFile = getContextConfigFile(params.servletContainerId, context.baseResource)
       if(!contextConfigFile && webapp.contextConfigFile)
         contextConfigFile = new File(webapp.contextConfigFile).toURI().toURL()
       configurer.applyContextConfigFile(context, contextConfigFile)
 
       String realm = webapp.realm ?: params.realm
-      URL realmConfigFile = getRealmFile(params.servletContainerId, webapp.resourceBase)
+      URL realmConfigFile = getRealmFile(params.servletContainerId, context.baseResource)
       if(!realmConfigFile) {
         if(webapp.realmConfigFile)
           realmConfigFile = new File(webapp.realmConfigFile).toURI().toURL()
@@ -95,40 +99,25 @@ class JettyServerConfigurer {
     return server
   }
 
-  URL getContextConfigFile(String servletContainer, String resourceBase) {
+  URL getContextConfigFile(String servletContainer, baseResource) {
     for(def possibleFileName in [ servletContainer + '-env.xml', 'jetty-env.xml' ]) {
-      URL url = resolveContextFile(resourceBase, 'META-INF/' + possibleFileName)
+      URL url = resolveContextFile(baseResource, 'META-INF/' + possibleFileName)
       if(url)
         return url
     }
     null
   }
 
-  URL getRealmFile(String servletContainer, String resourceBase) {
+  URL getRealmFile(String servletContainer, baseResource) {
     for(def possibleFileName in [ servletContainer + '-realm.properties', 'jetty-realm.properties' ]) {
-      URL url = resolveContextFile(resourceBase, 'META-INF/' + possibleFileName)
+      URL url = resolveContextFile(baseResource, 'META-INF/' + possibleFileName)
       if(url)
         return url
     }
     null
   }
 
-  URL resolveContextFile(String resourceBase, String file) {
-    File docBase = new File(resourceBase)
-    if (docBase.isDirectory()) {
-      File configFile = new File(docBase, file)
-      if(configFile.exists())
-        return configFile.toURI().toURL()
-    } else {
-      JarFile jar = new JarFile(docBase)
-      try {
-        JarEntry entry = jar.getJarEntry(file)
-        if (entry != null)
-          return new URL('jar:' + docBase.toURI().toString() + '!/' + file)
-      } finally {
-        jar.close()
-      }
-    }
-    null
+  URL resolveContextFile(baseResource, String path) {
+    baseResource.findResource(path)?.url
   }
 }
