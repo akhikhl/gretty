@@ -13,7 +13,7 @@ dependencies {
 }
 
 processResources {
-  filter ReplaceTokens, tokens: [
+  def props = [
     grettyVersion: project.version,
     jetty7Version: project.jetty7_version,
     jetty7ServletApi: project.jetty7_servlet_api,
@@ -31,6 +31,8 @@ processResources {
     tomcat8ServletApi: project.tomcat8_servlet_api,
     tomcat8ServletApiVersion: project.tomcat8_servlet_api_version
   ]
+  inputs.properties props
+  filter ReplaceTokens, tokens: props
 }
 
 jar {
