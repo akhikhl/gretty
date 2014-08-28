@@ -46,7 +46,7 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
 
     ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
 
-    Tomcat tomcat = new TomcatServerConfigurer().createAndConfigureServer(tomcatConfigurer, params) { webapp, context ->
+    Tomcat tomcat = new TomcatServerConfigurer(tomcatConfigurer, params).createAndConfigureServer { webapp, context ->
 
       if(webapp.springBoot) {
         if (isRegisterDefaultServlet())

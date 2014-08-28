@@ -7,8 +7,11 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.catalina.WebResourceRoot
+import org.apache.catalina.core.StandardContext
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
+import org.apache.catalina.webresources.DirResourceSet
 import org.apache.tomcat.JarScanner
 import org.apache.tomcat.util.descriptor.web.WebXml
 import org.slf4j.Logger
@@ -22,6 +25,15 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   protected Logger log
 
+  @Override
+  void addExtraResourceBases(StandardContext context, List extraResourceBases) {
+    if(extraResourceBases) {
+      WebResourceRoot root = context.getResources()
+      extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
+    }
+  }
+
+  @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
 
     new ContextConfig() {
@@ -41,16 +53,19 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     }
   }
 
+  @Override
   JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns) {
     new SkipPatternJarScanner(jarScanner, skipPatterns)
   }
 
+  @Override
   void setBaseDir(Tomcat tomcat, File baseDir) {
     tomcat.baseDir = baseDir.absolutePath
     tomcat.server.setCatalinaHome(baseDir)
     tomcat.server.setCatalinaBase(baseDir)
   }
 
+  @Override
   void setLogger(Logger logger) {
     log = logger
   }
