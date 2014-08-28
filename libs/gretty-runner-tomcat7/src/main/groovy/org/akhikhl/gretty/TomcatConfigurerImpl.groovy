@@ -8,9 +8,12 @@
 package org.akhikhl.gretty
 
 import org.apache.catalina.Globals
+import org.apache.catalina.core.StandardContext
 import org.apache.catalina.deploy.WebXml
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
+import org.apache.naming.resources.ProxyDirContext
+import org.apache.naming.resources.VirtualDirContext
 import org.apache.tomcat.JarScanner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,6 +26,28 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   protected Logger log
 
+  @Override
+  void addExtraResourceBases(StandardContext context, List extraResourceBases) {
+    if(extraResourceBases) {
+      def dir = context.getResources()
+      log.warn 'addExtraResourceBases, resources={}, extraResourceBases={}', dir, extraResourceBases
+      while(dir instanceof ProxyDirContext)
+        dir = dir.getDirContext()
+      log.warn 'DirContext={}, docBase={}', dir, dir.getDocBase()
+      VirtualDirContext vdc = new VirtualDirContext() {
+        protected File file(String name) {
+          File result = super.file(name)
+          log.warn 'VirtualDirContext.file("{}") -> {}', name, result
+          result
+        }
+      }
+      vdc.setDocBase(dir.getDocBase())
+      vdc.setExtraResourcePaths extraResourceBases.collect { "/=$it" }.join(',')
+      context.setResources(vdc)
+    }
+  }
+
+  @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
 
     new ContextConfig() {
@@ -42,16 +67,19 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     }
   }
 
+  @Override
   JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns) {
     new SkipPatternJarScanner(jarScanner, skipPatterns)
   }
 
+  @Override
   void setBaseDir(Tomcat tomcat, File baseDir) {
     tomcat.baseDir = baseDir.absolutePath
     tomcat.engine.baseDir = baseDir.absolutePath
     System.setProperty(Globals.CATALINA_BASE_PROP, baseDir.absolutePath)
   }
 
+  @Override
   void setLogger(Logger logger) {
     log = logger
   }

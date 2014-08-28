@@ -35,12 +35,16 @@ import org.xml.sax.InputSource
 class TomcatServerConfigurer {
 
   protected final Logger log
+  protected final TomcatConfigurer configurer
+  protected final Map params
 
-  TomcatServerConfigurer() {
+  TomcatServerConfigurer(TomcatConfigurer configurer, Map params) {
     log = LoggerFactory.getLogger(this.getClass())
+    this.configurer = configurer
+    this.params = params
   }
 
-  Tomcat createAndConfigureServer(TomcatConfigurer configurer, Map params, Closure configureContext = null) {
+  Tomcat createAndConfigureServer(Closure configureContext = null) {
 
     Tomcat tomcat = new Tomcat()
 
@@ -156,7 +160,7 @@ class TomcatServerConfigurer {
     if(params.singleSignOn && !tomcat.host.pipeline.valves.find { it instanceof SingleSignOn })
       tomcat.host.addValve(new SingleSignOn())
 
-    for(def webapp in params.webApps) {
+    for(Map webapp in params.webApps) {
       StandardContext context = params.contextClass ? params.contextClass.newInstance() : new StandardContext()
       context.setName(webapp.contextPath)
       context.setPath(webapp.contextPath)
@@ -189,6 +193,17 @@ class TomcatServerConfigurer {
         log.info 'Configuring {} with {}', webapp.contextPath, context.configFile
 
       context.addLifecycleListener(configurer.createContextConfig(classpathUrls))
+
+      if(webapp.extraResourceBases)
+        configurer.addExtraResourceBases(context, webapp.extraResourceBases)
+        /*context.addLifecycleListener(new LifecycleListener() {
+          @Override
+          public void lifecycleEvent(LifecycleEvent event) {
+            if (event.type == Lifecycle.CONFIGURE_START_EVENT) {
+              configurer.addExtraResourceBases(context, webapp.extraResourceBases)
+            }
+          }
+        })*/
 
       if(configureContext)
         configureContext(webapp, context)

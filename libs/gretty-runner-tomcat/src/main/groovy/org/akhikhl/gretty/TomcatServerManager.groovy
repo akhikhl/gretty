@@ -55,7 +55,7 @@ class TomcatServerManager implements ServerManager {
     log = LoggerFactory.getLogger(this.getClass())
     configurer.setLogger(log)
 
-    tomcat = new TomcatServerConfigurer().createAndConfigureServer(configurer, params)
+    tomcat = new TomcatServerConfigurer(configurer, params).createAndConfigureServer()
     tomcat.start()
 
     if(startEvent)
