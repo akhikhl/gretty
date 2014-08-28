@@ -214,7 +214,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
   @Override
   List getConfigurations(Map webappParams) {
     [
-      new WebInfConfiguration(),
+      new WebInfConfigurationEx(),
       new WebXmlConfiguration(),
       new MetaInfConfiguration(),
       new FragmentConfiguration(),
