@@ -20,12 +20,40 @@ import org.slf4j.LoggerFactory
 class JettyServerConfigurer {
 
   protected final Logger log
+  protected final JettyConfigurer configurer
+  protected final Map params
 
-  JettyServerConfigurer() {
+  JettyServerConfigurer(JettyConfigurer configurer, Map params) {
     log = LoggerFactory.getLogger(this.getClass())
+    this.configurer = configurer
+    this.params = params
   }
 
-  def createAndConfigureServer(JettyConfigurer configurer, Map params, Closure configureContext = null) {
+  protected void configureWithBaseResource(Map webapp, context) {
+
+    URL contextConfigFile = getContextConfigFile(context.baseResource, params.servletContainerId)
+    if(!contextConfigFile && webapp.contextConfigFile)
+      contextConfigFile = new File(webapp.contextConfigFile).toURI().toURL()
+    configurer.applyContextConfigFile(context, contextConfigFile)
+
+    String realm = webapp.realm ?: params.realm
+    URL realmConfigFile = getRealmFile(context.baseResource, params.servletContainerId)
+    if(!realmConfigFile) {
+      if(webapp.realmConfigFile)
+        realmConfigFile = new File(webapp.realmConfigFile).toURI().toURL()
+      else if(params.realmConfigFile)
+        realmConfigFile = new File(params.realmConfigFile).toURI().toURL()
+    }
+    if(realm && realmConfigFile) {
+      if(context.securityHandler.loginService == null) {
+        log.info 'Configuring {} with realm \'{}\', {}', context.contextPath, realm, realmConfigFile
+        configurer.configureSecurity(context, realm, realmConfigFile.toString(), params.singleSignOn ?: false)
+      } else
+        log.warn 'loginService is already configured, ignoring realm \'{}\', {}', realm, realmConfigFile
+    }
+  }
+
+  def createAndConfigureServer(Closure configureContext = null) {
 
     def server = configurer.createServer()
 
@@ -37,13 +65,20 @@ class JettyServerConfigurer {
 
     List handlers = []
 
-    for(def webapp in params.webApps) {
+    for(Map webapp in params.webApps) {
       def context = configurer.createWebAppContext(webapp.webappClassPath)
       context.displayName = webapp.contextPath
       context.contextPath = webapp.contextPath
 
-      if(!params.supressSetConfigurations)
-        configurer.setConfigurationsToWebAppContext(context, configurer.getConfigurations(webapp.webappClassPath))
+      if(!params.supressSetConfigurations) {
+        List configurations = configurer.getConfigurations(webapp)
+        BaseResourceConfiguration baseRes = configurations.find { it instanceof BaseResourceConfiguration }
+        if(baseRes) {
+          baseRes.setExtraResourceBases(webapp.extraResourceBases)
+          baseRes.addBaseResourceListener this.&configureWithBaseResource.curry(webapp)
+        }
+        configurer.setConfigurationsToWebAppContext(context, configurations)
+      }
 
       File tempDir = new File(baseDir, 'webapps-exploded' + context.contextPath)
       tempDir.mkdirs()
@@ -56,36 +91,12 @@ class JettyServerConfigurer {
         context.setInitParameter(key, value)
       }
 
-      if(new File(webapp.resourceBase).isDirectory()) {
-        log.warn 'webapp.extraResourceBases={}', webapp.extraResourceBases
-        if(webapp.extraResourceBases)
-          context.setBaseResource(configurer.createResourceCollection([ webapp.resourceBase ] + webapp.extraResourceBases))
-        else
-          context.setResourceBase(webapp.resourceBase)
-      }
+      File resourceFile = new File(webapp.resourceBase)
+
+      if(resourceFile.isDirectory())
+        context.setResourceBase(webapp.resourceBase)
       else
         context.setWar(webapp.resourceBase)
-
-      URL contextConfigFile = getContextConfigFile(configurer, context.baseResource, params.servletContainerId)
-      if(!contextConfigFile && webapp.contextConfigFile)
-        contextConfigFile = new File(webapp.contextConfigFile).toURI().toURL()
-      configurer.applyContextConfigFile(context, contextConfigFile)
-
-      String realm = webapp.realm ?: params.realm
-      URL realmConfigFile = getRealmFile(configurer, context.baseResource, params.servletContainerId)
-      if(!realmConfigFile) {
-        if(webapp.realmConfigFile)
-          realmConfigFile = new File(webapp.realmConfigFile).toURI().toURL()
-        else if(params.realmConfigFile)
-          realmConfigFile = new File(params.realmConfigFile).toURI().toURL()
-      }
-      if(realm && realmConfigFile) {
-        if(context.securityHandler.loginService == null) {
-          log.info 'Configuring {} with realm \'{}\', {}', context.contextPath, realm, realmConfigFile
-          configurer.configureSecurity(context, realm, realmConfigFile.toString(), params.singleSignOn ?: false)
-        } else
-          log.warn 'loginService is already configured, ignoring realm \'{}\', {}', realm, realmConfigFile
-      }
 
       configurer.configureSessionManager(server, context, params, webapp)
 
@@ -100,7 +111,7 @@ class JettyServerConfigurer {
     return server
   }
 
-  URL getContextConfigFile(JettyConfigurer configurer, baseResource, String servletContainer) {
+  URL getContextConfigFile(baseResource, String servletContainer) {
     for(def possibleFileName in [ servletContainer + '-env.xml', 'jetty-env.xml' ]) {
       URL url = configurer.findResourceURL(baseResource, 'META-INF/' + possibleFileName)
       if(url) {
@@ -111,7 +122,7 @@ class JettyServerConfigurer {
     null
   }
 
-  URL getRealmFile(JettyConfigurer configurer, baseResource, String servletContainer) {
+  URL getRealmFile(baseResource, String servletContainer) {
     for(def possibleFileName in [ servletContainer + '-realm.properties', 'jetty-realm.properties' ]) {
       URL url = configurer.findResourceURL(baseResource, 'META-INF/' + possibleFileName)
       if(url)
