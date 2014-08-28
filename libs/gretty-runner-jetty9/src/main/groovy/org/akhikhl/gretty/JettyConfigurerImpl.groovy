@@ -174,7 +174,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     }
     context.getSessionHandler().setSessionManager(sessionManager)
   }
-  
+
   @Override
   def createResourceCollection(List paths) {
     new ResourceCollection(paths as String[])
@@ -205,7 +205,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
   def findHttpsConnector(server) {
     server.connectors.find { it.connectionFactories.find { it.protocol.startsWith('HTTP') } && it.connectionFactories.find { it.protocol.startsWith('SSL') } }
   }
-  
+
   @Override
   URL findResourceURL(baseResource, String path) {
     Resource res
@@ -219,9 +219,9 @@ class JettyConfigurerImpl implements JettyConfigurer {
   }
 
   @Override
-  List getConfigurations(List<String> webappClassPath) {
+  List getConfigurations(Map webappParams) {
     [
-      new WebInfConfiguration(),
+      new WebInfConfigurationEx(),
       new WebXmlConfiguration(),
       new MetaInfConfiguration(),
       new FragmentConfiguration(),
