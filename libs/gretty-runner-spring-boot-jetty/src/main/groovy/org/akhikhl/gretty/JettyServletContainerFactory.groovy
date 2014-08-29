@@ -34,26 +34,27 @@ class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory 
     jettyConfigurer.setLogger(log)
     params.supressSetConfigurations = true
     def server = new JettyServerConfigurer(jettyConfigurer, params).createAndConfigureServer { webapp, context ->
+
       if(webapp.springBoot) {
         if (isRegisterDefaultServlet())
           addDefaultServlet(context)
 
         if (isRegisterJspServlet() && ClassUtils.isPresent(getJspServletClassName(), getClass().getClassLoader()))
           addJspServlet(context)
-
-        ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
-        def configurations = jettyConfigurer.getConfigurations(webapp)
-        BaseResourceConfiguration baseRes = configurations.find { it instanceof BaseResourceConfiguration }
-        if(baseRes) {
-          baseRes.setExtraResourceBases(webapp.extraResourceBases)
-          baseRes.addBaseResourceListener delegate.&configureWithBaseResource.curry(webapp)
-        }
-        setConfigurations(configurations)
-        configurations = getWebAppContextConfigurations(context, initializersToUse)
-        context.setConfigurations(configurations)
-        context.getSessionHandler().getSessionManager().setMaxInactiveInterval(getSessionTimeout())
-        postProcessWebAppContext(context)
       }
+      
+      ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
+      def configurations = jettyConfigurer.getConfigurations(webapp)
+      BaseResourceConfiguration baseRes = configurations.find { it instanceof BaseResourceConfiguration }
+      if(baseRes) {
+        baseRes.setExtraResourceBases(webapp.extraResourceBases)
+        baseRes.addBaseResourceListener delegate.&configureWithBaseResource.curry(webapp)
+      }
+      setConfigurations(configurations)
+      configurations = getWebAppContextConfigurations(context, initializersToUse)
+      context.setConfigurations(configurations)
+      context.getSessionHandler().getSessionManager().setMaxInactiveInterval(getSessionTimeout())
+      postProcessWebAppContext(context)
     }
 
     for (JettyServerCustomizer customizer : getServerCustomizers())
