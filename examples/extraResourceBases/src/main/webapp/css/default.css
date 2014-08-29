@@ -1,0 +1,14 @@
+body {
+  padding-top: 20px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 18px;
+}
+
+h1 {
+  font-weight: 400;
+  font-size: 40px;
+}
+
+.margin-base-vertical {
+  margin: 40px 0;
+}
