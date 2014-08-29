@@ -12,6 +12,7 @@ import org.apache.catalina.core.StandardContext
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
 import org.apache.catalina.webresources.DirResourceSet
+import org.apache.catalina.webresources.StandardRoot
 import org.apache.tomcat.JarScanner
 import org.apache.tomcat.util.descriptor.web.WebXml
 import org.slf4j.Logger
@@ -30,6 +31,15 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     if(extraResourceBases) {
       WebResourceRoot root = context.getResources()
       extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
+    }
+  }
+
+  void setResourceBase(StandardContext context, Map webappParams) {
+    context.setDocBase(webappParams.resourceBase)
+    if(webappParams.extraResourceBases) {
+      WebResourceRoot root = new StandardRoot(context)
+      context.setResources(root)
+      webappParams.extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
     }
   }
 
