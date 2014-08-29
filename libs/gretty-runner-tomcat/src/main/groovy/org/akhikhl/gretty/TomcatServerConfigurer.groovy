@@ -194,8 +194,10 @@ class TomcatServerConfigurer {
 
       context.addLifecycleListener(configurer.createContextConfig(classpathUrls))
 
-      if(configureContext)
+      if(configureContext) {
+        configureContext.delegate = this
         configureContext(webapp, context)
+      }
 
       if(!context.findChild('default'))
         context.addLifecycleListener(new DefaultWebXmlListener())
