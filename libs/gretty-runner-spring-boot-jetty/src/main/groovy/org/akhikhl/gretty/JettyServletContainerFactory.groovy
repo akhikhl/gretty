@@ -46,7 +46,7 @@ class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory 
         BaseResourceConfiguration baseRes = configurations.find { it instanceof BaseResourceConfiguration }
         if(baseRes) {
           baseRes.setExtraResourceBases(webapp.extraResourceBases)
-          baseRes.addBaseResourceListener jettyConfigurer.&configureWithBaseResource.curry(webapp)
+          baseRes.addBaseResourceListener delegate.&configureWithBaseResource.curry(webapp)
         }
         setConfigurations(configurations)
         configurations = getWebAppContextConfigurations(context, initializersToUse)
