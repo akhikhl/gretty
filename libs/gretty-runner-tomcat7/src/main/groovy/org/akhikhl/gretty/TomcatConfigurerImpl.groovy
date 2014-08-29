@@ -27,37 +27,6 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
   protected Logger log
 
   @Override
-  void addExtraResourceBases(StandardContext context, List extraResourceBases) {
-    if(extraResourceBases) {
-      def dir = context.getResources()
-      log.warn 'addExtraResourceBases, resources={}, extraResourceBases={}', dir, extraResourceBases
-      while(dir instanceof ProxyDirContext)
-        dir = dir.getDirContext()
-      log.warn 'DirContext={}, docBase={}', dir, dir.getDocBase()
-      VirtualDirContext vdc = new VirtualDirContext() {
-        protected File file(String name) {
-          File result = super.file(name)
-          log.warn 'VirtualDirContext.file("{}") -> {}', name, result
-          result
-        }
-      }
-      vdc.setDocBase(dir.getDocBase())
-      vdc.setExtraResourcePaths extraResourceBases.collect { "/=$it" }.join(',')
-      context.setResources(vdc)
-    }
-  }
-
-  void setResourceBase(StandardContext context, Map webappParams) {
-    context.setDocBase(webappParams.resourceBase)
-    if(webappParams.extraResourceBases) {
-      VirtualDirContext vdc = new VirtualDirContext()
-      vdc.setDocBase(webappParams.resourceBase)
-      vdc.setExtraResourcePaths(webappParams.extraResourceBases.collect { "/=$it" }.join(','))
-      context.setResources(vdc)
-    }
-  }
-
-  @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
 
     new ContextConfig() {
@@ -92,5 +61,15 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
   @Override
   void setLogger(Logger logger) {
     log = logger
+  }
+
+  @Override
+  void setResourceBase(StandardContext context, Map webappParams) {
+    context.setDocBase(webappParams.resourceBase)
+    if(webappParams.extraResourceBases) {
+      VirtualDirContext vdc = new VirtualDirContext()
+      vdc.setExtraResourcePaths(webappParams.extraResourceBases.collect { "/=$it" }.join(','))
+      context.setResources(vdc)
+    }
   }
 }
