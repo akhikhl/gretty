@@ -27,23 +27,6 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
   protected Logger log
 
   @Override
-  void addExtraResourceBases(StandardContext context, List extraResourceBases) {
-    if(extraResourceBases) {
-      WebResourceRoot root = context.getResources()
-      extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
-    }
-  }
-
-  void setResourceBase(StandardContext context, Map webappParams) {
-    context.setDocBase(webappParams.resourceBase)
-    if(webappParams.extraResourceBases) {
-      WebResourceRoot root = new StandardRoot(context)
-      context.setResources(root)
-      webappParams.extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
-    }
-  }
-
-  @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
 
     new ContextConfig() {
@@ -78,5 +61,15 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
   @Override
   void setLogger(Logger logger) {
     log = logger
+  }
+
+  @Override
+  void setResourceBase(StandardContext context, Map webappParams) {
+    context.setDocBase(webappParams.resourceBase)
+    if(webappParams.extraResourceBases) {
+      WebResourceRoot root = new StandardRoot(context)
+      context.setResources(root)
+      webappParams.extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
+    }
   }
 }

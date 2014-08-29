@@ -19,8 +19,6 @@ import org.slf4j.Logger
  */
 interface TomcatConfigurer {
 
-  void addExtraResourceBases(StandardContext context, List extraResourceBases)
-
   ContextConfig createContextConfig(URL[] classpathUrls)
 
   JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns)
@@ -28,5 +26,7 @@ interface TomcatConfigurer {
   void setBaseDir(Tomcat tomcat, File baseDir)
 
   void setLogger(Logger logger)
+
+  void setResourceBase(StandardContext context, Map webappParams)
 }
 
