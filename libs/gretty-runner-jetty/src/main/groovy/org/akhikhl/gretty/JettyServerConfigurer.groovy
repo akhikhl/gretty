@@ -100,8 +100,10 @@ class JettyServerConfigurer {
 
       configurer.configureSessionManager(server, context, params, webapp)
 
-      if(configureContext)
+      if(configureContext) {
+        configureContext.delegate = this
         configureContext(webapp, context)
+      }
 
       handlers.add(context)
     }
