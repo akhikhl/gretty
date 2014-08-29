@@ -39,10 +39,12 @@ class JettyServerConfigurer {
     String realm = webapp.realm ?: params.realm
     URL realmConfigFile = getRealmFile(context.baseResource, params.servletContainerId)
     if(!realmConfigFile) {
-      if(webapp.realmConfigFile)
-        realmConfigFile = new File(webapp.realmConfigFile).toURI().toURL()
-      else if(params.realmConfigFile)
-        realmConfigFile = new File(params.realmConfigFile).toURI().toURL()
+      if(webapp.realmConfigFile) {
+        realmConfigFile = new File(webapp.realmConfigFile).canonicalFile.toURI().toURL()
+      }
+      else if(params.realmConfigFile) {
+        realmConfigFile = new File(params.realmConfigFile).canonicalFile.toURI().toURL()
+      }
     }
     if(realm && realmConfigFile) {
       if(context.securityHandler.loginService == null) {
