@@ -33,6 +33,11 @@ If you are new with Gretty, good starting point would be [getting started](http:
       classpath 'org.akhikhl.gretty:gretty:1.1.2-SNAPSHOT'
     }
   }
+  
+  repositories {
+    // ...
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
+  }
   ```
 
 See also: [complete list of changes](changes.md) in this and previous versions.
