@@ -1,0 +1,30 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+  }
+
+  dependencies {
+    classpath "org.akhikhl.gretty:gretty:$gretty_version"
+  }
+}
+
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply from: rootProject.file('integrationTests.gradle')
+
+dependencies {
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+  // We use UrlRewriteFilter for redirecting to the home page.
+  compile 'org.tuckey:urlrewritefilter:4.0.4'
+  // We use Velocity for example of template processing within the webapp.
+  compile 'org.apache.velocity:velocity:1.7'
+}
+
+gretty {
+  extraResourceBase 'extra1'
+}
+
+rootProject.tasks.testAll.dependsOn { project.tasks.integrationTestAllContainers }
+
