@@ -164,7 +164,7 @@ class TomcatServerConfigurer {
       StandardContext context = params.contextClass ? params.contextClass.newInstance() : new StandardContext()
       context.setName(webapp.contextPath)
       context.setPath(webapp.contextPath)
-      context.setDocBase(webapp.resourceBase)
+      configurer.setResourceBase(context, webapp)
       // context.setLogEffectiveWebXml(true) // enable for debugging webxml merge
       ClassLoader parentClassLoader = params.parentClassLoader ?: this.getClass().getClassLoader()
       URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
@@ -193,17 +193,6 @@ class TomcatServerConfigurer {
         log.info 'Configuring {} with {}', webapp.contextPath, context.configFile
 
       context.addLifecycleListener(configurer.createContextConfig(classpathUrls))
-
-      if(webapp.extraResourceBases)
-        configurer.addExtraResourceBases(context, webapp.extraResourceBases)
-        /*context.addLifecycleListener(new LifecycleListener() {
-          @Override
-          public void lifecycleEvent(LifecycleEvent event) {
-            if (event.type == Lifecycle.CONFIGURE_START_EVENT) {
-              configurer.addExtraResourceBases(context, webapp.extraResourceBases)
-            }
-          }
-        })*/
 
       if(configureContext)
         configureContext(webapp, context)

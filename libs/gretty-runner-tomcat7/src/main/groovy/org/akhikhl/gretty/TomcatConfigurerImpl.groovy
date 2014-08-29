@@ -47,6 +47,16 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     }
   }
 
+  void setResourceBase(StandardContext context, Map webappParams) {
+    context.setDocBase(webappParams.resourceBase)
+    if(webappParams.extraResourceBases) {
+      VirtualDirContext vdc = new VirtualDirContext()
+      vdc.setDocBase(webappParams.resourceBase)
+      vdc.setExtraResourcePaths(webappParams.extraResourceBases.collect { "/=$it" }.join(','))
+      context.setResources(vdc)
+    }
+  }
+
   @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
 
