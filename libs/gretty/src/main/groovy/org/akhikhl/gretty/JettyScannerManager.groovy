@@ -109,7 +109,7 @@ final class JettyScannerManager implements ScannerManager {
   protected void scanFilesChanged(Collection<String> changedFiles) {
 
     for(def f in changedFiles)
-      log.debug 'changedFile={}', f
+      log.warn 'changedFile={}', f
 
     sconfig.onScanFilesChanged*.call(changedFiles)
 
@@ -126,15 +126,16 @@ final class JettyScannerManager implements ScannerManager {
     for(String f in changedFiles) {
       if(f.endsWith('.jar')) {
         List<WebAppConfig> dependantWebAppProjects = webapps.findAll {
-          it.projectPath && project.project(it.projectPath).configurations.compile.dependencies.find { it.absolutePath == f }
+          it.projectPath && project.project(it.projectPath).configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.file.absolutePath == f }
         }
         if(dependantWebAppProjects) {
           for(WebAppConfig wconfig in dependantWebAppProjects) {
             if(wconfig.recompileOnSourceChange) {
-              log.debug 'changed file {} is dependency of {}, the latter will be recompiled', f, wconfig.projectPath
+              log.warn 'changed file {} is dependency of {}, the latter will be recompiled', f, wconfig.projectPath
               reloadProject(wconfig.projectPath, 'compile')
-              if(reloadOnLibChange)
+              if(managedClassReload)
                 shouldRestart = true
+              // Otherwise there's no need to restart. When compilation finishes, scanner will wake up again and then restart.
             }
           }
           continue
@@ -144,7 +145,7 @@ final class JettyScannerManager implements ScannerManager {
         it.projectPath && f.startsWith(project.project(it.projectPath).projectDir.absolutePath)
       }
       if(wconfig != null) {
-        log.debug 'changed file {} affects project {}', f, wconfig.projectPath
+        log.warn 'changed file {} affects project {}', f, wconfig.projectPath
         def proj = project.project(wconfig.projectPath)
         if(proj.sourceSets.main.allSource.srcDirs.find { f.startsWith(it.absolutePath) }) {
           if(wconfig.recompileOnSourceChange) {
@@ -154,29 +155,29 @@ final class JettyScannerManager implements ScannerManager {
         } else if (proj.sourceSets.main.output.files.find { f.startsWith(it.absolutePath) }) {
           if(wconfig.reloadOnClassChange) {
             if(managedClassReload) {
-              log.info 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
+              log.warn 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
             } else {
-              log.info 'file {} is in output of {}, servlet-container will be restarted', f, wconfig.projectPath
+              log.warn 'file {} is in output of {}, servlet-container will be restarted', f, wconfig.projectPath
               shouldRestart = true
             }
           }
         } else if (isWebConfigFile(new File(f))) {
           if(wconfig.reloadOnConfigChange) {
-            log.info 'file {} is configuration file, servlet-container will be restarted', f
+            log.warn 'file {} is configuration file, servlet-container will be restarted', f
             reloadProject(wconfig.projectPath, 'compile')
             shouldRestart = true
           }
         } else if(f.startsWith(new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/lib').absolutePath)) {
           if(wconfig.reloadOnLibChange) {
-            log.info 'file {} is in WEB-INF/lib, servlet-container will be restarted', f
+            log.warn 'file {} is in WEB-INF/lib, servlet-container will be restarted', f
             reloadProject(wconfig.projectPath, 'compile')
             shouldRestart = true
           }
         } else if(ProjectReloadUtils.satisfiesOneOfReloadSpecs(f, fastReloadMap[proj.path])) {
-          log.info 'file {} is in fastReload directories', f
+          log.warn 'file {} is in fastReload directories', f
           reloadProject(wconfig.projectPath, 'fastReload')
         } else {
-          log.info 'file {} is not in fastReload directories, switching to fullReload', f
+          log.warn 'file {} is not in fastReload directories, switching to fullReload', f
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true
         }
@@ -186,7 +187,7 @@ final class JettyScannerManager implements ScannerManager {
     webAppProjectReloads.each { String projectPath, Set reloadModes ->
       Project proj = project.project(projectPath)
       if(reloadModes.contains('compile')) {
-        log.info 'Recompiling {}', (projectPath == ':' ? proj.name : projectPath)
+        log.warn 'Recompiling {}', (projectPath == ':' ? proj.name : projectPath)
         WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
         ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
         try {
@@ -195,7 +196,7 @@ final class JettyScannerManager implements ScannerManager {
           connection.close()
         }
       } else if(reloadModes.contains('fastReload')) {
-        log.info 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
+        log.warn 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
         ProjectUtils.prepareInplaceWebAppFolder(proj)
       }
     }
