@@ -92,6 +92,11 @@ class ProductConfigurer {
             result.add wconfig.realmConfigFile
           if(wconfig.contextConfigFile)
             result.add wconfig.contextConfigFile
+          if(wconfig.extraResourceBases) {
+            def proj = wconfig.projectPath ? project.project(wconfig.projectPath) : project
+            for(def resBase in wconfig.extraResourceBases)
+              result.addAll proj.fileTree(resBase).files
+          }
           result
         }
         result
@@ -164,7 +169,7 @@ class ProductConfigurer {
 
   void copyWebappFiles() {
 
-    ManagedDirectory dir = new ManagedDirectory(new File(outputDir, 'webapps'))
+    ManagedDirectory webappsDir = new ManagedDirectory(new File(outputDir, 'webapps'))
 
     for(WebAppConfig wconfig in wconfigs) {
       String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
@@ -174,7 +179,7 @@ class ProductConfigurer {
           def proj = project.project(wconfig.projectPath)
           for(File webappDir in ProjectUtils.getWebAppDirs(proj))
             for(File f in (webappDir.listFiles() ?: []))
-              dir.add(f, appDir)
+              webappsDir.add(f, appDir)
           def resolvedClassPath = new LinkedHashSet<URL>()
           resolvedClassPath.addAll(ProjectUtils.getClassPathJars(proj, 'runtimeNoSpringBoot'))
           resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
@@ -189,19 +194,29 @@ class ProductConfigurer {
         for(File file in files) {
           if(file.isDirectory())
             for(File f in (file.listFiles() ?: []))
-              dir.add(f, appDir + '/WEB-INF/classes')
+              webappsDir.add(f, appDir + '/WEB-INF/classes')
           else
-            dir.add(file, appDir + '/WEB-INF/lib')
+            webappsDir.add(file, appDir + '/WEB-INF/lib')
         }
       } else {
         def file = wconfig.resourceBase
         if(!(file instanceof File))
           file = new File(file.toString())
-        dir.add(file)
-      }
+        webappsDir.add(file)
+      }      
     }
 
-    dir.cleanup()
+    webappsDir.cleanup()
+    
+    if(wconfigs.find { it.extraResourceBases }) {
+      ManagedDirectory extraResourcesDir = new ManagedDirectory(new File(outputDir, 'extraResources'))
+      for(WebAppConfig wconfig in wconfigs) {
+        String appDir = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
+        for(def resBase in wconfig.extraResourceBases)
+          extraResourcesDir.add(resBase, appDir)
+      }
+      extraResourcesDir.cleanup()
+    }
   }
 
   protected void createLaunchScripts() {
@@ -390,12 +405,15 @@ class ProductConfigurer {
       }
       webApps wconfigs.collect { WebAppConfig wconfig ->
         { ->
-          def appConfigDir = 'conf/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
+          String webappDestName = ProjectUtils.getWebAppDestinationDirName(project, wconfig)
+          String appConfigDir = 'conf/' + webappDestName
           contextPath wconfig.contextPath
           if(ProjectUtils.isSpringBootApp(project, wconfig))
             resourceBase 'webapps/' + ProjectUtils.getWebAppDestinationDirName(project, wconfig)
           else
             resourceBase 'webapps/' + getFileName(wconfig.resourceBase)
+          if(wconfig.extraResourceBases)
+            extraResourceBases wconfig.extraResourceBases.collect { 'extraResources/' + webappDestName + '/' + getFileName(it) }
           if(wconfig.initParameters)
             initParams wconfig.initParameters
           if(wconfig.realm)

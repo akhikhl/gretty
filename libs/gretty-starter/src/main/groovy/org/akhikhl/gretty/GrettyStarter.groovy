@@ -71,6 +71,8 @@ class GrettyStarter {
       wconfig.resourceBase = resolveFile(wconfig.resourceBase)
       wconfig.realmConfigFile = resolveFile(wconfig.realmConfigFile)
       wconfig.contextConfigFile = resolveFile(wconfig.contextConfigFile)
+      if(wconfig.extraResourceBases)
+        wconfig.extraResourceBases = wconfig.extraResourceBases.collect { resolveFile(it) }
       wconfigs.add(wconfig)
     }
 
