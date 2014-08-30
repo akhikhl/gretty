@@ -8,12 +8,16 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.Project
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  *
  * @author akhikhl
  */
 final class FileResolver {
+
+  protected static final Logger log = LoggerFactory.getLogger(FileResolver)
 
   Iterable projectSearchDirs
   Iterable globalSearchDirs
@@ -93,6 +97,7 @@ final class FileResolver {
 
   File resolveSingleFile(Project project, file) {
     Set<File> files = resolveFile(project, file)
-    files ? files[0] : null
+    def result = files ? files.toList().first() : null
+    result
   }
 }
