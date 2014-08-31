@@ -15,6 +15,9 @@ import groovy.transform.ToString
  */
 @ToString
 class ServerConfig {
+  
+  static final int defaultServicePort = 9000
+  static final int defaultStatusPort = 9001
 
   List<String> jvmArgs
   Map<String, String> systemProperties
@@ -59,8 +62,8 @@ class ServerConfig {
     result.managedClassReload = false
     result.httpEnabled = true
     result.httpsEnabled = false
-    result.servicePort = 9900
-    result.statusPort = 9901
+    result.servicePort = defaultServicePort
+    result.statusPort = defaultStatusPort
     result.scanInterval = 1
     result.loggingLevel = 'INFO'
     result.consoleLogEnabled = true

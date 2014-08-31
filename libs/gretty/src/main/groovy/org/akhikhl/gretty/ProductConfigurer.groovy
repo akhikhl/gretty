@@ -363,6 +363,10 @@ class ProductConfigurer {
         description servletContainerConfig.servletContainerDescription
       }
       serverConfig {
+        if(sconfig.servicePort != ServerConfig.defaultServicePort)
+          servicePort sconfig.servicePort
+        if(sconfig.statusPort != ServerConfig.defaultStatusPort)
+          statusPort sconfig.statusPort
         if(sconfig.host)
           host sconfig.host
         if(sconfig.httpEnabled) {
