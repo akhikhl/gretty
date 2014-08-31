@@ -5,6 +5,7 @@ dependencies {
   compile project(':libs:gretty-starter')
   compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
   compile "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"
-  compile "org.eclipse.jetty:jetty-util:$jetty9_version" // provides org.eclipse.jetty.util.Scanner
+  // jetty-util provides org.eclipse.jetty.util.Scanner. Must use version 8 to stay compatible with JDK6.
+  compile "org.eclipse.jetty:jetty-util:$jetty8_version" 
   compile gradleApi()
 }
