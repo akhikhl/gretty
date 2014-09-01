@@ -36,6 +36,8 @@ If you are new with Gretty, good starting point would be [getting started](http:
     }
   }
   
+  apply plugin: 'org.akhikhl.gretty'
+  
   repositories {
     // ...
     maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
