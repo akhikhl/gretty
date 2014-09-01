@@ -94,10 +94,10 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
     if(httpConn) {
       if(!httpConn.host)
-        httpConn.host = params.host ?: 'localhost'
+        httpConn.host = params.host ?: ServerDefaults.defaultHost
 
       if(!httpConn.port)
-        httpConn.port = params.httpPort ?: 8080
+        httpConn.port = params.httpPort ?: ServerDefaults.defaultHttpPort
 
       if(params.httpIdleTimeout)
         httpConn.idleTimeout = params.httpIdleTimeout
@@ -121,10 +121,10 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
     if(httpsConn) {
       if(!httpsConn.host)
-        httpsConn.host = params.host ?: 'localhost'
+        httpsConn.host = params.host ?: ServerDefaults.defaultHost
 
       if(!httpsConn.port)
-        httpsConn.port = params.httpsPort ?: 8443
+        httpsConn.port = params.httpsPort ?: ServerDefaults.defaultHttpsPort
 
       def sslContextFactory = httpsConn.getConnectionFactories().find { it instanceof SslConnectionFactory }?.getSslContextFactory()
       if(sslContextFactory) {

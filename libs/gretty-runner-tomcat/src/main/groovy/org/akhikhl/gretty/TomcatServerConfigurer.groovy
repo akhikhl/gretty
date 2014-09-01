@@ -84,7 +84,7 @@ class TomcatServerConfigurer {
     }
 
     if(!tomcat.hostname)
-      tomcat.hostname = params.host ?: 'localhost'
+      tomcat.hostname = params.host ?: ServerDefaults.defaultHost
 
     Connector httpConn = connectors.find { it.scheme == 'http' }
 
@@ -97,7 +97,7 @@ class TomcatServerConfigurer {
 
     if(httpConn) {
       if(!httpConn.port || httpConn.port < 0)
-        httpConn.port = params.httpPort ?: 8080
+        httpConn.port = params.httpPort ?: ServerDefaults.defaultHttpPort
 
       if(params.httpIdleTimeout)
         httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout)
@@ -123,7 +123,7 @@ class TomcatServerConfigurer {
 
     if(httpsConn) {
       if(!httpsConn.port || httpsConn.port < 0)
-        httpsConn.port = params.httpsPort ?: 8443
+        httpsConn.port = params.httpsPort ?: ServerDefaults.defaultHttpsPort
 
       if(params.sslKeyManagerPassword)
         httpsConn.setProperty('keyPass', params.sslKeyManagerPassword)

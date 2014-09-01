@@ -36,13 +36,13 @@ class JettyServerStartInfo {
     for(def context in server.handler.handlers) {
       log.warn '{} runs at:', (context.displayName - '/')
       if(httpConn) {
-        log.warn '  http://{}:{}{}', httpConn.host, httpConn.port, context.contextPath
+        log.warn '  http://{}:{}{}', (httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host), httpConn.port, context.contextPath
         httpConn.with {
           contextInfo.add([ protocol: 'http', host: host, port: port, contextPath: context.contextPath, baseURI: "http://${host}:${port}${context.contextPath}" ])
         }
       }
       if(httpsConn) {
-        log.warn '  https://{}:{}{}', httpsConn.host, httpsConn.port, context.contextPath
+        log.warn '  https://{}:{}{}', (httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host), httpsConn.port, context.contextPath
         httpsConn.with {
           contextInfo.add([ protocol: 'https', host: host, port: port, contextPath: context.contextPath, baseURI: "https://${host}:${port}${context.contextPath}" ])
         }
@@ -61,6 +61,6 @@ class JettyServerStartInfo {
 
     serverStartInfo.contexts = contextInfo
     serverStartInfo
-  }	
+  }
 }
 

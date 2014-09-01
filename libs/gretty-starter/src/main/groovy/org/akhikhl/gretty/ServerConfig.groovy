@@ -15,7 +15,7 @@ import groovy.transform.ToString
  */
 @ToString
 class ServerConfig {
-  
+
   static final int defaultServicePort = 9000
   static final int defaultStatusPort = 9001
 
