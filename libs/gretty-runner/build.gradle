@@ -2,6 +2,7 @@ apply from: rootProject.file('libs/common.gradle')
 apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
+  compile "org.codehaus.groovy:groovy-all:${groovy_version}"
   compile 'commons-cli:commons-cli:1.2'
   compile 'commons-io:commons-io:2.4'
   compile "ch.qos.logback:logback-classic:$logback_version"

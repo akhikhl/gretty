@@ -10,8 +10,6 @@ buildscript {
   }
 }
 
-//import org.jfrog.gradle.plugin.artifactory.ArtifactoryPublicationsPlugin
-
 apply plugin: 'base' // import clean task
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.artifactory'

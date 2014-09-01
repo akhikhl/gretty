@@ -14,7 +14,7 @@ group = rootProject.group
 version = rootProject.version
 
 dependencies {
-  compile "org.codehaus.groovy:groovy-all:${groovy_version}"
+  testCompile "org.codehaus.groovy:groovy-all:${groovy_version}"
   testCompile "org.spockframework:spock-core:${spock_version}"
 }
 

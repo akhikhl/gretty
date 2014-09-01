@@ -2,7 +2,9 @@ apply from: rootProject.file('libs/common.gradle')
 apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
-  compile project(':libs:gretty-starter')
+  compile project(':libs:gretty-starter'), {
+    exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+  }
   compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
   compile "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"
   // jetty-util provides org.eclipse.jetty.util.Scanner. Must use version 8 to stay compatible with JDK6.
