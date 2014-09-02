@@ -32,7 +32,7 @@ If you are new with Gretty, good starting point would be [getting started](http:
       maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
     }
     dependencies {
-      classpath 'org.akhikhl.gretty:gretty:1.1.2-SNAPSHOT'
+      classpath 'org.akhikhl.gretty:gretty:1.1.3-SNAPSHOT'
     }
   }
   
@@ -60,7 +60,7 @@ Gretty also works on JDK6, although Jetty support is limited to versions 7 and 8
 
 Gretty is an open-source project and is freely available in sources as well as in compiled form.
 
-All versions of gretty are available at [jcenter](https://bintray.com/akhikhl/maven/gretty/view) and [maven central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22) under the group 'org.akhikhl.gretty'.
+All releases of Gretty are available at [jcenter](https://bintray.com/akhikhl/maven/gretty/view) and [maven central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22) under the group 'org.akhikhl.gretty'.
 
 #### Copyright and License
 
