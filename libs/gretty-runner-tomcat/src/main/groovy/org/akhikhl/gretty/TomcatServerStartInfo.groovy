@@ -42,13 +42,13 @@ class TomcatServerStartInfo {
     for(Context context in tomcat.host.findChildren().findAll { it instanceof Context }) {
       log.warn '{} runs at:', (context.name - '/')
       if(httpConn) {
-        log.warn '  http://{}:{}{}', tomcat.hostname, (httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host), context.path
+        log.warn '  http://{}:{}{}', (tomcat.hostname == '0.0.0.0' ? 'localhost' : tomcat.hostname), httpConn.port, context.path
         httpConn.with {
           contextInfo.add([ protocol: 'http', host: tomcat.hostname, port: port, contextPath: context.path, baseURI: "http://${tomcat.hostname}:${port}${context.path}" ])
         }
       }
       if(httpsConn) {
-        log.warn '  https://{}:{}{}', tomcat.hostname, (httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host), context.path
+        log.warn '  https://{}:{}{}', (tomcat.hostname == '0.0.0.0' ? 'localhost' : tomcat.hostname), httpsConn.port, context.path
         httpsConn.with {
           contextInfo.add([ protocol: 'https', host: tomcat.hostname, port: port, contextPath: context.path, baseURI: "https://${tomcat.hostname}:${port}${context.path}" ])
         }
