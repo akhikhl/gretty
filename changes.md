@@ -4,6 +4,18 @@
 
 ### What's new:
 
+#### Version 1.1.2
+
+- New feature: [webapp extra resource bases](http://akhikhl.github.io/gretty-doc/Web-app-extra-resource-bases.html).
+
+- New feature [webapp filtering](http://akhikhl.github.io/gretty-doc/Web-app-filtering.html).
+
+- Better start/stop protocol, gracefully handling attempts to start Gretty twice (on the same ports). There should be no hanging processes after such attempts anymore.
+
+- gretty.host now defaults to "0.0.0.0", effectively allowing to connect to any interface.
+
+- Fixed issues: #41, #44, #45, #49, #52, #53, #54, #56, #57, #60, #61.
+
 #### Version 1.1.1
 
 - Fixed breaking change in 1.1.0: properties jettyXmlFile and jettyEnvXmlFile are supported again (although deprecated, please use serverConfigFile and contextConfigFile properties instead).
