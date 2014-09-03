@@ -114,7 +114,7 @@ abstract class StartBaseTask extends DefaultTask {
       }
 
       File getBaseDir() {
-        new File(project.buildDir, 'serverBaseDir_' + getServerConfig().servletContainer)
+        new File(self.project.buildDir, 'serverBaseDir_' + getServerConfig().servletContainer)
       }
 
       WebAppClassPathResolver getWebAppClassPathResolver() {
