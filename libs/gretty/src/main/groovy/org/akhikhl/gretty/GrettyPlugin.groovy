@@ -7,6 +7,7 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
@@ -540,6 +541,12 @@ class GrettyPlugin implements Plugin<Project> {
   }
 
   void apply(final Project project) {
+  
+    if(project.gradle.gradleVersion.startsWith('1.')) {
+      int releaseNumber = project.gradle.gradleVersion.split('\\.')[1] as int
+      if(releaseNumber < 12)
+        throw new GradleException("Gretty supports only Gradle 1.12 or newer. You have Gradle ${project.gradle.gradleVersion}.")
+    }
 
     addExtensions(project)
     addConfigurations(project)
