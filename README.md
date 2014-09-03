@@ -18,6 +18,8 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
+- Gretty 1.1.3-SNAPSHOT fixes compatibility problem with Gradle 1.12 and introduces Gradle version check.
+
 - Gretty 1.1.2 new feature: [webapp extra resource bases](http://akhikhl.github.io/gretty-doc/Web-app-extra-resource-bases.html).
 
 - Gretty 1.1.2 implements better start/stop protocol, gracefully handling attempts to start Gretty twice (on the same ports). There should be no hanging processes after such attempts anymore.
