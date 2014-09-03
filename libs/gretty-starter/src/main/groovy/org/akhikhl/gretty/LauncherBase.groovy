@@ -100,8 +100,8 @@ abstract class LauncherBase implements Launcher {
       try {
         log.debug 'Sending "status" command to (probably) running server...'
         ServiceProtocol.send(sconfig.servicePort, 'status')
-      } catch(java.net.ConnectException e) {
-        log.debug 'Got java.net.ConnectException'
+      } catch(java.net.ConnectException | java.net.SocketException e) {
+        log.debug 'Got {}', e.getClass().getName()
         while(true) {
           Thread.sleep(100)
           synchronized(listeningForStatusLock) {
