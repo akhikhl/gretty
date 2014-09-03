@@ -5,6 +5,7 @@ import org.apache.tools.ant.filters.*
 
 dependencies {
   compile "org.codehaus.groovy:groovy-all:${groovy_version}"
+  compile 'org.codehaus.groovy:groovy-backports-compat23:2.3.6'
   compile "ch.qos.logback:logback-classic:$logback_version"
   compile 'commons-cli:commons-cli:1.2'
   compile 'commons-configuration:commons-configuration:1.10'
