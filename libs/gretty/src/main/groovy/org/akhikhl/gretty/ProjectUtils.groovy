@@ -284,8 +284,11 @@ final class ProjectUtils {
     }
     sconfig.jvmArgs = resolvedJvmArgs
 
-    sconfig.sslKeyStorePath = new FileResolver(['security', 'config', '.']).resolveSingleFile(project, sconfig.sslKeyStorePath)
-    sconfig.sslTrustStorePath = new FileResolver(['security', 'config', '.']).resolveSingleFile(project, sconfig.sslTrustStorePath)
+    if(!(sconfig.sslKeyStorePath instanceof String) || !sconfig.sslKeyStorePath.startsWith('res://'))
+      sconfig.sslKeyStorePath = new FileResolver(['security', 'config', '.']).resolveSingleFile(project, sconfig.sslKeyStorePath)
+
+    if(!(sconfig.sslTrustStorePath instanceof String) || !sconfig.sslTrustStorePath.startsWith('res://'))
+      sconfig.sslTrustStorePath = new FileResolver(['security', 'config', '.']).resolveSingleFile(project, sconfig.sslTrustStorePath)
 
     String servletContainerType = ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerType
 

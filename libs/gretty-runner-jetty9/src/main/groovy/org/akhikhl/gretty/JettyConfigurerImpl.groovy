@@ -9,6 +9,7 @@ package org.akhikhl.gretty
 
 import ch.qos.logback.classic.selector.servlet.ContextDetachingSCL
 import ch.qos.logback.classic.selector.servlet.LoggerContextFilter
+import java.security.KeyStore
 import javax.servlet.DispatcherType
 import org.eclipse.jetty.annotations.AnnotationConfiguration
 import org.eclipse.jetty.plus.webapp.EnvConfiguration
@@ -27,6 +28,7 @@ import org.eclipse.jetty.server.SslConnectionFactory
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.server.session.HashSessionManager
 import org.eclipse.jetty.util.component.LifeCycle
+import org.eclipse.jetty.util.resource.FileResource
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.util.resource.ResourceCollection
 import org.eclipse.jetty.util.ssl.SslContextFactory
@@ -128,14 +130,32 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
       def sslContextFactory = httpsConn.getConnectionFactories().find { it instanceof SslConnectionFactory }?.getSslContextFactory()
       if(sslContextFactory) {
-        if(params.sslKeyStorePath)
-          sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
+        if(params.sslKeyStorePath) {
+          if(params.sslKeyStorePath.startsWith('res://')) {
+            String resString = params.sslKeyStorePath - 'res://'
+            URL url = getClass().getResource(resString)
+            if(url == null)
+              throw new Exception("Could not resource referenced in sslKeyStorePath: '${resString}'")
+            sslContextFactory.setKeyStoreResource(new FileResource(url))
+          }
+          else
+            sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
+        }
         if(params.sslKeyStorePassword)
           sslContextFactory.setKeyStorePassword(params.sslKeyStorePassword)
         if(params.sslKeyManagerPassword)
           sslContextFactory.setKeyManagerPassword(params.sslKeyManagerPassword)
-        if(params.sslTrustStorePath)
-          sslContextFactory.setTrustStorePath(params.sslTrustStorePath)
+        if(params.sslTrustStorePath) {
+          if(params.sslTrustStorePath.startsWith('res://')) {
+            String resString = params.sslTrustStorePath - 'res://'
+            URL url = getClass().getResource(resString)
+            if(url == null)
+              throw new Exception("Could not resource referenced in sslTrustStorePath: '${resString}'")
+            sslContextFactory.setTrustStoreResource(new FileResource(url))
+          }
+          else
+            sslContextFactory.setTrustStorePath(params.sslTrustStorePath)
+        }
         if(params.sslTrustStorePassword)
           sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
       }

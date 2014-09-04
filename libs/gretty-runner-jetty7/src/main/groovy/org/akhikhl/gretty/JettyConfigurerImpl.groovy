@@ -114,14 +114,32 @@ class JettyConfigurerImpl implements JettyConfigurer {
         httpsConn.port = params.httpsPort ?: ServerDefaults.defaultHttpsPort
 
       def sslContextFactory = httpsConn.getSslContextFactory()
-      if(params.sslKeyStorePath)
-        sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
+      if(params.sslKeyStorePath) {
+        if(params.sslKeyStorePath.startsWith('res://')) {
+          String resString = params.sslKeyStorePath - 'res://'
+          URL url = getClass().getResource(resString)
+          if(url == null)
+            throw new Exception("Could not resource referenced in sslKeyStorePath: '${resString}'")
+            sslContextFactory.setKeyStoreResource(Resource.newResource(url))
+        }
+        else
+          sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
+      }
       if(params.sslKeyStorePassword)
         sslContextFactory.setKeyStorePassword(params.sslKeyStorePassword)
       if(params.sslKeyManagerPassword)
         sslContextFactory.setKeyManagerPassword(params.sslKeyManagerPassword)
-      if(params.sslTrustStorePath)
-        sslContextFactory.setTrustStorePath(params.sslTrustStorePath)
+      if(params.sslTrustStorePath) {
+        if(params.sslTrustStorePath.startsWith('res://')) {
+          String resString = params.sslTrustStorePath - 'res://'
+          URL url = getClass().getResource(resString)
+          if(url == null)
+            throw new Exception("Could not resource referenced in sslTrustStorePath: '${resString}'")
+          sslContextFactory.setTrustStoreResource(Resource.newResource(url))
+        }
+        else
+          sslContextFactory.setTrustStorePath(params.sslTrustStorePath)
+      }
       if(params.sslTrustStorePassword)
         sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
 

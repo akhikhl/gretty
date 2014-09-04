@@ -203,11 +203,11 @@ class ProductConfigurer {
         if(!(file instanceof File))
           file = new File(file.toString())
         webappsDir.add(file)
-      }      
+      }
     }
 
     webappsDir.cleanup()
-    
+
     if(wconfigs.find { it.extraResourceBases }) {
       ManagedDirectory extraResourcesDir = new ManagedDirectory(new File(outputDir, 'extraResources'))
       for(WebAppConfig wconfig in wconfigs) {
@@ -305,10 +305,10 @@ class ProductConfigurer {
     configFile.text = jsonConfig.toPrettyString()
     dir.registerAdded(configFile)
 
-    if(sconfig.sslKeyStorePath)
+    if(sconfig.sslKeyStorePath && (!(sconfig.sslKeyStorePath instanceof String) || !sconfig.sslKeyStorePath.startsWith('res://')))
       dir.add(sconfig.sslKeyStorePath)
 
-    if(sconfig.sslTrustStorePath)
+    if(sconfig.sslTrustStorePath && (!(sconfig.sslTrustStorePath instanceof String) || !sconfig.sslTrustStorePath.startsWith('res://')))
       dir.add(sconfig.sslTrustStorePath)
 
     if(sconfig.realmConfigFile)
@@ -382,14 +382,22 @@ class ProductConfigurer {
             httpsPort sconfig.httpsPort
           if(sconfig.httpsIdleTimeout)
             httpsIdleTimeout sconfig.httpsIdleTimeout
-          if(sconfig.sslKeyStorePath)
-            sslKeyStorePath 'conf/' + sconfig.sslKeyStorePath.name
+          if(sconfig.sslKeyStorePath) {
+            if(sconfig.sslKeyStorePath instanceof File)
+              sslKeyStorePath 'conf/' + sconfig.sslKeyStorePath.name
+            else if(sconfig.sslKeyStorePath instanceof String)
+              sslKeyStorePath sconfig.sslKeyStorePath
+          }
           if(sconfig.sslKeyStorePassword)
             sslKeyStorePassword sconfig.sslKeyStorePassword
           if(sconfig.sslKeyManagerPassword)
             sslKeyManagerPassword sconfig.sslKeyManagerPassword
-          if(sconfig.sslTrustStorePath)
-            sslTrustStorePath 'conf/' + sconfig.sslTrustStorePath.name
+          if(sconfig.sslTrustStorePath) {
+            if(sconfig.sslTrustStorePath instanceof File)
+              sslTrustStorePath 'conf/' + sconfig.sslTrustStorePath.name
+            else if(sconfig.sslTrustStorePath instanceof String)
+              sslTrustStorePath sconfig.sslTrustStorePath
+          }
           if(sconfig.sslTrustStorePassword)
             sslTrustStorePassword sconfig.sslTrustStorePassword
         }
