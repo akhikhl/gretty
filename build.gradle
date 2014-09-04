@@ -49,6 +49,10 @@ task('cleanExamples', type: GradleBuild) {
   project.tasks.clean.dependsOn it
 }
 
+task('wrapper', type: Wrapper) {
+  gradleVersion = '2.0'
+}
+
 artifactory {
   contextUrl = 'https://oss.jfrog.org/artifactory'
   publish {
