@@ -305,10 +305,10 @@ class ProductConfigurer {
     configFile.text = jsonConfig.toPrettyString()
     dir.registerAdded(configFile)
 
-    if(sconfig.sslKeyStorePath && (!(sconfig.sslKeyStorePath instanceof String) || !sconfig.sslKeyStorePath.startsWith('res://')))
+    if(sconfig.sslKeyStorePath && (!(sconfig.sslKeyStorePath instanceof String) || !sconfig.sslKeyStorePath.startsWith('classpath:')))
       dir.add(sconfig.sslKeyStorePath)
 
-    if(sconfig.sslTrustStorePath && (!(sconfig.sslTrustStorePath instanceof String) || !sconfig.sslTrustStorePath.startsWith('res://')))
+    if(sconfig.sslTrustStorePath && (!(sconfig.sslTrustStorePath instanceof String) || !sconfig.sslTrustStorePath.startsWith('classpath:')))
       dir.add(sconfig.sslTrustStorePath)
 
     if(sconfig.realmConfigFile)

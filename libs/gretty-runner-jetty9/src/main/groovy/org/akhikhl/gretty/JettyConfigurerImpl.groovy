@@ -131,8 +131,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
       def sslContextFactory = httpsConn.getConnectionFactories().find { it instanceof SslConnectionFactory }?.getSslContextFactory()
       if(sslContextFactory) {
         if(params.sslKeyStorePath) {
-          if(params.sslKeyStorePath.startsWith('res://')) {
-            String resString = params.sslKeyStorePath - 'res://'
+          if(params.sslKeyStorePath.startsWith('classpath:')) {
+            String resString = params.sslKeyStorePath - 'classpath:'
             URL url = getClass().getResource(resString)
             if(url == null)
               throw new Exception("Could not resource referenced in sslKeyStorePath: '${resString}'")
@@ -146,8 +146,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
         if(params.sslKeyManagerPassword)
           sslContextFactory.setKeyManagerPassword(params.sslKeyManagerPassword)
         if(params.sslTrustStorePath) {
-          if(params.sslTrustStorePath.startsWith('res://')) {
-            String resString = params.sslTrustStorePath - 'res://'
+          if(params.sslTrustStorePath.startsWith('classpath:')) {
+            String resString = params.sslTrustStorePath - 'classpath:'
             URL url = getClass().getResource(resString)
             if(url == null)
               throw new Exception("Could not resource referenced in sslTrustStorePath: '${resString}'")

@@ -51,6 +51,8 @@ class TomcatServerConfigurer {
     File baseDir = new File(params.baseDir)
     new File(baseDir, 'webapps').mkdirs()
 
+    File tempDir = new File(baseDir, 'temp')
+
     def service
     def connectors
 
@@ -127,12 +129,48 @@ class TomcatServerConfigurer {
 
       if(params.sslKeyManagerPassword)
         httpsConn.setProperty('keyPass', params.sslKeyManagerPassword)
-      if(params.sslKeyStorePath)
-        httpsConn.setProperty('keystoreFile', params.sslKeyStorePath)
+      if(params.sslKeyStorePath) {
+        if(params.sslKeyStorePath.startsWith('classpath:')) {
+          String resString = params.sslKeyStorePath - 'classpath:'
+          File keystoreFile = new File(tempDir, 'keystore')
+          keystoreFile.parentFile.mkdirs()
+          if(keystoreFile.exists())
+            keystoreFile.delete()
+          def stm = getClass().getResourceAsStream(resString)
+          if(stm == null)
+            throw new Exception("Could not resource referenced in sslKeyStorePath: '${resString}'")
+          stm.withStream {
+            keystoreFile.withOutputStream { outs ->
+              outs << stm
+            }
+          }
+          httpsConn.setProperty('keystoreFile', keystoreFile.absolutePath)
+        }
+        else
+          httpsConn.setProperty('keystoreFile', params.sslKeyStorePath)
+      }
       if(params.sslKeyStorePassword)
         httpsConn.setProperty('keystorePass', params.sslKeyStorePassword)
-      if(params.sslTrustStorePath)
-        httpsConn.setProperty('truststoreFile', params.sslTrustStorePath)
+      if(params.sslTrustStorePath) {
+        if(params.sslTrustStorePath.startsWith('classpath:')) {
+          String resString = params.sslTrustStorePath - 'classpath:'
+          File truststoreFile = new File(tempDir, 'truststore')
+          truststoreFile.parentFile.mkdirs()
+          if(truststoreFile.exists())
+            truststoreFile.delete()
+          def stm = getClass().getResourceAsStream(resString)
+          if(stm == null)
+            throw new Exception("Could not resource referenced in sslTrustStorePath: '${resString}'")
+          stm.withStream {
+            truststoreFile.withOutputStream { outs ->
+              outs << stm
+            }
+          }
+          httpsConn.setProperty('truststoreFile', truststoreFile.absolutePath)
+        }
+        else
+          httpsConn.setProperty('truststoreFile', params.sslTrustStorePath)
+      }
       if(params.sslTrustStorePassword)
         httpsConn.setProperty('truststorePass', params.sslTrustStorePassword)
 

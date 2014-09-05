@@ -51,9 +51,9 @@ class GrettyStarter {
       }
     }
 
-    if(!(sconfig.sslKeyStorePath instanceof String) || !(sconfig.sslKeyStorePath.startsWith('res://')))
+    if(!(sconfig.sslKeyStorePath instanceof String) || !(sconfig.sslKeyStorePath.startsWith('classpath:')))
       sconfig.sslKeyStorePath = resolveFile(sconfig.sslKeyStorePath)
-    if(!(sconfig.sslTrustStorePath instanceof String) || !(sconfig.sslTrustStorePath.startsWith('res://')))
+    if(!(sconfig.sslTrustStorePath instanceof String) || !(sconfig.sslTrustStorePath.startsWith('classpath:')))
       sconfig.sslTrustStorePath = resolveFile(sconfig.sslTrustStorePath)
     sconfig.realmConfigFile = resolveFile(sconfig.realmConfigFile)
     sconfig.serverConfigFile = resolveFile(sconfig.serverConfigFile)
