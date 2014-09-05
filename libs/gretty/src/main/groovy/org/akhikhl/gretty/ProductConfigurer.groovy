@@ -382,6 +382,7 @@ class ProductConfigurer {
             httpsPort sconfig.httpsPort
           if(sconfig.httpsIdleTimeout)
             httpsIdleTimeout sconfig.httpsIdleTimeout
+          // Note that sslHost is not written to config. sslHost must be only used by CertificateGenerator, which is not available in gretty products.
           if(sconfig.sslKeyStorePath) {
             if(sconfig.sslKeyStorePath instanceof File)
               sslKeyStorePath 'conf/' + sconfig.sslKeyStorePath.name

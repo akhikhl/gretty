@@ -30,6 +30,7 @@ class ServerConfig {
   Boolean httpsEnabled
   Integer httpsPort
   Integer httpsIdleTimeout
+  String sslHost
   def sslKeyStorePath
   String sslKeyStorePassword
   String sslKeyManagerPassword

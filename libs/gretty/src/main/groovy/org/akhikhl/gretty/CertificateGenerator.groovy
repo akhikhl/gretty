@@ -66,7 +66,7 @@ class CertificateGenerator {
       certGen.setIssuerDN(new X509Principal("CN=gretty-issuer, OU=None, O=Gretty, L=None, C=None"))
       certGen.setNotBefore(new Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 30))
       certGen.setNotAfter(new Date(System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 365*10)))
-      certGen.setSubjectDN(new X509Principal("CN=${sconfig.host}, OU=None, O=${project.name}, L=None, C=None"))
+      certGen.setSubjectDN(new X509Principal("CN=${sconfig.sslHost ?: sconfig.host}, OU=None, O=${project.name}, L=None, C=None"))
       certGen.setPublicKey(KPair.getPublic())
       certGen.setSignatureAlgorithm('SHA256WithRSA')
       def PKCertificate = certGen.generateX509Certificate(KPair.getPrivate(), 'BC')
