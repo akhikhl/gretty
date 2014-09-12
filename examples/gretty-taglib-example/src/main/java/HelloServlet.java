@@ -13,12 +13,15 @@ public class HelloServlet extends HttpServlet {
             // Following output will be produced by Gretty
             resp.getOutputStream().print("<p>/WEB-INF/libs are empty</p>");
         } else {
-            resp.getOutputStream().print("<p>");
+            resp.getOutputStream().print("<p>/WEB-INF/libs are not empty</p>");
+            resp.getOutputStream().print("<ul>");
             // Following output will be produced by maven-jetty-plugin:
             for (String lib : libs) {
+                resp.getOutputStream().print("<li>");
                 resp.getOutputStream().print(lib);
+                resp.getOutputStream().print("</li>");
             }
-            resp.getOutputStream().print("</p>");
+            resp.getOutputStream().print("</ul>");
         }
     }
 }
