@@ -1,3 +1,10 @@
+/*
+ * gretty
+ *
+ * Copyright 2013  Andrey Hihlovskiy.
+ *
+ * See the file "license.txt" for copying and usage permission.
+ */
 package org.akhikhl.gretty
 
 import org.eclipse.jetty.util.URIUtil
@@ -12,9 +19,9 @@ import org.eclipse.jetty.webapp.WebAppContext
  *  @author sala
  */
 class JettyWebAppContext extends WebAppContext {
-    private static final Logger LOG = Log.getLogger(JettyWebAppContext.class);
+    private static final Logger LOG = Log.getLogger(JettyWebAppContext.class)
 
-    private static final String WEB_INF_LIB_PREFIX = "/WEB-INF/lib"
+    private static final String WEB_INF_LIB_PREFIX = '/WEB-INF/lib'
     private final Map<String, File> webInfJarMap = [:]
     private final List<File> webInfJars = []
 
@@ -28,7 +35,7 @@ class JettyWebAppContext extends WebAppContext {
         webInfJarMap.clear()
         webInfJars.each {
             String fileName = it.getName()
-            if(fileName.endsWith(".jar")) {
+            if(fileName.endsWith('.jar')) {
                 webInfJarMap.put(fileName, it)
             }
         }
@@ -55,7 +62,7 @@ class JettyWebAppContext extends WebAppContext {
 
             if(path.startsWith(WEB_INF_LIB_PREFIX)) {
                 webInfJarMap.keySet().each {
-                    allPaths.add(WEB_INF_LIB_PREFIX + "/" + it)
+                    allPaths.add(WEB_INF_LIB_PREFIX + '/' + it)
                 }
             }
             return allPaths
@@ -76,8 +83,8 @@ class JettyWebAppContext extends WebAppContext {
 
             try {
                 if(uri.startsWith(WEB_INF_LIB_PREFIX)) {
-                    String jarName = uri.replace(WEB_INF_LIB_PREFIX, "")
-                    if(jarName.startsWith("/") || jarName.startsWith("\\")) {
+                    String jarName = uri.replace(WEB_INF_LIB_PREFIX, '')
+                    if(jarName.startsWith('/') || jarName.startsWith('\\')) {
                         jarName = jarName.substring(1)
                     }
                     if(jarName.isEmpty()) {
