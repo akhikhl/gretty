@@ -54,7 +54,6 @@ class JettyWebAppContext extends WebAppContext {
 
     @Override
     Set<String> getResourcePaths(String path) {
-      LOG.warn "getResourcePaths $path"
         Set<String> paths = super.getResourcePaths(path)
         // Tinkering with pathes, adding pathes provided manually
         if(path != null) {
