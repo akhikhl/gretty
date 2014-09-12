@@ -199,7 +199,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
   def createWebAppContext(List<String> webappClassPath) {
     URL[] classpathUrls = (webappClassPath.collect { new URL(it) }) as URL[]
     ClassLoader classLoader = new URLClassLoader(classpathUrls, this.getClass().getClassLoader())
-    WebAppContext context = new WebAppContext()
+    JettyWebAppContext context = new JettyWebAppContext()
+    context.setWebInfLib(webappClassPath.findAll { it.endsWith('jar') }.collect { new File(it)})
     context.setClassLoader(new WebAppClassLoader(classLoader, context))
     context.setOverrideDescriptor('/org/akhikhl/gretty/override-web.xml')
     context.addEventListener(new ContextDetachingSCL())
