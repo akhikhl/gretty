@@ -12,8 +12,8 @@ class RequestResponseIT extends GebReportingSpec {
 
     def 'should get expected static page'() {
         when:
-        go "${baseURI}/"
+        go "${baseURI}"
         then:
-        $('p').text != '/WEB-INF/libs are empty'
+        $('p').text() != '/WEB-INF/libs are empty'
     }
 }
