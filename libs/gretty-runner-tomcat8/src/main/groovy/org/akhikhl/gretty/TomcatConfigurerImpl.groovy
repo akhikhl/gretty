@@ -65,11 +65,22 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   @Override
   void setResourceBase(StandardContext context, Map webappParams) {
+
     context.setDocBase(webappParams.resourceBase)
-    if(webappParams.extraResourceBases) {
-      WebResourceRoot root = new StandardRoot(context)
-      context.setResources(root)
+
+    WebResourceRoot root = new StandardRoot(context)
+    context.setResources(root)
+
+    if(webappParams.extraResourceBases)
       webappParams.extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
+
+    Set classpathJarParentDirs = webappParams.webappClassPath.findAll { it.endsWith('.jar') && !(it =~ /.*servlet-api.*\.jar$/) }.collect({
+      File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
+      jarFile.parentFile.absolutePath
+    }) as Set
+
+    classpathJarParentDirs.each {
+      root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/WEB-INF/lib', it, null, '/')
     }
   }
 }
