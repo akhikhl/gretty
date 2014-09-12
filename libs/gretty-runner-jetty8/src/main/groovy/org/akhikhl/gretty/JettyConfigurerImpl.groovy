@@ -198,7 +198,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   def createWebAppContext(List<String> webappClassPath) {
-    WebAppContext context = new WebAppContext()
+    JettyWebAppContext context = new JettyWebAppContext()
+    context.setWebInfLib(webappClassPath.findAll { it.endsWith('jar') }.collect { new File(it)})
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !(it =~ /.*javax\.servlet-api.*\.jar/) }.join(';'))
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
