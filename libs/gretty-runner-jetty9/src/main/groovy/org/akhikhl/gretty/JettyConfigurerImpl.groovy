@@ -6,25 +6,13 @@
  * See the file "license.txt" for copying and usage permission.
  */
 package org.akhikhl.gretty
-
 import ch.qos.logback.classic.selector.servlet.ContextDetachingSCL
 import ch.qos.logback.classic.selector.servlet.LoggerContextFilter
-import java.security.KeyStore
-import javax.servlet.DispatcherType
 import org.eclipse.jetty.annotations.AnnotationConfiguration
 import org.eclipse.jetty.plus.webapp.EnvConfiguration
 import org.eclipse.jetty.plus.webapp.PlusConfiguration
 import org.eclipse.jetty.security.HashLoginService
-import org.eclipse.jetty.security.LoginService
-import org.eclipse.jetty.server.Connector
-import org.eclipse.jetty.server.Handler
-import org.eclipse.jetty.server.HttpConfiguration
-import org.eclipse.jetty.server.HttpConnectionFactory
-import org.eclipse.jetty.server.NetworkConnector
-import org.eclipse.jetty.server.SecureRequestCustomizer
-import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.server.ServerConnector
-import org.eclipse.jetty.server.SslConnectionFactory
+import org.eclipse.jetty.server.*
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.server.session.HashSessionManager
 import org.eclipse.jetty.util.component.LifeCycle
@@ -32,17 +20,11 @@ import org.eclipse.jetty.util.resource.FileResource
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.util.resource.ResourceCollection
 import org.eclipse.jetty.util.ssl.SslContextFactory
-import org.eclipse.jetty.webapp.Configuration
-import org.eclipse.jetty.webapp.FragmentConfiguration
-import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
-import org.eclipse.jetty.webapp.MetaInfConfiguration
-import org.eclipse.jetty.webapp.WebAppClassLoader
-import org.eclipse.jetty.webapp.WebAppContext
-import org.eclipse.jetty.webapp.WebInfConfiguration
-import org.eclipse.jetty.webapp.WebXmlConfiguration
+import org.eclipse.jetty.webapp.*
 import org.eclipse.jetty.xml.XmlConfiguration
 import org.slf4j.Logger
 
+import javax.servlet.DispatcherType
 /**
  *
  * @author akhikhl
@@ -209,7 +191,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   def createWebAppContext(List<String> webappClassPath) {
-    WebAppContext context = new WebAppContext()
+    JettyWebAppContext context = new JettyWebAppContext()
+    context.setWebInfLib(webappClassPath.findAll { it.endsWith('jar') }.collect { new File(it)})
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !(it =~ /.*javax\.servlet-api.*\.jar/) }.join(';'))
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
