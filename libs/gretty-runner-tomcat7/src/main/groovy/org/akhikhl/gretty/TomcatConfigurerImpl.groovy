@@ -23,8 +23,14 @@ import org.slf4j.LoggerFactory
  * @author akhikhl
  */
 class TomcatConfigurerImpl implements TomcatConfigurer {
+  
+  protected static boolean isServletApi(String filePath) {
+    filePath.matches(/^.*servlet-api.*\.jar$/)
+  }
 
   protected Logger log
+  
+  protected Set virtualWebInfLibs = new LinkedHashSet()
 
   @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
@@ -48,7 +54,7 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   @Override
   JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns) {
-    new SkipPatternJarScanner(jarScanner, skipPatterns)
+    new JarScannerEx(skipPatterns, virtualWebInfLibs)
   }
 
   @Override
@@ -65,10 +71,27 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   @Override
   void setResourceBase(StandardContext context, Map webappParams) {
+    
     context.setDocBase(webappParams.resourceBase)
-    if(webappParams.extraResourceBases) {
+    
+    Map extraResourcePaths = [:]
+    
+    if(webappParams.extraResourceBases)
+      extraResourcePaths << webappParams.extraResourceBases.collectEntries { ['/', it ] }
+
+    Set classpathJarParentDirs = new LinkedHashSet()
+    
+    webappParams.webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.each {
+      File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
+      classpathJarParentDirs.add jarFile.parentFile.absolutePath
+      virtualWebInfLibs.add('/WEB-INF/lib/' + jarFile.name)
+    }
+    
+    extraResourcePaths << classpathJarParentDirs.collectEntries { [ '/WEB-INF/lib', it ] }
+    
+    if(extraResourcePaths) {
       VirtualDirContext vdc = new VirtualDirContext()
-      vdc.setExtraResourcePaths(webappParams.extraResourceBases.collect { "/=$it" }.join(','))
+      vdc.setExtraResourcePaths(extraResourcePaths.collect { it.key + '=' + it.value }.join(','))
       context.setResources(vdc)
     }
   }

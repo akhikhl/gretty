@@ -11,9 +11,9 @@ public class HelloServlet extends HttpServlet {
         final Set<String> libs = getServletContext().getResourcePaths("/WEB-INF/lib");
         if(libs == null || libs.isEmpty()) {
             // Following output will be produced by Gretty
-            resp.getOutputStream().print("<p>/WEB-INF/lib are empty</p>");
+            resp.getOutputStream().print("<p>/WEB-INF/lib is empty</p>");
         } else {
-            resp.getOutputStream().print("<p>/WEB-INF/lib are not empty</p>");
+            resp.getOutputStream().print("<p>/WEB-INF/lib is not empty</p>");
             resp.getOutputStream().print("<ul>");
             // Following output will be produced by maven-jetty-plugin:
             for (String lib : libs) {

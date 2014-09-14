@@ -207,6 +207,7 @@ class TomcatServerConfigurer {
       ClassLoader parentClassLoader = params.parentClassLoader ?: this.getClass().getClassLoader()
       URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
       ClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
+      classLoader.metaClass.webappClassLoader = true
       context.addLifecycleListener(new SpringloadedCleanup())
       context.setParentClassLoader(classLoader)
       context.setJarScanner(configurer.createJarScanner(context.getJarScanner(), new JarSkipPatterns()))

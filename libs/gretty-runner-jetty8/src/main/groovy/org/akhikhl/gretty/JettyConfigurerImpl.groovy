@@ -44,6 +44,10 @@ import org.slf4j.Logger
  * @author akhikhl
  */
 class JettyConfigurerImpl implements JettyConfigurer {
+  
+  protected static boolean isServletApi(String filePath) {
+    filePath.matches(/^.*servlet-api.*\.jar$/)
+  }
 
   private Logger log
   private SSOAuthenticatorFactory ssoAuthenticatorFactory
@@ -199,8 +203,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
   @Override
   def createWebAppContext(List<String> webappClassPath) {
     JettyWebAppContext context = new JettyWebAppContext()
-    context.setWebInfLib(webappClassPath.findAll { it.endsWith('jar') }.collect { new File(it)})
-    context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !(it =~ /.*javax\.servlet-api.*\.jar/) }.join(';'))
+    context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect { new File(it) })
+    context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context

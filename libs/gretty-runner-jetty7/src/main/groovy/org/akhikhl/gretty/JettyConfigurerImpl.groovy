@@ -43,6 +43,10 @@ import org.slf4j.Logger
  * @author akhikhl
  */
 class JettyConfigurerImpl implements JettyConfigurer {
+  
+  protected static boolean isServletApi(String filePath) {
+    filePath.matches(/^.*servlet-api.*\.jar$/)
+  }
 
   private Logger log
   private SSOAuthenticatorFactory ssoAuthenticatorFactory
@@ -200,7 +204,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     URL[] classpathUrls = (webappClassPath.collect { new URL(it) }) as URL[]
     ClassLoader classLoader = new URLClassLoader(classpathUrls, this.getClass().getClassLoader())
     JettyWebAppContext context = new JettyWebAppContext()
-    context.setWebInfLib(webappClassPath.findAll { it.endsWith('jar') }.collect { new File(it)})
+    context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect { new File(it) })
     context.setClassLoader(new WebAppClassLoader(classLoader, context))
     context.setOverrideDescriptor('/org/akhikhl/gretty/override-web.xml')
     context.addEventListener(new ContextDetachingSCL())

@@ -23,6 +23,10 @@ import org.slf4j.LoggerFactory
  * @author akhikhl
  */
 class TomcatConfigurerImpl implements TomcatConfigurer {
+  
+  protected static boolean isServletApi(String filePath) {
+    filePath.matches(/^.*servlet-api.*\.jar$/)
+  }
 
   protected Logger log
 
@@ -74,7 +78,7 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     if(webappParams.extraResourceBases)
       webappParams.extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
 
-    Set classpathJarParentDirs = webappParams.webappClassPath.findAll { it.endsWith('.jar') && !(it =~ /.*servlet-api.*\.jar$/) }.collect({
+    Set classpathJarParentDirs = webappParams.webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect({
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
       jarFile.parentFile.absolutePath
     }) as Set

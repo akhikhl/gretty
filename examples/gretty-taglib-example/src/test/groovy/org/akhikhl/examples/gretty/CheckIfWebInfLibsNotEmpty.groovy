@@ -14,6 +14,6 @@ class RequestResponseIT extends GebReportingSpec {
         when:
         go "${baseURI}"
         then:
-        $('p').text() == '/WEB-INF/libs are not empty'
+        $('p').text() == '/WEB-INF/lib is not empty'
     }
 }
