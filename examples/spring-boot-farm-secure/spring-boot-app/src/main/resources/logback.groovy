@@ -1,3 +1,11 @@
+/*
+ * Gretty
+ *
+ * Copyright (C) 2013-2014 Andrey Hihlovskiy and contributors.
+ *
+ * See the file "LICENSE" for copying and usage permission.
+ * See the file "CONTRIBUTORS" for complete list of contributors.
+ */
 scan '30 seconds'
 
 String encoderPattern = '%-12date{HH:mm:ss} %-5level %logger{35} - %msg%n'

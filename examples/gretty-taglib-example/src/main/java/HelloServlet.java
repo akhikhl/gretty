@@ -1,3 +1,11 @@
+/*
+ * Gretty
+ *
+ * Copyright (C) 2013-2014 Andrey Hihlovskiy and contributors.
+ *
+ * See the file "LICENSE" for copying and usage permission.
+ * See the file "CONTRIBUTORS" for complete list of contributors.
+ */
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
