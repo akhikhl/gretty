@@ -35,12 +35,12 @@ class AppStartTask extends StartBaseTask {
   }
 
   protected String getEffectiveInplaceMode() {
-      if(webAppConfig.inplaceMode != null)
-        webAppConfig.inplaceMode
-      else if (project.gretty.webAppConfig.inplaceMode != null)
-        project.gretty.webAppConfig.inplaceMode
-      else
-        true
+    if(webAppConfig.inplaceMode != null)
+      webAppConfig.inplaceMode
+    else if (project.gretty.webAppConfig.inplaceMode != null)
+      project.gretty.webAppConfig.inplaceMode
+    else
+      "soft"
   }
 
   @Override

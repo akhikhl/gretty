@@ -240,6 +240,7 @@ abstract class LauncherBase implements Launcher {
       webApps webAppConfigs.collect { WebAppConfig wconfig ->
         { ->
           inplace wconfig.inplace
+          inplaceMode wconfig.inplaceMode
           self.writeWebAppClassPath(delegate, wconfig)
           contextPath wconfig.contextPath
           resourceBase self.fileToString(wconfig.resourceBase)
