@@ -144,8 +144,8 @@ class GrettyPlugin implements Plugin<Project> {
           task.getWebAppConfigsForProjects().collect {
             def proj = project.project(it.projectPath)
             boolean inplace = it.inplace == null ? task.inplace : it.inplace
-            // TODO: inplaceMode support
-            inplace ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareArchiveWebApp
+            String inplaceMode = it.inplaceMode == null ? task.inplaceMode : it.inplaceMode
+            inplace ? (inplaceMode == 'hard' ? proj.tasks.prepareInplaceWebAppClasses : proj.tasks.prepareInplaceWebApp) : proj.tasks.prepareArchiveWebApp
           }
         }
     }

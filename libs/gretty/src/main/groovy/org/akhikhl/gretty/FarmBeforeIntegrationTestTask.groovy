@@ -8,12 +8,10 @@
  */
 package org.akhikhl.gretty
 
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.process.JavaForkOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -115,7 +113,7 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     FarmExtension tempFarm = new FarmExtension()
     configurer.configureFarm(tempFarm, new FarmExtension(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
     def options = tempFarm.webAppRefs.find { key, value -> configurer.resolveWebAppRefToProject(key) == webappProject }.value
-    def webappConfig = configurer.getWebAppConfigForProject(options, webappProject, inplace)
+    def webappConfig = configurer.getWebAppConfigForProject(options, webappProject, inplace, inplaceMode)
     ProjectUtils.prepareToRun(project, webappConfig)
 
     def contextPath = webappConfig.contextPath

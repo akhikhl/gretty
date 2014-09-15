@@ -67,7 +67,7 @@ final class ProjectUtils {
         urls.addAll proj.configurations[dependencyConfig].files.collect { it.toURI().toURL() }
         // ATTENTION: order of overlay classpath is important!
         if(proj.extensions.findByName('gretty'))
-          // TODO: check for hardInplace here
+          // TODO: check for hardInplace here?
           for(String overlay in proj.gretty.overlays.reverse())
             addProjectClassPath(proj.project(overlay))
       }
@@ -116,7 +116,18 @@ final class ProjectUtils {
     result.reloadOnConfigChange = true
     result.reloadOnLibChange = true
     result.resourceBase = {
-      inplace ? (inplaceMode == 'hard' ? ProjectUtils.getWebAppDir(project) : "${project.buildDir}/inplaceWebapp/" as String)  : ProjectUtils.getFinalArchivePath(project).toString()
+      def resourceBase
+      if(inplace) {
+          if(inplaceMode == 'hard') {
+              // in hard inplaceMode resourceBase is src/main/webapp (or something user specified instead)
+              resourceBase = ProjectUtils.getWebAppDir(project).toString()
+          } else {
+              resourceBase = "${project.buildDir}/inplaceWebapp/" as String
+          }
+      } else {
+          resourceBase = ProjectUtils.getFinalArchivePath(project).toString()
+      }
+      return resourceBase
     }
     result.projectPath = project.path
     return result
