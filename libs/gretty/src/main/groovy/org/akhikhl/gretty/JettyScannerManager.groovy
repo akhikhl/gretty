@@ -188,24 +188,23 @@ final class JettyScannerManager implements ScannerManager {
       if(reloadModes.contains('compile')) {
         log.warn 'Recompiling {}', (projectPath == ':' ? proj.name : projectPath)
         WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
-        if(!(wconfig.inplace && wconfig.inplaceMode == 'hard')) {
-            ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
-            try {
-                connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp').run()
-            } finally {
-                connection.close()
+        ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
+        try {
+            String task
+            if (wconfig.inplace && wconfig.inplaceMode == 'hard') {
+                // We don't need to prepare inplaceWebapp in `hard` inplaceMode
+                task = 'prepareInplaceWebAppClasses'
+            } else {
+                task = wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp'
             }
-        } else {
-            ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
-            try {
-                connection.newBuild().forTasks("prepareInplaceWebAppClasses").run()
-            } finally {
-                connection.close();
-            }
+            connection.newBuild().forTasks(task).run()
+        } finally {
+            connection.close()
         }
       } else if(reloadModes.contains('fastReload')) {
         log.warn 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
         WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
+        // TODO: maybe we should disable fastReload at all?
         if(!(wconfig.inplace && wconfig.inplaceMode == 'hard')) {
             ProjectUtils.prepareInplaceWebAppFolder(proj)
         }

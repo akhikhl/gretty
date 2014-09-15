@@ -67,7 +67,6 @@ final class ProjectUtils {
         urls.addAll proj.configurations[dependencyConfig].files.collect { it.toURI().toURL() }
         // ATTENTION: order of overlay classpath is important!
         if(proj.extensions.findByName('gretty'))
-          // TODO: check for hardInplace here?
           for(String overlay in proj.gretty.overlays.reverse())
             addProjectClassPath(proj.project(overlay))
       }
