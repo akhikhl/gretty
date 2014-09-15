@@ -7,15 +7,10 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
-import java.util.regex.Pattern
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Project
-import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTree
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -72,6 +67,7 @@ final class ProjectUtils {
         urls.addAll proj.configurations[dependencyConfig].files.collect { it.toURI().toURL() }
         // ATTENTION: order of overlay classpath is important!
         if(proj.extensions.findByName('gretty'))
+          // TODO: check for hardInplace here
           for(String overlay in proj.gretty.overlays.reverse())
             addProjectClassPath(proj.project(overlay))
       }
@@ -120,7 +116,7 @@ final class ProjectUtils {
     result.reloadOnConfigChange = true
     result.reloadOnLibChange = true
     result.resourceBase = {
-      inplace ? "${project.buildDir}/inplaceWebapp/" as String : ProjectUtils.getFinalArchivePath(project).toString()
+      inplace ? (inplaceMode == 'hard' ? ProjectUtils.getWebAppDir(project) : "${project.buildDir}/inplaceWebapp/" as String)  : ProjectUtils.getFinalArchivePath(project).toString()
     }
     result.projectPath = project.path
     return result
