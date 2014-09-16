@@ -18,9 +18,9 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- Gretty 1.1.3-SNAPSHOT now supports "virtual" mapping of gradle dependencies (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).
+- Gretty 1.1.3 supports "virtual" mapping of gradle dependencies (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).
 
-- Gretty 1.1.3-SNAPSHOT fixes compatibility problem with Gradle 1.12 and introduces Gradle version check.
+- Gretty 1.1.3 fixes compatibility problem with Gradle 1.12 and introduces Gradle version check.
 
 - Gretty 1.1.2 new feature: [webapp extra resource bases](http://akhikhl.github.io/gretty-doc/Web-app-extra-resource-bases.html).
 
