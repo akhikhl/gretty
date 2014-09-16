@@ -70,7 +70,7 @@ All releases of Gretty are available at [jcenter](https://bintray.com/akhikhl/ma
 
 Copyright 2013-2014 (c) Andrey Hihlovskiy
 
-All versions, present and past, of Gretty are licensed under [MIT license](license.txt).
+All versions, present and past, of Gretty are licensed under [MIT license](LICENSE).
 
 [![Project Stats](https://www.ohloh.net/p/gretty/widgets/project_thin_badge.gif)](https://www.ohloh.net/p/gretty)
 [![Support via Gittip](https://rawgithub.com/twolfson/gittip-badge/0.2.0/dist/gittip.png)](https://www.gittip.com/akhikhl/)
