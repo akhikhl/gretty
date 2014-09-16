@@ -18,7 +18,7 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- Gretty 1.1.3 supports "virtual" mapping of gradle dependencies (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).
+- Gretty 1.1.3 new feature: [virtual mapping of gradle dependencies](http://akhikhl.github.io/gretty-doc/Web-app-virtual-webinflibs.html) (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).
 
 - Gretty 1.1.3 fixes compatibility problem with Gradle 1.12 and introduces Gradle version check.
 
@@ -28,7 +28,7 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 - Gretty 1.1.2 new feature [webapp filtering](http://akhikhl.github.io/gretty-doc/Web-app-filtering.html).
 
-- From now on I'll push snapshot versions of Gretty to jfrog snapshot repository. If you want to use snapshot versions, please add the following to your build script:
+- From now on the snapshot versions of Gretty are regularly pushed to jfrog snapshot repository. If you want to use snapshot versions, please add the following to your build script:
   ```groovy
   buildscript {
     repositories {
