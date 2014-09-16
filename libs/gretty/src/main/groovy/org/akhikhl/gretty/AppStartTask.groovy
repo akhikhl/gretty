@@ -57,6 +57,10 @@ class AppStartTask extends StartBaseTask {
     ProjectUtils.resolveWebAppConfig(project, wconfig, sconfig)
     doPrepareWebAppConfig(wconfig)
 
+    if(wconfig.inplace && wconfig.inplaceMode == 'hard') {
+        logger.warn('You\'re running webapp in hard inplaceMode: Overlay and filtering features of gretty will be disabled!')
+    }
+
     new StartConfig() {
 
       @Override
