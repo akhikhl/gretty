@@ -70,11 +70,11 @@ class FarmConfigurer {
     wconfig
   }
 
-  WebAppConfig getWebAppConfigForProject(Map options, Project proj, Boolean inplace = null) {
+  WebAppConfig getWebAppConfigForProject(Map options, Project proj, Boolean inplace = null, String inplaceMode = null) {
     WebAppConfig wconfig = new WebAppConfig()
     if(!proj.extensions.findByName('gretty'))
       throw new GradleException("${proj} does not contain gretty extension. Please make sure that gretty plugin is applied to it.")
-    ConfigUtils.complementProperties(wconfig, options, proj.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(proj), new WebAppConfig(inplace: inplace))
+    ConfigUtils.complementProperties(wconfig, options, proj.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(proj), new WebAppConfig(inplace: inplace, inplaceMode: inplaceMode))
     ProjectUtils.resolveWebAppConfig(proj, wconfig, sconfig)
     wconfig
   }
@@ -87,12 +87,12 @@ class FarmConfigurer {
     wconfig
   }
 
-  Iterable<WebAppConfig> getWebAppConfigsForProjects(Map wrefs, Boolean inplace = null) {
+  Iterable<WebAppConfig> getWebAppConfigsForProjects(Map wrefs, Boolean inplace = null, String inplaceMode = null) {
     wrefs.findResults { wref, options ->
       if(options.inplace != null)
         inplace = options.inplace
       def proj = resolveWebAppRefToProject(wref)
-      proj ? getWebAppConfigForProject(options, proj, inplace) : null
+      proj ? getWebAppConfigForProject(options, proj, inplace, inplaceMode) : null
     }
   }
 
@@ -112,7 +112,7 @@ class FarmConfigurer {
   }
 
   // attention: this method may modify project configurations and dependencies.
-  void resolveWebAppRefs(Map wrefs, Collection<WebAppConfig> destWebAppConfigs, Boolean inplace = null) {
+  void resolveWebAppRefs(Map wrefs, Collection<WebAppConfig> destWebAppConfigs, Boolean inplace = null, String inplaceMode = null) {
     wrefs.each { wref, options ->
       if(options.inplace != null)
         inplace = options.inplace
@@ -135,7 +135,7 @@ class FarmConfigurer {
       }
       WebAppConfig webappConfig
       if(proj)
-        webappConfig = getWebAppConfigForProject(options, proj, inplace)
+        webappConfig = getWebAppConfigForProject(options, proj, inplace, inplaceMode)
       else if (warFile)
         webappConfig = getWebAppConfigForWarFile(options, warFile)
       else {

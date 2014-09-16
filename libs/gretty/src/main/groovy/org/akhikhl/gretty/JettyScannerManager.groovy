@@ -7,12 +7,10 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
 import org.eclipse.jetty.util.Scanner
 import org.eclipse.jetty.util.Scanner.BulkListener
 import org.eclipse.jetty.util.Scanner.ScanCycleListener
 import org.gradle.api.Project
-import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 import org.slf4j.Logger
@@ -192,13 +190,24 @@ final class JettyScannerManager implements ScannerManager {
         WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
         ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
         try {
-          connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp').run()
+            String task
+            if (wconfig.inplace && wconfig.inplaceMode == 'hard') {
+                // We don't need to prepare inplaceWebapp in `hard` inplaceMode
+                task = 'prepareInplaceWebAppClasses'
+            } else {
+                task = wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp'
+            }
+            connection.newBuild().forTasks(task).run()
         } finally {
-          connection.close()
+            connection.close()
         }
       } else if(reloadModes.contains('fastReload')) {
         log.warn 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
-        ProjectUtils.prepareInplaceWebAppFolder(proj)
+        WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
+        // TODO: maybe we should disable fastReload at all?
+        if(!(wconfig.inplace && wconfig.inplaceMode == 'hard')) {
+            ProjectUtils.prepareInplaceWebAppFolder(proj)
+        }
       }
     }
 

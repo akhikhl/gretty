@@ -37,6 +37,10 @@ class WebAppConfig {
 
   String projectPath
   Boolean inplace
+  /*
+   * Specifies mode for inplace feature: "hard" for directly serving src/main/webapp folder and "soft" for preparing build/inplaceWebapp first
+   */
+  String inplaceMode
 
   Boolean springBoot
   def springBootSources

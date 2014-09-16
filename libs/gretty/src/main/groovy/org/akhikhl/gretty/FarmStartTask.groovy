@@ -25,6 +25,8 @@ class FarmStartTask extends StartBaseTask {
   protected Map webAppRefs = [:]
 
   boolean inplace = true
+  // specifying default inplaceMode to override (optionally) by child applications
+  String inplaceMode = 'soft'
 
   @Override
   protected StartConfig getStartConfig() {
@@ -36,7 +38,7 @@ class FarmStartTask extends StartBaseTask {
     doPrepareServerConfig(tempFarm.serverConfig)
 
     List<WebAppConfig> wconfigs = []
-    configurer.resolveWebAppRefs(tempFarm.webAppRefs, wconfigs, inplace)
+    configurer.resolveWebAppRefs(tempFarm.webAppRefs, wconfigs, inplace, inplaceMode)
     for(WebAppConfig wconfig in wconfigs)
       doPrepareWebAppConfig(wconfig)
 
@@ -66,7 +68,7 @@ class FarmStartTask extends StartBaseTask {
     FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).webAppRefs)
     if(!wrefs)
       wrefs = configurer.getDefaultWebAppRefMap()
-    configurer.getWebAppConfigsForProjects(wrefs, inplace)
+    configurer.getWebAppConfigsForProjects(wrefs, inplace, inplaceMode)
   }
 
   Iterable<Project> getWebAppProjects() {

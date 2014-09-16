@@ -34,6 +34,15 @@ class AppStartTask extends StartBaseTask {
       true
   }
 
+  protected String getEffectiveInplaceMode() {
+    if(webAppConfig.inplaceMode != null)
+      webAppConfig.inplaceMode
+    else if (project.gretty.webAppConfig.inplaceMode != null)
+      project.gretty.webAppConfig.inplaceMode
+    else
+      "soft"
+  }
+
   @Override
   protected StartConfig getStartConfig() {
 
@@ -44,7 +53,7 @@ class AppStartTask extends StartBaseTask {
     doPrepareServerConfig(sconfig)
 
     WebAppConfig wconfig = new WebAppConfig()
-    ConfigUtils.complementProperties(wconfig, webAppConfig, project.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(project), new WebAppConfig(inplace: true))
+    ConfigUtils.complementProperties(wconfig, webAppConfig, project.gretty.webAppConfig, ProjectUtils.getDefaultWebAppConfigForProject(project), new WebAppConfig(inplace: true, inplaceMode: 'soft'))
     ProjectUtils.resolveWebAppConfig(project, wconfig, sconfig)
     doPrepareWebAppConfig(wconfig)
 
