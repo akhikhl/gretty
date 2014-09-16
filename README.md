@@ -2,8 +2,8 @@
 
 [![Build Status](http://img.shields.io/travis/akhikhl/gretty.svg)](https://travis-ci.org/akhikhl/gretty)
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
-[![Release](http://img.shields.io/badge/release-1.1.2-47b31f.svg)](https://github.com/akhikhl/gretty/releases/latest)
-[![Snapshot](http://img.shields.io/badge/current-1.1.3--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
+[![Release](http://img.shields.io/badge/release-1.1.3-47b31f.svg)](https://github.com/akhikhl/gretty/releases/latest)
+[![Snapshot](http://img.shields.io/badge/current-1.1.4--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
@@ -18,9 +18,9 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- Gretty 1.1.3-SNAPSHOT now supports "virtual" mapping of gradle dependencies (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).
+- Gretty 1.1.3 supports "virtual" mapping of gradle dependencies (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).
 
-- Gretty 1.1.3-SNAPSHOT fixes compatibility problem with Gradle 1.12 and introduces Gradle version check.
+- Gretty 1.1.3 fixes compatibility problem with Gradle 1.12 and introduces Gradle version check.
 
 - Gretty 1.1.2 new feature: [webapp extra resource bases](http://akhikhl.github.io/gretty-doc/Web-app-extra-resource-bases.html).
 
@@ -70,7 +70,7 @@ All releases of Gretty are available at [jcenter](https://bintray.com/akhikhl/ma
 
 Copyright 2013-2014 (c) Andrey Hihlovskiy
 
-All versions, present and past, of Gretty are licensed under [MIT license](license.txt).
+All versions, present and past, of Gretty are licensed under [MIT license](LICENSE).
 
 [![Project Stats](https://www.ohloh.net/p/gretty/widgets/project_thin_badge.gif)](https://www.ohloh.net/p/gretty)
 [![Support via Gittip](https://rawgithub.com/twolfson/gittip-badge/0.2.0/dist/gittip.png)](https://www.gittip.com/akhikhl/)
