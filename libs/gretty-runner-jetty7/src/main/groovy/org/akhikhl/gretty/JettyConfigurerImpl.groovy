@@ -44,7 +44,7 @@ import org.slf4j.Logger
  * @author akhikhl
  */
 class JettyConfigurerImpl implements JettyConfigurer {
-  
+
   protected static boolean isServletApi(String filePath) {
     filePath.matches(/^.*servlet-api.*\.jar$/)
   }
@@ -202,11 +202,13 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   def createWebAppContext(List<String> webappClassPath) {
-    URL[] classpathUrls = (webappClassPath.collect { new URL(it) }) as URL[]
-    ClassLoader classLoader = new URLClassLoader(classpathUrls, this.getClass().getClassLoader())
     JettyWebAppContext context = new JettyWebAppContext()
     context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect { new File(it) })
-    context.setClassLoader(new WebAppClassLoader(classLoader, context))
+    context.addSystemClass('ch.qos.logback.')
+    context.addSystemClass('org.slf4j.')
+    context.addSystemClass('org.codehaus.groovy.')
+    context.addSystemClass('groovy.lang.')
+    context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.setOverrideDescriptor('/org/akhikhl/gretty/override-web.xml')
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))

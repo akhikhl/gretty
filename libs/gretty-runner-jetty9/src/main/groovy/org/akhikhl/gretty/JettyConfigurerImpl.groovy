@@ -31,7 +31,7 @@ import javax.servlet.DispatcherType
  * @author akhikhl
  */
 class JettyConfigurerImpl implements JettyConfigurer {
-  
+
   protected static boolean isServletApi(String filePath) {
     filePath.matches(/^.*servlet-api.*\.jar$/)
   }
@@ -193,11 +193,15 @@ class JettyConfigurerImpl implements JettyConfigurer {
     org.eclipse.jetty.util.resource.Resource.defaultUseCaches = false
     return new Server()
   }
- 
+
   @Override
   def createWebAppContext(List<String> webappClassPath) {
     JettyWebAppContext context = new JettyWebAppContext()
     context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect { new File(it) })
+    context.addSystemClass('ch.qos.logback.')
+    context.addSystemClass('org.slf4j.')
+    context.addSystemClass('org.codehaus.groovy.')
+    context.addSystemClass('groovy.lang.')
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
