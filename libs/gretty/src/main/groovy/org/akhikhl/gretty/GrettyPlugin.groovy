@@ -7,14 +7,11 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.testing.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -139,14 +136,16 @@ class GrettyPlugin implements Plugin<Project> {
     project.tasks.whenObjectAdded { task ->
       if(task instanceof AppStartTask)
         task.dependsOn {
-          task.effectiveInplace ? project.tasks.prepareInplaceWebApp : project.tasks.prepareArchiveWebApp
+          // We don't need any task for hard inplace mode.
+          task.effectiveInplace ? (task.effectiveInplaceMode == 'hard' ? project.tasks.prepareInplaceWebAppClasses : project.tasks.prepareInplaceWebApp) : project.tasks.prepareArchiveWebApp
         }
       else if(task instanceof FarmStartTask)
         task.dependsOn {
           task.getWebAppConfigsForProjects().collect {
             def proj = project.project(it.projectPath)
             boolean inplace = it.inplace == null ? task.inplace : it.inplace
-            inplace ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareArchiveWebApp
+            String inplaceMode = it.inplaceMode == null ? task.inplaceMode : it.inplaceMode
+            inplace ? (inplaceMode == 'hard' ? proj.tasks.prepareInplaceWebAppClasses : proj.tasks.prepareInplaceWebApp) : proj.tasks.prepareArchiveWebApp
           }
         }
     }

@@ -7,15 +7,10 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
-import java.util.regex.Pattern
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Project
-import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTree
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -120,7 +115,18 @@ final class ProjectUtils {
     result.reloadOnConfigChange = true
     result.reloadOnLibChange = true
     result.resourceBase = {
-      inplace ? "${project.buildDir}/inplaceWebapp/" as String : ProjectUtils.getFinalArchivePath(project).toString()
+      def resourceBase
+      if(inplace) {
+          if(inplaceMode == 'hard') {
+              // in hard inplaceMode resourceBase is src/main/webapp (or something user specified instead)
+              resourceBase = ProjectUtils.getWebAppDir(project).toString()
+          } else {
+              resourceBase = "${project.buildDir}/inplaceWebapp/" as String
+          }
+      } else {
+          resourceBase = ProjectUtils.getFinalArchivePath(project).toString()
+      }
+      return resourceBase
     }
     result.projectPath = project.path
     return result

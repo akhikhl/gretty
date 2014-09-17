@@ -4,6 +4,12 @@
 
 ### What's new:
 
+#### Version 1.1.3
+
+- New feature: [virtual mapping of gradle dependencies](http://akhikhl.github.io/gretty-doc/Web-app-virtual-webinflibs.html) (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).
+
+- Fix for compatibility problem with Gradle 1.12 and introduction of Gradle version check.
+
 #### Version 1.1.2
 
 - New feature: [webapp extra resource bases](http://akhikhl.github.io/gretty-doc/Web-app-extra-resource-bases.html).
