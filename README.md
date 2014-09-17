@@ -38,7 +38,7 @@ If you are new with Gretty, good starting point would be [getting started](http:
       maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
     }
     dependencies {
-      classpath 'org.akhikhl.gretty:gretty:1.1.3-SNAPSHOT'
+      classpath 'org.akhikhl.gretty:gretty:1.1.4-SNAPSHOT'
     }
   }
   
