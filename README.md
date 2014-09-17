@@ -18,7 +18,9 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- Gretty 1.1.3 new feature: [virtual mapping of gradle dependencies](http://akhikhl.github.io/gretty-doc/Web-app-virtual-webinflibs.html) (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).
+- Incubating feature in Gretty 1.1.4: `gretty.inplaceMode='hard'`. When specified, Gretty serves assets directly from "src/main/webapp" (or whatever specified by project.webAppDir), without copying files to temporary directory. Thanks to @saladinkzn for contributing this feature.
+
+- Gretty 1.1.3 new feature: [virtual mapping of gradle dependencies](http://akhikhl.github.io/gretty-doc/Web-app-virtual-webinflibs.html) (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker). Thanks to @saladinkzn for contributing this feature.
 
 - Gretty 1.1.3 fixes compatibility problem with Gradle 1.12 and introduces Gradle version check.
 
