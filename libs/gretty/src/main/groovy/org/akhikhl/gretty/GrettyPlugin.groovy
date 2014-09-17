@@ -137,15 +137,14 @@ class GrettyPlugin implements Plugin<Project> {
       if(task instanceof AppStartTask)
         task.dependsOn {
           // We don't need any task for hard inplace mode.
-          task.effectiveInplace ? (task.effectiveInplaceMode == 'hard' ? project.tasks.prepareInplaceWebAppClasses : project.tasks.prepareInplaceWebApp) : project.tasks.prepareArchiveWebApp
+          task.effectiveInplace ? project.tasks.prepareInplaceWebApp : project.tasks.prepareArchiveWebApp
         }
       else if(task instanceof FarmStartTask)
         task.dependsOn {
           task.getWebAppConfigsForProjects().collect {
             def proj = project.project(it.projectPath)
             boolean inplace = it.inplace == null ? task.inplace : it.inplace
-            String inplaceMode = it.inplaceMode == null ? task.inplaceMode : it.inplaceMode
-            inplace ? (inplaceMode == 'hard' ? proj.tasks.prepareInplaceWebAppClasses : proj.tasks.prepareInplaceWebApp) : proj.tasks.prepareArchiveWebApp
+            inplace ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareArchiveWebApp
           }
         }
     }
@@ -157,11 +156,21 @@ class GrettyPlugin implements Plugin<Project> {
 
       project.task('prepareInplaceWebAppFolder', group: 'gretty') {
         description = 'Copies webAppDir of this web-app and all overlays (if any) to ${buildDir}/inplaceWebapp'
+        def getInplaceMode = {
+            project.tasks.findByName('appRun').effectiveInplaceMode
+        }
         inputs.dir ProjectUtils.getWebAppDir(project)
+        // We should track changes in inplaceMode value or plugin would show UP-TO-DATE for this task
+        // even if inplaceMode was changed
+        inputs.property('inplaceMode', getInplaceMode)
         outputs.dir "${project.buildDir}/inplaceWebapp"
         doLast {
-          ProjectUtils.prepareInplaceWebAppFolder(project)
+            if(getInplaceMode() != 'hard') {
+                // Skipping this task for hard inplaceMode.
+                ProjectUtils.prepareInplaceWebAppFolder(project)
+            }
         }
+
       }
 
       project.task('prepareInplaceWebAppClasses', group: 'gretty') {

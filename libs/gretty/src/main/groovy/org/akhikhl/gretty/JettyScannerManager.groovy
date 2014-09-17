@@ -190,14 +190,7 @@ final class JettyScannerManager implements ScannerManager {
         WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
         ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
         try {
-            String task
-            if (wconfig.inplace && wconfig.inplaceMode == 'hard') {
-                // We don't need to prepare inplaceWebapp in `hard` inplaceMode
-                task = 'prepareInplaceWebAppClasses'
-            } else {
-                task = wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp'
-            }
-            connection.newBuild().forTasks(task).run()
+            connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp').run()
         } finally {
             connection.close()
         }

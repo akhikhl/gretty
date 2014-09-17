@@ -39,8 +39,13 @@ class FarmStartTask extends StartBaseTask {
 
     List<WebAppConfig> wconfigs = []
     configurer.resolveWebAppRefs(tempFarm.webAppRefs, wconfigs, inplace, inplaceMode)
-    for(WebAppConfig wconfig in wconfigs)
+    for(WebAppConfig wconfig in wconfigs) {
       doPrepareWebAppConfig(wconfig)
+
+      if(wconfig.inplace && wconfig.inplaceMode == 'hard') {
+          logger.warn("You\'re running webapp (${wconfig.projectPath}) in hard inplaceMode: Overlay and filtering features of gretty will be disabled!")
+      }
+    }
 
     new StartConfig() {
 
