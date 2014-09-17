@@ -417,6 +417,8 @@ class ProductConfigurer {
           springBootMainClass self.getSpringBootMainClass()
         if(sconfig.singleSignOn != null)
           singleSignOn sconfig.singleSignOn
+        if(sconfig.jvmArgs)
+          jvmArgs sconfig.jvmArgs
       }
       webApps wconfigs.collect { WebAppConfig wconfig ->
         { ->
