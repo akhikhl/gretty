@@ -21,7 +21,10 @@ class GrettyStarter {
     File basedir = new File(GrettyStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath().toURI().getPath()).parentFile.parentFile
 
     def cli = new CliBuilder()
-    // here we could define command-line parameters via CliBuilder DSL
+    cli.with {
+      _ longOpt: 'runnerArg', args: 1, argName: 'runnerArg', 'arguments for Gretty Runner'
+      raf longOpt: 'runnerArgFile', args: 1, argName: 'runnerArgFile', 'file with arguments for Gretty Runner'
+    }
 
     def options = cli.parse(args)
 
@@ -41,15 +44,15 @@ class GrettyStarter {
       sconfig[key] = value
     }
 
-    if(cliArgs){
-        def jvmArgs = []
-        cliArgs.eachWithIndex{ arg,index ->
-            if(index >0)
-                jvmArgs << arg
-        }
-        sconfig.jvmArgs = jvmArgs
+    if(options.runnerArgFile) {
+      File f = new File(options.runnerArgFile)
+      if(!f.isAbsolute())
+        f = new File(basedir, options.runnerArgFile)
+      sconfig.jvmArgs.addAll(f.text.split('\\s'))
     }
 
+    if(options.runnerArgs)
+      sconfig.jvmArgs.addAll(options.runnerArgs)
 
     ConfigUtils.complementProperties(sconfig, ServerConfig.getDefaultServerConfig(config.productName))
 
