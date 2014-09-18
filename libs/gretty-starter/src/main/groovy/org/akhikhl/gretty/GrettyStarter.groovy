@@ -41,6 +41,16 @@ class GrettyStarter {
       sconfig[key] = value
     }
 
+    if(cliArgs){
+        def jvmArgs = []
+        cliArgs.eachWithIndex{ arg,index ->
+            if(index >0)
+                jvmArgs << arg
+        }
+        sconfig.jvmArgs = jvmArgs
+    }
+
+
     ConfigUtils.complementProperties(sconfig, ServerConfig.getDefaultServerConfig(config.productName))
 
     def resolveFile = { f ->
