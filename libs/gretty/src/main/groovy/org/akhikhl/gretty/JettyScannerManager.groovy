@@ -210,6 +210,10 @@ final class JettyScannerManager implements ScannerManager {
 
   @Override
   void startScanner() {
+    if(sconfig.reload == 'manual') {
+        log.warn 'reload mode is manual, hot deployment disabled'
+        return
+    }
     if(!sconfig.scanInterval) {
       if(sconfig.scanInterval == null)
         log.warn 'scanInterval not specified, hot deployment disabled'
