@@ -210,10 +210,6 @@ final class JettyScannerManager implements ScannerManager {
 
   @Override
   void startScanner() {
-    if(sconfig.interactiveMode == 'restartOnKeyPress') {
-        log.warn 'interactiveMode is `restartOnKeyPress`, hot deployment disabled'
-        return
-    }
     if(!sconfig.scanInterval) {
       if(sconfig.scanInterval == null)
         log.warn 'scanInterval not specified, hot deployment disabled'
