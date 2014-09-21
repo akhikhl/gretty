@@ -47,7 +47,7 @@ class ServerConfig {
   def realm
   def realmConfigFile
   def serverConfigFile
-  String reload
+  String interactiveMode
   Integer scanInterval
   def logbackConfigFile
   String loggingLevel
@@ -74,7 +74,7 @@ class ServerConfig {
     result.httpsEnabled = false
     result.servicePort = defaultServicePort
     result.statusPort = defaultStatusPort
-    result.reload = 'automatic'
+    result.interactiveMode = 'stopOnKeyPress'
     result.scanInterval = 1
     result.loggingLevel = 'INFO'
     result.consoleLogEnabled = true
