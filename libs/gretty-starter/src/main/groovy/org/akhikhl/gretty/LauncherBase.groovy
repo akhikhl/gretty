@@ -68,7 +68,7 @@ abstract class LauncherBase implements Launcher {
   void launch() {
     Thread thread = launchThread()
     if(config.getInteractive()) {
-      if(sconfig.reload == 'manual') {
+      if(sconfig.interactiveMode == 'restartOnKeyPress') {
           ExecutorService executorService = Executors.newSingleThreadExecutor()
           try {
             while(true) {
@@ -86,11 +86,13 @@ abstract class LauncherBase implements Launcher {
           } finally {
               executorService.shutdown()
           }
-      } else {
+      } else if(sconfig.interactiveMode == 'stopOnKeyPress') {
           System.out.println 'Press any key to stop the server.'
           System.in.read()
           log.debug 'Sending command: {}', 'stop'
           ServiceProtocol.send(sconfig.servicePort, 'stop')
+      } else {
+        log.warn 'Unexpected interactiveMode: {}', sconfig.interactiveMode
       }
     } else
       System.out.println "Run '${config.getStopCommand()}' to stop the server."
