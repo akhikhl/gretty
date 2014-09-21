@@ -47,6 +47,7 @@ class ServerConfig {
   def realm
   def realmConfigFile
   def serverConfigFile
+  String reload
   Integer scanInterval
   def logbackConfigFile
   String loggingLevel
@@ -73,6 +74,7 @@ class ServerConfig {
     result.httpsEnabled = false
     result.servicePort = defaultServicePort
     result.statusPort = defaultStatusPort
+    result.reload = 'automatic'
     result.scanInterval = 1
     result.loggingLevel = 'INFO'
     result.consoleLogEnabled = true

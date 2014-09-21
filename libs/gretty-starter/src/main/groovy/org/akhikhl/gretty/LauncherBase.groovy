@@ -68,10 +68,30 @@ abstract class LauncherBase implements Launcher {
   void launch() {
     Thread thread = launchThread()
     if(config.getInteractive()) {
-      System.out.println 'Press any key to stop the server.'
-      System.in.read()
-      log.debug 'Sending command: {}', 'stop'
-      ServiceProtocol.send(sconfig.servicePort, 'stop')
+      if(sconfig.reload == 'manual') {
+          ExecutorService executorService = Executors.newSingleThreadExecutor()
+          try {
+            while(true) {
+              System.out.println 'Press any key to restart the server.'
+              System.in.read()
+              log.debug 'Sending command: {}', 'restart'
+              def futureStatus = executorService.submit({
+                ServiceProtocol.readMessage(sconfig.statusPort)
+              } as Callable)
+              ServiceProtocol.send(sconfig.servicePort, 'restart')
+              // Waiting for restart complete event
+              def status = futureStatus.get()
+              log.debug "Received status: ${status}"
+            }
+          } finally {
+              executorService.shutdown()
+          }
+      } else {
+          System.out.println 'Press any key to stop the server.'
+          System.in.read()
+          log.debug 'Sending command: {}', 'stop'
+          ServiceProtocol.send(sconfig.servicePort, 'stop')
+      }
     } else
       System.out.println "Run '${config.getStopCommand()}' to stop the server."
     thread.join()
