@@ -69,19 +69,38 @@ abstract class LauncherBase implements Launcher {
     Thread thread = launchThread()
     if(config.getInteractive()) {
       if(sconfig.interactiveMode == 'restartOnKeyPress') {
-          ExecutorService executorService = Executors.newSingleThreadExecutor()
+        System.out.println 'Press ENTER to restart the server.'
+        ExecutorService executorService = Executors.newSingleThreadExecutor()
           try {
             while(true) {
-              System.out.println 'Press any key to restart the server.'
-              System.in.read()
-              log.debug 'Sending command: {}', 'restart'
-              def futureStatus = executorService.submit({
-                ServiceProtocol.readMessage(sconfig.statusPort)
-              } as Callable)
-              ServiceProtocol.send(sconfig.servicePort, 'restart')
-              // Waiting for restart complete event
-              def status = futureStatus.get()
-              log.debug "Received status: ${status}"
+              while(System.in.available() > 0) {
+                def input = System.in.read()
+                if(input >= 0) {
+                  char c = input as char
+                  if(c == '\n') {
+                    log.debug 'Sending command: {}', 'restart'
+                    def futureStatus = executorService.submit({
+                      ServiceProtocol.readMessage(sconfig.statusPort)
+                    } as Callable)
+                    ServiceProtocol.send(sconfig.servicePort, 'restart')
+                    // Waiting for restart complete event
+                    def status = futureStatus.get()
+                    log.debug "Received status: ${status}"
+                    //
+                    System.out.println 'Press ENTER to restart the server.'
+                    // dumping input
+                    while (System.in.available() > 0) {
+                      long available = System.in.available()
+                      for (int i = 0; i < available; i++) {
+                        if (System.in.read() == -1) {
+                          break
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              Thread.sleep(500)
             }
           } finally {
               executorService.shutdown()
