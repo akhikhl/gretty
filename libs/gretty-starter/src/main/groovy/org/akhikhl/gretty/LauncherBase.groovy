@@ -67,17 +67,27 @@ abstract class LauncherBase implements Launcher {
   @Override
   void launch() {
     Thread thread = launchThread()
+    def stopServer = {
+      log.debug 'Sending command: {}', 'stop'
+      ServiceProtocol.send(sconfig.servicePort, 'stop')
+    }
     if(config.getInteractive()) {
       if(sconfig.interactiveMode == 'restartOnKeyPress') {
-        System.out.println 'Press ENTER to restart the server.'
+        def hint = 'Press \'q\' or \'Q\' to stop the server or any other key to restart.'
+        System.out.println hint
         ExecutorService executorService = Executors.newSingleThreadExecutor()
           try {
+            // Based on Jetty-Maven-Plugin console scanner
+            infinite:
             while(true) {
               while(System.in.available() > 0) {
                 def input = System.in.read()
                 if(input >= 0) {
                   char c = input as char
-                  if(c == '\n') {
+                  if(c == 'q' || c == 'Q') {
+                    stopServer()
+                    break infinite
+                  } else {
                     log.debug 'Sending command: {}', 'restart'
                     def futureStatus = executorService.submit({
                       ServiceProtocol.readMessage(sconfig.statusPort)
@@ -87,11 +97,12 @@ abstract class LauncherBase implements Launcher {
                     def status = futureStatus.get()
                     log.debug "Received status: ${status}"
                     //
-                    System.out.println 'Press ENTER to restart the server.'
+                    System.out.println hint
                     // dumping input
                     while (System.in.available() > 0) {
                       long available = System.in.available()
                       for (int i = 0; i < available; i++) {
+                        // Stream ended suddenly
                         if (System.in.read() == -1) {
                           break
                         }
@@ -100,6 +111,7 @@ abstract class LauncherBase implements Launcher {
                   }
                 }
               }
+              // Sleep to prevent busy wait
               Thread.sleep(500)
             }
           } finally {
@@ -108,8 +120,7 @@ abstract class LauncherBase implements Launcher {
       } else if(sconfig.interactiveMode == 'stopOnKeyPress') {
           System.out.println 'Press any key to stop the server.'
           System.in.read()
-          log.debug 'Sending command: {}', 'stop'
-          ServiceProtocol.send(sconfig.servicePort, 'stop')
+          stopServer()
       } else {
         log.warn 'Unexpected interactiveMode: {}', sconfig.interactiveMode
       }
