@@ -54,7 +54,7 @@ class GrettyStarter {
         f = new File(basedir, options.runnerArgFile)
 
       if(!f.exists())
-          throw new FileNotFoundException("File ${f.absolutePath} do not exists!")
+          throw new FileNotFoundException("File ${f.absolutePath} does not exist!")
 
       sconfig.jvmArgs.addAll(f.text.split('\\s'))
     }
