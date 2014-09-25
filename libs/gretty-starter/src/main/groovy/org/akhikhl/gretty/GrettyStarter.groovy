@@ -25,6 +25,7 @@ class GrettyStarter {
       _ longOpt: 'runnerArg', args: 1, argName: 'runnerArg', 'arguments for Gretty Runner'
       raf longOpt: 'runnerArgFile', args: 1, argName: 'runnerArgFile', 'file with arguments for Gretty Runner'
       roa longOpt: 'runnerOverrideArgs', args: 0, argName: 'runnerOverrideArgs', 'override all arguments for Gretty Runner'
+      rau longOpt: 'runnerArgURL', args: 1, argName: 'runnerArgURL', 'url with arguments for Gretty Runner (same file format)'
     }
 
     def options = cli.parse(args)
@@ -57,6 +58,11 @@ class GrettyStarter {
           throw new FileNotFoundException("File ${f.absolutePath} does not exist!")
 
       sconfig.jvmArgs.addAll(f.text.split('\\s'))
+    }
+
+    if(options.runnerArgURL) {
+          URL urlSource = new URL(options.runnerArgURL)
+          sconfig.jvmArgs.addAll(urlSource.text.split('\\s'))
     }
 
     if(options.runnerArgs)
