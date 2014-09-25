@@ -88,11 +88,11 @@ abstract class LauncherBase implements Launcher {
                     stopServer()
                     break infinite
                   } else {
-                    log.debug 'Sending command: {}', 'restart'
+                    log.debug 'Sending command: {}', 'restartWithEvent'
                     def futureStatus = executorService.submit({
                       ServiceProtocol.readMessage(sconfig.statusPort)
                     } as Callable)
-                    ServiceProtocol.send(sconfig.servicePort, 'restart')
+                    ServiceProtocol.send(sconfig.servicePort, 'restartWithEvent')
                     // Waiting for restart complete event
                     def status = futureStatus.get()
                     log.debug "Received status: ${status}"
