@@ -81,6 +81,10 @@ final class Runner {
         }
         else if(data == 'restart') {
           serverManager.stopServer()
+          serverManager.startServer()
+        }
+        else if(data == 'restartWithEvent') {
+          serverManager.stopServer()
           serverManager.startServer(new RestartEvent())
         }
       }
