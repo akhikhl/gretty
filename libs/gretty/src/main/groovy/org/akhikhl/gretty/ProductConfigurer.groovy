@@ -11,6 +11,7 @@ package org.akhikhl.gretty
 import groovy.json.JsonBuilder
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.bundling.Zip
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -35,6 +36,7 @@ class ProductConfigurer {
   protected jsonConfig
   protected String logbackConfig
   protected Map launchScripts = [:]
+  protected Map textFiles = [:]
 
   ProductConfigurer(Project project, File baseOutputDir, String productName, ProductExtension product) {
     this.project = project
@@ -75,6 +77,11 @@ class ProductConfigurer {
       inputs.property 'launchScripts', {
         resolveConfig()
         launchScripts
+      }
+
+      inputs.property 'textFiles', {
+        resolveConfig()
+        textFiles
       }
 
       inputs.property 'realms', {
@@ -128,6 +135,7 @@ class ProductConfigurer {
         resolveConfig()
         writeConfigFiles()
         writeLaunchScripts()
+        writeTextFiles()
         copyWebappFiles()
         copyStarter()
         copyRunner()
@@ -136,12 +144,18 @@ class ProductConfigurer {
 
     project.tasks.buildAllProducts.dependsOn buildProductTask
 
-    def archiveProductTask = project.task("archiveProduct${productName}", group: 'gretty') {
+    def archiveProductTask = project.task("archiveProduct${productName}", group: 'gretty', type: Zip) {
 
       dependsOn buildProductTask
 
+      baseName = productName ?: project.name
+      version = project.version
+      destinationDir = baseOutputDir
+
+      from outputDir, { into project.name }
+
       doLast {
-        println "archiving product $productName"
+        ant.checksum file: it.archivePath
       }
     }
 
@@ -237,6 +251,14 @@ class ProductConfigurer {
     }
   }
 
+  protected void createTextFiles() {
+
+    textFiles['VERSION.txt'] = """Product: ${productName ?: project.name}
+Version: ${project.version}
+Created: ${new Date()}
+"""
+  }
+
   protected FileCollection getRunnerFileCollection() {
     def servletContainerConfig = ServletContainerConfig.getConfig(sconfig.servletContainer)
     def files
@@ -279,6 +301,7 @@ class ProductConfigurer {
       logbackConfig = LogbackUtils.generateLogbackConfig(sconfig)
     jsonConfig = writeConfigToJson()
     createLaunchScripts()
+    createTextFiles()
   }
 
   protected void writeConfigFiles() {
@@ -449,11 +472,18 @@ class ProductConfigurer {
   }
 
   protected void writeLaunchScripts() {
-    launchScripts.each { scriptName, scriptText ->
-      File launchScriptFile = new File(outputDir, scriptName)
-      launchScriptFile.text = scriptText
-      if(scriptName.endsWith('.sh'))
-        launchScriptFile.setExecutable(true)
+    launchScripts.each { fileName, fileText ->
+      File file = new File(outputDir, fileName)
+      file.text = fileText
+      if(fileName.endsWith('.sh'))
+        file.setExecutable(true)
+    }
+  }
+
+  protected void writeTextFiles() {
+    textFiles.each { fileName, fileText ->
+      File file = new File(outputDir, fileName)
+      file.text = fileText
     }
   }
 }

@@ -12,8 +12,8 @@ package org.akhikhl.gretty
 import org.gradle.api.Project
 
 /**
- *
- * @author ahi
+ * Describes properties of Gretty product.
+ * @author akhikhl
  */
 class ProductExtension {
 
