@@ -297,7 +297,7 @@ Created: ${new Date()}
     for(WebAppConfig wconfig in wconfigs)
       ProjectUtils.prepareToRun(project, wconfig)
     CertificateGenerator.maybeGenerate(project, sconfig)
-    if(!sconfig.logbackConfigFile)
+    if(!sconfig.logbackConfigFile && product.autoGenerateLogbackConfig)
       logbackConfig = LogbackUtils.generateLogbackConfig(sconfig)
     jsonConfig = writeConfigToJson()
     createLaunchScripts()
@@ -344,7 +344,7 @@ Created: ${new Date()}
 
     if(sconfig.logbackConfigFile)
       dir.add(sconfig.logbackConfigFile)
-    else {
+    else if (product.autoGenerateLogbackConfig) {
       File logbackConfigFile = new File(dir.baseDir, 'logback.groovy')
       logbackConfigFile.parentFile.mkdirs()
       logbackConfigFile.text = logbackConfig
@@ -433,7 +433,8 @@ Created: ${new Date()}
           realmConfigFile 'conf/' + getFileName(sconfig.realmConfigFile)
         if(sconfig.serverConfigFile)
           serverConfigFile 'conf/' + getFileName(sconfig.serverConfigFile)
-        logbackConfigFile 'conf/' + (getFileName(sconfig.logbackConfigFile) ?: 'logback.groovy')
+        if(sconfig.logbackConfigFile || product.autoGenerateLogbackConfig)
+          logbackConfigFile 'conf/' + (getFileName(sconfig.logbackConfigFile) ?: 'logback.groovy')
         if(sconfig.secureRandom != null)
           secureRandom sconfig.secureRandom
         if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) })

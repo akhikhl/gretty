@@ -19,6 +19,11 @@ class ProductExtension {
 
   @Delegate
   protected ServerConfig serverConfig = new ServerConfig()
+  
+  /**
+   * When true, Gretty will generate logback.groovy and place it to product's conf directory.
+   */
+  Boolean autoGenerateLogbackConfig = false
 
   // key is project path or war path, value is options
   Map webAppRefs = [:]

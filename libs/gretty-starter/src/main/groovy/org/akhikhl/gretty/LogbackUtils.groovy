@@ -22,7 +22,7 @@ class LogbackUtils {
       consoleLogEnabled: sconfig.consoleLogEnabled,
       fileLogEnabled: sconfig.fileLogEnabled,
       logFileName: sconfig.logFileName,
-      logDir: sconfig.logDir
+      logDir: (sconfig.logDir ?: '${System.getProperty(\'user.home\')}/logs')
     ]
     def template
     LogbackUtils.getResourceAsStream('logback-groovy.template').withReader {
