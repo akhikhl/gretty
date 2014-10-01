@@ -47,11 +47,11 @@ class ProductConfigurer {
 
   void configureProduct() {
 
-    def buildProductTask = project.task("buildProduct${productName}", group: 'gretty') {
+    def buildProductTask = project.task("buildProduct${productName}", group: 'gretty') { task ->
 
       dependsOn {
         resolveConfig()
-        wconfigs.findResults { wconfig ->
+        wconfigs.collectMany { wconfig ->
           def result = []
           if(wconfig.projectPath) {
             def proj = project.project(wconfig.projectPath)
@@ -59,8 +59,8 @@ class ProductConfigurer {
             if(ProjectUtils.isSpringBootApp(proj, wconfig))
               result.add(proj.tasks.jar)
           }
-          return result
-        }.flatten()
+          result
+        }
       }
 
       inputs.property 'config', {
@@ -92,7 +92,9 @@ class ProductConfigurer {
         def result = []
         for(WebAppConfig wconfig in wconfigs) {
           // projects are already set as input in dependsOn
-          if(!wconfig.projectPath)
+          if(wconfig.projectPath)
+            result.addAll project.project(wconfig.projectPath).configurations.runtime.files
+          else
             result.add wconfig.resourceBase
           if(wconfig.realmConfigFile)
             result.add wconfig.realmConfigFile
