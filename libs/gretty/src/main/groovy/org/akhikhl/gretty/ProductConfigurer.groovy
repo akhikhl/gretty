@@ -36,7 +36,6 @@ class ProductConfigurer {
   protected jsonConfig
   protected String logbackConfig
   protected Map launchScripts = [:]
-  protected Map textFiles = [:]
 
   ProductConfigurer(Project project, File baseOutputDir, String productName, ProductExtension product) {
     this.project = project
@@ -80,8 +79,7 @@ class ProductConfigurer {
       }
 
       inputs.property 'textFiles', {
-        resolveConfig()
-        textFiles
+        createTextFiles(false)
       }
 
       inputs.property 'realms', {
@@ -135,7 +133,7 @@ class ProductConfigurer {
         resolveConfig()
         writeConfigFiles()
         writeLaunchScripts()
-        writeTextFiles()
+        writeTextFiles(createTextFiles(true))
         copyWebappFiles()
         copyStarter()
         copyRunner()
@@ -251,12 +249,12 @@ class ProductConfigurer {
     }
   }
 
-  protected void createTextFiles() {
-
-    textFiles['VERSION.txt'] = """Product: ${productName ?: project.name}
-Version: ${project.version}
-Created: ${new Date()}
-"""
+  protected Map createTextFiles(boolean addTimeStamp) {
+    String text = """Product: ${productName ?: project.name}
+Version: ${project.version}"""
+    if(addTimeStamp)
+      text += "\nCreated: ${new Date()}"
+    ['VERSION.txt': text]
   }
 
   protected FileCollection getRunnerFileCollection() {
@@ -300,8 +298,7 @@ Created: ${new Date()}
     if(!sconfig.logbackConfigFile)
       logbackConfig = LogbackUtils.generateLogbackConfig(sconfig)
     jsonConfig = writeConfigToJson()
-    createLaunchScripts()
-    createTextFiles()
+    createLaunchScripts()    
   }
 
   protected void writeConfigFiles() {
@@ -480,7 +477,7 @@ Created: ${new Date()}
     }
   }
 
-  protected void writeTextFiles() {
+  protected void writeTextFiles(Map textFiles) {
     textFiles.each { fileName, fileText ->
       File file = new File(outputDir, fileName)
       file.text = fileText
