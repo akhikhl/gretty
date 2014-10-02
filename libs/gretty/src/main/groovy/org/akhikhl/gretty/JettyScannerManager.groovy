@@ -41,7 +41,7 @@ final class JettyScannerManager implements ScannerManager {
     this.managedClassReload = managedClassReload
   }
 
-  private static void collectScanDirs(Collection<File> scanDirs, boolean scanDependencies, Project proj) {
+  private static void collectScanDirs(Collection<File> scanDirs, Boolean scanDependencies, Project proj) {
     scanDirs.add(ProjectUtils.getWebAppDir(proj))
     scanDirs.addAll(proj.sourceSets.main.allSource.srcDirs)
     scanDirs.addAll(proj.sourceSets.main.runtimeClasspath.files)
