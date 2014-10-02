@@ -22,7 +22,7 @@ class GrettyPlugin implements Plugin<Project> {
 
   private void addConfigurations(Project project) {
     project.configurations {
-      gretty
+      gretty()
       springBoot {
         if(project.configurations.findByName('runtime'))
           extendsFrom project.configurations.runtime
@@ -33,17 +33,26 @@ class GrettyPlugin implements Plugin<Project> {
         extendsFrom project.configurations.gretty
         exclude group: 'org.springframework.boot'
       }
-      grettyRunnerSpringBoot
+      grettyRunnerSpringBootBase()
+      grettyRunnerSpringBoot {
+        extendsFrom project.configurations.grettyRunnerSpringBootBase
+      }
+      grettyRunnerSpringBootJettyBase {
+        extendsFrom project.configurations.grettyRunnerSpringBoot
+      }
       grettyRunnerSpringBootJetty {
+        extendsFrom project.configurations.grettyRunnerSpringBootJettyBase
+      }
+      grettyRunnerSpringBootTomcatBase {
         extendsFrom project.configurations.grettyRunnerSpringBoot
       }
       grettyRunnerSpringBootTomcat {
-        extendsFrom project.configurations.grettyRunnerSpringBoot
+        extendsFrom project.configurations.grettyRunnerSpringBootTomcatBase
       }
       grettySpringLoaded {
         transitive = false
       }
-      grettyStarter
+      grettyStarter()
       runtimeNoSpringBoot {
         extendsFrom project.configurations.runtime
         exclude group: 'org.springframework.boot'
@@ -62,19 +71,27 @@ class GrettyPlugin implements Plugin<Project> {
 
   private void addDependencies(Project project) {
 
-    String grettyVersion = Externalized.getString('grettyVersion')
+    String grettyVersion = Externalized.getString('grettyVersion')    
+    String springBootVersion = project.gretty.springBootVersion ?: (project.hasProperty('springBootVersion') ? project.springBootVersion : '1.1.5.RELEASE')
 
     project.dependencies {
-      grettyRunnerSpringBoot "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion"
-      grettyRunnerSpringBootJetty "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
+      grettyRunnerSpringBootBase "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion", {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+      }
+      grettyRunnerSpringBoot "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+      grettyRunnerSpringBootJettyBase "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
         // concrete implementation is chosen depending on servletContainer property
         exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
       }
-      grettyRunnerSpringBootTomcat "org.akhikhl.gretty:gretty-runner-spring-boot-tomcat:$grettyVersion", {
+      grettyRunnerSpringBootJetty "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}"
+      grettyRunnerSpringBootTomcatBase "org.akhikhl.gretty:gretty-runner-spring-boot-tomcat:$grettyVersion", {
         // concrete implementation is chosen depending on servletContainer property
         exclude group: 'org.apache.tomcat.embed'
         exclude group: 'javax.servlet', module: 'javax.servlet-api'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
       }
+      grettyRunnerSpringBootTomcat "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}"
       grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
       grettyStarter "org.akhikhl.gretty:gretty-starter:$grettyVersion"
     }
@@ -95,10 +112,10 @@ class GrettyPlugin implements Plugin<Project> {
 
     if(project.gretty.springBoot)
       project.dependencies {
-        compile 'org.springframework.boot:spring-boot-starter-web', {
+        compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
           exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
         }
-        springBoot 'org.springframework.boot:spring-boot-starter-jetty'
+        springBoot "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}"
       }
 
     for(String overlay in project.gretty.overlays)
