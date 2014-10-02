@@ -41,12 +41,27 @@ final class JettyScannerManager implements ScannerManager {
     this.managedClassReload = managedClassReload
   }
 
-  private static void collectScanDirs(Collection<File> scanDirs, boolean inplace, Project proj) {
+  private static void collectScanDirs(Collection<File> scanDirs, boolean scanDependencies, Project proj) {
     scanDirs.add(ProjectUtils.getWebAppDir(proj))
     scanDirs.addAll(proj.sourceSets.main.allSource.srcDirs)
     scanDirs.addAll(proj.sourceSets.main.runtimeClasspath.files)
+    if(scanDependencies) {
+      collectDependenciesSourceSets(scanDirs, proj)
+    }
     for(def overlay in proj.gretty.overlays)
-      collectScanDirs(scanDirs, inplace, proj.project(overlay))
+      // TODO: Do we need to scan overlay dependencies?
+      collectScanDirs(scanDirs, false, proj.project(overlay))
+  }
+
+  private static void collectDependenciesSourceSets(Collection<File> scanDirs, Project p) {
+      List<Project> dependencyProjects = ProjectUtils.getDependencyProjects(p, 'compile')
+      for(Project project: dependencyProjects) {
+          // adding sourceSets of dependecy project
+          scanDirs.addAll(project.sourceSets.main.allSource.srcDirs)
+          // TODO: add runtime classpath?
+          // repeat for dependency's dependencies
+          collectDependenciesSourceSets(scanDirs, project)
+      }
   }
 
   private void configureFastReload() {
@@ -88,7 +103,7 @@ final class JettyScannerManager implements ScannerManager {
     for(WebAppConfig webapp in webapps) {
       if(webapp.projectPath) {
         def proj = project.project(webapp.projectPath)
-        collectScanDirs(scanDirs, webapp.inplace, proj)
+        collectScanDirs(scanDirs, webapp.scanDependencies, proj)
         for(def dir in webapp.scanDirs) {
           if(!(dir instanceof File))
             dir = proj.file(dir.toString())

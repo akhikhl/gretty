@@ -9,6 +9,7 @@
 package org.akhikhl.gretty
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 /**
@@ -384,5 +385,9 @@ final class ProjectUtils {
       wconfig.contextConfigFile = new FileResolver(['webapp-tomcat', 'webapp-config' ]).resolveSingleFile(project, contextConfigFiles)
     } else
       wconfig.contextConfigFile = null
+  }
+
+  static List<Project> getDependencyProjects(Project project, String configurationName) {
+    project.configurations[configurationName].dependencies.withType(ProjectDependency).collect{ it.dependencyProject }
   }
 }

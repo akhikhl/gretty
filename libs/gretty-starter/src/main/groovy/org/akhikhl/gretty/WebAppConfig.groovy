@@ -24,6 +24,10 @@ class WebAppConfig {
   def realmConfigFile
   def contextConfigFile
   def scanDirs
+  /**
+   * Specifies if Gretty should automatically add dependencyProjects' sourceSets to scanDirs
+   */
+  Boolean scanDependencies
   def fastReload
   Boolean recompileOnSourceChange
   Boolean reloadOnClassChange
