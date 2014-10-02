@@ -69,7 +69,7 @@ final class JettyScannerManager implements ScannerManager {
     for(WebAppConfig webapp in webapps)
       if(webapp.inplace && webapp.projectPath) {
         def proj = project.project(webapp.projectPath)
-        fastReloadMap[webapp.projectPath] = ProjectReloadUtils.getReloadSpecs(proj, 'fastReload', webapp.fastReload) { p ->
+        fastReloadMap[webapp.projectPath] = ProjectReloadUtils.getReloadSpecs(proj, webapp.fastReload) { p ->
           [ new FileReloadSpec(baseDir: ProjectUtils.getWebAppDir(p)) ]
         }
       }

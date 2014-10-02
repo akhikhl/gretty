@@ -21,6 +21,7 @@ class ProjectReloadUtils {
   private static final Logger log = LoggerFactory.getLogger(ProjectReloadUtils)
 
   private static void addReloadDirs(List<FileReloadSpec> result, Project proj, List reloadSpecs) {
+    log.debug 'addReloadDirs reloadSpecs: {}', reloadSpecs
     for(def spec in reloadSpecs) {
       if(spec instanceof Boolean)
         continue
@@ -50,25 +51,28 @@ class ProjectReloadUtils {
         log.warn 'Reload argument is {}. It must be String, File or Map.', spec?.getClass()?.getName()
         continue
       }
-      new FileResolver([ '.', ProjectUtils.getWebAppDir(proj), { it.sourceSets.main.output.files } ]).resolveFile(proj, baseDir) {
-        result.add(new FileReloadSpec(baseDir: it, pattern: pattern, excludesPattern: excludesPattern))
-      }
+      log.debug 'addReloadDirs baseDir: {}', baseDir
+      def fileResolver = new FileResolver([ '.', ProjectUtils.getWebAppDir(proj), { it.sourceSets.main.output.files } ])
+      fileResolver.acceptDirs = true
+      for(File f in fileResolver.resolveFile(proj, baseDir))
+        result.add(new FileReloadSpec(baseDir: f, pattern: pattern, excludesPattern: excludesPattern))
     }
   }
 
-  static List<FileReloadSpec> getReloadSpecs(Project project, String reloadProperty, List reloadSpecs, Closure defaultReloadSpecsForProject) {
+  static List<FileReloadSpec> getReloadSpecs(Project project, List reloadSpecs, Closure defaultReloadSpecsForProject) {
     reloadSpecs = reloadSpecs == null ? [] : ([] + reloadSpecs)
-    def collectReloadSpecs
-    collectReloadSpecs = { Project proj ->
-      if(proj.gretty[reloadProperty] != null)
-        reloadSpecs.addAll(proj.gretty[reloadProperty])
+    def collectOverlayReloadSpecs
+    collectOverlayReloadSpecs = { Project proj ->
       for(def overlay in proj.gretty.overlays.reverse()) {
         overlay = proj.project(overlay)
-        if(overlay.extensions.findByName('gretty'))
-          collectReloadSpecs(overlay)
+        if(overlay.extensions.findByName('gretty')) {
+          if(overlay.gretty.fastReload != null)
+            reloadSpecs.addAll(overlay.gretty.fastReload)
+          collectOverlayReloadSpecs(overlay)
+        }
       }
     }
-    collectReloadSpecs(project)
+    collectOverlayReloadSpecs(project)
     List<FileReloadSpec> result = []
     if(reloadSpecs.find { (it instanceof Boolean) && it }) {
       def addDefaultReloadSpecs
@@ -81,7 +85,7 @@ class ProjectReloadUtils {
       addDefaultReloadSpecs(project)
     }
     addReloadDirs(result, project, reloadSpecs)
-    log.debug '{} : {} reloadSpecs: {}', project, reloadProperty, result
+    log.debug '{} reloadSpecs: {}', project, result
     return result
   }
 
