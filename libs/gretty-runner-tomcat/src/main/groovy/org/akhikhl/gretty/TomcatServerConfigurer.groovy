@@ -48,6 +48,9 @@ class TomcatServerConfigurer {
   Tomcat createAndConfigureServer(Closure configureContext = null) {
 
     Tomcat tomcat = new Tomcat()
+    
+    if(params.enableNaming)
+      tomcat.enableNaming()
 
     File baseDir = new File(params.baseDir)
     new File(baseDir, 'webapps').mkdirs()

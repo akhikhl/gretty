@@ -440,6 +440,8 @@ Version: ${project.version}"""
           springBootMainClass self.getSpringBootMainClass()
         if(sconfig.singleSignOn != null)
           singleSignOn sconfig.singleSignOn
+        if(sconfig.enableNaming != null)
+          enableNaming sconfig.enableNaming
         if(sconfig.jvmArgs)
           jvmArgs sconfig.jvmArgs
       }
