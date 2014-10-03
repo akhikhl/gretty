@@ -294,6 +294,8 @@ abstract class LauncherBase implements Launcher {
         baseDir config.baseDir.absolutePath
       if(sconfig.singleSignOn != null)
         singleSignOn sconfig.singleSignOn
+      if(sconfig.enableNaming != null)
+        enableNaming sconfig.enableNaming
       webApps webAppConfigs.collect { WebAppConfig wconfig ->
         { ->
           inplace wconfig.inplace
