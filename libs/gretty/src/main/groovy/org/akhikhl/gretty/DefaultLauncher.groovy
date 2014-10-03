@@ -7,12 +7,10 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
 import org.gradle.api.Project
-import org.gradle.api.file.FileCollection
 import org.gradle.process.JavaExecSpec
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.gradle.tooling.GradleConnector
+import org.gradle.tooling.ProjectConnection
 
 /**
  *
@@ -64,5 +62,18 @@ class DefaultLauncher extends LauncherBase {
   @Override
   protected void prepareToRun(WebAppConfig wconfig) {
     ProjectUtils.prepareToRun(project, wconfig)
+  }
+
+  @Override
+  protected void rebuildWebapps() {
+    webAppConfigs.each { WebAppConfig wconfig ->
+      def proj = project.project(wconfig.projectPath)
+      ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
+      try {
+        connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp').run()
+      } finally {
+        connection.close()
+      }
+    }
   }
 }
