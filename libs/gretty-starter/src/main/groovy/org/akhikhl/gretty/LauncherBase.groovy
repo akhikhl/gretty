@@ -64,6 +64,8 @@ abstract class LauncherBase implements Launcher {
 
   protected abstract void javaExec(JavaExecParams params)
 
+  protected abstract void rebuildWebapps()
+
   @Override
   void launch() {
     Thread thread = launchThread()
@@ -72,7 +74,7 @@ abstract class LauncherBase implements Launcher {
       ServiceProtocol.send(sconfig.servicePort, 'stop')
     }
     if(config.getInteractive()) {
-      if(sconfig.interactiveMode == 'restartOnKeyPress') {
+      if(sconfig.interactiveMode == 'restartOnKeyPress' || sconfig.interactiveMode == 'rebuildAndRestartOnKeyPress') {
         def hint = 'Press \'q\' or \'Q\' to stop the server or any other key to restart.'
         System.out.println hint
         ExecutorService executorService = Executors.newSingleThreadExecutor()
@@ -88,6 +90,9 @@ abstract class LauncherBase implements Launcher {
                     stopServer()
                     break infinite
                   } else {
+                    if(sconfig.interactiveMode == 'rebuildAndRestartOnKeyPress') {
+                      rebuildWebapps()
+                    }
                     log.debug 'Sending command: {}', 'restartWithEvent'
                     def futureStatus = executorService.submit({
                       ServiceProtocol.readMessage(sconfig.statusPort)

@@ -64,6 +64,11 @@ class StarterLauncher extends LauncherBase {
   }
 
   @Override
+  protected void rebuildWebapps() {
+    println 'Cannot rebuild application in StarterLauncher'
+  }
+
+  @Override
   protected void writeRunConfigJson(json) {
     super.writeRunConfigJson(json)
     json.with {
