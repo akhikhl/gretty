@@ -22,7 +22,7 @@ class GrettyPlugin implements Plugin<Project> {
 
   private void addConfigurations(Project project) {
     project.configurations {
-      gretty()
+      gretty
       springBoot {
         if(project.configurations.findByName('runtime'))
           extendsFrom project.configurations.runtime
@@ -33,7 +33,7 @@ class GrettyPlugin implements Plugin<Project> {
         extendsFrom project.configurations.gretty
         exclude group: 'org.springframework.boot'
       }
-      grettyRunnerSpringBootBase()
+      grettyRunnerSpringBootBase
       grettyRunnerSpringBoot {
         extendsFrom project.configurations.grettyRunnerSpringBootBase
       }
@@ -52,7 +52,7 @@ class GrettyPlugin implements Plugin<Project> {
       grettySpringLoaded {
         transitive = false
       }
-      grettyStarter()
+      grettyStarter
       runtimeNoSpringBoot {
         extendsFrom project.configurations.runtime
         exclude group: 'org.springframework.boot'
@@ -78,20 +78,28 @@ class GrettyPlugin implements Plugin<Project> {
       grettyRunnerSpringBootBase "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion", {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
       }
-      grettyRunnerSpringBoot "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+      grettyRunnerSpringBoot "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+      }
       grettyRunnerSpringBootJettyBase "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
         // concrete implementation is chosen depending on servletContainer property
         exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
       }
-      grettyRunnerSpringBootJetty "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}"
+      grettyRunnerSpringBootJetty "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}", {
+        exclude group: 'org.eclipse.jetty'
+        exclude group: 'javax.servlet', module: 'javax.servlet-api'
+      }
       grettyRunnerSpringBootTomcatBase "org.akhikhl.gretty:gretty-runner-spring-boot-tomcat:$grettyVersion", {
         // concrete implementation is chosen depending on servletContainer property
         exclude group: 'org.apache.tomcat.embed'
         exclude group: 'javax.servlet', module: 'javax.servlet-api'
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
       }
-      grettyRunnerSpringBootTomcat "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}"
+      grettyRunnerSpringBootTomcat "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}", {
+        exclude group: 'org.apache.tomcat.embed'
+        exclude group: 'javax.servlet', module: 'javax.servlet-api'
+      }
       grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
       grettyStarter "org.akhikhl.gretty:gretty-starter:$grettyVersion"
     }
