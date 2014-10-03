@@ -5,7 +5,6 @@ import org.apache.tools.ant.filters.*
 
 dependencies {
   compile "org.codehaus.groovy:groovy-all:${groovy_version}"
-  compile 'org.codehaus.groovy:groovy-backports-compat23:2.3.6'
   compile "ch.qos.logback:logback-classic:$logback_version"
   compile 'commons-cli:commons-cli:1.2'
   compile 'commons-configuration:commons-configuration:1.10'
@@ -31,7 +30,8 @@ processResources {
     tomcat7ServletApiVersion: project.tomcat7_servlet_api_version,
     tomcat8Version: project.tomcat8_version,
     tomcat8ServletApi: project.tomcat8_servlet_api,
-    tomcat8ServletApiVersion: project.tomcat8_servlet_api_version
+    tomcat8ServletApiVersion: project.tomcat8_servlet_api_version,
+    springBootVersion: project.springBootVersion
   ]
   inputs.properties props
   filter ReplaceTokens, tokens: props

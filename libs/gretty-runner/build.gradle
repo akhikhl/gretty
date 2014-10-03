@@ -3,7 +3,6 @@ apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
   compile "org.codehaus.groovy:groovy-all:${groovy_version}"
-  compile 'org.codehaus.groovy:groovy-backports-compat23:2.3.6'
   compile 'commons-cli:commons-cli:1.2'
   compile 'commons-io:commons-io:2.4'
   compile "ch.qos.logback:logback-classic:$logback_version"

@@ -71,8 +71,8 @@ class GrettyPlugin implements Plugin<Project> {
 
   private void addDependencies(Project project) {
 
-    String grettyVersion = Externalized.getString('grettyVersion')    
-    String springBootVersion = project.gretty.springBootVersion ?: (project.hasProperty('springBootVersion') ? project.springBootVersion : '1.1.5.RELEASE')
+    String grettyVersion = Externalized.getString('grettyVersion')
+    String springBootVersion = project.gretty.springBootVersion ?: (project.hasProperty('springBootVersion') ? project.springBootVersion : Externalized.getString('springBootVersion'))
 
     project.dependencies {
       grettyRunnerSpringBootBase "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion", {
