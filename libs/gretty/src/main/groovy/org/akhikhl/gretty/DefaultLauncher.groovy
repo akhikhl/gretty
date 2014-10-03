@@ -67,12 +67,14 @@ class DefaultLauncher extends LauncherBase {
   @Override
   protected void rebuildWebapps() {
     webAppConfigs.each { WebAppConfig wconfig ->
-      def proj = project.project(wconfig.projectPath)
-      ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
-      try {
-        connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp').run()
-      } finally {
-        connection.close()
+      if(wconfig.projectPath) {
+        def proj = project.project(wconfig.projectPath)
+        ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
+        try {
+          connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp').run()
+        } finally {
+          connection.close()
+        }
       }
     }
   }
