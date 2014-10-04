@@ -8,6 +8,7 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaForkOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,7 +27,7 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
   AppBeforeIntegrationTestTask() {
     scanInterval = 0 // disable scanning on integration tests
   }
-
+  
   @Override
   protected boolean getDefaultJacocoEnabled() {
     true
@@ -61,10 +62,11 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
     project.tasks.all { t ->
       if(t.name == thisTask.integrationTestTask) {
         t.dependsOn thisTask
-        thisTask.dependsOn project.tasks.testClasses
+        thisTask.dependsOn { project.tasks.prepareInplaceWebApp }
+        thisTask.dependsOn { project.tasks.testClasses }
         if(t.name != 'test' && project.tasks.findByName('test'))
-          thisTask.mustRunAfter project.tasks.test
-        if(t instanceof JavaForkOptions) {
+          thisTask.mustRunAfter { project.tasks.test }
+        if(GradleUtils.instanceOf(t, 'org.gradle.process.JavaForkOptions')) {
           t.doFirst {
             if(thisTask.didWork)
               passSystemPropertiesToIntegrationTask(t)

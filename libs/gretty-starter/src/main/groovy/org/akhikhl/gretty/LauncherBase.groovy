@@ -146,24 +146,29 @@ abstract class LauncherBase implements Launcher {
     ExecutorService executorService = Executors.newSingleThreadExecutor()
     try {
       def listeningForStatusLock = new Object()
-      boolean listeningForStatus = false
-
-      Future futureStatus = executorService.submit({
-        synchronized(listeningForStatusLock) {
-          listeningForStatus = true
-        }
-        ServiceProtocol.readMessage(sconfig.statusPort)
-      } as Callable)
+      boolean listeningForStatus
       
-      def handleConnectionError = { e ->
-        log.debug 'Got {}', e.getClass().getName()
+      def asyncReadStatus = {
+        listeningForStatus = false
+        def future = executorService.submit({
+          synchronized(listeningForStatusLock) {
+            listeningForStatus = true
+          }
+          ServiceProtocol.readMessage(sconfig.statusPort)
+        } as Callable)
         while(true) {
-          Thread.sleep(100)
           synchronized(listeningForStatusLock) {
             if(listeningForStatus)
               break
           }
+          Thread.sleep(100)
         }
+        future
+      }
+
+      Future futureStatus = asyncReadStatus()
+      
+      def handleConnectionError = { e ->
         log.debug 'Sending "notStarted" to status port...'
         ServiceProtocol.send(sconfig.statusPort, 'notStarted')
       }
@@ -184,7 +189,7 @@ abstract class LauncherBase implements Launcher {
       if(status == 'started')
         throw new RuntimeException('Web-server is already running.')
 
-      futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
+      futureStatus = asyncReadStatus()
       thread = Thread.start {
         for(Closure c in sconfig.onStart) {
           c.delegate = sconfig
@@ -223,7 +228,7 @@ abstract class LauncherBase implements Launcher {
       status = futureStatus.get()
       log.debug 'Got response: {}', status
 
-      futureStatus = executorService.submit({ ServiceProtocol.readMessage(sconfig.statusPort) } as Callable)
+      futureStatus = asyncReadStatus()
       def runConfigJson = getRunConfigJson()
       log.debug 'Sending parameters to port {}', sconfig.servicePort
       log.debug runConfigJson.toPrettyString()

@@ -208,6 +208,7 @@ final class ProjectUtils {
   }
 
   static void prepareInplaceWebAppFolder(Project project) {
+    new File(project.buildDir, 'inplaceWebapp').mkdirs()
     // ATTENTION: overlay copy order is important!
     for(String overlay in project.gretty.overlays) {
       Project overlayProject = project.project(overlay)
