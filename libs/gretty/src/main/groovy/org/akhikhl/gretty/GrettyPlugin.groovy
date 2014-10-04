@@ -578,8 +578,8 @@ class GrettyPlugin implements Plugin<Project> {
   
     if(project.gradle.gradleVersion.startsWith('1.')) {
       int releaseNumber = project.gradle.gradleVersion.split('\\.')[1] as int
-      if(releaseNumber < 12)
-        throw new GradleException("Gretty supports only Gradle 1.12 or newer. You have Gradle ${project.gradle.gradleVersion}.")
+      if(releaseNumber < 10)
+        throw new GradleException("Gretty supports only Gradle 1.10 or newer. You have Gradle ${project.gradle.gradleVersion}.")
     }
 
     addExtensions(project)

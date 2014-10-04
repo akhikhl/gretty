@@ -154,11 +154,8 @@ abstract class LauncherBase implements Launcher {
         }
         ServiceProtocol.readMessage(sconfig.statusPort)
       } as Callable)
-
-      try {
-        log.debug 'Sending "status" command to (probably) running server...'
-        ServiceProtocol.send(sconfig.servicePort, 'status')
-      } catch(java.net.ConnectException | java.net.SocketException e) {
+      
+      def handleConnectionError = { e ->
         log.debug 'Got {}', e.getClass().getName()
         while(true) {
           Thread.sleep(100)
@@ -169,6 +166,15 @@ abstract class LauncherBase implements Launcher {
         }
         log.debug 'Sending "notStarted" to status port...'
         ServiceProtocol.send(sconfig.statusPort, 'notStarted')
+      }
+
+      try {
+        log.debug 'Sending "status" command to (probably) running server...'
+        ServiceProtocol.send(sconfig.servicePort, 'status')
+      } catch(java.net.ConnectException e) {
+        handleConnectionError(e)
+      } catch(java.net.SocketException e) {
+        handleConnectionError(e)
       }
 
       log.debug 'Reading response...'
