@@ -114,6 +114,10 @@ abstract class StartBaseTask extends DefaultTask {
         new File(self.project.buildDir, 'serverBaseDir_' + getServerConfig().servletContainer)
       }
 
+      boolean getProductMode() {
+        false
+      }
+
       WebAppClassPathResolver getWebAppClassPathResolver() {
         new WebAppClassPathResolver() {
           Collection<URL> resolveWebAppClassPath(WebAppConfig wconfig) {

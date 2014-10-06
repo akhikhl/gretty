@@ -205,7 +205,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addSystemClass('groovy.lang.')
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.setOverrideDescriptor('/org/akhikhl/gretty/override-web.xml')
-    if(serverParams.useFileMappedBuffer)
+    if(serverParams.productMode)
       context.setInitParameter('org.eclipse.jetty.servlet.Default.useFileMappedBuffer', 'true')
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))

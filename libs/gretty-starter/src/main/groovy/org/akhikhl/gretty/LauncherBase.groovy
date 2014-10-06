@@ -147,7 +147,7 @@ abstract class LauncherBase implements Launcher {
     try {
       def listeningForStatusLock = new Object()
       boolean listeningForStatus
-      
+
       def asyncReadStatus = {
         listeningForStatus = false
         def future = executorService.submit({
@@ -167,7 +167,7 @@ abstract class LauncherBase implements Launcher {
       }
 
       Future futureStatus = asyncReadStatus()
-      
+
       def handleConnectionError = { e ->
         log.debug 'Sending "notStarted" to status port...'
         ServiceProtocol.send(sconfig.statusPort, 'notStarted')
@@ -307,6 +307,8 @@ abstract class LauncherBase implements Launcher {
         singleSignOn sconfig.singleSignOn
       if(sconfig.enableNaming != null)
         enableNaming sconfig.enableNaming
+      if(config.productMode)
+        productMode true
       webApps webAppConfigs.collect { WebAppConfig wconfig ->
         { ->
           inplace wconfig.inplace

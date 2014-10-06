@@ -26,6 +26,8 @@ interface LauncherConfig {
 
   File getBaseDir()
 
+  boolean getProductMode()
+
   WebAppClassPathResolver getWebAppClassPathResolver()
 
   Iterable<WebAppConfig> getWebAppConfigs()

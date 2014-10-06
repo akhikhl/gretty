@@ -132,6 +132,10 @@ class GrettyStarter {
         basedir
       }
 
+      boolean getProductMode() {
+        true
+      }
+
       WebAppClassPathResolver getWebAppClassPathResolver() {
       }
 
