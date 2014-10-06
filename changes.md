@@ -4,6 +4,41 @@
 
 ### What's new:
 
+#### Version 1.1.4
+
+- New feature: [inplaceMode property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_inplacemode), when assigned to "hard", instructs Gretty to serve files directly from src/main/webapp, bypassing file copy on change.
+
+- New feature: now [gretty.jvmArgs property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_jvmargs) is automatically passed to Gretty products.
+
+- New feature: [runner arguments](http://akhikhl.github.io/gretty-doc/Runner-arguments.html) for Gretty products.
+
+- New feature: [interactiveMode property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_interactivemode) allows to fine-tune Gretty's reaction on keypresses.
+
+- New feature: archiveProduct task, archives the generated product to zip-file.
+
+- New feature: [gretty.springBootVersion property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_springbootversion) allows to specify spring boot version (the default is 1.1.7.RELEASE) (issue #88, "Set Spring / SpringBoot version doesn't work").
+
+- New feature: [gretty.enableNaming property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_enablenaming) allows to enable JNDI naming on Tomcat (issue #64, "JNDI - NoInitialContextException with Tomcat (tried in 7x and 8x)").
+
+- Enhancement in Jetty/Windows-specific lifecycle: useFileMappedBuffer is not set to false for all Gretty tasks, so that Jetty does not lock css/js files.
+
+- Enhancement in buildProduct task: now it automatically generates VERSION.txt file with the version and creation date information.
+
+- Resolved issue #89, "How to configure fastReload?".
+
+- Upgrades: 
+  - gradle wrapper to version 2.1
+  - Groovy to version 2.3.7
+  - SpringBoot to version 1.1.7.RELEASE
+  - Embedded Tomcat 7 to version 7.0.55
+  - Embedded Tomcat 8 to version 8.0.14 
+  - Embedded Jetty 9 to version 9.2.3.v20140905
+  - asm to version 5.0.3
+  
+- Implemented support of Gradle 1.10 (still, using Gradle 2.1 is highly recommended!).
+
+- fixed issues with groovy-all versions and logback versions in the webapp classpath
+
 #### Version 1.1.3
 
 - New feature: [virtual mapping of gradle dependencies](http://akhikhl.github.io/gretty-doc/Web-app-virtual-webinflibs.html) (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).

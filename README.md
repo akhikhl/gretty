@@ -2,8 +2,8 @@
 
 [![Build Status](http://img.shields.io/travis/akhikhl/gretty.svg)](https://travis-ci.org/akhikhl/gretty)
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
-[![Release](http://img.shields.io/badge/release-1.1.3-47b31f.svg)](https://github.com/akhikhl/gretty/releases/latest)
-[![Snapshot](http://img.shields.io/badge/current-1.1.4--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
+[![Release](http://img.shields.io/badge/release-1.1.4-47b31f.svg)](https://github.com/akhikhl/gretty/releases/latest)
+[![Snapshot](http://img.shields.io/badge/current-1.1.5--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
@@ -18,37 +18,38 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- Incubating feature in Gretty 1.1.4-SNAPSHOT: `gretty.inplaceMode='hard'`. When specified, Gretty serves assets directly from "src/main/webapp" (or whatever specified by project.webAppDir), without copying files to temporary directory. Thanks to @saladinkzn for contributing this feature.
+- New feature: [inplaceMode property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_inplacemode), when assigned to "hard", instructs Gretty to serve files directly from src/main/webapp, bypassing file copy on change.
 
-- Gretty 1.1.3 new feature: [virtual mapping of gradle dependencies](http://akhikhl.github.io/gretty-doc/Web-app-virtual-webinflibs.html) (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker). Thanks to @saladinkzn for contributing this feature.
+- New feature: now [gretty.jvmArgs property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_jvmargs) is automatically passed to Gretty products.
 
-- Gretty 1.1.3 fixes compatibility problem with Gradle 1.12 and introduces Gradle version check.
+- New feature: [runner arguments](http://akhikhl.github.io/gretty-doc/Runner-arguments.html) for Gretty products.
 
-- Gretty 1.1.2 new feature: [webapp extra resource bases](http://akhikhl.github.io/gretty-doc/Web-app-extra-resource-bases.html).
+- New feature: [interactiveMode property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_interactivemode) allows to fine-tune Gretty's reaction on keypresses.
 
-- Gretty 1.1.2 implements better start/stop protocol, gracefully handling attempts to start Gretty twice (on the same ports). There should be no hanging processes after such attempts anymore.
+- New feature: archiveProduct task, archives the generated product to zip-file.
 
-- Gretty 1.1.2 new feature [webapp filtering](http://akhikhl.github.io/gretty-doc/Web-app-filtering.html).
+- New feature: [gretty.springBootVersion property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_springbootversion) allows to specify spring boot version (the default is 1.1.7.RELEASE) (issue #88, "Set Spring / SpringBoot version doesn't work").
 
-- From now on the snapshot versions of Gretty are regularly pushed to jfrog snapshot repository. If you want to use snapshot versions, please add the following to your build script:
-  ```groovy
-  buildscript {
-    repositories {
-      // ...
-      maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
-    }
-    dependencies {
-      classpath 'org.akhikhl.gretty:gretty:1.1.4-SNAPSHOT'
-    }
-  }
+- New feature: [gretty.enableNaming property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_enablenaming) allows to enable JNDI naming on Tomcat (issue #64, "JNDI - NoInitialContextException with Tomcat (tried in 7x and 8x)").
+
+- Enhancement in Jetty/Windows-specific lifecycle: useFileMappedBuffer is not set to false for all Gretty tasks, so that Jetty does not lock css/js files.
+
+- Enhancement in buildProduct task: now it automatically generates VERSION.txt file with the version and creation date information.
+
+- Resolved issue #89, "How to configure fastReload?".
+
+- Upgrades: 
+  - gradle wrapper to version 2.1
+  - Groovy to version 2.3.7
+  - SpringBoot to version 1.1.7.RELEASE
+  - Embedded Tomcat 7 to version 7.0.55
+  - Embedded Tomcat 8 to version 8.0.14 
+  - Embedded Jetty 9 to version 9.2.3.v20140905
+  - asm to version 5.0.3
   
-  apply plugin: 'org.akhikhl.gretty'
-  
-  repositories {
-    // ...
-    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
-  }
-  ```
+- Implemented support of Gradle 1.10 (still, using Gradle 2.1 is highly recommended!).
+
+- fixed issues with groovy-all versions and logback versions in the webapp classpath
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 

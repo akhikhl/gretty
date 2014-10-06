@@ -47,26 +47,31 @@ class GrettyStarter {
     }
 
     if(options.runnerOverrideArgs)
-        sconfig.jvmArgs = []
+      sconfig.jvmArgs = []
 
     if(options.runnerArgFile) {
       File f = new File(options.runnerArgFile)
       if(!f.isAbsolute())
         f = new File(basedir, options.runnerArgFile)
-
       if(!f.exists())
           throw new FileNotFoundException("File ${f.absolutePath} does not exist!")
-
+      if(sconfig.jvmArgs == null)
+        sconfig.jvmArgs = []
       sconfig.jvmArgs.addAll(f.text.split('\\s'))
     }
 
     if(options.runnerArgURL) {
-          URL urlSource = new URL(options.runnerArgURL)
-          sconfig.jvmArgs.addAll(urlSource.text.split('\\s'))
+      URL urlSource = new URL(options.runnerArgURL)
+      if(sconfig.jvmArgs == null)
+        sconfig.jvmArgs = []
+      sconfig.jvmArgs.addAll(urlSource.text.split('\\s'))
     }
 
-    if(options.runnerArgs)
+    if(options.runnerArgs) {
+      if(sconfig.jvmArgs == null)
+        sconfig.jvmArgs = []
       sconfig.jvmArgs.addAll(options.runnerArgs)
+    }
 
     ConfigUtils.complementProperties(sconfig, ServerConfig.getDefaultServerConfig(config.productName))
 
