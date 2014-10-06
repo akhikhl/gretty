@@ -26,7 +26,7 @@
 >
 
   <description>
-    Default web.xml file.  
+    Default web.xml file.
     This file is applied to a Web application before it's own WEB_INF/web.xml file
   </description>
 
@@ -37,15 +37,15 @@
   <listener>
    <listener-class>org.eclipse.jetty.servlet.listener.ELContextCleaner</listener-class>
   </listener>
-  
+
   <!-- ==================================================================== -->
   <!-- Removes static cache of Methods from java.beans.Introspector to      -->
   <!-- ensure webapp classloader can be released on undeploy                -->
-  <!-- ==================================================================== -->  
+  <!-- ==================================================================== -->
   <listener>
    <listener-class>org.eclipse.jetty.servlet.listener.IntrospectorCleaner</listener-class>
   </listener>
-  
+
 
   <!-- ==================================================================== -->
   <!-- Context params to control Session Cookies                            -->
@@ -61,7 +61,7 @@
   <!-- This servlet, normally mapped to /, provides the handling for static -->
   <!-- content, OPTIONS and TRACE methods for the context.                  -->
   <!-- The following initParameters are supported:                          -->
-  <!--  
+  <!--
  *  acceptRanges      If true, range requests and responses are
  *                    supported
  *
@@ -87,9 +87,9 @@
  *
  *  resourceBase      Set to replace the context resource base
  *
- *  resourceCache     If set, this is a context attribute name, which the servlet 
- *                    will use to look for a shared ResourceCache instance. 
- *                        
+ *  resourceCache     If set, this is a context attribute name, which the servlet
+ *                    will use to look for a shared ResourceCache instance.
+ *
  *  relativeResourceBase
  *                    Set with a pathname relative to the base of the
  *                    servlet context root. Useful for only serving static content out
@@ -111,8 +111,8 @@
  *  cacheControl      If set, all static content will have this value set as the cache-control
  *                    header.
  -->
- 
- 
+
+
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
   <servlet>
     <servlet-name>default</servlet-name>
@@ -127,7 +127,8 @@
     </init-param>
     <init-param>
       <param-name>dirAllowed</param-name>
-      <param-value>true</param-value>
+      <!-- set to "false" by akhikhl -->
+      <param-value>false</param-value>
     </init-param>
     <init-param>
       <param-name>welcomeServlets</param-name>
@@ -155,7 +156,7 @@
     </init-param>
     <init-param>
       <param-name>useFileMappedBuffer</param-name>
-      <!-- set to false by akhikhl -->
+      <!-- set to "false" by akhikhl -->
       <param-value>false</param-value>
     </init-param>
     <!--
@@ -281,7 +282,7 @@
       <param-name>xpoweredBy</param-name>
       <param-value>false</param-value>
     </init-param>
-    <!--  
+    <!--
     <init-param>
         <param-name>classpath</param-name>
         <param-value>?</param-value>

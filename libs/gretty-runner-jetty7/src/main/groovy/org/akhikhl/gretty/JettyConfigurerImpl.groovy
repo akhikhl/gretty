@@ -201,7 +201,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
   }
 
   @Override
-  def createWebAppContext(List<String> webappClassPath) {
+  def createWebAppContext(Map serverParams, Map webappParams) {
+    List<String> webappClassPath = webappParams.webappClassPath
     JettyWebAppContext context = new JettyWebAppContext()
     context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect { new File(it) })
     context.addSystemClass('ch.qos.logback.')
@@ -210,6 +211,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addSystemClass('groovy.lang.')
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.setOverrideDescriptor('/org/akhikhl/gretty/override-web.xml')
+    if(serverParams.useFileMappedBuffer)
+      context.setInitParameter('org.eclipse.jetty.servlet.defaultex.useFileMappedBuffer', 'true')
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context

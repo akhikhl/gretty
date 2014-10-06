@@ -69,7 +69,7 @@ class JettyServerConfigurer {
     List handlers = []
 
     for(Map webapp in params.webApps) {
-      def context = configurer.createWebAppContext(webapp.webappClassPath)
+      def context = configurer.createWebAppContext(params, webapp)
       context.displayName = webapp.contextPath
       context.contextPath = webapp.contextPath
 

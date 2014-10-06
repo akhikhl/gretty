@@ -6,7 +6,7 @@
   metadata-complete="true"
   version="2.5"
 >
- 
+
   <servlet>
     <servlet-name>defaultex</servlet-name>
     <servlet-class>org.akhikhl.gretty.DefaultServletEx</servlet-class>
@@ -20,7 +20,7 @@
     </init-param>
     <init-param>
       <param-name>dirAllowed</param-name>
-      <!-- akhikhl changed it to false -->
+      <!-- set to "false" by akhikhl -->
       <param-value>false</param-value>
     </init-param>
     <init-param>
@@ -49,7 +49,8 @@
     </init-param>
     <init-param>
       <param-name>useFileMappedBuffer</param-name>
-      <param-value>true</param-value>
+      <!-- set to "false" by akhikhl -->
+      <param-value>false</param-value>
     </init-param>
     <!--
     <init-param>

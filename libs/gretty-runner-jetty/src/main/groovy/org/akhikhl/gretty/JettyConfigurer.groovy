@@ -32,7 +32,7 @@ interface JettyConfigurer {
 
   def createServer()
 
-  def createWebAppContext(List<String> webappClassPath)
+  def createWebAppContext(Map serverParams, Map webappParams)
 
   def findHttpConnector(server)
 
