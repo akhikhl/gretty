@@ -67,6 +67,7 @@ class JettyServerConfigurer {
     configurer.configureConnectors(server, params)
 
     List handlers = []
+    //params.useFileMappedBuffer = true // DBG
 
     for(Map webapp in params.webApps) {
       def context = configurer.createWebAppContext(params, webapp)
