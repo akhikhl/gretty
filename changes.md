@@ -20,7 +20,7 @@
 
 - Enhancement: now [gretty.jvmArgs property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_jvmargs) is automatically passed to Gretty products.
 
-- Enhancement in Jetty/Windows-specific lifecycle: useFileMappedBuffer is not set to false for all Gretty tasks, so that Jetty does not lock css/js files.
+- Enhancement in Jetty/Windows-specific lifecycle: useFileMappedBuffer is set to false for all Gretty tasks, so that Jetty does not lock css/js files.
 
 - Enhancement in buildProduct task: now it automatically generates VERSION.txt file with the version and creation date information.
 
