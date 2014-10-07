@@ -59,7 +59,7 @@ You can learn about all Gretty features in [online documentation](http://akhikhl
 
 #### System requirements
 
-Gretty requires JDK7 or JDK8 and Gradle 1.12 or newer.
+Gretty requires JDK7 or JDK8 and Gradle 1.10 or newer.
 
 Gretty also works on JDK6, although Jetty support is limited to versions 7 and 8 in this case. This is due to the fact that Jetty 9 was compiled against JDK7 and it's bytecode is not compatible with JDK6.
 
