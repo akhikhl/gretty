@@ -577,7 +577,10 @@ class GrettyPlugin implements Plugin<Project> {
   void apply(final Project project) {
   
     if(project.gradle.gradleVersion.startsWith('1.')) {
-      int releaseNumber = project.gradle.gradleVersion.split('\\.')[1] as int
+      String releaseNumberStr = project.gradle.gradleVersion.split('\\.')[1]
+      if(releaseNumberStr.contains('-'))
+        releaseNumberStr = releaseNumberStr.split('-')[0]
+      int releaseNumber = releaseNumberStr as int
       if(releaseNumber < 10)
         throw new GradleException("Gretty supports only Gradle 1.10 or newer. You have Gradle ${project.gradle.gradleVersion}.")
     }
