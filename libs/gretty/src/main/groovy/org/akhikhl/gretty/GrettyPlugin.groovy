@@ -53,9 +53,12 @@ class GrettyPlugin implements Plugin<Project> {
         transitive = false
       }
       grettyStarter
-      runtimeNoSpringBoot {
+      productRuntime {
         extendsFrom project.configurations.runtime
         exclude group: 'org.springframework.boot'
+        // We exclude groovy from product, because it is already included in runner configuration
+        // (see gretty-runner dependencies). Thus we avoid groovy version conflicts.
+        exclude module: 'groovy-all'
       }
     }
     if(!project.configurations.findByName('providedCompile'))
@@ -575,7 +578,7 @@ class GrettyPlugin implements Plugin<Project> {
   }
 
   void apply(final Project project) {
-  
+
     if(project.gradle.gradleVersion.startsWith('1.')) {
       int releaseNumber = project.gradle.gradleVersion.split('\\.')[1] as int
       if(releaseNumber < 10)
