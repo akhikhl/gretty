@@ -36,12 +36,13 @@ class SpringBootLauncher extends DefaultLauncher {
       files += project.configurations.grettyRunnerSpringBootTomcat.files
     def classPath = files.collect { it.toURL() } as LinkedHashSet
     def classPathResolver = config.getWebAppClassPathResolver()
-    for(def wconfig in webAppConfigs)
-      if(wconfig.projectPath && ProjectUtils.isSpringBootApp(project, wconfig) && classPathResolver) {
-        def cp = classPathResolver.resolveWebAppClassPath(wconfig)
-        if(cp)
-          classPath += cp
-      }
+    if(classPathResolver)
+      for(def wconfig in webAppConfigs)
+        if(wconfig.projectPath && ProjectUtils.isSpringBootApp(project, wconfig)) {
+          def cp = classPathResolver.resolveWebAppClassPath(wconfig)
+          if(cp)
+            classPath += cp
+        }
     classPath
   }
 
@@ -49,10 +50,10 @@ class SpringBootLauncher extends DefaultLauncher {
   protected String getServerManagerFactory() {
     'org.akhikhl.gretty.SpringBootServerManagerFactory'
   }
-  
+
   protected String getSpringBootMainClass() {
-    sconfig.springBootMainClass ?: 
-    SpringBootMainClassFinder.findMainClass(project) ?: 
+    sconfig.springBootMainClass ?:
+    SpringBootMainClassFinder.findMainClass(project) ?:
     webAppConfigs.findResult { it.projectPath ? SpringBootMainClassFinder.findMainClass(project.project(it.projectPath)) : null }
   }
 
@@ -73,7 +74,7 @@ class SpringBootLauncher extends DefaultLauncher {
   @Override
   protected void writeRunConfigJson(json) {
     super.writeRunConfigJson(json)
-    json.with {      
+    json.with {
       springBootMainClass getSpringBootMainClass()
     }
   }
