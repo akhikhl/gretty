@@ -18,38 +18,7 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- New feature: [inplaceMode property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_inplacemode), when assigned to "hard", instructs Gretty to serve files directly from src/main/webapp, bypassing file copy on change.
-
-- New feature: [runner arguments](http://akhikhl.github.io/gretty-doc/Runner-arguments.html) for Gretty products.
-
-- New feature: [interactiveMode property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_interactivemode) allows to fine-tune Gretty's reaction on keypresses.
-
-- New feature: archiveProduct task, archives the generated product to zip-file.
-
-- New feature: [gretty.springBootVersion property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_springbootversion) allows to specify spring boot version (the default is 1.1.7.RELEASE) (issue #88, "Set Spring / SpringBoot version doesn't work").
-
-- New feature: [gretty.enableNaming property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_enablenaming) allows to enable JNDI naming on Tomcat (issue #64, "JNDI - NoInitialContextException with Tomcat (tried in 7x and 8x)").
-
-- Enhancement: now [gretty.jvmArgs property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_jvmargs) is automatically passed to Gretty products.
-
-- Enhancement in Jetty/Windows-specific lifecycle: useFileMappedBuffer is set to false for all Gretty tasks, so that Jetty does not lock css/js files.
-
-- Enhancement in buildProduct task: now it automatically generates VERSION.txt file with the version and creation date information.
-
-- Resolved issue #89, "How to configure fastReload?".
-
-- Upgrades: 
-  - gradle wrapper to version 2.1
-  - Groovy to version 2.3.7
-  - SpringBoot to version 1.1.7.RELEASE
-  - Embedded Tomcat 7 to version 7.0.55
-  - Embedded Tomcat 8 to version 8.0.14 
-  - Embedded Jetty 9 to version 9.2.3.v20140905
-  - asm to version 5.0.3
-  
-- Implemented support of Gradle 1.10 (still, using Gradle 2.1 is highly recommended!).
-
-- fixed issues with groovy-all versions and logback versions in the webapp classpath
+- Gretty 1.1.4 is out and immediately available at [Gradle plugin portal](http://plugins.gradle.org/plugin/org.akhikhl.gretty), [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22).
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
@@ -59,7 +28,7 @@ You can learn about all Gretty features in [online documentation](http://akhikhl
 
 #### System requirements
 
-Gretty requires JDK7 or JDK8 and Gradle 1.10 or newer.
+Gretty requires JDK7 or JDK8 and Gradle 1.10 or newer (Gradle 2.1 is highly recommended!).
 
 Gretty also works on JDK6, although Jetty support is limited to versions 7 and 8 in this case. This is due to the fact that Jetty 9 was compiled against JDK7 and it's bytecode is not compatible with JDK6.
 
@@ -67,7 +36,7 @@ Gretty also works on JDK6, although Jetty support is limited to versions 7 and 8
 
 Gretty is an open-source project and is freely available in sources as well as in compiled form.
 
-All releases of Gretty are available at [jcenter](https://bintray.com/akhikhl/maven/gretty/view) and [maven central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22) under the group 'org.akhikhl.gretty'.
+All releases of Gretty are available at [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22) under the group 'org.akhikhl.gretty'.
 
 #### Copyright and License
 
