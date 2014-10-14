@@ -261,16 +261,15 @@ Version: ${project.version}"""
 
   protected FileCollection getRunnerFileCollection() {
     def servletContainerConfig = ServletContainerConfig.getConfig(sconfig.servletContainer)
-    def files
+    def files = project.configurations.grettyNoSpringBoot
     if(ProjectUtils.anyWebAppUsesSpringBoot(project, wconfigs)) {
-      files = project.configurations.grettyNoSpringBoot +
-        project.configurations[servletContainerConfig.servletContainerRunnerConfig]
+      files += project.configurations[servletContainerConfig.servletContainerRunnerConfig]
       if(servletContainerConfig.servletContainerType == 'jetty')
         files += project.configurations.grettyRunnerSpringBootJetty
       else if(servletContainerConfig.servletContainerType == 'tomcat')
         files += project.configurations.grettyRunnerSpringBootTomcat
     } else
-      files = project.configurations[servletContainerConfig.servletContainerRunnerConfig]
+      files += project.configurations[servletContainerConfig.servletContainerRunnerConfig]
     files
   }
 
