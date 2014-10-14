@@ -12,8 +12,7 @@ import org.akhikhl.gretty.ServerManager
 import org.akhikhl.gretty.LoggingUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
+import org.springframework.boot.SpringApplication
 
 /**
  *
@@ -60,9 +59,6 @@ final class SpringBootServerManager implements ServerManager {
 
   @Override
   void stopServer() {
-    if(ServletContainer.servletContainer != null) {
-      ServletContainer.servletContainer.stop()
-      ServletContainer.servletContainer = null
-    }
+    SpringApplication.exit(ApplicationContextProvider.applicationContext)
   }
 }
