@@ -588,6 +588,25 @@ class GrettyPlugin implements Plugin<Project> {
         throw new GradleException("Gretty supports only Gradle 1.10 or newer. You have Gradle ${project.gradle.gradleVersion}.")
     }
 
+    project.ext {
+      grettyVersion = Externalized.getString('grettyVersion')
+      jetty7Version = Externalized.getString('jetty7Version')
+      jetty7ServletApi = Externalized.getString('jetty7ServletApi')
+      jetty7ServletApiVersion = Externalized.getString('jetty7ServletApiVersion')
+      jetty8Version = Externalized.getString('jetty8Version')
+      jetty8ServletApi = Externalized.getString('jetty8ServletApi')
+      jetty8ServletApiVersion = Externalized.getString('jetty8ServletApiVersion')
+      jetty9Version = Externalized.getString('jetty9Version')
+      jetty9ServletApi = Externalized.getString('jetty9ServletApi')
+      jetty9ServletApiVersion = Externalized.getString('jetty9ServletApiVersion')
+      tomcat7Version = Externalized.getString('tomcat7Version')
+      tomcat7ServletApi = Externalized.getString('tomcat7ServletApi')
+      tomcat7ServletApiVersion = Externalized.getString('tomcat7ServletApiVersion')
+      tomcat8Version = Externalized.getString('tomcat8Version')
+      tomcat8ServletApi = Externalized.getString('tomcat8ServletApi')
+      tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
+    }
+
     addExtensions(project)
     addConfigurations(project)
 
