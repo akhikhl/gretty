@@ -33,22 +33,34 @@ class JettyServerStartInfo {
     def httpsConn = configurer.findHttpsConnector(server)
 
     List contextInfo = []
-
-    for(def context in server.handler.handlers) {
-      log.warn '{} runs at:', (context.displayName - '/')
-      if(httpConn) {
-        log.warn '  http://{}:{}{}', (httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host), httpConn.port, context.contextPath
-        httpConn.with {
-          contextInfo.add([ protocol: 'http', host: host, port: port, contextPath: context.contextPath, baseURI: "http://${host}:${port}${context.contextPath}" ])
+  
+    def collectContextInfo
+    collectContextInfo = { handler ->
+      if(handler.respondsTo('getHandlers')) {
+        for(def h in handler.getHandlers()) {
+          collectContextInfo(h)
         }
-      }
-      if(httpsConn) {
-        log.warn '  https://{}:{}{}', (httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host), httpsConn.port, context.contextPath
-        httpsConn.with {
-          contextInfo.add([ protocol: 'https', host: host, port: port, contextPath: context.contextPath, baseURI: "https://${host}:${port}${context.contextPath}" ])
+      } else {
+        if(handler.respondsTo('getDisplayName'))
+          log.warn '{} runs at:', (handler.displayName - '/')
+        if(handler.respondsTo('getContextPath')) {
+          if(httpConn) {
+            log.warn '  http://{}:{}{}', (httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host), httpConn.port, handler.contextPath
+            httpConn.with {
+              contextInfo.add([ protocol: 'http', host: host, port: port, contextPath: handler.contextPath, baseURI: "http://${host}:${port}${handler.contextPath}" ])
+            }
+          }
+          if(httpsConn) {
+            log.warn '  https://{}:{}{}', (httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host), httpsConn.port, handler.contextPath
+            httpsConn.with {
+              contextInfo.add([ protocol: 'https', host: host, port: port, contextPath: handler.contextPath, baseURI: "https://${host}:${port}${handler.contextPath}" ])
+            }
+          }
         }
       }
     }
+
+    collectContextInfo(server.handler)
 
     def serverStartInfo = [ status: 'successfully started' ]
 
