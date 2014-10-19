@@ -63,8 +63,8 @@ class JettyServerConfigurer {
     File baseDir = new File(params.baseDir)
     new File(baseDir, 'webapps').mkdirs()
 
-    configurer.applyJettyXml(server, params.serverConfigFile)
     configurer.configureConnectors(server, params)
+    configurer.applyJettyXml(server, params.serverConfigFile)
 
     List handlers = []
     //params.useFileMappedBuffer = true // DBG
