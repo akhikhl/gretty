@@ -253,9 +253,23 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   void setHandlersToServer(server, List handlers) {
-    ContextHandlerCollection contexts = new ContextHandlerCollection()
+
+    def findContextHandlerCollection
+    findContextHandlerCollection = { handler ->
+      if(handler instanceof ContextHandlerCollection)
+        return handler
+      if(handler.respondsTo('getHandlers'))
+        return handler.getHandlers().findResult { findContextHandlerCollection(it) }
+      null
+    }
+
+    ContextHandlerCollection contexts = findContextHandlerCollection(server.handler)
+    if(!contexts)
+      contexts = new ContextHandlerCollection()
+
     contexts.setHandlers(handlers as Handler[])
-    server.setHandler(contexts)
+    if(server.handler == null)
+      server.handler = contexts
   }
 
   @Override

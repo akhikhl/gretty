@@ -40,21 +40,21 @@ class JettyServerStartInfo {
         for(def h in handler.getHandlers()) {
           collectContextInfo(h)
         }
-      } else {
-        if(handler.respondsTo('getDisplayName'))
-          log.warn '{} runs at:', (handler.displayName - '/')
-        if(handler.respondsTo('getContextPath')) {
-          if(httpConn) {
-            log.warn '  http://{}:{}{}', (httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host), httpConn.port, handler.contextPath
-            httpConn.with {
-              contextInfo.add([ protocol: 'http', host: host, port: port, contextPath: handler.contextPath, baseURI: "http://${host}:${port}${handler.contextPath}" ])
-            }
+      }
+      if(handler.respondsTo('getDisplayName'))
+        log.warn '{} runs at:', (handler.getDisplayName() - '/')
+      if(handler.respondsTo('getContextPath')) {
+        String contextPath = handler.getContextPath()
+        if(httpConn) {
+          log.warn '  http://{}:{}{}', (httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host), httpConn.port, contextPath
+          httpConn.with {
+            contextInfo.add([ protocol: 'http', host: host, port: port, contextPath: contextPath, baseURI: "http://${host}:${port}${handler.contextPath}" ])
           }
-          if(httpsConn) {
-            log.warn '  https://{}:{}{}', (httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host), httpsConn.port, handler.contextPath
-            httpsConn.with {
-              contextInfo.add([ protocol: 'https', host: host, port: port, contextPath: handler.contextPath, baseURI: "https://${host}:${port}${handler.contextPath}" ])
-            }
+        }
+        if(httpsConn) {
+          log.warn '  https://{}:{}{}', (httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host), httpsConn.port, contextPath
+          httpsConn.with {
+            contextInfo.add([ protocol: 'https', host: host, port: port, contextPath: contextPath, baseURI: "https://${host}:${port}${handler.contextPath}" ])
           }
         }
       }

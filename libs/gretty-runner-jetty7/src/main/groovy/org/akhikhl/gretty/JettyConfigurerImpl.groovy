@@ -7,15 +7,15 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
 import ch.qos.logback.classic.selector.servlet.ContextDetachingSCL
 import ch.qos.logback.classic.selector.servlet.LoggerContextFilter
+import org.eclipse.jetty.plus.webapp.EnvConfiguration
+import org.eclipse.jetty.plus.webapp.PlusConfiguration
 import org.eclipse.jetty.security.HashLoginService
-import org.eclipse.jetty.security.LoginService
 import org.eclipse.jetty.server.Connector
+import org.eclipse.jetty.server.DispatcherType
 import org.eclipse.jetty.server.Handler
 import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.server.SessionManager
 import org.eclipse.jetty.server.bio.SocketConnector
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.server.session.HashSessionManager
@@ -25,20 +25,9 @@ import org.eclipse.jetty.util.component.LifeCycle
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.util.resource.ResourceCollection
 import org.eclipse.jetty.util.ssl.SslContextFactory
-import org.eclipse.jetty.webapp.WebAppClassLoader
-import org.eclipse.jetty.webapp.WebAppContext
-import org.eclipse.jetty.webapp.WebInfConfiguration
-import org.eclipse.jetty.webapp.WebXmlConfiguration
-import org.eclipse.jetty.webapp.Configuration
-import org.eclipse.jetty.webapp.FragmentConfiguration
-import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
-import org.eclipse.jetty.webapp.MetaInfConfiguration
-import org.eclipse.jetty.plus.webapp.EnvConfiguration
-import org.eclipse.jetty.plus.webapp.PlusConfiguration
+import org.eclipse.jetty.webapp.*
 import org.eclipse.jetty.xml.XmlConfiguration
-import org.eclipse.jetty.server.DispatcherType
 import org.slf4j.Logger
-
 /**
  *
  * @author akhikhl
@@ -258,9 +247,23 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   void setHandlersToServer(server, List handlers) {
-    ContextHandlerCollection contexts = new ContextHandlerCollection()
+
+    def findContextHandlerCollection
+    findContextHandlerCollection = { handler ->
+      if(handler instanceof ContextHandlerCollection)
+        return handler
+      if(handler.respondsTo('getHandlers'))
+        return handler.getHandlers().findResult { findContextHandlerCollection(it) }
+      null
+    }
+
+    ContextHandlerCollection contexts = findContextHandlerCollection(server.handler)
+    if(!contexts)
+      contexts = new ContextHandlerCollection()
+
     contexts.setHandlers(handlers as Handler[])
-    server.setHandler(contexts)
+    if(server.handler == null)
+      server.handler = contexts
   }
 
   @Override

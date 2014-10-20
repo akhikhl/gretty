@@ -7,13 +7,8 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
-import java.util.jar.JarEntry
-import java.util.jar.JarFile
-import org.apache.commons.io.FilenameUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -67,56 +62,52 @@ class JettyServerConfigurer {
     
     configurer.configureConnectors(server, params)
 
-    // handlers might be already configured in jetty.xml
-    if(server.getHandler() == null) {
-    
-      List handlers = []
+    List handlers = []
 
-      for(Map webapp in params.webApps) {
-        def context = configurer.createWebAppContext(params, webapp)
-        context.displayName = webapp.contextPath
-        context.contextPath = webapp.contextPath
+    for(Map webapp in params.webApps) {
+      def context = configurer.createWebAppContext(params, webapp)
+      context.displayName = webapp.contextPath
+      context.contextPath = webapp.contextPath
 
-        if(!params.supressSetConfigurations) {
-          List configurations = configurer.getConfigurations(webapp)
-          BaseResourceConfiguration baseRes = configurations.find { it instanceof BaseResourceConfiguration }
-          if(baseRes) {
-            baseRes.setExtraResourceBases(webapp.extraResourceBases)
-            baseRes.addBaseResourceListener this.&configureWithBaseResource.curry(webapp)
-          }
-          configurer.setConfigurationsToWebAppContext(context, configurations)
+      if(!params.supressSetConfigurations) {
+        List configurations = configurer.getConfigurations(webapp)
+        BaseResourceConfiguration baseRes = configurations.find { it instanceof BaseResourceConfiguration }
+        if(baseRes) {
+          baseRes.setExtraResourceBases(webapp.extraResourceBases)
+          baseRes.addBaseResourceListener this.&configureWithBaseResource.curry(webapp)
         }
-
-        File tempDir = new File(baseDir, 'webapps-exploded' + context.contextPath)
-        tempDir.mkdirs()
-        log.debug 'jetty context temp directory: {}', tempDir
-        context.setTempDirectory(tempDir)
-        if(context.respondsTo('setPersistTempDirectory')) // not supported on older jetty versions
-          context.setPersistTempDirectory(true)
-
-        webapp.initParams?.each { key, value ->
-          context.setInitParameter(key, value)
-        }
-
-        File resourceFile = new File(webapp.resourceBase)
-
-        if(resourceFile.isDirectory())
-          context.setResourceBase(webapp.resourceBase)
-        else
-          context.setWar(webapp.resourceBase)
-
-        configurer.configureSessionManager(server, context, params, webapp)
-
-        if(configureContext) {
-          configureContext.delegate = this
-          configureContext(webapp, context)
-        }
-
-        handlers.add(context)
+        configurer.setConfigurationsToWebAppContext(context, configurations)
       }
 
-      configurer.setHandlersToServer(server, handlers)
+      File tempDir = new File(baseDir, 'webapps-exploded' + context.contextPath)
+      tempDir.mkdirs()
+      log.debug 'jetty context temp directory: {}', tempDir
+      context.setTempDirectory(tempDir)
+      if(context.respondsTo('setPersistTempDirectory')) // not supported on older jetty versions
+        context.setPersistTempDirectory(true)
+
+      webapp.initParams?.each { key, value ->
+        context.setInitParameter(key, value)
+      }
+
+      File resourceFile = new File(webapp.resourceBase)
+
+      if(resourceFile.isDirectory())
+        context.setResourceBase(webapp.resourceBase)
+      else
+        context.setWar(webapp.resourceBase)
+
+      configurer.configureSessionManager(server, context, params, webapp)
+
+      if(configureContext) {
+        configureContext.delegate = this
+        configureContext(webapp, context)
+      }
+
+      handlers.add(context)
     }
+
+    configurer.setHandlersToServer(server, handlers)
 
     return server
   }
