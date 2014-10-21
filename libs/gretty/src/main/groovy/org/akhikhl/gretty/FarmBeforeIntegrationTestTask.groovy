@@ -118,7 +118,15 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     def webappConfig = configurer.getWebAppConfigForProject(options, webappProject, inplace, inplaceMode)
     ProjectUtils.prepareToRun(project, webappConfig)
 
-    def contextPath = webappConfig.contextPath
+    def contextPath
+    if(task.hasProperty('contextPath') && task.contextPath != null) {
+      contextPath = task.contextPath
+      if(!contextPath.startsWith('/'))
+        contextPath = '/' + contextPath
+    }
+    else
+      contextPath = webappConfig.contextPath
+
     task.systemProperty 'gretty.contextPath', contextPath
 
     String preferredProtocol
