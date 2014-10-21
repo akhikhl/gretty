@@ -30,3 +30,6 @@ gretty {
 
 rootProject.tasks.testAll.dependsOn { project.tasks.integrationTestAllContainers }
 
+war {
+  archiveName 'helloGretty.war'
+}
