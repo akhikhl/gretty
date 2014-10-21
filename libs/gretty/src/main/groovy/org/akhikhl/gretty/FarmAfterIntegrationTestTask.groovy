@@ -48,7 +48,7 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Map wrefs = [:]
     FarmConfigurer.mergeWebAppRefMaps(wrefs, webAppRefs)
-    FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).webAppRefs)
+    FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).getWebAppRefs(project))
     if(!wrefs)
       wrefs = configurer.getDefaultWebAppRefMap()
     configurer.getWebAppProjects(wrefs)

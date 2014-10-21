@@ -18,10 +18,26 @@ class FarmExtension extends FarmConfig {
 
   String integrationTestTask = 'integrationTest'
 
+  List includes = []
+
   protected afterEvaluate = []
 
   void afterEvaluate(Closure closure) {
     afterEvaluate.add(closure)
+  }
+
+  Map getWebAppRefs(Project project) {
+    if(includes) {
+      Map result = [:] << webAppRefs
+      for(def include in includes)
+        result << project.project(include.project).farms[farmName].getWebAppRefs(project)
+      result
+    } else
+      webAppRefs
+  }
+
+  void include(def project, def farmName = '') {
+    includes.add([ project: project, farmName: farmName ])
   }
 
   @Override

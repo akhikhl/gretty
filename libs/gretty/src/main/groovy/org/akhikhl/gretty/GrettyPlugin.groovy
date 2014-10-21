@@ -22,54 +22,61 @@ class GrettyPlugin implements Plugin<Project> {
 
   private void addConfigurations(Project project) {
     project.configurations {
-      gretty
-      springBoot {
-        if(project.configurations.findByName('runtime'))
-          extendsFrom project.configurations.runtime
-        exclude module: 'spring-boot-starter-tomcat'
-        exclude group: 'org.eclipse.jetty'
-      }
-      grettyNoSpringBoot {
-        extendsFrom project.configurations.gretty
-        exclude group: 'org.springframework.boot'
-      }
-      grettyRunnerSpringBootBase
-      grettyRunnerSpringBoot {
-        extendsFrom project.configurations.grettyRunnerSpringBootBase
-      }
-      grettyRunnerSpringBootJettyBase {
-        extendsFrom project.configurations.grettyRunnerSpringBoot
-      }
-      grettyRunnerSpringBootJetty {
-        extendsFrom project.configurations.grettyRunnerSpringBootJettyBase
-      }
-      grettyRunnerSpringBootTomcatBase {
-        extendsFrom project.configurations.grettyRunnerSpringBoot
-      }
-      grettyRunnerSpringBootTomcat {
-        extendsFrom project.configurations.grettyRunnerSpringBootTomcatBase
-      }
-      grettySpringLoaded {
-        transitive = false
-      }
       grettyStarter
-      productRuntime {
-        extendsFrom project.configurations.runtime
-        exclude group: 'org.springframework.boot'
-        // We exclude groovy from product, because it is already included in runner configuration
-        // (see gretty-runner dependencies). Thus we avoid groovy version conflicts.
-        exclude module: 'groovy-all'
+    }
+    def runtimeConfig = project.configurations.findByName('runtime')
+    if(runtimeConfig) {
+      project.configurations {
+        gretty
+        springBoot {
+          extendsFrom runtimeConfig
+          exclude module: 'spring-boot-starter-tomcat'
+          exclude group: 'org.eclipse.jetty'
+        }
+        grettyNoSpringBoot {
+          extendsFrom project.configurations.gretty
+          exclude group: 'org.springframework.boot'
+        }
+        grettyRunnerSpringBootBase
+        grettyRunnerSpringBoot {
+          extendsFrom project.configurations.grettyRunnerSpringBootBase
+        }
+        grettyRunnerSpringBootJettyBase {
+          extendsFrom project.configurations.grettyRunnerSpringBoot
+        }
+        grettyRunnerSpringBootJetty {
+          extendsFrom project.configurations.grettyRunnerSpringBootJettyBase
+        }
+        grettyRunnerSpringBootTomcatBase {
+          extendsFrom project.configurations.grettyRunnerSpringBoot
+        }
+        grettyRunnerSpringBootTomcat {
+          extendsFrom project.configurations.grettyRunnerSpringBootTomcatBase
+        }
+        grettySpringLoaded {
+          transitive = false
+        }
+        productRuntime {
+          extendsFrom runtimeConfig
+          exclude group: 'org.springframework.boot'
+          // We exclude groovy from product, because it is already included in runner configuration
+          // (see gretty-runner dependencies). Thus we avoid groovy version conflicts.
+          exclude module: 'groovy-all'
+        }
       }
     }
-    if(!project.configurations.findByName('providedCompile'))
+    def compileConfig = project.configurations.findByName('compile')
+    if(compileConfig && !project.configurations.findByName('providedCompile'))
       project.configurations {
         providedCompile
-        compile.extendsFrom(providedCompile)
+        compileConfig.extendsFrom providedCompile
       }
-    ServletContainerConfig.getConfigs().each { configName, config ->
-      project.configurations.create config.servletContainerRunnerConfig
+    if(runtimeConfig) {
+      ServletContainerConfig.getConfigs().each { configName, config ->
+        project.configurations.create config.servletContainerRunnerConfig
+      }
+      SpringBootResolutionStrategy.apply(project)
     }
-    SpringBootResolutionStrategy.apply(project)
   }
 
   private void addDependencies(Project project) {
@@ -78,59 +85,71 @@ class GrettyPlugin implements Plugin<Project> {
     String springBootVersion = project.gretty.springBootVersion ?: (project.hasProperty('springBootVersion') ? project.springBootVersion : Externalized.getString('springBootVersion'))
 
     project.dependencies {
-      grettyRunnerSpringBootBase "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion", {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
-      }
-      grettyRunnerSpringBoot "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-      }
-      grettyRunnerSpringBootJettyBase "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
-        // concrete implementation is chosen depending on servletContainer property
-        exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
-      }
-      grettyRunnerSpringBootJetty "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}", {
-        exclude group: 'org.eclipse.jetty'
-        exclude group: 'javax.servlet', module: 'javax.servlet-api'
-      }
-      grettyRunnerSpringBootTomcatBase "org.akhikhl.gretty:gretty-runner-spring-boot-tomcat:$grettyVersion", {
-        // concrete implementation is chosen depending on servletContainer property
-        exclude group: 'org.apache.tomcat.embed'
-        exclude group: 'javax.servlet', module: 'javax.servlet-api'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-      }
-      grettyRunnerSpringBootTomcat "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}", {
-        exclude group: 'org.apache.tomcat.embed'
-        exclude group: 'javax.servlet', module: 'javax.servlet-api'
-      }
-      grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
       grettyStarter "org.akhikhl.gretty:gretty-starter:$grettyVersion"
+      if(project.configurations.findByName('grettyRunnerSpringBootBase'))
+        grettyRunnerSpringBootBase "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion", {
+          exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+        }
+      if(project.configurations.findByName('grettyRunnerSpringBoot'))
+        grettyRunnerSpringBoot "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
+          exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+        }
+      if(project.configurations.findByName('grettyRunnerSpringBootJettyBase'))
+        grettyRunnerSpringBootJettyBase "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
+          // concrete implementation is chosen depending on servletContainer property
+          exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
+          exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
+        }
+      if(project.configurations.findByName('grettyRunnerSpringBootJetty'))
+        grettyRunnerSpringBootJetty "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}", {
+          exclude group: 'org.eclipse.jetty'
+          exclude group: 'javax.servlet', module: 'javax.servlet-api'
+        }
+      if(project.configurations.findByName('grettyRunnerSpringBootTomcatBase'))
+        grettyRunnerSpringBootTomcatBase "org.akhikhl.gretty:gretty-runner-spring-boot-tomcat:$grettyVersion", {
+          // concrete implementation is chosen depending on servletContainer property
+          exclude group: 'org.apache.tomcat.embed'
+          exclude group: 'javax.servlet', module: 'javax.servlet-api'
+          exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+        }
+      if(project.configurations.findByName('grettyRunnerSpringBootTomcat'))
+        grettyRunnerSpringBootTomcat "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}", {
+          exclude group: 'org.apache.tomcat.embed'
+          exclude group: 'javax.servlet', module: 'javax.servlet-api'
+        }
+      if(project.configurations.findByName('grettySpringLoaded'))
+        grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
     }
 
-    ServletContainerConfig.getConfig(project.gretty.servletContainer).with { config ->
-      def closure = config.servletApiDependencies
-      closure = closure.rehydrate(config, closure.owner, closure.thisObject)
-      closure.resolveStrategy = Closure.DELEGATE_FIRST
-      closure(project)
-    }
+    if(project.configurations.findByName('runtime')) {
+      ServletContainerConfig.getConfig(project.gretty.servletContainer).with { config ->
+        def closure = config.servletApiDependencies
+        closure = closure.rehydrate(config, closure.owner, closure.thisObject)
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure(project)
+      }
 
-    ServletContainerConfig.getConfigs().each { configName, config ->
-      def closure = config.servletContainerRunnerDependencies
-      closure = closure.rehydrate(config, closure.owner, closure.thisObject)
-      closure.resolveStrategy = Closure.DELEGATE_FIRST
-      closure(project)
+      ServletContainerConfig.getConfigs().each { configName, config ->
+        def closure = config.servletContainerRunnerDependencies
+        closure = closure.rehydrate(config, closure.owner, closure.thisObject)
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure(project)
+      }
     }
 
     if(project.gretty.springBoot)
       project.dependencies {
-        compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
-          exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-        }
-        springBoot "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}"
+        if(project.configurations.findByName('compile'))
+          compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
+            exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+          }
+        if(project.configurations.findByName('springBoot'))
+          springBoot "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}"
       }
 
-    for(String overlay in project.gretty.overlays)
-      project.dependencies.add 'providedCompile', project.project(overlay)
+    if(project.configurations.findByName('providedCompile'))
+      for(String overlay in project.gretty.overlays)
+        project.dependencies.add 'providedCompile', project.project(overlay)
   }
 
   private void addExtensions(Project project) {
@@ -578,6 +597,8 @@ class GrettyPlugin implements Plugin<Project> {
   }
 
   void apply(final Project project) {
+
+    log.warn 'DBG Gretty plugin applies to {}', project
 
     if(project.gradle.gradleVersion.startsWith('1.')) {
       String releaseNumberStr = project.gradle.gradleVersion.split('\\.')[1]
