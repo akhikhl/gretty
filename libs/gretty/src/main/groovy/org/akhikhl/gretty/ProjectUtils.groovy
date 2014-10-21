@@ -336,7 +336,9 @@ final class ProjectUtils {
       sconfig.serverConfigFile = null
 
     def logbackConfigFiles = [ sconfig.logbackConfigFile, 'logback.groovy', 'logback.xml' ] as LinkedHashSet
-    sconfig.logbackConfigFile = new FileResolver(['logback', 'server', 'config', '.', { getWebInfDir(it) }, { it.sourceSets.main.output.files } ]).resolveSingleFile(project, logbackConfigFiles)
+    sconfig.logbackConfigFile = new FileResolver(
+      ['logback', 'server', 'config', '.', { getWebInfDir(it) }, { it.hasProperty('sourceSets') ? it.sourceSets.main.output.files : [] } ]
+    ).resolveSingleFile(project, logbackConfigFiles)
   }
 
   static void resolveWebAppConfig(Project project, WebAppConfig wconfig, ServerConfig sconfig) {

@@ -29,8 +29,11 @@ class FarmExtension extends FarmConfig {
   Map getWebAppRefs(Project project) {
     if(includes) {
       Map result = [:] << webAppRefs
-      for(def include in includes)
-        result << project.project(include.project).farms[farmName].getWebAppRefs(project)
+      for(def include in includes) {
+        def otherFarms = project.project(include.project).extensions.findByName('farms')
+        if(otherFarms)
+          result << otherFarms.farmsMap[include.farmName].getWebAppRefs(project)
+      }
       result
     } else
       webAppRefs

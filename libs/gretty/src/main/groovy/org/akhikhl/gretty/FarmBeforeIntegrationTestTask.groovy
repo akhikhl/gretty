@@ -7,9 +7,7 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaForkOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -86,20 +84,22 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     }
     integrationTestTask_ = integrationTestTask
     def thisTask = this
-    getWebAppProjects().each { proj ->
+    project.rootProject.allprojects.each { proj ->
       proj.tasks.all { t ->
-        if(t.name == thisTask.integrationTestTask) {
-          t.mustRunAfter thisTask
-          thisTask.mustRunAfter proj.tasks.testClasses
-          if(t.name != 'test' && project.tasks.findByName('test'))
-            thisTask.mustRunAfter project.tasks.test
-          if(GradleUtils.instanceOf(t, 'org.gradle.process.JavaForkOptions'))
-            t.doFirst {
-              if(thisTask.didWork)
-                passSystemPropertiesToIntegrationTask(proj, t)
-            }
-        } else if(GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppBeforeIntegrationTestTask') && t.integrationTestTask == thisTask.integrationTestTask)
-          t.mustRunAfter thisTask // need this to be able to disable AppBeforeIntegrationTestTask in doFirst
+        if(getWebAppProjects().contains(t.project)) {
+          if (t.name == thisTask.integrationTestTask) {
+            t.mustRunAfter thisTask
+            thisTask.mustRunAfter proj.tasks.testClasses
+            if (t.name != 'test' && project.tasks.findByName('test'))
+              thisTask.mustRunAfter project.tasks.test
+            if (GradleUtils.instanceOf(t, 'org.gradle.process.JavaForkOptions'))
+              t.doFirst {
+                if (thisTask.didWork)
+                  passSystemPropertiesToIntegrationTask(proj, t)
+              }
+          } else if (GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppBeforeIntegrationTestTask') && t.integrationTestTask == thisTask.integrationTestTask)
+            t.mustRunAfter thisTask // need this to be able to disable AppBeforeIntegrationTestTask in doFirst
+        }
       }
     }
     integrationTestTaskAssigned = true

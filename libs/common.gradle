@@ -26,7 +26,7 @@ project.tasks.build.finalizedBy project.tasks.install
 rootProject.tasks.buildExamples.dependsOn project.tasks.build
 rootProject.tasks.buildExamples.dependsOn project.tasks.install
 
-task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
+/* task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
   classifier = 'sources'
   from sourceSets.main.allSource
 }
@@ -44,4 +44,4 @@ task javadocJar(type: Jar, description: 'Creates javadoc jar') {
 artifacts {
   archives sourcesJar, javadocJar
 }
-
+*/
