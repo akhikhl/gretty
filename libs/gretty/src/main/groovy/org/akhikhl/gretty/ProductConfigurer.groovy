@@ -283,10 +283,10 @@ Version: ${project.version}"""
     if(sconfig != null)
       return
     FarmConfigurer configurer = new FarmConfigurer(project)
-    FarmExtension productFarm = new FarmExtension()
+    FarmExtension productFarm = new FarmExtension(project)
     configurer.configureFarm(productFarm,
-      new FarmExtension(logDir: 'logs'),
-      new FarmExtension(serverConfig: product.serverConfig, webAppRefs: product.webAppRefs),
+      new FarmExtension(project, logDir: 'logs'),
+      new FarmExtension(project, serverConfig: product.serverConfig, webAppRefs: product.webAppRefs),
       configurer.findProjectFarm(productName)
     )
     sconfig = productFarm.serverConfig

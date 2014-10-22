@@ -21,8 +21,8 @@ package org.akhikhl.gretty
  */
 class FarmsConfig {
 
-  protected Map farmsMap = [:]
-  
+  protected final Map farmsMap_ = [:]
+
   FarmConfig createFarm() {
     new FarmConfig()
   }
@@ -30,11 +30,15 @@ class FarmsConfig {
   void farm(String name = null, Closure closure) {
     if(name == null)
       name = ''
-    def f = farmsMap[name]
+    def f = farmsMap_[name]
     if(f == null)
-      f = farmsMap[name] = createFarm()
+      f = farmsMap_[name] = createFarm()
     closure.delegate = f
     closure.resolveStrategy = Closure.DELEGATE_FIRST
     closure()
+  }
+
+  Map getFarmsMap() {
+    farmsMap_.asImmutable()
   }
 }

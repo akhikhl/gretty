@@ -8,15 +8,22 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.Project
+
 /**
  *
  * @author akhikhl
  */
 class FarmsExtension extends FarmsConfig {
- 
+
+  final Project project
+
+  FarmsExtension(Project project) {
+    this.project = project
+  }
+
   @Override
   FarmConfig createFarm() {
-    new FarmExtension()
+    new FarmExtension(project)
   }
 }
-

@@ -112,8 +112,8 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     task.systemProperty 'gretty.host', host
 
     FarmConfigurer configurer = new FarmConfigurer(project)
-    FarmExtension tempFarm = new FarmExtension()
-    configurer.configureFarm(tempFarm, new FarmExtension(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
+    FarmExtension tempFarm = new FarmExtension(project)
+    configurer.configureFarm(tempFarm, new FarmExtension(project, serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
     def options = tempFarm.webAppRefs.find { key, value -> configurer.resolveWebAppRefToProject(key) == webappProject }.value
     def webappConfig = configurer.getWebAppConfigForProject(options, webappProject, inplace, inplaceMode)
     ProjectUtils.prepareToRun(project, webappConfig)

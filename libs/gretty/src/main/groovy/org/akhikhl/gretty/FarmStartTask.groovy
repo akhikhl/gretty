@@ -33,8 +33,8 @@ class FarmStartTask extends StartBaseTask {
 
     FarmConfigurer configurer = new FarmConfigurer(project)
 
-    FarmExtension tempFarm = new FarmExtension()
-    configurer.configureFarm(tempFarm, new FarmExtension(serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName), new FarmExtension())
+    FarmExtension tempFarm = new FarmExtension(project)
+    configurer.configureFarm(tempFarm, new FarmExtension(project, serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName), new FarmExtension(project))
     doPrepareServerConfig(tempFarm.serverConfig)
 
     List<WebAppConfig> wconfigs = []
@@ -70,7 +70,7 @@ class FarmStartTask extends StartBaseTask {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Map wrefs = [:]
     FarmConfigurer.mergeWebAppRefMaps(wrefs, webAppRefs)
-    FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).getWebAppRefs(project))
+    FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).webAppRefs)
     if(!wrefs)
       wrefs = configurer.getDefaultWebAppRefMap()
     configurer.getWebAppConfigsForProjects(wrefs, inplace, inplaceMode)
@@ -80,7 +80,7 @@ class FarmStartTask extends StartBaseTask {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Map wrefs = [:]
     FarmConfigurer.mergeWebAppRefMaps(wrefs, webAppRefs)
-    FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).getWebAppRefs(project))
+    FarmConfigurer.mergeWebAppRefMaps(wrefs, configurer.getProjectFarm(farmName).webAppRefs)
     if(!wrefs)
       wrefs = configurer.getDefaultWebAppRefMap()
     configurer.getWebAppProjects(wrefs)

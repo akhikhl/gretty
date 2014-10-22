@@ -34,7 +34,7 @@ class FarmConfigurer {
     sconfig = dstFarm.serverConfig
     ProjectUtils.resolveServerConfig(project, dstFarm.serverConfig)
     for(def f in srcFarms)
-      mergeWebAppRefMaps(dstFarm.webAppRefs, f.getWebAppRefs(project))
+      mergeWebAppRefMaps(dstFarm.webAppRefs_, f.webAppRefs)
     if(!dstFarm.webAppRefs)
       dstFarm.webAppRefs = getDefaultWebAppRefMap()
     if(dstFarm.integrationTestTask == null)

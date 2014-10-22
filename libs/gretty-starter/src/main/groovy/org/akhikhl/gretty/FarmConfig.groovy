@@ -18,11 +18,7 @@ class FarmConfig {
   protected ServerConfig serverConfig = new ServerConfig()
 
   // key is project path or war path, value is options
-  Map webAppRefs = [:]
-
-  void webapp(Map options = [:], w) {
-    webAppRefs[w] = options
-  }
+  protected Map webAppRefs_ = [:]
 
   // use serverConfigFile instead
   @Deprecated
@@ -30,9 +26,17 @@ class FarmConfig {
     serverConfig.getJettyXmlFile()
   }
 
+  Map getWebAppRefs() {
+    webAppRefs_.asImmutable()
+  }
+
   // use serverConfigFile instead
   @Deprecated
   void setJettyXmlFile(newValue) {
     serverConfig.setJettyXmlFile(newValue)
+  }
+
+  void webapp(Map options = [:], w) {
+    webAppRefs_[w] = options
   }
 }
