@@ -8,6 +8,7 @@
  */
 package org.akhikhl.gretty
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 
 /**
@@ -20,7 +21,7 @@ class FarmExtension extends FarmConfig {
 
   String integrationTestTask = 'integrationTest'
 
-  private final List includes_ = []
+  protected final List includes_ = []
 
   private final List afterEvaluate_ = []
 
@@ -39,9 +40,33 @@ class FarmExtension extends FarmConfig {
   void afterEvaluate(Closure closure) {
     afterEvaluate_.add(closure)
   }
+  
+  private static void collectWebAppRefs(Map result, List includeStack, FarmExtension ext) {
+    if(includeStack.contains(ext))
+      throw new GradleException("Cyclic farm inclusion: ${ includeStack.collect { it.project.path + '/' + it.farmName } + [ext.project.path + '/' + ext.farmName] }")
+    result << ext.webAppRefs_
+    if(ext.includes_) {
+      includeStack.push(ext)
+      for(Map include in ext.includes_) {
+        def otherFarms = ext.project.project(include.project).extensions.findByName('farms')
+        if(otherFarms) {
+          def otherFarm = otherFarms.farmsMap[include.farmName]
+          if(otherFarm == null)
+            throw new GradleException("Farm ${ext.project.path + '/' + ext.farmName} includes non-existing farm ${include.project + '/' + include.farmName}")
+          collectWebAppRefs(result, includeStack, otherFarm)
+        }
+      }
+      includeStack.pop()
+    }
+  }
 
   List getAfterEvaluate() {
     afterEvaluate_.asImmutable()
+  }
+  
+  String getFarmName() {
+    def thisFarm = this
+    project.farms.farmsMap.find { key, value -> value == thisFarm }?.key
   }
 
   List getIncludes() {
@@ -50,16 +75,9 @@ class FarmExtension extends FarmConfig {
 
   @Override
   Map getWebAppRefs() {
-    if(includes_) {
-      Map result = [:] << webAppRefs_
-      for(Map include in includes_) {
-        def otherFarms = project.project(include.project).extensions.findByName('farms')
-        if(otherFarms)
-          result << otherFarms.farmsMap[include.farmName].webAppRefs
-      }
-      result.asImmutable()
-    } else
-      webAppRefs_.asImmutable()
+    Map result = [:]
+    collectWebAppRefs(result, [], this)
+    result
   }
 
   void include(def project, def farmName = '') {
