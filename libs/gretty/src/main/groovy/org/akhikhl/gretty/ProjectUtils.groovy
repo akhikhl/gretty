@@ -66,6 +66,15 @@ final class ProjectUtils {
       addProjectClassPath = { Project proj ->
         urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
         urls.addAll proj.configurations[dependencyConfig].files.collect { it.toURI().toURL() }
+        for (pd in proj.configurations[dependencyConfig].getAllDependencies().withType(ProjectDependency)) {
+          def p = pd.getDependencyProject()
+          if (!p.sourceSets.main.output.files.any {
+            new File(it, 'META-INF/web-fragment.xml').exists()
+          }) {
+            urls.addAll p.sourceSets.main.output.files.collect { it.toURI().toURL() }
+            urls.remove p.jar.archivePath.toURI().toURL()
+          }
+        }
         // ATTENTION: order of overlay classpath is important!
         if(proj.extensions.findByName('gretty'))
           for(String overlay in proj.gretty.overlays.reverse())
