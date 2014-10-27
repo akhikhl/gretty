@@ -4,6 +4,28 @@
 
 ### What's new:
 
+#### Version 1.1.5
+
+- New feature: [composite farms](http://akhikhl.github.io/gretty-doc/Composite-farms.html).
+
+- New feature [dependent projects can run in inplace mode](http://akhikhl.github.io/gretty-doc/Hot-deployment.html#_dependencyprojectsinplaceserve).
+
+- New feature: [override of context path in integration test tasks](http://akhikhl.github.io/gretty-doc/Override-context-path-in-integration-test-tasks.html).
+
+- New feature: [injection of version variables into project.ext](http://akhikhl.github.io/gretty-doc/Injection-of-version-variables.html).
+
+- Upgraded to Spring Boot 1.1.8.RELEASE.
+
+- Fixed bug: spring-boot improperly shutdown in SpringBootServerManager.stopServer.
+
+- Resolved issue #101: [Jetty.xml Rewrite Handler doesnt seem to take effect](https://github.com/akhikhl/gretty/issues/101).
+
+- Resolved issue #97: [How can I add runner libraries](https://github.com/akhikhl/gretty/issues/97).
+
+- Resolved issue #96: [Custom builds of Gradle cause NumberFormatException](https://github.com/akhikhl/gretty/issues/96).
+
+- Resolved issue #93: [Groovy version conflicts when running farmStart with a war file](https://github.com/akhikhl/gretty/issues/93).
+
 #### Version 1.1.4
 
 - New feature: [inplaceMode property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_inplacemode), when assigned to "hard", instructs Gretty to serve files directly from src/main/webapp, bypassing file copy on change.

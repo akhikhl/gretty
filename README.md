@@ -2,8 +2,8 @@
 
 [![Build Status](http://img.shields.io/travis/akhikhl/gretty.svg)](https://travis-ci.org/akhikhl/gretty)
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
-[![Release](http://img.shields.io/badge/release-1.1.4-47b31f.svg)](https://github.com/akhikhl/gretty/releases/latest)
-[![Snapshot](http://img.shields.io/badge/current-1.1.5--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
+[![Release](http://img.shields.io/badge/release-1.1.5-47b31f.svg)](https://github.com/akhikhl/gretty/releases/latest)
+[![Snapshot](http://img.shields.io/badge/current-1.1.6--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
@@ -18,7 +18,7 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- Gretty 1.1.4 is out and immediately available at [Gradle plugin portal](http://plugins.gradle.org/plugin/org.akhikhl.gretty), [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22).
+- Gretty 1.1.5 is out and immediately available at [Gradle plugin portal](http://plugins.gradle.org/plugin/org.akhikhl.gretty), [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22).
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
