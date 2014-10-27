@@ -2,11 +2,18 @@ buildscript {
   repositories {
     mavenLocal()
     jcenter()
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
   }
 
   dependencies {
     classpath "org.akhikhl.gretty:gretty:$gretty_version"
   }
+}
+
+repositories {
+  mavenLocal()
+  jcenter()
+  maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
 }
 
 apply plugin: 'groovy'
