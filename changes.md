@@ -4,6 +4,10 @@
 
 ### What's new:
 
+#### Version 1.1.6
+
+Maintenance release. Fixed bug: "readonly property" exception when trying to generate Gretty product.
+
 #### Version 1.1.5
 
 - New feature: [composite farms](http://akhikhl.github.io/gretty-doc/Composite-farms.html).

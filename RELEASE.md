@@ -1,3 +1,9 @@
+## Gretty 1.1.6 release announcement
+
+Gretty version 1.1.5 brings new bug, preventing Gretty product generation.
+If you run buildProduct task and experience "readonly property" exception,
+please switch to Gretty 1.1.6 - it fixes the problem.
+
 ## Gretty 1.1.5 release announcement
 
 Hello colleagues,
