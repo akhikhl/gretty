@@ -36,7 +36,7 @@ class FarmConfigurer {
     for(def f in srcFarms)
       mergeWebAppRefMaps(dstFarm.webAppRefs_, f.webAppRefs)
     if(!dstFarm.webAppRefs)
-      dstFarm.webAppRefs = getDefaultWebAppRefMap()
+      dstFarm.webAppRefs_ = getDefaultWebAppRefMap()
     if(dstFarm.integrationTestTask == null)
       dstFarm.integrationTestTask = srcFarms.findResult { it.integrationTestTask }
   }
