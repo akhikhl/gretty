@@ -1,4 +1,4 @@
-== Gretty 1.1.5 release announcement
+## Gretty 1.1.5 release announcement
 
 Hello colleagues,
 
@@ -20,6 +20,6 @@ What's new in Gretty 1.1.5:
 - Resolved issue #96: Custom builds of Gradle cause NumberFormatException.
 - Resolved issue #93: Groovy version conflicts when running farmStart with a war file.
 
-Full list of changes: https://github.com/akhikhl/gretty/blob/master/changes.md
+Here is [full list of changes](https://github.com/akhikhl/gretty/blob/master/changes.md) in this and previous releases.
 
 I would be thankful for your feedback, bug reports and suggestions!
