@@ -52,8 +52,8 @@ class CertificateGenerator {
     File keystoreFile = new File(dir, 'keystore')
     File certFile = new File(dir, 'cert')
     File propertiesFile = new File(dir, 'properties')
-    String sslKeyStorePassword
-    String sslKeyManagerPassword
+    String sslKeyStorePassword = null
+    String sslKeyManagerPassword = null
     if(!keystoreFile.exists() || !certFile.exists() || !propertiesFile.exists()) {
       dir.mkdirs()
       log.warn 'Generating RSA key'
@@ -63,11 +63,11 @@ class CertificateGenerator {
       log.warn 'Generating self-signed X.509 certificate'
       def certGen = new X509V3CertificateGenerator()
       certGen.setSerialNumber(BigInteger.valueOf(new SecureRandom().nextInt(Integer.MAX_VALUE)))
-      String userName = System.getProperty('user.name')
       certGen.setIssuerDN(new X509Principal("CN=gretty-issuer, OU=None, O=Gretty, L=None, C=None"))
       certGen.setNotBefore(new Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 30))
       certGen.setNotAfter(new Date(System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 365*10)))
-      certGen.setSubjectDN(new X509Principal("CN=${sconfig.sslHost ?: sconfig.host}, OU=None, O=${project.name}, L=None, C=None"))
+      String host = sconfig.sslHost ?: sconfig.host ?: 'localhost'
+      certGen.setSubjectDN(new X509Principal("CN=${host}, OU=None, O=${project.name}, L=None, C=None"))
       certGen.setPublicKey(KPair.getPublic())
       certGen.setSignatureAlgorithm('SHA256WithRSA')
       def PKCertificate = certGen.generateX509Certificate(KPair.getPrivate(), 'BC')
