@@ -59,20 +59,23 @@ final class ProjectUtils {
     return contextPath
   }
 
-  static Set<URL> getClassPath(Project project, boolean inplace, String dependencyConfig) {
+  static Set<URL> getClassPath(Project project, boolean inplace, String dependencyConfigName) {
     Set<URL> urls = new LinkedHashSet()
     if(project != null && inplace) {
       def addProjectClassPath
       addProjectClassPath = { Project proj ->
         urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
-        urls.addAll proj.configurations[dependencyConfig].files.collect { it.toURI().toURL() }
-        for (pd in proj.configurations[dependencyConfig].getAllDependencies().withType(ProjectDependency)) {
-          def p = pd.getDependencyProject()
-          if (!p.sourceSets.main.output.files.any {
-            new File(it, 'META-INF/web-fragment.xml').exists()
-          }) {
-            urls.addAll p.sourceSets.main.output.files.collect { it.toURI().toURL() }
-            urls.remove p.jar.archivePath.toURI().toURL()
+        def dependencyConfig = proj.configurations.findByName(dependencyConfigName)
+        if(dependencyConfig) {
+          urls.addAll dependencyConfig.files.collect { it.toURI().toURL() }
+          for (pd in dependencyConfig.getAllDependencies().withType(ProjectDependency)) {
+            def p = pd.getDependencyProject()
+            if (!p.sourceSets.main.output.files.any {
+              new File(it, 'META-INF/web-fragment.xml').exists()
+            }) {
+              urls.addAll p.sourceSets.main.output.files.collect { it.toURI().toURL() }
+              urls.remove p.jar.archivePath.toURI().toURL()
+            }
           }
         }
         // ATTENTION: order of overlay classpath is important!
@@ -194,7 +197,8 @@ final class ProjectUtils {
 
   // ATTENTION: this function resolves compile configuration!
   static boolean isSpringBootApp(Project project) {
-    project.configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == 'org.springframework.boot' }
+    def compileConfig = project.configurations.findByName('compile')
+    compileConfig && compileConfig.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == 'org.springframework.boot' }
   }
 
   static boolean isSpringBootApp(Project project, WebAppConfig wconfig) {

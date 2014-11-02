@@ -70,7 +70,7 @@ class FarmExtension extends FarmConfig {
   }
 
   List getIncludes() {
-    includes.asImmutable()
+    includes_.asImmutable()
   }
 
   @Override

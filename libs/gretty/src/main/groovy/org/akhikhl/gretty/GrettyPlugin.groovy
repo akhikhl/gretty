@@ -175,10 +175,17 @@ class GrettyPlugin implements Plugin<Project> {
         }
       else if(GradleUtils.instanceOf(task, 'org.akhikhl.gretty.FarmStartTask'))
         task.dependsOn {
-          task.getWebAppConfigsForProjects().collect {
+          task.getWebAppConfigsForProjects().findResults {
             def proj = project.project(it.projectPath)
             boolean inplace = it.inplace == null ? task.inplace : it.inplace
-            inplace ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareArchiveWebApp
+            String prepareTaskName = inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp'
+            def projTask = proj.tasks.findByName(prepareTaskName)
+            if(!projTask)
+              proj.tasks.whenObjectAdded { t ->
+                if(t.name == prepareTaskName)
+                  task.dependsOn t
+              }
+            projTask
           }
         }
     }
