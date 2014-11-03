@@ -10,6 +10,8 @@ package org.akhikhl.gretty
 
 import org.apache.catalina.Globals
 import org.apache.catalina.core.StandardContext
+import org.apache.catalina.deploy.FilterDef
+import org.apache.catalina.deploy.FilterMap
 import org.apache.catalina.deploy.WebXml
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
@@ -24,14 +26,29 @@ import org.slf4j.LoggerFactory
  * @author akhikhl
  */
 class TomcatConfigurerImpl implements TomcatConfigurer {
-  
+
   protected static boolean isServletApi(String filePath) {
     filePath.matches(/^.*servlet-api.*\.jar$/)
   }
 
   protected Logger log
-  
+
   protected Set virtualWebInfLibs = new LinkedHashSet()
+
+  @Override
+  void addRedirectFilter(StandardContext context, Map params) {
+    def redirectFilter = new FilterDef()
+    redirectFilter.setFilter(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(params)))
+    redirectFilter.setFilterName('RedirectFilter')
+    context.addFilterDef(redirectFilter)
+
+    def redirectFilterMap = new FilterMap()
+    redirectFilterMap.setFilterName('RedirectFilter')
+    redirectFilterMap.addURLPattern('/*')
+    redirectFilterMap.setDispatcher('REQUEST')
+    redirectFilterMap.setDispatcher('FORWARD')
+    context.addFilterMap(redirectFilterMap)
+  }
 
   @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
@@ -72,24 +89,24 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   @Override
   void setResourceBase(StandardContext context, Map webappParams) {
-    
+
     context.setDocBase(webappParams.resourceBase)
-    
+
     Map extraResourcePaths = [:]
-    
+
     if(webappParams.extraResourceBases)
       extraResourcePaths << webappParams.extraResourceBases.collectEntries { ['/', it ] }
 
     Set classpathJarParentDirs = new LinkedHashSet()
-    
+
     webappParams.webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.each {
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
       classpathJarParentDirs.add jarFile.parentFile.absolutePath
       virtualWebInfLibs.add('/WEB-INF/lib/' + jarFile.name)
     }
-    
+
     extraResourcePaths << classpathJarParentDirs.collectEntries { [ '/WEB-INF/lib', it ] }
-    
+
     if(extraResourcePaths) {
       VirtualDirContext vdc = new VirtualDirContext()
       vdc.setExtraResourcePaths(extraResourcePaths.collect { it.key + '=' + it.value }.join(','))
