@@ -24,7 +24,7 @@ class RedirectFilter implements Filter {
       return destination
     if(destination instanceof URIBuilder)
       return destination.toURI()
-    URI uri = new URI(destination)
+    URI uri = new URI(destination.toString())
     URIBuilder builder = new URIBuilder(defaultURI.toString())
     if(uri.scheme)
       builder.setScheme(uri.scheme)
@@ -52,10 +52,19 @@ class RedirectFilter implements Filter {
 
   protected static final Logger log = LoggerFactory.getLogger(RedirectFilter)
 
+  protected final Map params
   protected File webappDir
   protected long configFileLastModified
   protected Object filtersLock = new Object()
   protected List filters = []
+
+  RedirectFilter() {
+    this.params = null
+  }
+
+  RedirectFilter(Map params) {
+    this.params = params
+  }
 
   @Override
   public void destroy() {
@@ -65,11 +74,13 @@ class RedirectFilter implements Filter {
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
     loadFilters()
     Map result = [ action: FilterAction.CHAIN ]
-    def filterContext = new Expando()
+    def filterContext = new Expando(params)
     filterContext.log = log
     filterContext.request = req
     filterContext.response = resp
-    filterContext.requestURI = new URI(req.getRequestURL().toString())
+    def uriBuilder = new URIBuilder(req.getRequestURL().toString())
+    uriBuilder.setRawQuery(req.getQueryString())
+    filterContext.requestURI = uriBuilder.toURI()
     filterContext.contextPath = req.getContextPath()
     filterContext.webappDir = webappDir
     filterContext.redirect = { destination ->
@@ -139,7 +150,7 @@ class RedirectFilter implements Filter {
         if(!matchResult)
           return false
       }
-      filter.closure.call(filterContext, matches)
+      filter.closure.call(matches)
       return result.action != FilterAction.CHAIN // interrupt find, when not chaining
     }
   }

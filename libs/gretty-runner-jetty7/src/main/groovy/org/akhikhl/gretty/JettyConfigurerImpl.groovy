@@ -21,6 +21,7 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.server.session.HashSessionManager
 import org.eclipse.jetty.server.session.SessionHandler
 import org.eclipse.jetty.server.ssl.SslSocketConnector
+import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.util.component.LifeCycle
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.util.resource.ResourceCollection
@@ -202,6 +203,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.setOverrideDescriptor('/org/akhikhl/gretty/override-web.xml')
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
+    context.addFilter(new FilterHolder(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(serverParams))), '/*', EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD))
     return context
   }
 

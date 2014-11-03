@@ -16,6 +16,7 @@ import org.eclipse.jetty.security.HashLoginService
 import org.eclipse.jetty.server.*
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.server.session.HashSessionManager
+import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.util.component.LifeCycle
 import org.eclipse.jetty.util.resource.FileResource
 import org.eclipse.jetty.util.resource.Resource
@@ -207,6 +208,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.setInitParameter('org.eclipse.jetty.servlet.Default.useFileMappedBuffer', serverParams.productMode ? 'true' : 'false')
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
+    context.addFilter(new FilterHolder(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(serverParams))), '/*', EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD))
     return context
   }
 
