@@ -10,8 +10,6 @@ package org.akhikhl.gretty
 
 import org.apache.catalina.Globals
 import org.apache.catalina.core.StandardContext
-import org.apache.catalina.deploy.FilterDef
-import org.apache.catalina.deploy.FilterMap
 import org.apache.catalina.deploy.WebXml
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
@@ -34,21 +32,6 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
   protected Logger log
 
   protected Set virtualWebInfLibs = new LinkedHashSet()
-
-  @Override
-  void addRedirectFilter(StandardContext context, Map params) {
-    def redirectFilter = new FilterDef()
-    redirectFilter.setFilter(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(params)))
-    redirectFilter.setFilterName('GrettyRedirectFilter')
-    context.addFilterDef(redirectFilter)
-
-    def redirectFilterMap = new FilterMap()
-    redirectFilterMap.setFilterName('GrettyRedirectFilter')
-    redirectFilterMap.addURLPattern('/*')
-    redirectFilterMap.setDispatcher('REQUEST')
-    redirectFilterMap.setDispatcher('FORWARD')
-    context.addFilterMap(redirectFilterMap)
-  }
 
   @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {

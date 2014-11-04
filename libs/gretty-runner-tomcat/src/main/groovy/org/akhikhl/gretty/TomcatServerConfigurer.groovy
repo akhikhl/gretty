@@ -259,8 +259,6 @@ class TomcatServerConfigurer {
           }
         })
 
-      configurer.addRedirectFilter(context, params)
-
       tomcat.host.addChild(context)
     }
 

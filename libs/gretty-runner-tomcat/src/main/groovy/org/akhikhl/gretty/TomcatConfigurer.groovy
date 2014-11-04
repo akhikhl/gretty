@@ -20,8 +20,6 @@ import org.slf4j.Logger
  */
 interface TomcatConfigurer {
 
-  void addRedirectFilter(StandardContext context, Map params)
-
   ContextConfig createContextConfig(URL[] classpathUrls)
 
   JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns)

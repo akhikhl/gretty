@@ -203,9 +203,6 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.setOverrideDescriptor('/org/akhikhl/gretty/override-web.xml')
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
-    def filterHolder = new FilterHolder(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(serverParams)))
-    filterHolder.setName('GrettyRedirectFilter')
-    context.addFilter(filterHolder, '/*', EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD))
     return context
   }
 

@@ -15,8 +15,6 @@ import org.apache.catalina.startup.Tomcat
 import org.apache.catalina.webresources.DirResourceSet
 import org.apache.catalina.webresources.StandardRoot
 import org.apache.tomcat.JarScanner
-import org.apache.tomcat.util.descriptor.web.FilterDef
-import org.apache.tomcat.util.descriptor.web.FilterMap
 import org.apache.tomcat.util.descriptor.web.WebXml
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,21 +30,6 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
   }
 
   protected Logger log
-
-  @Override
-  void addRedirectFilter(StandardContext context, Map params) {
-    def redirectFilter = new FilterDef()
-    redirectFilter.setFilter(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(params)))
-    redirectFilter.setFilterName('GrettyRedirectFilter')
-    context.addFilterDef(redirectFilter)
-
-    def redirectFilterMap = new FilterMap()
-    redirectFilterMap.setFilterName('GrettyRedirectFilter')
-    redirectFilterMap.addURLPattern('/*')
-    redirectFilterMap.setDispatcher('REQUEST')
-    redirectFilterMap.setDispatcher('FORWARD')
-    context.addFilterMap(redirectFilterMap)
-  }
 
   @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
