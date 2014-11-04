@@ -208,7 +208,9 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.setInitParameter('org.eclipse.jetty.servlet.Default.useFileMappedBuffer', serverParams.productMode ? 'true' : 'false')
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
-    context.addFilter(new FilterHolder(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(serverParams))), '/*', EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD))
+    def filterHolder = new FilterHolder(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(serverParams)))
+    filterHolder.setName('GrettyRedirectFilter')
+    context.addFilter(filterHolder, '/*', EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD))
     return context
   }
 

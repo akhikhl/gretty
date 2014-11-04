@@ -35,19 +35,17 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   @Override
   void addRedirectFilter(StandardContext context, Map params) {
-    if(!context.findFilterDef('GrettyRedirectFilter')) {
-      def redirectFilter = new FilterDef()
-      redirectFilter.setFilter(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(params)))
-      redirectFilter.setFilterName('GrettyRedirectFilter')
-      context.addFilterDef(redirectFilter)
+    def redirectFilter = new FilterDef()
+    redirectFilter.setFilter(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(params)))
+    redirectFilter.setFilterName('GrettyRedirectFilter')
+    context.addFilterDef(redirectFilter)
 
-      def redirectFilterMap = new FilterMap()
-      redirectFilterMap.setFilterName('GrettyRedirectFilter')
-      redirectFilterMap.addURLPattern('/*')
-      redirectFilterMap.setDispatcher('REQUEST')
-      redirectFilterMap.setDispatcher('FORWARD')
-      context.addFilterMap(redirectFilterMap)
-    }
+    def redirectFilterMap = new FilterMap()
+    redirectFilterMap.setFilterName('GrettyRedirectFilter')
+    redirectFilterMap.addURLPattern('/*')
+    redirectFilterMap.setDispatcher('REQUEST')
+    redirectFilterMap.setDispatcher('FORWARD')
+    context.addFilterMap(redirectFilterMap)
   }
 
   @Override

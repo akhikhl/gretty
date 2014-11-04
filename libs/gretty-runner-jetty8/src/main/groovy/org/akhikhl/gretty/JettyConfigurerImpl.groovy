@@ -203,7 +203,9 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.addEventListener(new ContextDetachingSCL())
     context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
-    context.addFilter(new FilterHolder(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(serverParams))), '/*', EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD))
+    def filterHolder = new FilterHolder(new RedirectFilter(ServerDefaults.getRestrictedEffectiveParams(serverParams)))
+    filterHolder.setName('GrettyRedirectFilter')
+    context.addFilter(filterHolder, '/*', EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD))
     return context
   }
 
