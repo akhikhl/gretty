@@ -2,7 +2,6 @@ apply from: rootProject.file('libs/common.gradle')
 apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
-  compile project(':libs:gretty-filter')
   compile "org.codehaus.groovy:groovy-all:${groovy_version}"
   compile 'commons-cli:commons-cli:1.2'
   compile 'commons-io:commons-io:2.4'

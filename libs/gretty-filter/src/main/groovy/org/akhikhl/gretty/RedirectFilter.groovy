@@ -6,6 +6,7 @@ import groovyx.net.http.URIBuilder
 import javax.servlet.*
 import javax.servlet.http.HttpServletRequest
 import java.util.regex.Pattern
+import javax.management.ObjectName
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.slf4j.Logger
@@ -52,18 +53,14 @@ class RedirectFilter implements Filter {
 
   protected static final Logger log = LoggerFactory.getLogger(RedirectFilter)
 
-  protected final Map params
+  protected Integer httpPort
+  protected Integer httpsPort
   protected File webappDir
   protected long configFileLastModified
   protected Object filtersLock = new Object()
   protected List filters = []
 
   RedirectFilter() {
-    this.params = null
-  }
-
-  RedirectFilter(Map params) {
-    this.params = params
   }
 
   @Override
@@ -74,7 +71,9 @@ class RedirectFilter implements Filter {
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
     loadFilters()
     Map result = [ action: FilterAction.CHAIN ]
-    def filterContext = new Expando(params)
+    def filterContext = new Expando()
+    filterContext.httpPort = httpPort
+    filterContext.httpsPort = httpsPort
     filterContext.log = log
     filterContext.request = req
     filterContext.response = resp
@@ -157,6 +156,36 @@ class RedirectFilter implements Filter {
 
   @Override
   public void init(FilterConfig config) throws ServletException {
+    if(config.servletContext.hasProperty('contextHandler')) {
+      // jetty-specific
+      def server = config.servletContext.contextHandler.server
+      server.connectors.each { conn ->
+        if(server.version.startsWith('7.') || server.version.startsWith('8.')) {
+          if(conn.getClass().getName() == 'org.eclipse.jetty.server.bio.SocketConnector')
+            httpPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8080)
+          else if(conn.getClass().getName() == 'org.eclipse.jetty.server.ssl.SslSocketConnector')
+            httpsPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8443)
+        } else {
+          if(conn.protocols.find { it.startsWith 'http/' } && !conn.protocols.find { it.startsWith 'ssl-http/' })
+            httpPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8080)
+          else if(conn.protocols.find { it.startsWith 'http/' } && conn.protocols.find { it.startsWith 'ssl-http/' })
+            httpsPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8443)
+        }
+      }
+    }
+    else {
+      // tomcat-specific
+      def mbeans = java.lang.management.ManagementFactory.getPlatformMBeanServer()
+      for(def connName in mbeans.queryNames(new ObjectName('Tomcat:type=Connector,*'), null)) {
+        def conn = new GroovyMBean(mbeans, connName)
+        if(conn.scheme == 'http')
+          httpPort = conn.port
+        else if(conn.scheme == 'https')
+          httpsPort = conn.port
+      }
+    }
+    log.debug 'found httpPort={}', httpPort
+    log.debug 'found httpsPort={}', httpsPort
     webappDir = new File(config.getServletContext().getRealPath(''))
     loadFilters()
   }
@@ -168,17 +197,16 @@ class RedirectFilter implements Filter {
       if(configFileLastModified == configFile.lastModified())
         return
       configFileLastModified = configFile.lastModified()
-      def importCustomizer = new ImportCustomizer()
-      importCustomizer.addImport 'URIBuilder', 'groovyx.net.http.URIBuilder'
-      def configuration = new CompilerConfiguration()
-      configuration.addCompilationCustomizers(importCustomizer)
-      def shell = new GroovyShell(configuration)
-      def script = shell.parse(configFile)
       Binding binding = new Binding()
       binding.filter = { Map options, Closure closure ->
         newFilters.add([options: options, closure: closure])
       }
-      script.setBinding(binding)
+      def importCustomizer = new ImportCustomizer()
+      importCustomizer.addImport 'URIBuilder', 'groovyx.net.http.URIBuilder'
+      def configuration = new CompilerConfiguration()
+      configuration.addCompilationCustomizers(importCustomizer)
+      def shell = new GroovyShell(this.getClass().getClassLoader(), binding, configuration)
+      def script = shell.parse(configFile)
       script.run()
     }
     synchronized (filtersLock) {
