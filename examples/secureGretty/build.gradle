@@ -23,8 +23,6 @@ apply from: rootProject.file('integrationTests.gradle') // remove this to disabl
 dependencies {
   compile 'org.webjars:bootstrap:3.2.0'
   compile 'org.webjars:jquery:2.1.1'
-  // We use UrlRewriteFilter for redirecting to the protected home page.
-  compile 'org.tuckey:urlrewritefilter:4.0.4'
   // We use Velocity for example of template processing within the webapp.
   compile 'org.apache.velocity:velocity:1.7'
 }

@@ -4,11 +4,11 @@
       version="3.0">
 
   <filter>
-    <filter-name>UrlRewriteFilter</filter-name>
-    <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+    <filter-name>RedirectFilter</filter-name>
+    <filter-class>org.akhikhl.gretty.RedirectFilter</filter-class>
   </filter>
   <filter-mapping>
-    <filter-name>UrlRewriteFilter</filter-name>
+    <filter-name>RedirectFilter</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>FORWARD</dispatcher>

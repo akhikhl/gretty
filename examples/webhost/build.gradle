@@ -22,8 +22,6 @@ apply from: rootProject.file('integrationTests.gradle') // remove this to disabl
 
 dependencies {
   compile project(':webfragment')
-  // We use UrlRewriteFilter for redirecting to the protected home page.
-  compile 'org.tuckey:urlrewritefilter:4.0.4'
 }
 
 ext {
