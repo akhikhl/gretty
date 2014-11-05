@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import groovy.util.XmlSlurper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 /**
@@ -137,6 +138,15 @@ class GrettyPlugin implements Plugin<Project> {
 
     for(String overlay in project.gretty.overlays)
       project.dependencies.add 'providedCompile', project.project(overlay)
+
+    File webXmlFile = new File(ProjectUtils.getWebAppDir(project), 'WEB-INF/web.xml')
+    if(webXmlFile.exists()) {
+      def webXml = new XmlSlurper().parse(webXmlFile)
+      if(webXml.filter.find { it.'filter-class'.text() == 'org.akhikhl.gretty.RedirectFilter' })
+        project.dependencies {
+          compile "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}"
+        }
+    }
   }
 
   private void addExtensions(Project project) {
