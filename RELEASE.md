@@ -1,3 +1,11 @@
+## Gretty 1.1.7 release announcement
+
+Gretty version 1.1.7 is out and immediately available at github, bintray, maven central and gradle plugin portal!
+
+Gretty version 1.1.7 introduces new feature: [redirect filter](http://akhikhl.github.io/gretty-doc/Redirect-filter.html). 
+The feature is completely independent from the rest of Gretty and can be deployed as part of WAR-file. 
+Charming thing about redirect filter is that it provides groovy-based configuration DSL.
+
 ## Gretty 1.1.6 release announcement
 
 Gretty version 1.1.5 brings new bug, preventing Gretty product generation.
@@ -5,8 +13,6 @@ If you run buildProduct task and experience "readonly property" exception,
 please switch to Gretty 1.1.6 - it fixes the problem.
 
 ## Gretty 1.1.5 release announcement
-
-Hello colleagues,
 
 Gretty version 1.1.5 is out and immediately available at github, bintray, maven central and gradle plugin portal!
 

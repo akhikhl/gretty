@@ -4,9 +4,17 @@
 
 ### What's new:
 
+#### Version 1.1.7
+
+New feature: [redirect filter](http://akhikhl.github.io/gretty-doc/Redirect-filter.html).
+
 #### Version 1.1.6
 
 Maintenance release. Fixed bug: "readonly property" exception when trying to generate Gretty product.
+
+Resolved issue #102: [How to do integration test in a multi-project setup](https://github.com/akhikhl/gretty/issues/102).
+
+Resolved issue with host name in generated certificates, when gretty config does not define sslHost property.
 
 #### Version 1.1.5
 
