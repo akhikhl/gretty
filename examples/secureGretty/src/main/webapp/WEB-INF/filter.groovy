@@ -1,3 +1,3 @@
 filter relPath: '/', {
-  redirect 'index.html'
+  redirect 'content/index.html'
 }
