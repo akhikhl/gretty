@@ -131,6 +131,9 @@ class ProductConfigurer {
 
       outputs.dir outputDir
 
+      ext.outputDir = outputDir
+      ext.baseOutputDir = baseOutputDir
+
       doLast {
         resolveConfig()
         writeConfigFiles()
