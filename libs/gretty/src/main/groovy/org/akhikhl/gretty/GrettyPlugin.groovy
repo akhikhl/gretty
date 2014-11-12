@@ -34,7 +34,13 @@ class GrettyPlugin implements Plugin<Project> {
       }
       grettyNoSpringBoot {
         extendsFrom project.configurations.gretty
-        exclude group: 'org.springframework.boot'
+        exclude group: 'org.springframework.boot', module: 'spring-boot'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-autoconfigure'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
       }
       grettyRunnerSpringBootBase
       grettyRunnerSpringBoot {
@@ -58,7 +64,13 @@ class GrettyPlugin implements Plugin<Project> {
       productRuntime {
         if(runtimeConfig)
           extendsFrom runtimeConfig
-        exclude group: 'org.springframework.boot'
+        exclude group: 'org.springframework.boot', module: 'spring-boot'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-autoconfigure'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
         // We exclude groovy from product, because it is already included in runner configuration
         // (see gretty-runner dependencies). Thus we avoid groovy version conflicts.
         exclude module: 'groovy-all'
