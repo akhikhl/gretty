@@ -48,7 +48,7 @@ class TomcatServerConfigurer {
   Tomcat createAndConfigureServer(Closure configureContext = null) {
 
     Tomcat tomcat = new Tomcat()
-    
+
     if(params.enableNaming)
       tomcat.enableNaming()
 

@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import groovy.util.XmlSlurper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 /**
@@ -33,7 +34,13 @@ class GrettyPlugin implements Plugin<Project> {
       }
       grettyNoSpringBoot {
         extendsFrom project.configurations.gretty
-        exclude group: 'org.springframework.boot'
+        exclude group: 'org.springframework.boot', module: 'spring-boot'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-autoconfigure'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
       }
       grettyRunnerSpringBootBase
       grettyRunnerSpringBoot {
@@ -57,7 +64,13 @@ class GrettyPlugin implements Plugin<Project> {
       productRuntime {
         if(runtimeConfig)
           extendsFrom runtimeConfig
-        exclude group: 'org.springframework.boot'
+        exclude group: 'org.springframework.boot', module: 'spring-boot'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-autoconfigure'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
         // We exclude groovy from product, because it is already included in runner configuration
         // (see gretty-runner dependencies). Thus we avoid groovy version conflicts.
         exclude module: 'groovy-all'
@@ -137,6 +150,15 @@ class GrettyPlugin implements Plugin<Project> {
 
     for(String overlay in project.gretty.overlays)
       project.dependencies.add 'providedCompile', project.project(overlay)
+
+    File webXmlFile = new File(ProjectUtils.getWebAppDir(project), 'WEB-INF/web.xml')
+    if(webXmlFile.exists()) {
+      def webXml = new XmlSlurper().parse(webXmlFile)
+      if(webXml.filter.find { it.'filter-class'.text() == 'org.akhikhl.gretty.RedirectFilter' })
+        project.dependencies {
+          compile "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}"
+        }
+    }
   }
 
   private void addExtensions(Project project) {
@@ -175,10 +197,17 @@ class GrettyPlugin implements Plugin<Project> {
         }
       else if(GradleUtils.instanceOf(task, 'org.akhikhl.gretty.FarmStartTask'))
         task.dependsOn {
-          task.getWebAppConfigsForProjects().collect {
+          task.getWebAppConfigsForProjects().findResults {
             def proj = project.project(it.projectPath)
             boolean inplace = it.inplace == null ? task.inplace : it.inplace
-            inplace ? proj.tasks.prepareInplaceWebApp : proj.tasks.prepareArchiveWebApp
+            String prepareTaskName = inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp'
+            def projTask = proj.tasks.findByName(prepareTaskName)
+            if(!projTask)
+              proj.tasks.whenObjectAdded { t ->
+                if(t.name == prepareTaskName)
+                  task.dependsOn t
+              }
+            projTask
           }
         }
     }

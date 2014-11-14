@@ -24,13 +24,13 @@ import org.slf4j.LoggerFactory
  * @author akhikhl
  */
 class TomcatConfigurerImpl implements TomcatConfigurer {
-  
+
   protected static boolean isServletApi(String filePath) {
     filePath.matches(/^.*servlet-api.*\.jar$/)
   }
 
   protected Logger log
-  
+
   protected Set virtualWebInfLibs = new LinkedHashSet()
 
   @Override
@@ -72,24 +72,24 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   @Override
   void setResourceBase(StandardContext context, Map webappParams) {
-    
+
     context.setDocBase(webappParams.resourceBase)
-    
+
     Map extraResourcePaths = [:]
-    
+
     if(webappParams.extraResourceBases)
       extraResourcePaths << webappParams.extraResourceBases.collectEntries { ['/', it ] }
 
     Set classpathJarParentDirs = new LinkedHashSet()
-    
+
     webappParams.webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.each {
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
       classpathJarParentDirs.add jarFile.parentFile.absolutePath
       virtualWebInfLibs.add('/WEB-INF/lib/' + jarFile.name)
     }
-    
+
     extraResourcePaths << classpathJarParentDirs.collectEntries { [ '/WEB-INF/lib', it ] }
-    
+
     if(extraResourcePaths) {
       VirtualDirContext vdc = new VirtualDirContext()
       vdc.setExtraResourcePaths(extraResourcePaths.collect { it.key + '=' + it.value }.join(','))

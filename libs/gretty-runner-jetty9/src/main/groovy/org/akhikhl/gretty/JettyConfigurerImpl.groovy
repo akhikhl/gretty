@@ -16,6 +16,7 @@ import org.eclipse.jetty.security.HashLoginService
 import org.eclipse.jetty.server.*
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.server.session.HashSessionManager
+import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.util.component.LifeCycle
 import org.eclipse.jetty.util.resource.FileResource
 import org.eclipse.jetty.util.resource.Resource

@@ -2,11 +2,18 @@ buildscript {
   repositories {
     mavenLocal()
     jcenter()
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
   }
 
   dependencies {
     classpath "org.akhikhl.gretty:gretty:$gretty_version"
   }
+}
+
+repositories {
+  mavenLocal()
+  jcenter()
+  maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
 }
 
 apply plugin: 'war'
@@ -19,8 +26,6 @@ import org.akhikhl.gretty.*
 dependencies {
   compile 'org.webjars:bootstrap:3.2.0'
   compile 'org.webjars:jquery:2.1.1'
-  // We use UrlRewriteFilter for redirecting to the home page.
-  compile 'org.tuckey:urlrewritefilter:4.0.4'
   // We use Velocity for example of template processing within the webapp.
   compile 'org.apache.velocity:velocity:1.7'
 }

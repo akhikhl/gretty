@@ -2,6 +2,7 @@ buildscript {
   repositories {
     mavenLocal()
     jcenter()
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
   }
 
   dependencies {
@@ -12,6 +13,7 @@ buildscript {
 repositories {
   mavenLocal()
   jcenter()
+  maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
 }
 
 apply plugin: 'groovy' // this is needed for spock

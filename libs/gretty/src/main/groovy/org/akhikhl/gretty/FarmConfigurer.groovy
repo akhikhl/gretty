@@ -33,10 +33,12 @@ class FarmConfigurer {
     ConfigUtils.complementProperties(dstFarm.serverConfig, srcFarms*.serverConfig + [ project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project) ])
     sconfig = dstFarm.serverConfig
     ProjectUtils.resolveServerConfig(project, dstFarm.serverConfig)
-    for(def f in srcFarms)
+    for(def f in srcFarms) {
       mergeWebAppRefMaps(dstFarm.webAppRefs_, f.webAppRefs)
-    if(!dstFarm.webAppRefs)
-      dstFarm.webAppRefs = getDefaultWebAppRefMap()
+      dstFarm.includes_.addAll(f.includes)
+    }
+    if(!dstFarm.webAppRefs && !dstFarm.includes)
+      dstFarm.webAppRefs_ = getDefaultWebAppRefMap()
     if(dstFarm.integrationTestTask == null)
       dstFarm.integrationTestTask = srcFarms.findResult { it.integrationTestTask }
   }

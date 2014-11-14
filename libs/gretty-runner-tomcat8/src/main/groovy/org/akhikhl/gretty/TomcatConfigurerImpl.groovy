@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory
  * @author akhikhl
  */
 class TomcatConfigurerImpl implements TomcatConfigurer {
-  
+
   protected static boolean isServletApi(String filePath) {
     filePath.matches(/^.*servlet-api.*\.jar$/)
   }
