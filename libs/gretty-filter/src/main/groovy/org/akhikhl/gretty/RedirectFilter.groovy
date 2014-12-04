@@ -127,7 +127,8 @@ class RedirectFilter implements Filter {
         resp.sendRedirect(result.uri.toString())
         break
       case FilterAction.FORWARD:
-        req.getRequestDispatcher(result.uri.toString()).forward(req, resp)
+        String forwardPath = result.uri.schemeSpecificPart - '//' - result.uri.authority
+        req.getRequestDispatcher(forwardPath).forward(req, resp)
         break
     }
   }
