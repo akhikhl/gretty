@@ -111,7 +111,8 @@ class RedirectFilter implements Filter {
         filterContext.scheme = filterContext.requestURI.scheme
         filterContext.userInfo = filterContext.requestURI.userInfo
         filterContext.relPath = filterContext.path - filterContext.contextPath
-        matchFilter(result, filters, filterContext, req, resp)
+        if(!matchFilter(result, filters, filterContext, req, resp))
+          break
         if(result.action == FilterAction.CHAIN || result.action == FilterAction.REDIRECT)
           break
         filterContext.requestURI = result.uri
@@ -131,7 +132,7 @@ class RedirectFilter implements Filter {
     }
   }
 
-  private void matchFilter(Map result, List filters, filterContext, ServletRequest req, ServletResponse resp) {
+  private boolean matchFilter(Map result, List filters, filterContext, ServletRequest req, ServletResponse resp) {
     filters.find { filter ->
       def matches = [:]
       for(def option in filter.options) {
