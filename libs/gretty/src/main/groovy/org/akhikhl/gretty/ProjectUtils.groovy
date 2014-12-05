@@ -68,15 +68,7 @@ final class ProjectUtils {
         def dependencyConfig = proj.configurations.findByName(dependencyConfigName)
         if(dependencyConfig) {
           urls.addAll dependencyConfig.files.collect { it.toURI().toURL() }
-          for (pd in dependencyConfig.getAllDependencies().withType(ProjectDependency)) {
-            def p = pd.getDependencyProject()
-            if (!p.sourceSets.main.output.files.any {
-              new File(it, 'META-INF/web-fragment.xml').exists()
-            }) {
-              urls.addAll p.sourceSets.main.output.files.collect { it.toURI().toURL() }
-              urls.remove p.jar.archivePath.toURI().toURL()
-            }
-          }
+          replaceWithDependedProjectOuptuts(urls, proj, dependencyConfigName)
         }
         // ATTENTION: order of overlay classpath is important!
         if(proj.extensions.findByName('gretty'))
@@ -93,6 +85,20 @@ final class ProjectUtils {
     return urls
   }
 
+  private static void replaceWithDependedProjectOuptuts(Set<URL> urls, Project project, String dependencyConfigName) {
+    def dependencyConfig = project.configurations.findByName(dependencyConfigName)
+    for (pd in dependencyConfig.getAllDependencies().withType(ProjectDependency)) {
+      def p = pd.getDependencyProject()
+      if (!p.sourceSets.main.output.files.any {
+        new File(it, 'META-INF/web-fragment.xml').exists()
+      }) {
+        urls.addAll p.sourceSets.main.output.files.collect { it.toURI().toURL() }
+        urls.remove p.jar.archivePath.toURI().toURL()
+        replaceWithDependedProjectOuptuts(urls, p, dependencyConfigName)
+      }
+    }
+  }
+  
   static Set<URL> getClassPathJars(Project project, String dependencyConfig) {
     Set<URL> urls = new LinkedHashSet()
     if(project != null) {
