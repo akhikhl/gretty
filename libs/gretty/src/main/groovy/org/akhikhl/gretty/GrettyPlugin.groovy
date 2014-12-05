@@ -157,8 +157,8 @@ class GrettyPlugin implements Plugin<Project> {
       if(webXmlFile.exists()) {
         def webXml = new XmlSlurper().parse(webXmlFile)
         if(webXml.filter.find { it.'filter-class'.text() == 'org.akhikhl.gretty.RedirectFilter' }) {
-          proj.dependencies {
-            gretty "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}", {
+          project.dependencies {
+            compile "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}", {
               exclude group: 'javax.servlet', module: 'servlet-api'
             }
           }

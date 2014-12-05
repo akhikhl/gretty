@@ -84,8 +84,12 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
     task.systemProperty 'gretty.host', host
 
     def contextPath
-
-    if(serverStartInfo.contexts)
+    if(task.hasProperty('contextPath') && task.contextPath != null) {
+      contextPath = task.contextPath
+      if(!contextPath.startsWith('/'))
+        contextPath = '/' + contextPath
+    }
+    else if(serverStartInfo.contexts)
       contextPath = serverStartInfo.contexts[0].contextPath
 
     task.systemProperty 'gretty.contextPath', contextPath

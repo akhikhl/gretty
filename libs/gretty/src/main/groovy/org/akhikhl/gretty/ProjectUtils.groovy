@@ -81,7 +81,10 @@ final class ProjectUtils {
   }
 
   private static void addProjectClassPathWithDependencies(Set<URL> urls, Project proj, String dependencyConfigName) {
-    urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
+    if(proj.sourceSets.main.output.files.any { new File(it, 'META-INF/web-fragment.xml').exists() })
+      urls.add proj.jar.archivePath.toURI().toURL()
+    else
+      urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
     def dependencyConfig = proj.configurations.findByName(dependencyConfigName)
     if(dependencyConfig) {
       urls.addAll(dependencyConfig.fileCollection { !(it instanceof ProjectDependency) }.collect { it.toURI().toURL() })
