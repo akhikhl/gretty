@@ -62,28 +62,7 @@ final class ProjectUtils {
   static Set<URL> getClassPath(Project project, boolean inplace, String dependencyConfigName) {
     Set<URL> urls = new LinkedHashSet()
     if(project != null && inplace) {
-      def addProjectClassPath
-      addProjectClassPath = { Project proj ->
-        urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
-        def dependencyConfig = proj.configurations.findByName(dependencyConfigName)
-        if(dependencyConfig) {
-          urls.addAll dependencyConfig.files.collect { it.toURI().toURL() }
-          for (pd in dependencyConfig.getAllDependencies().withType(ProjectDependency)) {
-            def p = pd.getDependencyProject()
-            if (!p.sourceSets.main.output.files.any {
-              new File(it, 'META-INF/web-fragment.xml').exists()
-            }) {
-              urls.addAll p.sourceSets.main.output.files.collect { it.toURI().toURL() }
-              urls.remove p.jar.archivePath.toURI().toURL()
-            }
-          }
-        }
-        // ATTENTION: order of overlay classpath is important!
-        if(proj.extensions.findByName('gretty'))
-          for(String overlay in proj.gretty.overlays.reverse())
-            addProjectClassPath(proj.project(overlay))
-      }
-      addProjectClassPath(project)
+      addProjectClassPathWithOverlays(urls, project, dependencyConfigName)
       for(File overlayJar in collectOverlayJars(project))
         if(urls.remove(overlayJar.toURI().toURL()))
           log.debug '{} is overlay jar, exclude from classpath', overlayJar
@@ -91,6 +70,25 @@ final class ProjectUtils {
         log.debug 'classpath URL: {}', url
     }
     return urls
+  }
+
+  private static void addProjectClassPathWithOverlays(Set<URL> urls, Project proj, String dependencyConfigName) {
+    addProjectClassPathWithDependencies(urls, proj, dependencyConfigName)
+    // ATTENTION: order of overlay classpath is important!
+    if(proj.extensions.findByName('gretty'))
+      for(String overlay in proj.gretty.overlays.reverse())
+        addProjectClassPathWithOverlays(urls, proj.project(overlay), dependencyConfigName)
+  }
+
+  private static void addProjectClassPathWithDependencies(Set<URL> urls, Project proj, String dependencyConfigName) {
+    urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
+    def dependencyConfig = proj.configurations.findByName(dependencyConfigName)
+    if(dependencyConfig) {
+      urls.addAll(dependencyConfig.fileCollection { !(it instanceof ProjectDependency) }.collect { it.toURI().toURL() })
+      dependencyConfig.allDependencies.withType(ProjectDependency).each { dep ->
+        addProjectClassPathWithDependencies(urls, dep.getDependencyProject(), dependencyConfigName)
+      }
+    }
   }
 
   static Set<URL> getClassPathJars(Project project, String dependencyConfig) {
@@ -405,5 +403,25 @@ final class ProjectUtils {
 
   static List<Project> getDependencyProjects(Project project, String configurationName) {
     project.configurations[configurationName].dependencies.withType(ProjectDependency).collect{ it.dependencyProject }
+  }
+
+  /**
+   * Returns set of projects: this project and all it's overlays.
+   */
+  static Set<Project> withOverlays(Project project) {
+    Set projects = new HashSet()
+    projects.add(project)
+    def addOverlays // separate declaration from init to enable recursion
+    addOverlays = { Project proj ->
+      if(proj.extensions.findByName('gretty'))
+        for(def overlay in proj.gretty.overlays) {
+          overlay = proj.project(overlay)
+          if(overlay)
+            projects.add(overlay)
+          addOverlays(overlay) // recursion
+        }
+    }
+    addOverlays(project)
+    return projects
   }
 }

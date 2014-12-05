@@ -151,13 +151,21 @@ class GrettyPlugin implements Plugin<Project> {
     for(String overlay in project.gretty.overlays)
       project.dependencies.add 'providedCompile', project.project(overlay)
 
-    File webXmlFile = new File(ProjectUtils.getWebAppDir(project), 'WEB-INF/web.xml')
-    if(webXmlFile.exists()) {
-      def webXml = new XmlSlurper().parse(webXmlFile)
-      if(webXml.filter.find { it.'filter-class'.text() == 'org.akhikhl.gretty.RedirectFilter' })
-        project.dependencies {
-          compile "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}"
+    ProjectUtils.withOverlays(project).find { proj ->
+      boolean alteredDependencies = false
+      File webXmlFile = new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/web.xml')
+      if(webXmlFile.exists()) {
+        def webXml = new XmlSlurper().parse(webXmlFile)
+        if(webXml.filter.find { it.'filter-class'.text() == 'org.akhikhl.gretty.RedirectFilter' }) {
+          proj.dependencies {
+            gretty "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}", {
+              exclude group: 'javax.servlet', module: 'servlet-api'
+            }
+          }
+          alteredDependencies = true
         }
+      }
+      alteredDependencies
     }
   }
 
