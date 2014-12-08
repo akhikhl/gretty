@@ -2,8 +2,8 @@
 
 [![Build Status](http://img.shields.io/travis/akhikhl/gretty.svg)](https://travis-ci.org/akhikhl/gretty)
 [![Maintainer Status](http://stillmaintained.com/akhikhl/gretty.png)](http://stillmaintained.com/akhikhl/gretty) 
-[![Release](http://img.shields.io/badge/release-1.1.7-47b31f.svg)](https://github.com/akhikhl/gretty/releases/latest)
-[![Snapshot](http://img.shields.io/badge/current-1.1.8--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
+[![Release](http://img.shields.io/badge/release-1.1.8-47b31f.svg)](https://github.com/akhikhl/gretty/releases/latest)
+[![Snapshot](http://img.shields.io/badge/current-1.1.9--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
@@ -18,8 +18,10 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- Gretty 1.1.7 is out and immediately available at [Gradle plugin portal](http://plugins.gradle.org/plugin/org.akhikhl.gretty), 
+- Gretty 1.1.8 is out and immediately available at [Gradle plugin portal](http://plugins.gradle.org/plugin/org.akhikhl.gretty), 
 [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22).
+
+See [Gretty 1.1.8 release announcement](RELEASE.md#gretty-118-release-announcement) for more information.
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
@@ -29,7 +31,7 @@ You can learn about all Gretty features in [online documentation](http://akhikhl
 
 #### System requirements
 
-Gretty requires JDK7 or JDK8 and Gradle 1.10 or newer (Gradle 2.1 is highly recommended!).
+Gretty requires JDK7 or JDK8 and Gradle 1.10 or newer (Gradle 2.2.1 is highly recommended!).
 
 Gretty also works on JDK6, although Jetty support is limited to versions 7 and 8 in this case. This is due to the fact that Jetty 9 was compiled against JDK7 and it's bytecode is not compatible with JDK6.
 
