@@ -19,8 +19,8 @@ abstract class StartBaseTask extends DefaultTask {
 
   boolean interactive = true
   boolean debug = false
-  int debugPort = 5005
-  boolean debugSuspend = true
+  Integer debugPort
+  Boolean debugSuspend
 
   private JacocoHelper jacocoHelper
 
@@ -97,11 +97,11 @@ abstract class StartBaseTask extends DefaultTask {
       }
 
       int getDebugPort() {
-        self.debugPort
+        self.debugPort == null ? self.project.gretty.debugPort : self.debugPort
       }
 
       boolean getDebugSuspend() {
-        self.debugSuspend
+        self.debugSuspend == null ? self.project.gretty.debugSuspend : self.debugSuspend
       }
 
       boolean getInteractive() {

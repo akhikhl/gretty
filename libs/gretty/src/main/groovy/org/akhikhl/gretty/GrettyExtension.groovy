@@ -13,6 +13,9 @@ package org.akhikhl.gretty
  * @author akhikhl
  */
 class GrettyExtension extends GrettyConfig {
+  
+  int debugPort = 5005
+  boolean debugSuspend = true
 
   protected List overlays = []
 
