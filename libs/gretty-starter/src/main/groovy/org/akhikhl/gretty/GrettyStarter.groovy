@@ -117,6 +117,14 @@ class GrettyStarter {
         false
       }
 
+      int getDebugPort() {
+        5005
+      }
+
+      boolean getDebugSuspend() {
+        true
+      }
+
       boolean getInteractive() {
         command != 'start'
       }

@@ -26,8 +26,12 @@ final class ProductsConfigurer {
 
   void configureProducts() {
     project.afterEvaluate {
-      project.task('buildAllProducts')
-      project.task('archiveAllProducts')
+      project.task('buildAllProducts', group: 'gretty') {
+        description = 'Builds all configured gretty products.'
+      }
+      project.task('archiveAllProducts', group: 'gretty') {
+        description = 'Archives all configured gretty products.'
+      }
       project.products.productsMap.each { productName, product ->
         new ProductConfigurer(project, outputDir, productName, product).configureProduct()
       }

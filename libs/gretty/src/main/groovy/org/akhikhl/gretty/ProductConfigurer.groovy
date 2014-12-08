@@ -49,6 +49,8 @@ class ProductConfigurer {
 
     def buildProductTask = project.task("buildProduct${productName}", group: 'gretty') { task ->
 
+      description = "Builds gretty product${ productName ? ' ' + productName : '' }."
+
       dependsOn {
         resolveConfig()
         wconfigs.collectMany { wconfig ->
@@ -148,6 +150,8 @@ class ProductConfigurer {
     project.tasks.buildAllProducts.dependsOn buildProductTask
 
     def archiveProductTask = project.task("archiveProduct${productName}", group: 'gretty', type: Zip) {
+
+      description = "Archives gretty product${ productName ? ' ' + productName : '' }."
 
       dependsOn buildProductTask
 

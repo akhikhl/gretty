@@ -24,6 +24,8 @@ class JavaExecParams {
   List<String> args = []
 
   boolean debug = false
+  int debugPort = 5005
+  boolean debugSuspend = true
 
   Map<String, String> systemProperties = [:]
 

@@ -16,6 +16,10 @@ interface LauncherConfig {
 
   boolean getDebug()
 
+  int getDebugPort()
+
+  boolean getDebugSuspend()
+
   boolean getInteractive()
 
   boolean getManagedClassReload()

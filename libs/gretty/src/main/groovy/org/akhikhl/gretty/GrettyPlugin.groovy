@@ -654,10 +654,14 @@ class GrettyPlugin implements Plugin<Project> {
     addConfigurations(project)
 
     if(!project.tasks.findByName('run'))
-      project.task('run')
+      project.task('run', group: 'gretty') {
+        description = 'Starts web-app inplace, in interactive mode. Same as appRun task.'
+      }
 
     if(!project.tasks.findByName('debug'))
-      project.task('debug')
+      project.task('debug', group: 'gretty') {
+        description = 'Starts web-app inplace, in debug and interactive mode. Same as appRunDebug task.'
+      }
 
     addTaskDependencies(project)
 

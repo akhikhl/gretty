@@ -203,6 +203,8 @@ abstract class LauncherBase implements Launcher {
             params.main = 'org.akhikhl.gretty.Runner'
             params.args = [ "--servicePort=${sconfig.servicePort}", "--statusPort=${sconfig.statusPort}", "--serverManagerFactory=${getServerManagerFactory()}" ]
             params.debug = config.getDebug()
+            params.debugSuspend = config.getDebugSuspend()
+            params.debugPort = config.getDebugPort()
             params.jvmArgs = sconfig.jvmArgs
             params.systemProperties = sconfig.systemProperties
             if(!sconfig.secureRandom) {

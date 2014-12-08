@@ -51,8 +51,14 @@ class DefaultLauncher extends LauncherBase {
         for(def path in runnerClasspath)
           log.debug 'Runner classpath: {}', path
       spec.classpath = project.files(runnerClasspath)
-      spec.debug = params.debug
-      spec.jvmArgs params.jvmArgs
+      def jvmArgs = params.jvmArgs
+      if(params.debug) {
+        jvmArgs.add '-Xdebug'
+        String debugArg = "-Xrunjdwp:transport=dt_socket,server=y,suspend=${params.debugSuspend ? 'y' : 'n'},address=${params.debugPort}"
+        jvmArgs.add debugArg
+        log.warn 'DEBUG MODE, port={}, suspend={}', params.debugPort, params.debugSuspend
+      }
+      spec.jvmArgs jvmArgs
       spec.systemProperties params.systemProperties
       spec.main = params.main
       spec.args = params.args
