@@ -18,7 +18,7 @@ If you are new with Gretty, good starting point would be [getting started](http:
 
 #### :star: What's new
 
-- Gretty 1.1.8 is out and immediately available at [Gradle plugin portal](http://plugins.gradle.org/plugin/org.akhikhl.gretty), 
+Dec 8, 2014: Gretty 1.1.8 is out and immediately available at [Gradle plugin portal](http://plugins.gradle.org/plugin/org.akhikhl.gretty), 
 [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22).
 
 See [Gretty 1.1.8 release announcement](RELEASE.md#gretty-118-release-announcement) for more information.
