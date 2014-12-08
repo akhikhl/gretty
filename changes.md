@@ -4,6 +4,20 @@
 
 ### What's new:
 
+#### Version 1.1.8
+
+Gretty version 1.1.8 introduces new parameters for [fine-tuning of debugging tasks](http://akhikhl.github.io/gretty-doc/Debugger-support.html#_fine_tuning).
+
+Also Gretty version 1.1.8 includes upgrades of the following components to their latest versions:
+
+Geb : 0.9.3 -> 0.10.0
+gradle-bintray-plugin : 0.4 -> 1.0
+Gradle Wrapper : 2.1 -> 2.1.1
+Groovy : 2.3.7 -> 2.3.8
+Tomcat-8 : 8.0.14 -> 8.0.15
+Selenium : 2.43.1 -> 2.44.0
+Spring Boot : 1.1.8.RELEASE -> 1.1.9.RELEASE
+
 #### Version 1.1.7
 
 New feature: [redirect filter](http://akhikhl.github.io/gretty-doc/Redirect-filter.html).
