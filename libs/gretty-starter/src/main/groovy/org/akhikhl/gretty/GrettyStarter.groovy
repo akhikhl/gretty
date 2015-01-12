@@ -16,6 +16,8 @@ import groovy.json.JsonSlurper
  */
 class GrettyStarter {
 
+  private static final Set specialArgNames = ['httpPort', 'httpsPort', 'servicePort', 'statusPort', 'httpEnabled', 'httpsEnabled', 'httpIdleTimeout', 'httpsIdleTimeout'] as Set
+
   static void main(String[] args) {
 
     File basedir = new File(GrettyStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath().toURI().getPath()).parentFile.parentFile
@@ -48,6 +50,8 @@ class GrettyStarter {
 
     if(options.runnerOverrideArgs)
       sconfig.jvmArgs = []
+      
+    List specialArgs = []
 
     if(options.runnerArgFile) {
       File f = new File(options.runnerArgFile)
@@ -57,23 +61,43 @@ class GrettyStarter {
           throw new FileNotFoundException("File ${f.absolutePath} does not exist!")
       if(sconfig.jvmArgs == null)
         sconfig.jvmArgs = []
-      sconfig.jvmArgs.addAll(f.text.split('\\s'))
+      for(String arg in f.text.split('\\s'))
+        if(specialArgNames.find { arg.startsWith(it) })
+          specialArgs.add(arg)
+        else
+          sconfig.jvmArgs.add(arg)
     }
 
     if(options.runnerArgURL) {
       URL urlSource = new URL(options.runnerArgURL)
       if(sconfig.jvmArgs == null)
         sconfig.jvmArgs = []
-      sconfig.jvmArgs.addAll(urlSource.text.split('\\s'))
+      for(String arg in urlSource.text.split('\\s'))
+        if(specialArgNames.find { arg.startsWith(it) })
+          specialArgs.add(arg)
+        else
+          sconfig.jvmArgs.add(arg)
     }
 
     if(options.runnerArgs) {
       if(sconfig.jvmArgs == null)
         sconfig.jvmArgs = []
-      sconfig.jvmArgs.addAll(options.runnerArgs)
+      for(String arg in options.runnerArgs)
+        if(specialArgNames.find { arg.startsWith(it) })
+          specialArgs.add(arg)
+        else
+          sconfig.jvmArgs.add(arg)
     }
 
     ConfigUtils.complementProperties(sconfig, ServerConfig.getDefaultServerConfig(config.productName))
+    
+    for(String arg in specialArgs) {
+      def (key, value) = arg.split('=')
+      if(key.matches(~'.*Port') || key.matches(~'.*IdleTimeout'))
+        sconfig[key] = value as int
+      else if(key.matches(~'.*Enabled'))
+        sconfig[key] = Boolean.valueOf(value)
+    }
 
     def resolveFile = { f ->
       if(f) {
