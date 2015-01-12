@@ -23,13 +23,32 @@ class SpringBootMainClassFinder {
       return bootExtension.mainClass
 
     def MainClassFinder = Class.forName('org.springframework.boot.loader.tools.MainClassFinder', true, SpringBootMainClassFinder.classLoader)
-
-    if(MainClassFinder.metaClass.methods.find { it.name == 'findSingleMainClass' })
+    
+    if(MainClassFinder.metaClass.methods.find { it.name == 'findSingleMainClass' }) {
       // spring-boot 1.1.x
-      return MainClassFinder.findSingleMainClass(project.sourceSets.main.output.classesDir)
+      def findInProject
+      findInProject = { Project proj ->
+        if(proj.hasProperty('sourceSets')) {
+          String result = MainClassFinder.findSingleMainClass(proj.sourceSets.main.output.classesDir)
+          if(result)
+            return result
+        }
+        proj.subprojects.findResult findInProject
+      }
+      return findInProject(project)
+    }
 
     // spring-boot 1.0.x
-    return MainClassFinder.findMainClass(project.sourceSets.main.output.classesDir)
+    def findInProject
+    findInProject = { Project proj ->
+      if(proj.hasProperty('sourceSets')) {
+        String result = MainClassFinder.findMainClass(proj.sourceSets.main.output.classesDir)
+        if(result)
+          return result
+      }
+      proj.subprojects.findResult findInProject
+    }
+    return findInProject(project)
   }
 }
 
