@@ -75,10 +75,10 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
     context.setDocBase(webappParams.resourceBase)
 
-    Map extraResourcePaths = [:]
+    List extraResourcePaths = []
 
     if(webappParams.extraResourceBases)
-      extraResourcePaths << webappParams.extraResourceBases.collectEntries { ['/', it ] }
+      extraResourcePaths += webappParams.extraResourceBases.collect { "/=$it" }
 
     Set classpathJarParentDirs = new LinkedHashSet()
 
@@ -88,11 +88,11 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
       virtualWebInfLibs.add('/WEB-INF/lib/' + jarFile.name)
     }
 
-    extraResourcePaths << classpathJarParentDirs.collectEntries { [ '/WEB-INF/lib', it ] }
+    extraResourcePaths += classpathJarParentDirs.collect { "/WEB-INF/lib=$it" }
 
     if(extraResourcePaths) {
       VirtualDirContext vdc = new VirtualDirContext()
-      vdc.setExtraResourcePaths(extraResourcePaths.collect { it.key + '=' + it.value }.join(','))
+      vdc.setExtraResourcePaths(extraResourcePaths.join(','))
       context.setResources(vdc)
     }
   }
