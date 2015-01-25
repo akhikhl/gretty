@@ -1,0 +1,33 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+      version="3.0">
+
+  <filter>
+    <filter-name>RedirectFilter</filter-name>
+    <filter-class>org.akhikhl.gretty.RedirectFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>RedirectFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
+  <servlet-mapping>
+    <servlet-name>jsp</servlet-name>
+    <url-pattern>*.html</url-pattern>
+  </servlet-mapping>  
+
+  <servlet>
+    <display-name>ExampleServlet</display-name>
+    <servlet-name>ExampleServlet</servlet-name>
+    <servlet-class>org.akhikhl.examples.gretty.hellogretty.ExampleServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ExampleServlet</servlet-name>
+    <url-pattern>/dynamic</url-pattern>
+  </servlet-mapping>
+</web-app>
