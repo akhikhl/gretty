@@ -49,7 +49,7 @@ class ServletContainerConfig {
         servletApiVersion: jetty7ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
-            providedCompile jetty7ServletApi
+            grettyProvidedCompile jetty7ServletApi
           }
         }
       ],
@@ -64,7 +64,7 @@ class ServletContainerConfig {
         servletApiVersion: jetty8ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
-            providedCompile jetty8ServletApi
+            grettyProvidedCompile jetty8ServletApi
           }
         }
       ],
@@ -79,7 +79,7 @@ class ServletContainerConfig {
         servletApiVersion: jetty9ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
-            providedCompile jetty9ServletApi
+            grettyProvidedCompile jetty9ServletApi
           }
         }
       ],
@@ -94,7 +94,7 @@ class ServletContainerConfig {
         servletApiVersion: tomcat7ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
-            providedCompile tomcat7ServletApi
+            grettyProvidedCompile tomcat7ServletApi
           }
         }
       ],
@@ -109,7 +109,7 @@ class ServletContainerConfig {
         servletApiVersion: tomcat8ServletApiVersion,
         servletApiDependencies: { project ->
           project.dependencies {
-            providedCompile tomcat8ServletApi
+            grettyProvidedCompile tomcat8ServletApi
           }
         }
       ]

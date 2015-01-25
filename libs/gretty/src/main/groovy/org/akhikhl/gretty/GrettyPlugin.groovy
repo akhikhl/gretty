@@ -77,10 +77,10 @@ class GrettyPlugin implements Plugin<Project> {
       }
     }
 
-    if(!project.configurations.findByName('providedCompile'))
+    if(!project.configurations.findByName('grettyProvidedCompile'))
       project.configurations {
-        providedCompile
-        project.configurations.findByName('compile')?.extendsFrom providedCompile
+        grettyProvidedCompile
+        project.configurations.findByName('compile')?.extendsFrom grettyProvidedCompile
       }
 
     ServletContainerConfig.getConfigs().each { configName, config ->
@@ -150,7 +150,7 @@ class GrettyPlugin implements Plugin<Project> {
       }
 
     for(String overlay in project.gretty.overlays)
-      project.dependencies.add 'providedCompile', project.project(overlay)
+      project.dependencies.add 'grettyProvidedCompile', project.project(overlay)
 
     ProjectUtils.withOverlays(project).find { proj ->
       boolean alteredDependencies = false
