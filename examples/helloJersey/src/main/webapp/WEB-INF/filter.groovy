@@ -1,0 +1,3 @@
+filter relPath: '/', {
+  redirect 'testresource'
+}
