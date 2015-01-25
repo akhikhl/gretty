@@ -31,7 +31,8 @@ processResources {
     tomcat8Version: project.tomcat8_version,
     tomcat8ServletApi: project.tomcat8_servlet_api,
     tomcat8ServletApiVersion: project.tomcat8_servlet_api_version,
-    springBootVersion: project.springBootVersion
+    springBootVersion: project.springBootVersion,
+    springLoadedVersion: project.springLoadedVersion
   ]
   inputs.properties props
   filter ReplaceTokens, tokens: props

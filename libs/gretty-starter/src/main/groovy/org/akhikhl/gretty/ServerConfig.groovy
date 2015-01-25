@@ -57,6 +57,7 @@ class ServerConfig {
   Boolean secureRandom
   String springBootMainClass
   String springBootVersion
+  String springLoadedVersion
   Boolean singleSignOn
   /**
    * Tomcat-specific: Enables JNDI naming which is disabled by default.

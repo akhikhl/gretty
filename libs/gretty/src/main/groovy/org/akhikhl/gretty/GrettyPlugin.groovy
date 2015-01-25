@@ -94,6 +94,7 @@ class GrettyPlugin implements Plugin<Project> {
 
     String grettyVersion = Externalized.getString('grettyVersion')
     String springBootVersion = project.gretty.springBootVersion ?: (project.hasProperty('springBootVersion') ? project.springBootVersion : Externalized.getString('springBootVersion'))
+    String springLoadedVersion = project.gretty.springLoadedVersion ?: (project.hasProperty('springLoadedVersion') ? project.springLoadedVersion : Externalized.getString('springLoadedVersion'))
 
     project.dependencies {
       grettyStarter "org.akhikhl.gretty:gretty-starter:$grettyVersion"
@@ -122,7 +123,7 @@ class GrettyPlugin implements Plugin<Project> {
         exclude group: 'org.apache.tomcat.embed'
         exclude group: 'javax.servlet', module: 'javax.servlet-api'
       }
-      grettySpringLoaded 'org.springframework:springloaded:1.2.0.RELEASE'
+      grettySpringLoaded "org.springframework:springloaded:$springLoadedVersion"
     }
 
     ServletContainerConfig.getConfig(project.gretty.servletContainer).with { config ->
