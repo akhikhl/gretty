@@ -220,6 +220,10 @@ class TomcatServerConfigurer {
       loader.setDelegate(true)
       context.setLoader(loader)
 
+      webapp.initParams?.each { key, value ->
+        context.addParameter(key, value)
+      }
+
       def realmConfigFile = webapp.realmConfigFile ?: params.realmConfigFile
       if(realmConfigFile && new File(realmConfigFile).exists()) {
         log.info '{} -> realm config {}', webapp.contextPath, realmConfigFile
