@@ -610,14 +610,14 @@ class GrettyPlugin implements Plugin<Project> {
         afterEvaluateClosure()
       }
 
-      if(!project.tasks.farmBeforeIntegrationTest.integrationTestTaskAssigned)
-        project.tasks.farmBeforeIntegrationTest.integrationTestTask null // default binding
+      if(!project.tasks."farmBeforeIntegrationTest$fname".integrationTestTaskAssigned)
+        project.tasks."farmBeforeIntegrationTest$fname".integrationTestTask null // default binding
 
-      if(!project.tasks.farmIntegrationTest.integrationTestTaskAssigned)
-        project.tasks.farmIntegrationTest.integrationTestTask null // default binding
+      if(!project.tasks."farmIntegrationTest$fname".integrationTestTaskAssigned)
+        project.tasks."farmIntegrationTest$fname".integrationTestTask null // default binding
 
-      if(!project.tasks.farmAfterIntegrationTest.integrationTestTaskAssigned)
-        project.tasks.farmAfterIntegrationTest.integrationTestTask null // default binding
+      if(!project.tasks."farmAfterIntegrationTest$fname".integrationTestTaskAssigned)
+        project.tasks."farmAfterIntegrationTest$fname".integrationTestTask null // default binding
     }
   }
 
