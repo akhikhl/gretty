@@ -584,40 +584,54 @@ class GrettyPlugin implements Plugin<Project> {
     } // farmsMap
   } // addTasks
 
-  private void afterAfterEvaluate(Project project) {
+  private void afterProjectEvaluate(Project project) {
 
-    for(Closure afterEvaluateClosure in project.gretty.afterEvaluate) {
-      afterEvaluateClosure.delegate = project.gretty
-      afterEvaluateClosure.resolveStrategy = Closure.DELEGATE_FIRST
-      afterEvaluateClosure()
-    }
+    if(project.extensions.findByName('gretty')) {
 
-    project.tasks.findByName('appBeforeIntegrationTest')?.with {
-      if(!integrationTestTaskAssigned)
-        integrationTestTask null // default binding
-    }
+      addRepositories(project)
+      addDependencies(project)
+      addTasks(project)
 
-    project.tasks.findByName('appAfterIntegrationTest')?.with {
-      if(!integrationTestTaskAssigned)
-        integrationTestTask null // default binding
-    }
-
-    project.farms.farmsMap.each { fname, farm ->
-
-      for(Closure afterEvaluateClosure in farm.afterEvaluate) {
-        afterEvaluateClosure.delegate = farm
+      for(Closure afterEvaluateClosure in project.gretty.afterEvaluate) {
+        afterEvaluateClosure.delegate = project.gretty
         afterEvaluateClosure.resolveStrategy = Closure.DELEGATE_FIRST
         afterEvaluateClosure()
       }
 
-      if(!project.tasks."farmBeforeIntegrationTest$fname".integrationTestTaskAssigned)
-        project.tasks."farmBeforeIntegrationTest$fname".integrationTestTask null // default binding
+      project.tasks.findByName('appBeforeIntegrationTest')?.with {
+        if(!integrationTestTaskAssigned)
+          integrationTestTask null // default binding
+      }
 
-      if(!project.tasks."farmIntegrationTest$fname".integrationTestTaskAssigned)
-        project.tasks."farmIntegrationTest$fname".integrationTestTask null // default binding
+      project.tasks.findByName('appAfterIntegrationTest')?.with {
+        if(!integrationTestTaskAssigned)
+          integrationTestTask null // default binding
+      }
+    }
+  }
 
-      if(!project.tasks."farmAfterIntegrationTest$fname".integrationTestTaskAssigned)
-        project.tasks."farmAfterIntegrationTest$fname".integrationTestTask null // default binding
+  private void afterAllProjectsEvaluate(Project rootProject) {
+
+    rootProject.allprojects { project ->
+
+      if(project.extensions.findByName('farms'))
+        project.farms.farmsMap.each { fname, farm ->
+
+          for(Closure afterEvaluateClosure in farm.afterEvaluate) {
+            afterEvaluateClosure.delegate = farm
+            afterEvaluateClosure.resolveStrategy = Closure.DELEGATE_FIRST
+            afterEvaluateClosure()
+          }
+
+          if(!project.tasks."farmBeforeIntegrationTest$fname".integrationTestTaskAssigned)
+            project.tasks."farmBeforeIntegrationTest$fname".integrationTestTask null // default binding
+
+          if(!project.tasks."farmIntegrationTest$fname".integrationTestTaskAssigned)
+            project.tasks."farmIntegrationTest$fname".integrationTestTask null // default binding
+
+          if(!project.tasks."farmAfterIntegrationTest$fname".integrationTestTaskAssigned)
+            project.tasks."farmAfterIntegrationTest$fname".integrationTestTask null // default binding
+        }
     }
   }
 
@@ -668,11 +682,18 @@ class GrettyPlugin implements Plugin<Project> {
 
     new ProductsConfigurer(project).configureProducts()
 
-    project.afterEvaluate {
-      addRepositories(project)
-      addDependencies(project)
-      addTasks(project)
-      afterAfterEvaluate(project)
+    if(!project.rootProject.hasProperty('gretty_')) {
+      Project rootProject = project.rootProject
+      rootProject.ext.gretty_ = [:]
+      rootProject.ext.gretty_.projects = []
+      rootProject.allprojects { proj ->
+        afterEvaluate {
+          afterProjectEvaluate(proj)
+          rootProject.ext.gretty_.projects.add proj
+          if(rootProject.ext.gretty_.projects.size() == rootProject.allprojects.size())
+            afterAllProjectsEvaluate(rootProject)
+        }
+      }
     }
   } // apply
 }

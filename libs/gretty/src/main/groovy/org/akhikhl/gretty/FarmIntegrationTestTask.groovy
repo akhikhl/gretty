@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
  */
 class FarmIntegrationTestTask extends DefaultTask {
 
-  private static final Logger log = LoggerFactory.getLogger(FarmIntegrationTestTask)
+  protected static final Logger log = LoggerFactory.getLogger(FarmIntegrationTestTask)
 
   String farmName = ''
 

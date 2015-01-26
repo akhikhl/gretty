@@ -44,8 +44,19 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     doFirst {
       getWebAppProjects().each { proj ->
         proj.tasks.each { t ->
-          if(GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppBeforeIntegrationTestTask') || 
+          if(GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppBeforeIntegrationTestTask') ||
              GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppAfterIntegrationTestTask'))
+            if(t.enabled)
+              t.enabled = false
+        }
+      }
+      project.subprojects.each { proj ->
+        proj.tasks.each { t ->
+          if(GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppBeforeIntegrationTestTask') ||
+             GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppAfterIntegrationTestTask') ||
+             GradleUtils.instanceOf(t, 'org.akhikhl.gretty.FarmBeforeIntegrationTestTask') ||
+             GradleUtils.instanceOf(t, 'org.akhikhl.gretty.FarmAfterIntegrationTestTask') ||
+             GradleUtils.instanceOf(t, 'org.akhikhl.gretty.FarmIntegrationTestTask'))
             if(t.enabled)
               t.enabled = false
         }
