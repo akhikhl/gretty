@@ -16,6 +16,7 @@ farm {
   webapp project
   webapp ':spring-boot-farm:spring-boot-webservice'
   webapp ':spring-boot-farm:jee-webservice'
+  webapp ':spring-boot-farm:spring-web-mvc-webservice'
 }
 
 ext {

@@ -1,0 +1,7 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply from: rootProject.file('integrationTests.gradle')
+
+dependencies {
+    compile "org.springframework:spring-webmvc:4.1.2.RELEASE"
+}
