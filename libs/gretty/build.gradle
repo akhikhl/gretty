@@ -3,7 +3,9 @@ apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
   compile project(':libs:gretty-starter'), {
+    // gradle API provides it's own versions of groovy-all and logback.
     exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    exclude group: 'ch.qos.logback', module: 'logback-classic'
   }
   compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
   compile "org.springframework.boot:spring-boot-dependency-tools:${springBootVersion}"
