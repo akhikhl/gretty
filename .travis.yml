@@ -1,7 +1,7 @@
-before_script:
- - "export JAVA_OPTS=-Xmx1024m"
 language: groovy
 jdk:
   - oraclejdk7
   - openjdk7
   - oraclejdk8
+env:
+  - JAVA_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M"
