@@ -1,3 +1,5 @@
+before_script:
+ - "export JAVA_OPTS=-Xmx1024m"
 language: groovy
 jdk:
   - oraclejdk7
