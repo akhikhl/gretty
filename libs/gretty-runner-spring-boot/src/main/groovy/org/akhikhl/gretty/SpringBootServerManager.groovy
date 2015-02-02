@@ -8,8 +8,6 @@
  */
 package org.akhikhl.gretty
 
-import org.akhikhl.gretty.ServerManager
-import org.akhikhl.gretty.LoggingUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.SpringApplication
