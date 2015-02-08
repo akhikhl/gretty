@@ -14,7 +14,6 @@ import org.apache.catalina.core.StandardContext
 import org.apache.catalina.startup.Tomcat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.bridge.SLF4JBridgeHandler
 
 /**
  *
@@ -45,13 +44,13 @@ class TomcatServerManager implements ServerManager {
   void startServer(ServerStartEvent startEvent) {
     assert tomcat == null
 
-    if(params.logging)
+    if(params.logging) {
+      def LoggingUtils = Class.forName('org.akhikhl.gretty.LoggingUtils', true, this.getClass().classLoader)
       LoggingUtils.configureLogging(params.logging)
-    else if(params.logbackConfig)
+    } else if(params.logbackConfig) {
+      def LoggingUtils = Class.forName('org.akhikhl.gretty.LoggingUtils', true, this.getClass().classLoader)
       LoggingUtils.useConfig(params.logbackConfig)
-
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install()
+    }
 
     log = LoggerFactory.getLogger(this.getClass())
     configurer.setLogger(log)

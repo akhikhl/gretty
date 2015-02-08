@@ -137,8 +137,6 @@ abstract class StartBaseTask extends DefaultTask {
               String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtime'
               resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, wconfig.inplace, runtimeConfig))
               resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
-              // exclude groovy-all from webapp classpath, so that there's no conflict with groovy-all inherited from web-server.
-              resolvedClassPath = resolvedClassPath.findAll { !it.toString().contains('groovy-all') }
             }
             resolvedClassPath
           }

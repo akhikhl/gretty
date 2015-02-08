@@ -40,10 +40,14 @@ final class JettyServerManager implements ServerManager {
   void startServer(ServerStartEvent startEvent) {
     assert server == null
 
-    if(params.logging)
+    if(params.logging) {
+      def LoggingUtils = Class.forName('org.akhikhl.gretty.LoggingUtils', true, this.getClass().classLoader)
       LoggingUtils.configureLogging(params.logging)
-    else if(params.logbackConfig)
+    } else if(params.logbackConfig) {
+      println "DBG logbackConfig: ${params.logbackConfig}"
+      def LoggingUtils = Class.forName('org.akhikhl.gretty.LoggingUtils', true, this.getClass().classLoader)
       LoggingUtils.useConfig(params.logbackConfig)
+    }
 
     log = LoggerFactory.getLogger(this.getClass())
     configurer.setLogger(log)

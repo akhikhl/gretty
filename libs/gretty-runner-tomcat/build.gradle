@@ -3,7 +3,7 @@ apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
   compile project(':libs:gretty-runner')
-  compile "org.slf4j:jul-to-slf4j:$slf4j_version"
+  // compile "org.slf4j:jul-to-slf4j:$slf4j_version"
   // These dependencies are needed for compiling gretty-runner-tomcat.
   // They are replaced by "real" dependencies at runtime.
   compile tomcat7_servlet_api

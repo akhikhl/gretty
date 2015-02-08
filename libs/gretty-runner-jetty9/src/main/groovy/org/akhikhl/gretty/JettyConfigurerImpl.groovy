@@ -7,8 +7,6 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-import ch.qos.logback.classic.selector.servlet.ContextDetachingSCL
-import ch.qos.logback.classic.selector.servlet.LoggerContextFilter
 import org.eclipse.jetty.annotations.AnnotationConfiguration
 import org.eclipse.jetty.plus.webapp.EnvConfiguration
 import org.eclipse.jetty.plus.webapp.PlusConfiguration
@@ -200,14 +198,12 @@ class JettyConfigurerImpl implements JettyConfigurer {
     List<String> webappClassPath = webappParams.webappClassPath
     JettyWebAppContext context = new JettyWebAppContext()
     context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect { new File(it) })
-    context.addSystemClass('ch.qos.logback.')
-    context.addSystemClass('org.slf4j.')
-    context.addSystemClass('org.codehaus.groovy.')
-    context.addSystemClass('groovy.lang.')
+    context.addServerClass('ch.qos.logback.')
+    context.addServerClass('org.slf4j.')
+    context.addServerClass('org.codehaus.groovy.')
+    context.addServerClass('groovy.lang.')
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.setInitParameter('org.eclipse.jetty.servlet.Default.useFileMappedBuffer', serverParams.productMode ? 'true' : 'false')
-    context.addEventListener(new ContextDetachingSCL())
-    context.addFilter(LoggerContextFilter.class, '/*', EnumSet.of(DispatcherType.REQUEST))
     return context
   }
 

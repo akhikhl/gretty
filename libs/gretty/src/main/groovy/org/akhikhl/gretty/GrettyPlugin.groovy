@@ -71,9 +71,6 @@ class GrettyPlugin implements Plugin<Project> {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
-        // We exclude groovy from product, because it is already included in runner configuration
-        // (see gretty-runner dependencies). Thus we avoid groovy version conflicts.
-        exclude module: 'groovy-all'
       }
     }
 

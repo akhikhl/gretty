@@ -58,20 +58,6 @@ class SpringBootLauncher extends DefaultLauncher {
   }
 
   @Override
-  protected void writeLoggingConfig(json) {
-    File logbackConfigFile
-    if(sconfig.logbackConfigFile)
-      logbackConfigFile = sconfig.logbackConfigFile
-    else {
-      logbackConfigFile = new File(project.buildDir, 'logging/logback.groovy')
-      LogbackUtils.generateLogbackConfig(logbackConfigFile, sconfig)
-    }
-    json.with {
-      logbackConfig logbackConfigFile.absolutePath
-    }
-  }
-
-  @Override
   protected void writeRunConfigJson(json) {
     super.writeRunConfigJson(json)
     json.with {
