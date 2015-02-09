@@ -8,17 +8,9 @@
  */
 package org.akhikhl.gretty
 
-import org.eclipse.jetty.util.resource.Resource
-import org.eclipse.jetty.annotations.AbstractDiscoverableAnnotationHandler
-import org.eclipse.jetty.annotations.AnnotationConfiguration
-import org.eclipse.jetty.annotations.AnnotationDecorator
-import org.eclipse.jetty.annotations.AnnotationParser
+import org.eclipse.jetty.annotations.*
 import org.eclipse.jetty.annotations.AnnotationParser.DiscoverableAnnotationHandler
-import org.eclipse.jetty.annotations.ClassNameResolver
-import org.eclipse.jetty.annotations.WebFilterAnnotationHandler
-import org.eclipse.jetty.annotations.WebListenerAnnotationHandler
-import org.eclipse.jetty.annotations.WebListenerAnnotationHandler
-import org.eclipse.jetty.annotations.WebServletAnnotationHandler
+import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.webapp.WebAppContext
 
 class AnnotationConfigurationEx extends AnnotationConfiguration {

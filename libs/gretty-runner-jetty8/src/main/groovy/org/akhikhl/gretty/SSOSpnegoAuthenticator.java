@@ -8,15 +8,9 @@
  */
 package org.akhikhl.gretty;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.eclipse.jetty.http.HttpMethods;
 import org.eclipse.jetty.security.ServerAuthException;
 import org.eclipse.jetty.security.authentication.DeferredAuthentication;
-import static org.eclipse.jetty.security.authentication.FormAuthenticator.__J_POST;
-import static org.eclipse.jetty.security.authentication.FormAuthenticator.__J_URI;
 import org.eclipse.jetty.security.authentication.SessionAuthentication;
 import org.eclipse.jetty.security.authentication.SpnegoAuthenticator;
 import org.eclipse.jetty.server.AbstractHttpConnection;
@@ -26,6 +20,14 @@ import org.eclipse.jetty.server.UserIdentity;
 import org.eclipse.jetty.util.MultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import static org.eclipse.jetty.security.authentication.FormAuthenticator.__J_POST;
+import static org.eclipse.jetty.security.authentication.FormAuthenticator.__J_URI;
 
 /**
  *
