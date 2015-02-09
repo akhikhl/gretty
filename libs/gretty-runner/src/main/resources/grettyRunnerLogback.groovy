@@ -8,13 +8,12 @@
  */
 scan '30 seconds'
 
-String encoderPattern = '%-12date{HH:mm:ss} %-5level %logger{35} - %msg%n'
 String logDir = "${System.getProperty('user.home')}/logs"
 String logFileName = 'gretty'
 
 appender('CONSOLE', ConsoleAppender) {
   encoder(PatternLayoutEncoder) {
-    pattern = encoderPattern
+    pattern = '%-8date{HH:mm:ss} %-5level %msg%n'
   }
 }
 
@@ -26,7 +25,7 @@ appender('FILE', RollingFileAppender) {
     maxHistory = 7
   }
   encoder(PatternLayoutEncoder) {
-    pattern = encoderPattern
+    pattern = '%-8date{HH:mm:ss} %-5level %logger{35} - %msg%n'
   }
 }
 

@@ -8,8 +8,11 @@
  */
 package org.akhikhl.gretty
 
+import ch.qos.logback.classic.LoggerContext
+import ch.qos.logback.classic.util.ContextInitializer
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
+import org.slf4j.LoggerFactory
 
 /**
  *
@@ -37,6 +40,7 @@ final class Runner {
   }
 
   static void main(String[] args) {
+    initLogback()
     def cli = new CliBuilder()
     cli.with {
       sv longOpt: 'servicePort', required: true, args: 1, argName: 'servicePort', type: Integer, 'service port'
@@ -46,6 +50,16 @@ final class Runner {
     def options = cli.parse(args)
     Map params = [ servicePort: options.servicePort as int, statusPort: options.statusPort as int, serverManagerFactory: options.serverManagerFactory ]
     new Runner(params).run()
+  }
+
+  static void initLogback() {
+    LoggerContext logCtx = LoggerFactory.getILoggerFactory()
+    logCtx.stop()
+    Map loggerCache = LoggerFactory.getILoggerFactory().@loggerCache
+    for(String loggerName in new HashSet(loggerCache.keySet()))
+      if(!loggerName.startsWith('org.eclipse.jetty'))
+        loggerCache.remove(loggerName)
+    new ContextInitializer(logCtx).configureByResource(this.getClass().getResource('/grettyRunnerLogback.groovy'))
   }
 
   private Runner(Map params) {
