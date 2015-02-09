@@ -21,10 +21,11 @@ import org.slf4j.LoggerFactory
  */
 class TomcatServerManager implements ServerManager {
 
+  private static final Logger log = LoggerFactory.getLogger(TomcatServerManager)
+
   private TomcatConfigurer configurer
   protected Map params
 	protected Tomcat tomcat
-  protected Logger log
 
   TomcatServerManager(TomcatConfigurer configurer) {
     this.configurer = configurer
@@ -44,33 +45,26 @@ class TomcatServerManager implements ServerManager {
   void startServer(ServerStartEvent startEvent) {
     assert tomcat == null
 
-    if(params.logging) {
-      def LoggingUtils = Class.forName('org.akhikhl.gretty.LoggingUtils', true, this.getClass().classLoader)
-      LoggingUtils.configureLogging(params.logging)
-    } else if(params.logbackConfig) {
-      def LoggingUtils = Class.forName('org.akhikhl.gretty.LoggingUtils', true, this.getClass().classLoader)
-      LoggingUtils.useConfig(params.logbackConfig)
-    }
-
-    log = LoggerFactory.getLogger(this.getClass())
-    configurer.setLogger(log)
+    log.debug '{} starting.', params.servletContainerDescription
 
     tomcat = new TomcatServerConfigurer(configurer, params).createAndConfigureServer()
     tomcat.start()
 
     if(startEvent)
       startEvent.onServerStart(new TomcatServerStartInfo().getInfo(tomcat, null, params))
+
+    log.debug '{} started.', params.servletContainerDescription
   }
 
   @Override
   void stopServer() {
     if(tomcat != null) {
+      log.debug '{} stopping.', params.servletContainerDescription
       tomcat.stop()
       tomcat.getServer().await()
       tomcat.destroy()
       tomcat = null
-      log.warn '{} stopped.', params.servletContainerDescription
-      log = null
+      log.debug '{} stopped.', params.servletContainerDescription
     }
   }
 }

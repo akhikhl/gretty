@@ -25,11 +25,11 @@ import org.slf4j.LoggerFactory
  */
 class TomcatConfigurerImpl implements TomcatConfigurer {
 
+  private static final Logger log = LoggerFactory.getLogger(TomcatConfigurerImpl)
+
   protected static boolean isServletApi(String filePath) {
     filePath.matches(/^.*servlet-api.*\.jar$/)
   }
-
-  protected Logger log
 
   @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
@@ -61,11 +61,6 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     tomcat.baseDir = baseDir.absolutePath
     tomcat.server.setCatalinaHome(baseDir)
     tomcat.server.setCatalinaBase(baseDir)
-  }
-
-  @Override
-  void setLogger(Logger logger) {
-    log = logger
   }
 
   @Override

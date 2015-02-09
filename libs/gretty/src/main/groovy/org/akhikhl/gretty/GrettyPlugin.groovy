@@ -482,6 +482,22 @@ class GrettyPlugin implements Plugin<Project> {
 
       project.ext.jettyAfterIntegrationTest = project.tasks.ext.jettyAfterIntegrationTest = project.tasks.appAfterIntegrationTest
 
+      project.task('showClassPath', group: 'gretty') {
+        description = 'Shows classpath information'
+        doLast {
+          println "Runner classpath:"
+          project.tasks.appRun.runnerClassPath.each { URL url ->
+            println " $url"
+          }
+          project.tasks.appRun.getWebappClassPaths().each { contextPath, cp ->
+            println "$contextPath classpath:"
+            cp.each { URL url ->
+              println " $url"
+            }
+          }
+        }
+      }
+
     } // JVM project
 
     project.farms.farmsMap.each { fname, farm ->

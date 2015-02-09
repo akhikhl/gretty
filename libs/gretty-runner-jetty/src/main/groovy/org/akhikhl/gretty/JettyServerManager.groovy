@@ -17,10 +17,11 @@ import org.slf4j.LoggerFactory
  */
 final class JettyServerManager implements ServerManager {
 
+  private static final Logger log = LoggerFactory.getLogger(JettyServerManager)
+
   private JettyConfigurer configurer
   protected Map params
 	protected server
-  protected Logger log
 
   JettyServerManager(JettyConfigurer configurer) {
     this.configurer = configurer
@@ -40,32 +41,24 @@ final class JettyServerManager implements ServerManager {
   void startServer(ServerStartEvent startEvent) {
     assert server == null
 
-    if(params.logging) {
-      def LoggingUtils = Class.forName('org.akhikhl.gretty.LoggingUtils', true, this.getClass().classLoader)
-      LoggingUtils.configureLogging(params.logging)
-    } else if(params.logbackConfig) {
-      println "DBG logbackConfig: ${params.logbackConfig}"
-      def LoggingUtils = Class.forName('org.akhikhl.gretty.LoggingUtils', true, this.getClass().classLoader)
-      LoggingUtils.useConfig(params.logbackConfig)
-    }
-
-    log = LoggerFactory.getLogger(this.getClass())
-    configurer.setLogger(log)
+    log.debug '{} starting.', params.servletContainerDescription
 
     server = new JettyServerConfigurer(configurer, params).createAndConfigureServer()
     server.start()
 
     if(startEvent)
       startEvent.onServerStart(new JettyServerStartInfo().getInfo(server, configurer, params))
+
+    log.debug '{} started.', params.servletContainerDescription
   }
 
   @Override
   void stopServer() {
     if(server != null) {
+      log.debug '{} stopping.', params.servletContainerDescription
       server.stop()
       server = null
-      log.warn '{} stopped.', params.servletContainerDescription
-      log = null
+      log.debug '{} stopped.', params.servletContainerDescription
     }
   }
 }

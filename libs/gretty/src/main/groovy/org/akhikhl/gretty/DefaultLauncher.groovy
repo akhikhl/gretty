@@ -26,7 +26,7 @@ class DefaultLauncher extends LauncherBase {
   }
 
   protected Collection<URL> getRunnerClassPath() {
-    (project.configurations.gretty + project.configurations[getServletContainerConfig().servletContainerRunnerConfig]).files.collect { it.toURL() }
+    (project.configurations.gretty + project.configurations[getServletContainerConfig().servletContainerRunnerConfig]).files.collect { it.toURI().toURL() }
   }
 
   protected Map getServletContainerConfig() {

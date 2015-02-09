@@ -26,8 +26,6 @@ interface TomcatConfigurer {
 
   void setBaseDir(Tomcat tomcat, File baseDir)
 
-  void setLogger(Logger logger)
-
   void setResourceBase(StandardContext context, Map webappParams)
 }
 

@@ -45,6 +45,4 @@ interface JettyConfigurer {
   void setConfigurationsToWebAppContext(context, List configurations)
 
   void setHandlersToServer(server, List handlers)
-
-  void setLogger(Logger logger)
 }

@@ -32,7 +32,7 @@ abstract class StartBaseTask extends DefaultTask {
   @TaskAction
   void action() {
     LauncherConfig config = getLauncherConfig()
-    Launcher launcher = ProjectUtils.anyWebAppUsesSpringBoot(project, config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
+    Launcher launcher = getLauncher(config)
     launcher.scannerManager = new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
     if(getIntegrationTest())
       project.ext.grettyLaunchThread = launcher.launchThread()
@@ -153,9 +153,34 @@ abstract class StartBaseTask extends DefaultTask {
     sconfig.managedClassReload
   }
 
+  Launcher getLauncher() {
+    getLauncher(getLauncherConfig())
+  }
+
+  Launcher getLauncher(LauncherConfig config) {
+    ProjectUtils.anyWebAppUsesSpringBoot(project, config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
+  }
+
+  Collection<URL> getRunnerClassPath() {
+    getLauncher().runnerClassPath
+  }
+
   protected abstract StartConfig getStartConfig()
 
   protected abstract String getStopCommand()
+
+  /**
+   * key is context path, value is collection of classpath URLs
+   * @return
+   */
+  Map<String, Collection<URL> > getWebappClassPaths() {
+    LauncherConfig config = getLauncherConfig()
+    Launcher launcher = getLauncher(config)
+    WebAppClassPathResolver resolver = config.getWebAppClassPathResolver()
+    config.getWebAppConfigs().collectEntries { wconfig ->
+      [ wconfig.contextPath, resolver.resolveWebAppClassPath(wconfig) ]
+    }
+  }
 
   final void jacoco(Closure configureClosure) {
     getJacoco()?.with configureClosure
