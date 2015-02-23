@@ -127,11 +127,11 @@ class FarmConfigurer {
           def gav = wref.split(':')
           if(gav.length != 3)
             throw new GradleException("'${wref}' is not an existing project or file or maven dependency.")
-          log.warn '{} is not an existing project or war-file, treating it as a maven dependency', wref
+          log.info '{} is not an existing project or war-file, treating it as a maven dependency', wref
           if(!options.suppressMavenToProjectResolution) {
             proj = project.rootProject.allprojects.find { it.group == gav[0] && it.name == gav[1] }
             if(proj)
-              log.warn '{} comes from project {}, so using project instead of maven dependency', wref, proj.path
+              log.info '{} comes from project {}, so using project instead of maven dependency', wref, proj.path
           }
         }
       }
