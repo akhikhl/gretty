@@ -44,7 +44,7 @@ class CertificateGenerator {
     }
 
     if(sconfig.sslKeyStorePath) {
-      log.warn 'Using cryptographic key and certificate from: {}', sconfig.sslKeyStorePath
+      log.info 'Using cryptographic key and certificate from: {}', sconfig.sslKeyStorePath
       return
     }
 
@@ -56,11 +56,11 @@ class CertificateGenerator {
     String sslKeyManagerPassword = null
     if(!keystoreFile.exists() || !certFile.exists() || !propertiesFile.exists()) {
       dir.mkdirs()
-      log.warn 'Generating RSA key'
+      log.info 'Generating RSA key'
       def keyPairGenerator = KeyPairGenerator.getInstance('RSA', 'BC')
       keyPairGenerator.initialize(1024, new SecureRandom())
       def KPair = keyPairGenerator.generateKeyPair()
-      log.warn 'Generating self-signed X.509 certificate'
+      log.info 'Generating self-signed X.509 certificate'
       def certGen = new X509V3CertificateGenerator()
       certGen.setSerialNumber(BigInteger.valueOf(new SecureRandom().nextInt(Integer.MAX_VALUE)))
       certGen.setIssuerDN(new X509Principal("CN=gretty-issuer, OU=None, O=Gretty, L=None, C=None"))
@@ -71,7 +71,7 @@ class CertificateGenerator {
       certGen.setPublicKey(KPair.getPublic())
       certGen.setSignatureAlgorithm('SHA256WithRSA')
       def PKCertificate = certGen.generateX509Certificate(KPair.getPrivate(), 'BC')
-      log.warn 'Writing certificate to {}', certFile.absolutePath - project.projectDir.absolutePath - '/'
+      log.info 'Writing certificate to {}', certFile.absolutePath - project.projectDir.absolutePath - '/'
       certFile.withOutputStream { stm ->
         stm.write(PKCertificate.getEncoded())
       }
@@ -80,11 +80,11 @@ class CertificateGenerator {
       sslKeyManagerPassword = RandomStringUtils.randomAlphanumeric(128)
       ks.load(null, sslKeyStorePassword.toCharArray());
       ks.setKeyEntry('jetty', KPair.getPrivate(), sslKeyManagerPassword.toCharArray(), [ PKCertificate ] as Certificate[]);
-      log.warn 'Writing key and certificate to {}', keystoreFile.absolutePath - project.projectDir.absolutePath - '/'
+      log.info 'Writing key and certificate to {}', keystoreFile.absolutePath - project.projectDir.absolutePath - '/'
       keystoreFile.withOutputStream { stm ->
         ks.store(stm, sslKeyStorePassword.toCharArray());
       }
-      log.warn 'Writing keystore passwords to {}', propertiesFile.absolutePath - project.projectDir.absolutePath - '/'
+      log.info 'Writing keystore passwords to {}', propertiesFile.absolutePath - project.projectDir.absolutePath - '/'
       new Properties().with { prop ->
         prop.setProperty('sslKeyStorePassword', sslKeyStorePassword)
         prop.setProperty('sslKeyManagerPassword', sslKeyManagerPassword)
@@ -93,8 +93,8 @@ class CertificateGenerator {
         }
       }
     } else {
-      log.warn 'Using RSA key and self-signed X.509 certificate from {}', keystoreFile.absolutePath - project.projectDir.absolutePath - '/'
-      log.warn 'Reading keystore passwords from {}', propertiesFile.absolutePath - project.projectDir.absolutePath - '/'
+      log.info 'Using RSA key and self-signed X.509 certificate from {}', keystoreFile.absolutePath - project.projectDir.absolutePath - '/'
+      log.info 'Reading keystore passwords from {}', propertiesFile.absolutePath - project.projectDir.absolutePath - '/'
       new Properties().with { prop ->
         propertiesFile.withInputStream { stm ->
           prop.load(stm)
