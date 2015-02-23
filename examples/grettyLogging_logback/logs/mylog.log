@@ -1,4 +1,0 @@
-2015-02-10 00:20:38 INFO [qtp1928301845-17] o.a.e.g.ExampleServlet [ExampleServlet.java:28] doGet (GET /grettyLogging_logback/)@1506567099 org.eclipse.jetty.server.Request@59cc63bb
-2015-02-10 00:23:22 INFO [qtp1928301845-17] o.a.e.g.ExampleServlet [ExampleServlet.java:28] doGet (GET /grettyLogging_logback/)@1641642567 org.eclipse.jetty.server.Request@61d97a47
-2015-02-10 00:25:08 INFO [qtp1928301845-17] o.a.e.g.ExampleServlet [ExampleServlet.java:28] doGet (GET /grettyLogging_logback/)@1518455150 org.eclipse.jetty.server.Request@5a81c96e
-2015-02-10 00:26:54 INFO [qtp1928301845-11] o.a.e.g.ExampleServlet [ExampleServlet.java:28] doGet (GET /grettyLogging_logback/)@1452951636 org.eclipse.jetty.server.Request@569a4854
