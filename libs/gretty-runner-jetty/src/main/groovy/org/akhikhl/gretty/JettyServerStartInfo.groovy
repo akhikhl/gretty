@@ -27,13 +27,13 @@ class JettyServerStartInfo {
 
     def portsInfo = server.getConnectors().collect { it.port }
     portsInfo = (portsInfo.size() == 1 ? 'port ' : 'ports ') + portsInfo.join(', ')
-    log.warn '{} started and listening on {}', params.servletContainerDescription, portsInfo
+    log.info '{} started and listening on {}', params.servletContainerDescription, portsInfo
 
     def httpConn = configurer.findHttpConnector(server)
     def httpsConn = configurer.findHttpsConnector(server)
 
     List contextInfo = []
-  
+
     def collectContextInfo
     collectContextInfo = { handler ->
       if(handler.respondsTo('getHandlers')) {
@@ -42,17 +42,17 @@ class JettyServerStartInfo {
         }
       }
       if(handler.respondsTo('getDisplayName'))
-        log.warn '{} runs at:', (handler.getDisplayName() - '/')
+        log.info '{} runs at:', (handler.getDisplayName() - '/')
       if(handler.respondsTo('getContextPath')) {
         String contextPath = handler.getContextPath()
         if(httpConn) {
-          log.warn '  http://{}:{}{}', (httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host), httpConn.port, contextPath
+          log.info '  http://{}:{}{}', (httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host), httpConn.port, contextPath
           httpConn.with {
             contextInfo.add([ protocol: 'http', host: host, port: port, contextPath: contextPath, baseURI: "http://${host}:${port}${handler.contextPath}" ])
           }
         }
         if(httpsConn) {
-          log.warn '  https://{}:{}{}', (httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host), httpsConn.port, contextPath
+          log.info '  https://{}:{}{}', (httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host), httpsConn.port, contextPath
           httpsConn.with {
             contextInfo.add([ protocol: 'https', host: host, port: port, contextPath: contextPath, baseURI: "https://${host}:${port}${handler.contextPath}" ])
           }
