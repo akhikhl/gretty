@@ -32,7 +32,6 @@ class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory 
   @Override
   public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
     def jettyConfigurer = Class.forName('org.akhikhl.gretty.JettyConfigurerImpl', true, this.getClass().classLoader).newInstance()
-    jettyConfigurer.setLogger(log)
     params.supressSetConfigurations = true
     def server = new JettyServerConfigurer(jettyConfigurer, params).createAndConfigureServer { webapp, context ->
 
@@ -43,7 +42,7 @@ class JettyServletContainerFactory extends JettyEmbeddedServletContainerFactory 
         if (isRegisterJspServlet() && ClassUtils.isPresent(getJspServletClassName(), getClass().getClassLoader()))
           addJspServlet(context)
       }
-      
+
       ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
       def configurations = jettyConfigurer.getConfigurations(webapp)
       BaseResourceConfiguration baseRes = configurations.find { it instanceof BaseResourceConfiguration }

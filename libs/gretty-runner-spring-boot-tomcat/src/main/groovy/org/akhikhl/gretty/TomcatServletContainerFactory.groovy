@@ -43,7 +43,6 @@ class TomcatServletContainerFactory extends TomcatEmbeddedServletContainerFactor
   public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
 
     def tomcatConfigurer = Class.forName('org.akhikhl.gretty.TomcatConfigurerImpl', true, this.getClass().classLoader).newInstance()
-    tomcatConfigurer.setLogger(log)
 
     ServletContextInitializer[] initializersToUse = mergeInitializers(initializers)
 
