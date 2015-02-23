@@ -33,7 +33,7 @@ class TomcatServerStartInfo {
 
     def portsInfo = connectors.collect { it.port }
     portsInfo = (portsInfo.size() == 1 ? 'port ' : 'ports ') + portsInfo.join(', ')
-    log.warn '{} started and listening on {}', params.servletContainerDescription, portsInfo
+    log.info '{} started and listening on {}', params.servletContainerDescription, portsInfo
 
     Connector httpConn = connectors.find { it.scheme == 'http' }
     Connector httpsConn = connectors.find { it.scheme == 'https' }
@@ -41,15 +41,15 @@ class TomcatServerStartInfo {
     List contextInfo = []
 
     for(Context context in tomcat.host.findChildren().findAll { it instanceof Context }) {
-      log.warn '{} runs at:', (context.name - '/')
+      log.info '{} runs at:', (context.name - '/')
       if(httpConn) {
-        log.warn '  http://{}:{}{}', (tomcat.hostname == '0.0.0.0' ? 'localhost' : tomcat.hostname), httpConn.port, context.path
+        log.info '  http://{}:{}{}', (tomcat.hostname == '0.0.0.0' ? 'localhost' : tomcat.hostname), httpConn.port, context.path
         httpConn.with {
           contextInfo.add([ protocol: 'http', host: tomcat.hostname, port: port, contextPath: context.path, baseURI: "http://${tomcat.hostname}:${port}${context.path}" ])
         }
       }
       if(httpsConn) {
-        log.warn '  https://{}:{}{}', (tomcat.hostname == '0.0.0.0' ? 'localhost' : tomcat.hostname), httpsConn.port, context.path
+        log.info '  https://{}:{}{}', (tomcat.hostname == '0.0.0.0' ? 'localhost' : tomcat.hostname), httpsConn.port, context.path
         httpsConn.with {
           contextInfo.add([ protocol: 'https', host: tomcat.hostname, port: port, contextPath: context.path, baseURI: "https://${tomcat.hostname}:${port}${context.path}" ])
         }
