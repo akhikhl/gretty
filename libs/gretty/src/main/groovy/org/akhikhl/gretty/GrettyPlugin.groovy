@@ -168,10 +168,13 @@ class GrettyPlugin implements Plugin<Project> {
       alteredDependencies
     }
 
-    def artifacts = project.configurations.runtime.copyRecursive().resolvedConfiguration.resolvedArtifacts
-    if(artifacts.find { it.name == 'slf4j-api' } && !artifacts.find { it.name in ['slf4j-nop', 'slf4j-simple', 'slf4j-log4j12', 'slf4j-jdk14', 'logback-classic'] }) {
-      project.dependencies {
-        compile "org.slf4j:slf4j-nop:$slf4jVersion"
+    def runtimeConfig = project.configurations.findByName('runtime')
+    if(runtimeConfig) {
+      def artifacts = runtimeConfig.copyRecursive().resolvedConfiguration.resolvedArtifacts
+      if(artifacts.find { it.name == 'slf4j-api' } && !artifacts.find { it.name in ['slf4j-nop', 'slf4j-simple', 'slf4j-log4j12', 'slf4j-jdk14', 'logback-classic'] }) {
+        project.dependencies {
+          compile "org.slf4j:slf4j-nop:$slf4jVersion"
+        }
       }
     }
   }
