@@ -31,3 +31,14 @@ appender('FILE', RollingFileAppender) {
 
 root INFO, ['CONSOLE', 'FILE']
 
+logger 'org.apache.catalina', WARN
+
+logger 'org.apache.coyote', WARN
+
+logger 'org.apache.jasper', WARN
+
+logger 'org.apache.tomcat', WARN
+
+logger 'org.eclipse.jetty', WARN
+
+logger 'org.eclipse.jetty.annotations.AnnotationConfiguration', ERROR
