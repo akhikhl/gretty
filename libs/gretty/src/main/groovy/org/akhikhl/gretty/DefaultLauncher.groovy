@@ -56,7 +56,7 @@ class DefaultLauncher extends LauncherBase {
         jvmArgs.add '-Xdebug'
         String debugArg = "-Xrunjdwp:transport=dt_socket,server=y,suspend=${params.debugSuspend ? 'y' : 'n'},address=${params.debugPort}"
         jvmArgs.add debugArg
-        log.warn 'DEBUG MODE, port={}, suspend={}', params.debugPort, params.debugSuspend
+        log.info 'DEBUG MODE, port={}, suspend={}', params.debugPort, params.debugSuspend
       }
       spec.jvmArgs jvmArgs
       spec.systemProperties params.systemProperties
