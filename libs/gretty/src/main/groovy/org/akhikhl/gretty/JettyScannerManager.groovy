@@ -123,7 +123,7 @@ final class JettyScannerManager implements ScannerManager {
   protected void scanFilesChanged(Collection<String> changedFiles) {
 
     for(def f in changedFiles)
-      log.warn 'changedFile={}', f
+      log.debug 'changedFile={}', f
 
     sconfig.onScanFilesChanged*.call(changedFiles)
 
@@ -145,7 +145,7 @@ final class JettyScannerManager implements ScannerManager {
         if(dependantWebAppProjects) {
           for(WebAppConfig wconfig in dependantWebAppProjects) {
             if(wconfig.recompileOnSourceChange) {
-              log.warn 'changed file {} is dependency of {}, the latter will be recompiled', f, wconfig.projectPath
+              log.info 'changed file {} is dependency of {}, the latter will be recompiled', f, wconfig.projectPath
               reloadProject(wconfig.projectPath, 'compile')
               if(managedClassReload)
                 shouldRestart = true
@@ -159,7 +159,7 @@ final class JettyScannerManager implements ScannerManager {
         it.projectPath && f.startsWith(project.project(it.projectPath).projectDir.absolutePath)
       }
       if(wconfig != null) {
-        log.warn 'changed file {} affects project {}', f, wconfig.projectPath
+        log.info 'changed file {} affects project {}', f, wconfig.projectPath
         def proj = project.project(wconfig.projectPath)
         if(proj.sourceSets.main.allSource.srcDirs.find { f.startsWith(it.absolutePath) }) {
           if(wconfig.recompileOnSourceChange) {
@@ -169,29 +169,29 @@ final class JettyScannerManager implements ScannerManager {
         } else if (proj.sourceSets.main.output.files.find { f.startsWith(it.absolutePath) }) {
           if(wconfig.reloadOnClassChange) {
             if(managedClassReload) {
-              log.warn 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
+              log.info 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
             } else {
-              log.warn 'file {} is in output of {}, servlet-container will be restarted', f, wconfig.projectPath
+              log.info 'file {} is in output of {}, servlet-container will be restarted', f, wconfig.projectPath
               shouldRestart = true
             }
           }
         } else if (isWebConfigFile(new File(f))) {
           if(wconfig.reloadOnConfigChange) {
-            log.warn 'file {} is configuration file, servlet-container will be restarted', f
+            log.info 'file {} is configuration file, servlet-container will be restarted', f
             reloadProject(wconfig.projectPath, 'compile')
             shouldRestart = true
           }
         } else if(f.startsWith(new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/lib').absolutePath)) {
           if(wconfig.reloadOnLibChange) {
-            log.warn 'file {} is in WEB-INF/lib, servlet-container will be restarted', f
+            log.info 'file {} is in WEB-INF/lib, servlet-container will be restarted', f
             reloadProject(wconfig.projectPath, 'compile')
             shouldRestart = true
           }
         } else if(ProjectReloadUtils.satisfiesOneOfReloadSpecs(f, fastReloadMap[proj.path])) {
-          log.warn 'file {} is in fastReload directories', f
+          log.info 'file {} is in fastReload directories', f
           reloadProject(wconfig.projectPath, 'fastReload')
         } else {
-          log.warn 'file {} is not in fastReload directories, switching to fullReload', f
+          log.info 'file {} is not in fastReload directories, switching to fullReload', f
           reloadProject(wconfig.projectPath, 'compile')
           shouldRestart = true
         }
@@ -201,20 +201,20 @@ final class JettyScannerManager implements ScannerManager {
     webAppProjectReloads.each { String projectPath, Set reloadModes ->
       Project proj = project.project(projectPath)
       if(reloadModes.contains('compile')) {
-        log.warn 'Recompiling {}', (projectPath == ':' ? proj.name : projectPath)
+        log.info 'Recompiling {}', (projectPath == ':' ? proj.name : projectPath)
         WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
         ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()
         try {
-            connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp').run()
+          connection.newBuild().forTasks(wconfig.inplace ? 'prepareInplaceWebApp' : 'prepareArchiveWebApp').run()
         } finally {
-            connection.close()
+          connection.close()
         }
       } else if(reloadModes.contains('fastReload')) {
-        log.warn 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
+        log.info 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
         WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
         // TODO: maybe we should disable fastReload at all?
         if(!(wconfig.inplace && wconfig.inplaceMode == 'hard')) {
-            ProjectUtils.prepareInplaceWebAppFolder(proj)
+          ProjectUtils.prepareInplaceWebAppFolder(proj)
         }
       }
     }
@@ -227,16 +227,16 @@ final class JettyScannerManager implements ScannerManager {
   void startScanner() {
     if(!sconfig.scanInterval) {
       if(sconfig.scanInterval == null)
-        log.warn 'scanInterval not specified, hot deployment disabled'
+        log.info 'scanInterval not specified, hot deployment disabled'
       else if(sconfig.scanInterval == 0)
-        log.warn 'scanInterval is zero, hot deployment disabled'
+        log.info 'scanInterval is zero, hot deployment disabled'
       return
     }
     scanner = new Scanner()
     scanner.scanDirs = getEffectiveScanDirs()
     configureFastReload()
     configureScanner()
-    log.warn 'Enabling hot deployment with interval of {} second(s)', sconfig.scanInterval
+    log.info 'Enabling hot deployment with interval of {} second(s)', sconfig.scanInterval
     scanner.start()
   }
 
