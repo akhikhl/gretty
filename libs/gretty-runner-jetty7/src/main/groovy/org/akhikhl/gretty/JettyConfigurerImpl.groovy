@@ -198,7 +198,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addServerClass('ch.qos.logback.')
     context.addServerClass('org.slf4j.')
     context.addServerClass('org.codehaus.groovy.')
-    context.addServerClass('groovy.lang.')
+    context.addServerClass('groovy.')
+    context.addServerClass('groovyx.')
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.setOverrideDescriptor('/org/akhikhl/gretty/override-web.xml')
     return context
