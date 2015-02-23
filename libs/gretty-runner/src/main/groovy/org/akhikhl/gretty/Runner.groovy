@@ -40,7 +40,6 @@ final class Runner {
   }
 
   static void main(String[] args) {
-    initLogback()
     def cli = new CliBuilder()
     cli.with {
       sv longOpt: 'servicePort', required: true, args: 1, argName: 'servicePort', type: Integer, 'service port'
@@ -52,7 +51,7 @@ final class Runner {
     new Runner(params).run()
   }
 
-  static void initLogback() {
+  static void initLogback(Map serverParams) {
     LoggerContext logCtx = LoggerFactory.getILoggerFactory()
     logCtx.stop()
     Map loggerCache = LoggerFactory.getILoggerFactory().@loggerCache
@@ -80,6 +79,7 @@ final class Runner {
         if(!paramsLoaded) {
           params << new JsonSlurper().parseText(data)
           paramsLoaded = true
+          initLogback(params)
           serverManager.setParams(params)
           serverManager.startServer(new ServerStartEventImpl())
           // Note that server is already in listening state.
