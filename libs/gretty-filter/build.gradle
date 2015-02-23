@@ -3,8 +3,11 @@ apply from: rootProject.file('libs/publish.gradle')
 
 dependencies {
   compile 'javax.servlet:servlet-api:2.5'
-  compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+  compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1', {
+    exclude group: 'commons-logging', module: 'commons-logging'
+  }
   compile "org.codehaus.groovy:groovy-all:${groovy_version}"
   compile "org.slf4j:slf4j-api:$slf4j_version"
+  compile "org.slf4j:jcl-over-slf4j:$slf4j_version"
 }
 
