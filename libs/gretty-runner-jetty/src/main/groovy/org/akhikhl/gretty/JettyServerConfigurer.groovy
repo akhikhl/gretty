@@ -59,7 +59,7 @@ class JettyServerConfigurer {
     new File(baseDir, 'webapps').mkdirs()
 
     configurer.applyJettyXml(server, params.serverConfigFile)
-    
+
     configurer.configureConnectors(server, params)
 
     List handlers = []
@@ -116,7 +116,7 @@ class JettyServerConfigurer {
     for(def possibleFileName in [ servletContainer + '-env.xml', 'jetty-env.xml' ]) {
       URL url = configurer.findResourceURL(baseResource, 'META-INF/' + possibleFileName)
       if(url) {
-        log.warn 'resolved {} to {}', possibleFileName, url
+        log.info 'resolved {} to {}', possibleFileName, url
         return url
       }
     }
