@@ -208,10 +208,14 @@ class TomcatServerConfigurer {
       context.setPath(webapp.contextPath)
       configurer.setResourceBase(context, webapp)
       // context.setLogEffectiveWebXml(true) // enable for debugging webxml merge
-      ClassLoader parentClassLoader = params.parentClassLoader ?: this.getClass().getClassLoader()
+      FilteringClassLoader parentClassLoader = new FilteringClassLoader(params.parentClassLoader ?: this.getClass().getClassLoader())
+      parentClassLoader.addServerClass('ch.qos.logback.')
+      parentClassLoader.addServerClass('org.slf4j.')
+      parentClassLoader.addServerClass('org.codehaus.groovy.')
+      parentClassLoader.addServerClass('groovy.')
+      parentClassLoader.addServerClass('groovyx.')
       URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
-      ClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
-      classLoader.metaClass.webappClassLoader = true
+      URLClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
       context.addLifecycleListener(new SpringloadedCleanup())
       context.setParentClassLoader(classLoader)
       context.setJarScanner(configurer.createJarScanner(context.getJarScanner(), new JarSkipPatterns()))
