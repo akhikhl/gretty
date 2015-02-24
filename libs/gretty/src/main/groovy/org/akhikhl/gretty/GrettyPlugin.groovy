@@ -613,7 +613,9 @@ class GrettyPlugin implements Plugin<Project> {
 
     if(project.extensions.findByName('gretty')) {
 
-      addRepositories(project)
+      if(project.gretty.autoConfigureRepositories)
+        addRepositories(project)
+
       addDependencies(project)
       addTasks(project)
 

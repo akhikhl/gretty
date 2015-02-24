@@ -13,7 +13,7 @@ package org.akhikhl.gretty
  * @author akhikhl
  */
 class GrettyExtension extends GrettyConfig {
-  
+
   int debugPort = 5005
   boolean debugSuspend = true
 
@@ -24,6 +24,8 @@ class GrettyExtension extends GrettyConfig {
   protected afterEvaluate = []
 
   Closure webappCopy = {}
+
+  boolean autoConfigureRepositories = false
 
   void afterEvaluate(Closure closure) {
     afterEvaluate.add(closure)
