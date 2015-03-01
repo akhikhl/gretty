@@ -340,19 +340,25 @@ final class ProjectUtils {
     realmConfigFiles = realmConfigFiles as LinkedHashSet
     sconfig.realmConfigFile = new FileResolver(['realm', 'security', 'server', 'config', '.']).resolveSingleFile(project, realmConfigFiles)
 
+    def specifiedServerConfigFile = sconfig.serverConfigFile
     if(servletContainerType == 'jetty') {
-      def serverConfigFiles = [ sconfig.serverConfigFile, sconfig.servletContainer + '.xml', 'jetty.xml' ] as LinkedHashSet
+      def serverConfigFiles = (specifiedServerConfigFile ? [ specifiedServerConfigFile ] : [ sconfig.servletContainer + '.xml', 'jetty.xml' ]) as LinkedHashSet
       sconfig.serverConfigFile = new FileResolver(['jetty', 'server', 'config', '.']).resolveSingleFile(project, serverConfigFiles)
     } else if(servletContainerType == 'tomcat') {
-      def serverConfigFiles = [ sconfig.serverConfigFile, sconfig.servletContainer + '.xml', 'tomcat.xml', sconfig.servletContainer + '-server.xml', 'server.xml' ] as LinkedHashSet
+      def serverConfigFiles = (specifiedServerConfigFile ? [ specifiedServerConfigFile ] : [ sconfig.servletContainer + '.xml', 'tomcat.xml', sconfig.servletContainer + '-server.xml', 'server.xml' ]) as LinkedHashSet
       sconfig.serverConfigFile = new FileResolver(['tomcat', 'server', 'config', '.']).resolveSingleFile(project, serverConfigFiles)
     } else
       sconfig.serverConfigFile = null
+    if(sconfig.serverConfigFile == null && specifiedServerConfigFile)
+      log.warn 'server configuration file {} is not found', specifiedServerConfigFile.toString()
 
-    def logbackConfigFiles = [ sconfig.logbackConfigFile, 'logback.groovy', 'logback.xml' ] as LinkedHashSet
+    def specifiedLogbackConfigFile = sconfig.logbackConfigFile
+    def logbackConfigFiles = ( specifiedLogbackConfigFile ? [ specifiedLogbackConfigFile ] : [ 'logback.groovy', 'logback.xml' ]) as LinkedHashSet
     sconfig.logbackConfigFile = new FileResolver(
-      ['logback', 'server', 'config', '.', { getWebInfDir(it) }, { it.hasProperty('sourceSets') ? it.sourceSets.main.output.files : [] } ]
+      ['logback', 'server', 'config', '.' ]
     ).resolveSingleFile(project, logbackConfigFiles)
+    if(sconfig.logbackConfigFile == null && specifiedLogbackConfigFile)
+      log.warn 'logback configuration file {} is not found', specifiedLogbackConfigFile.toString()
   }
 
   static void resolveWebAppConfig(Project project, WebAppConfig wconfig, ServerConfig sconfig) {

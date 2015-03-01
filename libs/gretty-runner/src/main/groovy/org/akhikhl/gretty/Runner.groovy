@@ -8,7 +8,9 @@
  */
 package org.akhikhl.gretty
 
+import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
+import ch.qos.logback.classic.joran.JoranConfigurator
 import ch.qos.logback.classic.util.ContextInitializer
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
@@ -58,7 +60,46 @@ final class Runner {
     for(String loggerName in new HashSet(loggerCache.keySet()))
       if(!loggerName.startsWith('org.eclipse.jetty'))
         loggerCache.remove(loggerName)
-    new ContextInitializer(logCtx).configureByResource(this.getClass().getResource('/grettyRunnerLogback.groovy'))
+    String logbackConfigText
+    if(serverParams.logbackConfigFile) {
+      if(serverParams.logbackConfigFile.endsWith('.xml')) {
+        JoranConfigurator configurator = new JoranConfigurator();
+        configurator.setContext(logCtx)
+        configurator.doConfigure(new File(serverParams.logbackConfigFile))
+        return
+      }
+      logbackConfigText = new File(serverParams.logbackConfigFile).getText('UTF-8')
+    }
+    else
+      logbackConfigText = this.getClass().getResourceAsStream('/grettyRunnerLogback.groovy').getText('UTF-8')
+    Binding binding = new Binding()
+    binding.loggingLevel = stringToLoggingLevel(serverParams.loggingLevel)
+    binding.consoleLogEnabled = Boolean.valueOf(serverParams.consoleLogEnabled == null ? true : serverParams.consoleLogEnabled)
+    binding.fileLogEnabled = Boolean.valueOf(serverParams.fileLogEnabled == null ? true : serverParams.fileLogEnabled)
+    binding.logFileName = serverParams.logFileName
+    binding.logDir = serverParams.logDir
+    new GafferConfiguratorEx(logCtx).run(binding, logbackConfigText)
+  }
+
+  private static Level stringToLoggingLevel(String str) {
+    switch(str?.toUpperCase()) {
+      case 'ALL':
+        return Level.ALL
+      case 'DEBUG':
+        return Level.DEBUG
+      case 'ERROR':
+        return Level.ERROR
+      case 'INFO':
+        return Level.INFO
+      case 'OFF':
+        return Level.OFF
+      case 'TRACE':
+        return Level.TRACE
+      case 'WARN':
+        return Level.WARN
+      default:
+        return Level.INFO
+    }
   }
 
   private Runner(Map params) {

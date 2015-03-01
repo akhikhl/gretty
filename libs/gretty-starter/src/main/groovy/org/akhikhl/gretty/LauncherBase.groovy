@@ -251,10 +251,17 @@ abstract class LauncherBase implements Launcher {
   }
 
   protected void writeLoggingConfig(json) {
-    if(sconfig.logbackConfigFile)
-      json.with {
-        logbackConfig sconfig.logbackConfigFile.absolutePath
-      }
+    json.with {
+      if(sconfig.logbackConfigFile)
+        logbackConfigFile sconfig.logbackConfigFile.toString()
+      loggingLevel sconfig.loggingLevel
+      consoleLogEnabled sconfig.consoleLogEnabled
+      fileLogEnabled sconfig.fileLogEnabled
+      if(sconfig.logFileName)
+        logFileName sconfig.logFileName
+      if(sconfig.logDir)
+        logDir sconfig.logDir.toString()
+    }
   }
 
   protected void writeRunConfigJson(json) {
