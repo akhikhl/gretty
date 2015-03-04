@@ -206,7 +206,7 @@ class ProductConfigurer {
           resolvedClassPath.addAll(ProjectUtils.getClassPathJars(proj, 'productRuntime'))
           resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
           files = resolvedClassPath.collect { new File(it.path) }
-          files -= getRunnerFileCollection().files
+          files -= getVisibleRunnerFileCollection().files
         } else {
           def file = wconfig.resourceBase
           if(!(file instanceof File))
@@ -284,6 +284,13 @@ Version: ${project.version}"""
     sconfig.springBootMainClass ?:
     SpringBootMainClassFinder.findMainClass(project) ?:
     wconfigs.findResult { it.projectPath ? SpringBootMainClassFinder.findMainClass(project.project(it.projectPath)) : null }
+  }
+
+  protected FileCollection getVisibleRunnerFileCollection() {
+    def files = getRunnerFileCollection()
+    files = files.filter { f ->
+      !f.name.startsWith('slf4j') && !f.name.startsWith('logback') && !f.name.startsWith('groovy')
+    }
   }
 
   protected resolveConfig() {
