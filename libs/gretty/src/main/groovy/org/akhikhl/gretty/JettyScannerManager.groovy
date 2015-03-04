@@ -169,7 +169,12 @@ final class JettyScannerManager implements ScannerManager {
         } else if (proj.sourceSets.main.output.files.find { f.startsWith(it.absolutePath) }) {
           if(wconfig.reloadOnClassChange) {
             if(managedClassReload) {
-              log.info 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
+              if(wconfig.inplace)
+                log.info 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
+              else {
+                log.info 'file {} is in output of {}, but it runs as WAR, servlet-container will be restarted', f, wconfig.projectPath
+                shouldRestart = true
+              }
             } else {
               log.info 'file {} is in output of {}, servlet-container will be restarted', f, wconfig.projectPath
               shouldRestart = true
