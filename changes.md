@@ -4,6 +4,14 @@
 
 ### What's new:
 
+#### Version 1.2.0
+
+Gretty version 1.2.0 introduces the following changes:
+
+* Upgrade to Jetty 9.2.9.v20150224, which fixes [critical vulnerability CVE-2015-2080](https://github.com/eclipse/jetty.project/blob/master/advisories/2015-02-24-httpparser-error-buffer-bleed.md)
+* Fix for class reloading with WAR tasks. Now if some class is changed (recompiled), the web-application restarts as expected.
+* Fix for the bug: slf4j/logback libraries are excluded from webapps packed into Gretty product.
+
 #### Version 1.1.9
 
 Gretty version 1.1.9 introduces full isolation of it's own logging system (slf4j/logback)

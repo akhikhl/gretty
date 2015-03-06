@@ -1,3 +1,13 @@
+## Gretty 1.2.0 release announcement
+
+Mar 6, 2015: Gretty version 1.2.0 is out and immediately available at github, bintray, maven central and gradle plugin portal!
+
+Gretty version 1.2.0 introduces the following changes:
+
+* Upgrade to Jetty 9.2.9.v20150224, which fixes [critical vulnerability CVE-2015-2080](https://github.com/eclipse/jetty.project/blob/master/advisories/2015-02-24-httpparser-error-buffer-bleed.md)
+* Fix for class reloading with WAR tasks. Now if some class is changed (recompiled), the web-application restarts as expected.
+* Fix for the bug: slf4j/logback libraries are excluded from webapps packed into Gretty product.
+
 ## Gretty 1.1.9 release announcement
 
 Mar 3, 2015: Gretty version 1.1.9 is out and immediately available at github, bintray, maven central and gradle plugin portal!
