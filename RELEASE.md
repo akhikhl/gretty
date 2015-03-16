@@ -21,12 +21,14 @@ and web-applications are defined in child projects.
 
 At last Gretty 1.1.9 includes upgrades of the following components to their latest versions:
 
+```
 jetty7: 7.6.15.v20140411 -> 7.6.16.v20140903
 jetty9: 9.2.3.v20140905 -> 9.2.7.v20150116
 selenium: 2.44.0 -> 2.45.0
 spock: 0.7-groovy-2.0 -> 1.0-groovy-2.4
 tomcat7: 7.0.55 -> 7.0.59
 tomcat8: 8.0.15 -> 8.0.20
+```
 
 ## Gretty 1.1.8 release announcement
 
