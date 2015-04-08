@@ -10,7 +10,7 @@ scan '30 seconds'
 
 String encoderPattern = '%-12date{HH:mm:ss} %-5level %logger{35} - %msg%n'
 String logDir = "${System.getProperty('user.home')}/logs"
-String logFileName = 'jettyWebSockets'
+String logFileName = 'websocket'
 
 appender('CONSOLE', ConsoleAppender) {
   encoder(PatternLayoutEncoder) {
