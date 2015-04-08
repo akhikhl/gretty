@@ -32,3 +32,5 @@ appender('FILE', RollingFileAppender) {
 
 root WARN, ['CONSOLE', 'FILE']
 
+logger 'org.akhikhl.gretty', INFO
+
