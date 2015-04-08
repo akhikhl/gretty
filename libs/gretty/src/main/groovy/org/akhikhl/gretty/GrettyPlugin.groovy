@@ -32,6 +32,7 @@ class GrettyPlugin implements Plugin<Project> {
           extendsFrom runtimeConfig
         exclude module: 'spring-boot-starter-tomcat'
         exclude group: 'org.eclipse.jetty'
+        exclude group: 'org.eclipse.jetty.websocket'
       }
       grettyNoSpringBoot {
         extendsFrom project.configurations.gretty
@@ -92,8 +93,13 @@ class GrettyPlugin implements Plugin<Project> {
 
     String grettyVersion = Externalized.getString('grettyVersion')
     String springBootVersion = project.gretty.springBootVersion ?: (project.hasProperty('springBootVersion') ? project.springBootVersion : Externalized.getString('springBootVersion'))
+    if(project.gretty.servletContainer == 'jetty7' || project.gretty.servletContainer == 'jetty8')
+      // too old servlet API, need to use older spring-boot
+      springBootVersion = '1.1.9.RELEASE'
     String springLoadedVersion = project.gretty.springLoadedVersion ?: (project.hasProperty('springLoadedVersion') ? project.springLoadedVersion : Externalized.getString('springLoadedVersion'))
+    String springVersion = project.gretty.springVersion ?: (project.hasProperty('springVersion') ? project.springVersion : Externalized.getString('springVersion'))
     String slf4jVersion = Externalized.getString('slf4jVersion')
+    String logbackVersion = Externalized.getString('logbackVersion')
 
     project.dependencies {
       grettyStarter "org.akhikhl.gretty:gretty-starter:$grettyVersion"
@@ -103,19 +109,27 @@ class GrettyPlugin implements Plugin<Project> {
       grettyRunnerSpringBoot "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
       }
+      grettyRunnerSpringBoot "org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}", {
+        exclude group: 'org.apache.tomcat.embed'
+      }
       grettyRunnerSpringBootJettyBase "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
         // concrete implementation is chosen depending on servletContainer property
         exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
       }
       grettyRunnerSpringBootJetty "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}", {
         exclude group: 'org.eclipse.jetty'
+        exclude group: 'org.eclipse.jetty.websocket'
         exclude group: 'javax.servlet', module: 'javax.servlet-api'
       }
       grettyRunnerSpringBootTomcatBase "org.akhikhl.gretty:gretty-runner-spring-boot-tomcat:$grettyVersion", {
         // concrete implementation is chosen depending on servletContainer property
         exclude group: 'org.apache.tomcat.embed'
         exclude group: 'javax.servlet', module: 'javax.servlet-api'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
       }
       grettyRunnerSpringBootTomcat "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}", {
@@ -141,10 +155,14 @@ class GrettyPlugin implements Plugin<Project> {
 
     if(project.gretty.springBoot)
       project.dependencies {
-        if(project.configurations.findByName('compile'))
+        if(project.configurations.findByName('compile')) {
           compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
             exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
           }
+          compile "org.springframework:spring-messaging:$springVersion"
+          compile "org.springframework:spring-websocket:$springVersion"
+          compile "ch.qos.logback:logback-classic:$logbackVersion"
+        }
         springBoot "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}"
       }
 

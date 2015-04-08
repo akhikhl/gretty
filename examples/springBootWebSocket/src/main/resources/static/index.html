@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <title>spring-boot websocket</title>
+  </head>
+  <body onload="disconnect()">
+    <h1>spring-boot websocket</h1>
+    <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
+        Javascript and reload this page!</h2></noscript>
+    <div>
+        <div>
+            <button id="connect" onclick="connect();">Connect</button>
+            <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+        </div>
+        <div id="conversationDiv">
+            <label>What is your name?</label><input type="text" id="name" />
+            <button id="sendName" onclick="sendName();">Send</button>
+            <p id="response"></p>
+        </div>
+    </div>
+
+    <script src="webjars/sockjs-client/0.3.4-1/sockjs.min.js"></script>
+    <script src="webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

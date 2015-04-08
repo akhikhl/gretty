@@ -80,6 +80,7 @@ class ServletContainerConfig {
         servletApiDependencies: { project ->
           project.dependencies {
             grettyProvidedCompile jetty9ServletApi
+            grettyProvidedCompile 'javax.websocket:javax.websocket-api:1.0'
           }
         }
       ],

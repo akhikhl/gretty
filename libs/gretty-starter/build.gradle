@@ -33,7 +33,9 @@ processResources {
     tomcat8ServletApiVersion: project.tomcat8_servlet_api_version,
     springBootVersion: project.springBootVersion,
     springLoadedVersion: project.springLoadedVersion,
-    slf4jVersion: project.slf4j_version
+    springVersion: project.springVersion,
+    slf4jVersion: project.slf4j_version,
+    logbackVersion: project.logback_version
   ]
   inputs.properties props
   filter ReplaceTokens, tokens: props
