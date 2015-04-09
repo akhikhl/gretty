@@ -59,7 +59,7 @@ class StarterLauncher extends LauncherBase {
     classPath = classPath.collect { it.absolutePath }.join(System.getProperty('path.separator'))
     // Note that JavaExecParams debugging properties are intentionally ignored.
     // It is supposed that webapp debugging is performed via DefaultLauncher.
-    def procParams = [ javaPath ] + params.jvmArgs + params.systemProperties.collect { k, v -> "-D$k=$v" } + [ '-cp', classPath, params.main ] + params.args
+    def procParams = [ javaPath ] + params.jvmArgs + ['-DgrettyProduct=true'] + params.systemProperties.collect { k, v -> "-D$k=$v" } + [ '-cp', classPath, params.main ] + params.args
     log.debug 'Launching runner process: {}', procParams.join(' ')
     Process proc = procParams.execute()
     proc.waitForProcessOutput(System.out, System.err)

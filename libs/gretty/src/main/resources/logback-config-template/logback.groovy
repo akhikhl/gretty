@@ -4,12 +4,18 @@ String encoderPattern = '%-12date{HH:mm:ss} %-5level %logger{35} - %msg%n'
 String logDir = "$logDir"
 String logFileName = "$logFileName"
 
+def appenders = []
+
+<% if(consoleLogEnabled) { %>
 appender('CONSOLE', ConsoleAppender) {
   encoder(PatternLayoutEncoder) {
     pattern = encoderPattern
   }
 }
+appenders.add('CONSOLE')
+<% } %>
 
+<% if(fileLogEnabled) { %>
 appender('FILE', RollingFileAppender) {
   file = "\${logDir}/\${logFileName}.log"
   append = true
@@ -21,5 +27,7 @@ appender('FILE', RollingFileAppender) {
     pattern = encoderPattern
   }
 }
+appenders.add('FILE')
+<% } %>
 
-root $loggingLevel, ['CONSOLE', 'FILE']
+root $loggingLevel, appenders

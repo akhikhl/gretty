@@ -179,7 +179,7 @@ class ProductConfigurer {
     for(File file in getRunnerFileCollection().files)
       dir.add(file)
 
-    File logbackConfigFile = new File(project.buildDir, 'runner/logback.groovy')
+    File logbackConfigFile = new File(project.buildDir, 'runner/logback.' + getLogbackConfigExtension())
     logbackConfigFile.parentFile.mkdirs()
     logbackConfigFile.text = getRunnerLogbackConfig()
     dir.add(logbackConfigFile, 'logback-config')
@@ -279,6 +279,17 @@ Version: ${project.version}"""
     ['VERSION.txt': text]
   }
 
+  private String getLogbackConfigExtension() {
+    if(sconfig.logbackConfigFile) {
+      def logbackConfigFile = sconfig.logbackConfigFile
+      if(!(logbackConfigFile instanceof File))
+        logbackConfigFile = new File(logbackConfigFile.toString())
+      int extPos = logbackConfigFile.name.lastIndexOf('.')
+      return logbackConfigFile.name.substring(extPos + 1)
+    }
+    'groovy'
+  }
+
   private String getLogbackConfigTemplate() {
     ProductConfigurer.class.classLoader.getResourceAsStream('logback-config-template/logback.groovy').withStream {
       it.text
@@ -300,6 +311,14 @@ Version: ${project.version}"""
   }
 
   private String getRunnerLogbackConfig() {
+
+    if(sconfig.logbackConfigFile) {
+      def logbackConfigFile = sconfig.logbackConfigFile
+      if(!(logbackConfigFile instanceof File))
+        logbackConfigFile = new File(logbackConfigFile.toString())
+      return logbackConfigFile.text
+    }
+
     String logDir = sconfig.logDir
     if(!logDir || logDir == "${System.getProperty('user.home')}/logs")
       logDir = '${System.getProperty(\'user.home\')}/logs'
@@ -311,7 +330,9 @@ Version: ${project.version}"""
     new groovy.text.SimpleTemplateEngine().createTemplate(getLogbackConfigTemplate()).make([
             logDir: logDir,
             logFileName: logFileName,
-            loggingLevel: loggingLevel
+            loggingLevel: loggingLevel,
+            consoleLogEnabled: sconfig.consoleLogEnabled,
+            fileLogEnabled: sconfig.fileLogEnabled
     ]).toString()
   }
 
@@ -333,7 +354,9 @@ Version: ${project.version}"""
     new groovy.text.SimpleTemplateEngine().createTemplate(getLogbackConfigTemplate()).make([
             logDir: logDir,
             logFileName: logFileName,
-            loggingLevel: loggingLevel
+            loggingLevel: loggingLevel,
+            consoleLogEnabled: sconfig.consoleLogEnabled,
+            fileLogEnabled: sconfig.fileLogEnabled
     ]).toString()
   }
 
@@ -484,16 +507,6 @@ Version: ${project.version}"""
           realmConfigFile 'conf/' + getFileName(sconfig.realmConfigFile)
         if(sconfig.serverConfigFile)
           serverConfigFile 'conf/' + getFileName(sconfig.serverConfigFile)
-        if(sconfig.loggingLevel != null)
-          loggingLevel sconfig.loggingLevel
-        if(sconfig.consoleLogEnabled != null)
-          consoleLogEnabled sconfig.consoleLogEnabled
-        if(sconfig.fileLogEnabled != null)
-          fileLogEnabled sconfig.fileLogEnabled
-        if(sconfig.logFileName != null)
-          logFileName sconfig.logFileName
-        if(sconfig.logDir != null)
-          logDir sconfig.logDir
         if(sconfig.secureRandom != null)
           secureRandom sconfig.secureRandom
         if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) })

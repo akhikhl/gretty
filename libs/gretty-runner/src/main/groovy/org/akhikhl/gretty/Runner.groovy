@@ -120,7 +120,8 @@ final class Runner {
         if(!paramsLoaded) {
           params << new JsonSlurper().parseText(data)
           paramsLoaded = true
-          initLogback(params)
+          if(!Boolean.valueOf(System.getProperty('grettyProduct')))
+            initLogback(params)
           serverManager.setParams(params)
           serverManager.startServer(new ServerStartEventImpl())
           // Note that server is already in listening state.
