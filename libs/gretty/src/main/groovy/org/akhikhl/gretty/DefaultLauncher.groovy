@@ -20,9 +20,19 @@ class DefaultLauncher extends LauncherBase {
 
   protected Project project
 
+  ScannerManager scannerManager
+
   DefaultLauncher(Project project, LauncherConfig config) {
     super(config)
     this.project = project
+  }
+
+  protected void afterJavaExec() {
+    scannerManager?.stopScanner()
+  }
+
+  protected void beforeJavaExec() {
+    scannerManager?.startScanner()
   }
 
   protected Collection<URL> getRunnerClassPath() {

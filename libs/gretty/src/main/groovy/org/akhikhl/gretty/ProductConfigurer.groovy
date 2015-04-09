@@ -299,7 +299,6 @@ Version: ${project.version}"""
     FarmConfigurer configurer = new FarmConfigurer(project)
     FarmExtension productFarm = new FarmExtension(project)
     configurer.configureFarm(productFarm,
-      new FarmExtension(project, logDir: 'logs'),
       new FarmExtension(project, serverConfig: product.serverConfig, webAppRefs: product.webAppRefs),
       configurer.findProjectFarm(productName)
     )
@@ -434,6 +433,16 @@ Version: ${project.version}"""
           realmConfigFile 'conf/' + getFileName(sconfig.realmConfigFile)
         if(sconfig.serverConfigFile)
           serverConfigFile 'conf/' + getFileName(sconfig.serverConfigFile)
+        if(sconfig.loggingLevel != null)
+          loggingLevel sconfig.loggingLevel
+        if(sconfig.consoleLogEnabled != null)
+          consoleLogEnabled sconfig.consoleLogEnabled
+        if(sconfig.fileLogEnabled != null)
+          fileLogEnabled sconfig.fileLogEnabled
+        if(sconfig.logFileName != null)
+          logFileName sconfig.logFileName
+        if(sconfig.logDir != null)
+          logDir sconfig.logDir
         if(sconfig.secureRandom != null)
           secureRandom sconfig.secureRandom
         if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) })
@@ -441,7 +450,7 @@ Version: ${project.version}"""
         if(sconfig.singleSignOn != null)
           singleSignOn sconfig.singleSignOn
         if(sconfig.enableNaming != null)
-          enableNaming sconfig.enableNaming
+          enableNaming sconfig.enableNaming        
         if(sconfig.jvmArgs)
           jvmArgs sconfig.jvmArgs
       }

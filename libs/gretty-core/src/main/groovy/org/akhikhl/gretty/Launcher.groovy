@@ -13,12 +13,8 @@ package org.akhikhl.gretty
  * @author akhikhl
  */
 interface Launcher {
-  
-  ScannerManager getScannerManager()
 
   void launch()
   
   Thread launchThread()
-  
-  void setScannerManager(ScannerManager newValue)
 }

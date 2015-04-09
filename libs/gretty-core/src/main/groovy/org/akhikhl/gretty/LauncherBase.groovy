@@ -30,12 +30,16 @@ abstract class LauncherBase implements Launcher {
   protected final Iterable<WebAppConfig> webAppConfigs
   protected serverStartInfo
 
-  ScannerManager scannerManager
-
   LauncherBase(LauncherConfig config) {
     this.config = config
     sconfig = config.getServerConfig()
     webAppConfigs = config.getWebAppConfigs()
+  }
+
+  protected void afterJavaExec() {
+  }
+
+  protected void beforeJavaExec() {
   }
 
   protected static fileToString(file) {
@@ -197,7 +201,7 @@ abstract class LauncherBase implements Launcher {
           c()
         }
         try {
-          scannerManager?.startScanner()
+          beforeJavaExec()
           try {
             JavaExecParams params = new JavaExecParams()
             params.main = 'org.akhikhl.gretty.Runner'
@@ -215,7 +219,7 @@ abstract class LauncherBase implements Launcher {
             }
             javaExec(params)
           } finally {
-            scannerManager?.stopScanner()
+            afterJavaExec()
           }
         } finally {
           for(Closure c in sconfig.onStop) {
