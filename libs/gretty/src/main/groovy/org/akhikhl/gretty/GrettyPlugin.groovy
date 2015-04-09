@@ -93,9 +93,6 @@ class GrettyPlugin implements Plugin<Project> {
 
     String grettyVersion = Externalized.getString('grettyVersion')
     String springBootVersion = project.gretty.springBootVersion ?: (project.hasProperty('springBootVersion') ? project.springBootVersion : Externalized.getString('springBootVersion'))
-    if(project.gretty.servletContainer == 'jetty7' || project.gretty.servletContainer == 'jetty8')
-      // too old servlet API, need to use older spring-boot
-      springBootVersion = '1.1.9.RELEASE'
     String springLoadedVersion = project.gretty.springLoadedVersion ?: (project.hasProperty('springLoadedVersion') ? project.springLoadedVersion : Externalized.getString('springLoadedVersion'))
     String springVersion = project.gretty.springVersion ?: (project.hasProperty('springVersion') ? project.springVersion : Externalized.getString('springVersion'))
     String slf4jVersion = Externalized.getString('slf4jVersion')
