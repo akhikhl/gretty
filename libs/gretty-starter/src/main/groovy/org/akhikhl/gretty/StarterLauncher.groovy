@@ -46,7 +46,7 @@ class StarterLauncher extends LauncherBase {
   protected void javaExec(JavaExecParams params) {
     String javaExe = PlatformUtils.isWindows() ? 'java.exe' : 'java'
     String javaPath = new File(System.getProperty("java.home"), "bin/$javaExe").absolutePath
-    def classPath = [ new File(basedir, 'conf'), new File(basedir, 'runner/*') ]
+    def classPath = [ new File(basedir, 'runner/*'), new File(basedir, 'runner/logback-config') ]
     for(WebAppConfig wconfig in config.getWebAppConfigs())
       if(wconfig.springBoot) {
         File classesDir = new File(wconfig.resourceBase, 'WEB-INF/classes')

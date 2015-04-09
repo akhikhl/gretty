@@ -1,4 +1,5 @@
 /*
+/*
  * Gretty
  *
  * Copyright (C) 2013-2015 Andrey Hihlovskiy and contributors.
@@ -131,6 +132,8 @@ class ProductConfigurer {
         getRunnerFileCollection()
       }
 
+      inputs.property 'logback-config-template', { getLogbackConfigTemplate() }
+
       outputs.dir outputDir
 
       ext.outputDir = outputDir
@@ -176,6 +179,11 @@ class ProductConfigurer {
     for(File file in getRunnerFileCollection().files)
       dir.add(file)
 
+    File logbackConfigFile = new File(project.buildDir, 'runner/logback.groovy')
+    logbackConfigFile.parentFile.mkdirs()
+    logbackConfigFile.text = getRunnerLogbackConfig()
+    dir.add(logbackConfigFile, 'logback-config')
+
     dir.cleanup()
   }
 
@@ -185,6 +193,11 @@ class ProductConfigurer {
 
     for(File file in project.configurations.grettyStarter.files)
       dir.add(file)
+
+    File logbackConfigFile = new File(project.buildDir, 'starter/logback.groovy')
+    logbackConfigFile.parentFile.mkdirs()
+    logbackConfigFile.text = getStarterLogbackConfig()
+    dir.add(logbackConfigFile, 'logback-config')
 
     dir.cleanup()
   }
@@ -253,8 +266,8 @@ class ProductConfigurer {
       'DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"\n'
 
     for(String cmd in ['run', 'start', 'stop', 'restart']) {
-      launchScripts[cmd + '.sh'] = shellResolveDir + 'java -Dfile.encoding=UTF8 -cp \"${DIR}/conf/:${DIR}/starter/*\" ' + mainClass + ' $@ ' + cmd
-      launchScripts[cmd + '.bat'] = '@java.exe -Dfile.encoding=UTF8 -cp \"%~dp0\\conf\\;%~dp0\\starter\\*\" ' + mainClass + ' %* ' + cmd
+      launchScripts[cmd + '.sh'] = shellResolveDir + 'java -Dfile.encoding=UTF8 -cp \"${DIR}/starter/*:${DIR}/starter/logback-config\" ' + mainClass + ' $@ ' + cmd
+      launchScripts[cmd + '.bat'] = '@java.exe -Dfile.encoding=UTF8 -cp \"%~dp0\\starter\\*;%~dp0\\starter\\logback-config\" ' + mainClass + ' %* ' + cmd
     }
   }
 
@@ -264,6 +277,12 @@ Version: ${project.version}"""
     if(addTimeStamp)
       text += "\nCreated: ${new Date()}"
     ['VERSION.txt': text]
+  }
+
+  private String getLogbackConfigTemplate() {
+    ProductConfigurer.class.classLoader.getResourceAsStream('logback-config-template/logback.groovy').withStream {
+      it.text
+    }
   }
 
   protected FileCollection getRunnerFileCollection() {
@@ -280,10 +299,42 @@ Version: ${project.version}"""
     files
   }
 
+  private String getRunnerLogbackConfig() {
+    String logDir = sconfig.logDir
+    if(!logDir || logDir == "${System.getProperty('user.home')}/logs")
+      logDir = '${System.getProperty(\'user.home\')}/logs'
+
+    def logFileName = (sconfig.logFileName ?: productName ?: project.name)
+
+    def loggingLevel = sconfig.loggingLevel ?: 'INFO'
+
+    new groovy.text.SimpleTemplateEngine().createTemplate(getLogbackConfigTemplate()).make([
+            logDir: logDir,
+            logFileName: logFileName,
+            loggingLevel: loggingLevel
+    ]).toString()
+  }
+
   protected String getSpringBootMainClass() {
     sconfig.springBootMainClass ?:
     SpringBootMainClassFinder.findMainClass(project) ?:
     wconfigs.findResult { it.projectPath ? SpringBootMainClassFinder.findMainClass(project.project(it.projectPath)) : null }
+  }
+
+  private String getStarterLogbackConfig() {
+    String logDir = sconfig.logDir
+    if(!logDir || logDir == "${System.getProperty('user.home')}/logs")
+      logDir = '${System.getProperty(\'user.home\')}/logs'
+
+    def logFileName = (sconfig.logFileName ?: productName ?: project.name) + '-starter'
+
+    def loggingLevel = sconfig.loggingLevel ?: 'INFO'
+
+    new groovy.text.SimpleTemplateEngine().createTemplate(getLogbackConfigTemplate()).make([
+            logDir: logDir,
+            logFileName: logFileName,
+            loggingLevel: loggingLevel
+    ]).toString()
   }
 
   protected FileCollection getVisibleRunnerFileCollection() {
