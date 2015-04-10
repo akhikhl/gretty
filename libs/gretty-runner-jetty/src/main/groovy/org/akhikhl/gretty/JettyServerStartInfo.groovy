@@ -46,16 +46,26 @@ class JettyServerStartInfo {
       if(handler.respondsTo('getContextPath')) {
         String contextPath = handler.getContextPath()
         if(httpConn) {
-          log.info '  http://{}:{}{}', (httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host), httpConn.port, contextPath
-          httpConn.with {
-            contextInfo.add([ protocol: 'http', host: host, port: port, contextPath: contextPath, baseURI: "http://${host}:${port}${handler.contextPath}" ])
-          }
+          String host = httpConn.host == '0.0.0.0' ? 'localhost' : httpConn.host          
+          log.info '  http://{}:{}{}', host, httpConn.port, contextPath
+          contextInfo.add([
+            protocol: 'http',
+            host: host,
+            port: httpConn.port,
+            contextPath: contextPath,
+            baseURI: "http://${host}:${httpConn.port}${contextPath}"
+          ])
         }
         if(httpsConn) {
-          log.info '  https://{}:{}{}', (httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host), httpsConn.port, contextPath
-          httpsConn.with {
-            contextInfo.add([ protocol: 'https', host: host, port: port, contextPath: contextPath, baseURI: "https://${host}:${port}${handler.contextPath}" ])
-          }
+          String host = httpsConn.host == '0.0.0.0' ? 'localhost' : httpsConn.host
+          log.info '  https://{}:{}{}', host, httpsConn.port, contextPath
+          contextInfo.add([
+            protocol: 'https',
+            host: host,
+            port: httpsConn.port,
+            contextPath: contextPath,
+            baseURI: "https://${host}:${httpsConn.port}${contextPath}"
+          ])
         }
       }
     }
@@ -65,6 +75,8 @@ class JettyServerStartInfo {
     def serverStartInfo = [ status: 'successfully started' ]
 
     serverStartInfo.host = httpConn?.host ?: httpsConn?.host
+    if(serverStartInfo.host == '0.0.0.0')
+      serverStartInfo.host = 'localhost'
 
     if(httpConn)
       serverStartInfo.httpPort = httpConn.port

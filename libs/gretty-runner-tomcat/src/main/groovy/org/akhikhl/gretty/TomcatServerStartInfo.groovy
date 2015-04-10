@@ -40,25 +40,35 @@ class TomcatServerStartInfo {
 
     List contextInfo = []
 
+    String host = tomcat.hostname == '0.0.0.0' ? 'localhost' : tomcat.hostname
+
     for(Context context in tomcat.host.findChildren().findAll { it instanceof Context }) {
       log.info '{} runs at:', (context.name - '/')
       if(httpConn) {
-        log.info '  http://{}:{}{}', (tomcat.hostname == '0.0.0.0' ? 'localhost' : tomcat.hostname), httpConn.port, context.path
-        httpConn.with {
-          contextInfo.add([ protocol: 'http', host: tomcat.hostname, port: port, contextPath: context.path, baseURI: "http://${tomcat.hostname}:${port}${context.path}" ])
-        }
+        log.info '  http://{}:{}{}', host, httpConn.port, context.path
+        contextInfo.add([
+          protocol: 'http',
+          host: host,
+          port: httpConn.port,
+          contextPath: context.path,
+          baseURI: "http://${host}:${httpConn.port}${context.path}"
+        ])
       }
       if(httpsConn) {
-        log.info '  https://{}:{}{}', (tomcat.hostname == '0.0.0.0' ? 'localhost' : tomcat.hostname), httpsConn.port, context.path
-        httpsConn.with {
-          contextInfo.add([ protocol: 'https', host: tomcat.hostname, port: port, contextPath: context.path, baseURI: "https://${tomcat.hostname}:${port}${context.path}" ])
-        }
+        log.info '  https://{}:{}{}', host, httpsConn.port, context.path
+        contextInfo.add([
+          protocol: 'https',
+          host: host,
+          port: port,
+          contextPath: context.path,
+          baseURI: "https://${host}:${httpsConn.port}${context.path}"
+        ])
       }
     }
 
     def serverStartInfo = [ status: 'successfully started' ]
 
-    serverStartInfo.host = tomcat.hostname
+    serverStartInfo.host = host
 
     if(httpConn)
       serverStartInfo.httpPort = httpConn.port
