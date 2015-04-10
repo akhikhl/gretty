@@ -40,11 +40,11 @@ class RequestResponseIT extends GebReportingSpec {
       $('#message').value('xxx')
       $('#btnSend').click()
       otherBrowser = getCurrentWindow()
-      println "otherBrowser=$otherBrowser"
     }
     $('#username').value('b')
     $('#message').value('yyy')
     $('#btnSend').click()
+    Thread.sleep(200)
     withWindow(otherBrowser) {
       assert $('#chat-content').value().contains('yyy')
     }
