@@ -4,6 +4,32 @@
 
 ### What's new:
 
+#### Version 1.2.1
+
+Gretty version 1.2.1 introduces the following changes:
+
+1. Inheriting logging options to generated product is fixed ([issue #152](https://github.com/akhikhl/gretty/issues/152)).
+
+2. Gretty now provides out-of-the-box websocket support ([issue #155](https://github.com/akhikhl/gretty/issues/155)) and examples of using websocket:
+  * https://github.com/akhikhl/gretty/blob/master/examples/websocket
+  * https://github.com/akhikhl/gretty/blob/master/examples/springBootWebSocket
+
+3. spring-loaded failure under java 8u40 is fixed ([issue #156](https://github.com/akhikhl/gretty/issues/156)).
+
+4. SpringBoot 1.2.x incompatibility with Jetty 8-9 is fixed ([issue #158](https://github.com/akhikhl/gretty/issues/158)).
+
+5. Fixed gretty.baseURI property in integration tests: now it returns "localhost" for all supported servlet containers ([issue #160](https://github.com/akhikhl/gretty/issues/160)).
+
+6. Upgraded to latest components:
+
+```
+tomcat8: 8.0.20 -> 8.0.21
+slf4j-api: 1.7.7 -> 1.7.12
+logback: 1.1.2 -> 1.1.3
+spring-boot: 1.1.9.RELEASE -> 1.2.3.RELEASE
+spring-loaded: 1.2.1.RELEASE -> 1.2.3.RELEASE
+```
+
 #### Version 1.2.0
 
 Gretty version 1.2.0 introduces the following changes:
