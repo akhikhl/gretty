@@ -6,6 +6,8 @@
 [![Snapshot](http://img.shields.io/badge/current-1.2.2--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
+*This "error" ^ is not an error. It seems that services.gradle.org have intermittent problems with their SSL certificate. Please be assured, Gretty compiles just fine against oracle-jdk-7, oracle-jdk-8 and open-jdk-7.*
+
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
 It supports Jetty versions 7, 8 and 9, Tomcat versions 7 and 8, multiple web-apps and many more.
 It wraps servlet container functions as convenient Gradle tasks and configuration DSL.
