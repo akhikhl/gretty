@@ -59,7 +59,7 @@ class TomcatServerStartInfo {
         contextInfo.add([
           protocol: 'https',
           host: host,
-          port: port,
+          port: httpsConn.port,
           contextPath: context.path,
           baseURI: "https://${host}:${httpsConn.port}${context.path}"
         ])
