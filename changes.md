@@ -4,6 +4,10 @@
 
 ### What's new:
 
+#### Version 1.2.2
+
+Gretty version 1.2.2 fixes [issue #163](https://github.com/akhikhl/gretty/issues/152): MissingPropertyException when running Tomcat with HTTPS.
+
 #### Version 1.2.1
 
 Gretty version 1.2.1 introduces the following changes:

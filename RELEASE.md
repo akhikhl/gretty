@@ -1,3 +1,9 @@
+## Gretty 1.2.2 release announcement
+
+Apr 20, 2015: Gretty version 1.2.2 is out and immediately available at github, bintray, maven central and gradle plugin portal!
+
+This is a maintenance release, fixing a single [issue #163](https://github.com/akhikhl/gretty/issues/152): MissingPropertyException when running Tomcat with HTTPS.
+
 ## Gretty 1.2.1 release announcement
 
 Apr 11, 2015: Gretty version 1.2.1 is out and immediately available at github, bintray, maven central and gradle plugin portal!
