@@ -5,8 +5,8 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
-    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.1'
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.1.0'
   }
 }
 
@@ -17,14 +17,20 @@ apply plugin: 'com.jfrog.artifactory'
 ext {
   project_website = "https://github.com/${developerId}/${projectId}"
   project_scm = "scm:git@github.com:${developerId}/${projectId}.git"
-  license_url = "https://raw.github.com/${developerId}/${projectId}/master/license.txt"
+  license_url = "https://raw.github.com/${developerId}/${projectId}/master/LICENSE"
+
+  if( !has( 'bintrayUser' ) )
+    bintrayUser = ''
+
+  if( !has( 'bintrayKey' ) )
+    bintrayKey = ''
+
+  if( !has( 'bintrayKeyPhrase' ) )
+    bintrayKeyPhrase = ''
+    
+  if( !has( 'bintrayDryRun' ) )
+    bintrayDryRun = false
 }
-
-if( !hasProperty( 'bintrayUser' ) )
-  ext.bintrayUser = ''
-
-if( !hasProperty( 'bintrayKey' ) )
-  ext.bintrayKey = ''
 
 task('build')
 
@@ -63,9 +69,6 @@ artifactory {
         repoKey = 'oss-release-local'
       username = project.bintrayUser
       password = project.bintrayKey
-    }
-    defaults {
-      publications 'mavenJava'
     }
   }
   resolve {
