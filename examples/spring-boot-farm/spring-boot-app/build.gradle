@@ -13,8 +13,12 @@ gretty {
 }
 
 farm {
+  managedClassReload = true
+  servletContainer = 'jetty8'
+  httpPort = 8081
   webapp project
-  webapp ':spring-boot-farm:spring-boot-webservice'
+  webapp ':spring-boot-farm:spring-boot-webservice1'
+  webapp ':spring-boot-farm:spring-boot-webservice2'
   webapp ':spring-boot-farm:jee-webservice'
 }
 
@@ -29,7 +33,8 @@ containers.each { container ->
   farms.farm container, {
     servletContainer = container
     webapp project
-    webapp ':spring-boot-farm:spring-boot-webservice'
+    webapp ':spring-boot-farm:spring-boot-webservice1'
+    webapp ':spring-boot-farm:spring-boot-webservice2'
     webapp ':spring-boot-farm:jee-webservice'
     afterEvaluate {
       tasks['farmBeforeIntegrationTest' + container].integrationTestTask 'integrationTest_' + container
@@ -41,3 +46,4 @@ containers.each { container ->
 }
 
 rootProject.tasks.testAll.dependsOn tasks.farmIntegrationTestAllContainers
+

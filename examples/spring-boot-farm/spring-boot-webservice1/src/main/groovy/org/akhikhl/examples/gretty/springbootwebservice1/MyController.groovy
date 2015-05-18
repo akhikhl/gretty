@@ -6,7 +6,7 @@
  * See the file "LICENSE" for copying and usage permission.
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
-package org.akhikhl.examples.gretty.springbootwebservice
+package org.akhikhl.examples.gretty.springbootwebservice1
 
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestMapping

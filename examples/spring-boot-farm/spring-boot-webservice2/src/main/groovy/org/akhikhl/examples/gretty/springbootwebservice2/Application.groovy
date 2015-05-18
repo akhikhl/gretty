@@ -6,7 +6,7 @@
  * See the file "LICENSE" for copying and usage permission.
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
-package org.akhikhl.examples.gretty.springbootwebservice
+package org.akhikhl.examples.gretty.springbootwebservice2
 
 import java.util.Arrays
 
