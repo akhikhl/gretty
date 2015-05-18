@@ -127,6 +127,10 @@ class ProductConfigurer {
 
       inputs.files project.configurations.grettyStarter
 
+      inputs.files project.configurations.grettyProductRuntime
+
+      inputs.files project.configurations.grettyProvidedCompile
+
       inputs.files {
         resolveConfig()
         getRunnerFileCollection()
@@ -216,7 +220,7 @@ class ProductConfigurer {
             for(File f in (webappDir.listFiles() ?: []))
               webappsDir.add(f, appDir)
           def resolvedClassPath = new LinkedHashSet<URL>()
-          resolvedClassPath.addAll(ProjectUtils.getClassPathJars(proj, 'productRuntime'))
+          resolvedClassPath.addAll(ProjectUtils.getClassPathJars(proj, 'grettyProductRuntime'))
           resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
           files = resolvedClassPath.collect { new File(it.path) }
           files -= getVisibleRunnerFileCollection().files

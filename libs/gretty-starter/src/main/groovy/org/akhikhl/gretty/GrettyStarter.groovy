@@ -101,7 +101,7 @@ class GrettyStarter {
 
     def resolveFile = { f ->
       if(f) {
-        File file = new File(f)
+        File file = f instanceof File ? f : new File(f)
         if(!file.isAbsolute())
           file = new File(basedir, f)
         file.exists() ? file : null
@@ -132,6 +132,13 @@ class GrettyStarter {
       wconfig.contextConfigFile = resolveFile(wconfig.contextConfigFile)
       if(wconfig.extraResourceBases)
         wconfig.extraResourceBases = wconfig.extraResourceBases.collect { resolveFile(it) }
+      File classesDir = new File(wconfig.resourceBase, 'WEB-INF/classes')
+      if(classesDir.exists())
+        wconfig.classPath classesDir
+      File libDir = new File(wconfig.resourceBase, 'WEB-INF/lib')
+      if(libDir.exists())
+        for(File jarFile in libDir.listFiles({ it.name.endsWith('.jar') } as FileFilter))
+          wconfig.classPath jarFile
       wconfigs.add(wconfig)
     }
 
@@ -174,6 +181,16 @@ class GrettyStarter {
       }
 
       WebAppClassPathResolver getWebAppClassPathResolver() {
+        new WebAppClassPathResolver() {
+          Collection<URL> resolveWebAppClassPath(WebAppConfig wconfig) {
+            Set<URL> resolvedClassPath = new LinkedHashSet<URL>()
+            if(wconfig.classPath) {
+              for(URL url in wconfig.classPath)
+                resolvedClassPath.add(resolveFile(new File(url.toURI())).toURI().toURL())
+            }
+            resolvedClassPath
+          }
+        }
       }
 
       Iterable<WebAppConfig> getWebAppConfigs() {

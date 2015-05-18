@@ -133,13 +133,14 @@ abstract class StartBaseTask extends DefaultTask {
       WebAppClassPathResolver getWebAppClassPathResolver() {
         new WebAppClassPathResolver() {
           Collection<URL> resolveWebAppClassPath(WebAppConfig wconfig) {
-            def resolvedClassPath = new LinkedHashSet<URL>()
+            Set<URL> resolvedClassPath = new LinkedHashSet<URL>()
             if(wconfig.projectPath) {
               def proj = self.project.project(wconfig.projectPath)
               String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtime'
               resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, wconfig.inplace, runtimeConfig))
               resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
-            }
+            } else if(wconfig.classPath)
+              resolvedClassPath.addAll(wconfig.classPath)
             resolvedClassPath
           }
         }

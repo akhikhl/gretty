@@ -54,8 +54,10 @@ class WebAppConfig {
       if(classPath == null)
         classPath = new LinkedHashSet<URL>()
       for(def arg in args) {
-        if(arg != null)
-          classPath.add(arg)
+        if(arg != null) {
+          URL url = arg instanceof URL ? arg : (arg instanceof File ? ((File)arg).toURI().toURL() : new URL(arg.toString()) )
+          classPath.add(url)
+        }
       }
     }
   }

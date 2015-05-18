@@ -26,6 +26,10 @@ class GrettyPlugin implements Plugin<Project> {
   private void addConfigurations(Project project) {
     def runtimeConfig = project.configurations.findByName('runtime')
     project.configurations {
+      compile {
+        exclude module: 'spring-boot-starter-tomcat'
+        exclude module: 'spring-boot-starter-jetty'
+      }
       gretty
       grettyStarter
       springBoot {
@@ -43,10 +47,9 @@ class GrettyPlugin implements Plugin<Project> {
       grettySpringLoaded {
         transitive = false
       }
-      productRuntime {
+      grettyProductRuntime {
         if(runtimeConfig)
           extendsFrom runtimeConfig
-        exclude group: 'org.springframework.boot'
       }
     }
 

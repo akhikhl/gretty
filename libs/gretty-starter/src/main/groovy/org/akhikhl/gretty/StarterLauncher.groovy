@@ -43,15 +43,6 @@ class StarterLauncher extends LauncherBase {
     String javaExe = PlatformUtils.isWindows() ? 'java.exe' : 'java'
     String javaPath = new File(System.getProperty("java.home"), "bin/$javaExe").absolutePath
     def classPath = [ new File(basedir, 'runner/*'), new File(basedir, 'runner/logback-config') ]
-    for(WebAppConfig wconfig in config.getWebAppConfigs())
-      if(wconfig.springBoot) {
-        File classesDir = new File(wconfig.resourceBase, 'WEB-INF/classes')
-        if(classesDir.exists())
-          classPath.add(classesDir)
-        File libDir = new File(wconfig.resourceBase, 'WEB-INF/lib')
-        if(libDir.exists())
-          classPath.add(new File(libDir, '*'))
-      }
     classPath = classPath.collect { it.absolutePath }.join(System.getProperty('path.separator'))
     // Note that JavaExecParams debugging properties are intentionally ignored.
     // It is supposed that webapp debugging is performed via DefaultLauncher.
