@@ -318,6 +318,8 @@ abstract class LauncherBase implements Launcher {
         { ->
           inplace wconfig.inplace
           inplaceMode wconfig.inplaceMode
+          if(wconfig.springBoot)
+            springBoot true
           self.writeWebAppClassPath(delegate, wconfig)
           contextPath wconfig.contextPath
           resourceBase self.fileToString(wconfig.resourceBase)
@@ -331,8 +333,8 @@ abstract class LauncherBase implements Launcher {
             realmConfigFile self.fileToString(wconfig.realmConfigFile)
           if(wconfig.contextConfigFile)
             contextConfigFile self.fileToString(wconfig.contextConfigFile)
-          if(wconfig.springBootSources)
-            springBootSources wconfig.springBootSources
+          if(wconfig.springBootMainClass)
+            springBootMainClass wconfig.springBootMainClass
         }
       }
     }

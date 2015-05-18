@@ -41,8 +41,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
   private HashSessionManager sharedSessionManager
 
   @Override
-  void addLifeCycleListener(server, listener) {
-    server.addLifeCycleListener(listener as LifeCycle.Listener)
+  void addLifeCycleListener(lifecycle, listener) {
+    lifecycle.addLifeCycleListener(listener as LifeCycleListenerAdapter)
   }
 
   @Override
@@ -206,6 +206,12 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addServerClass('groovyx.')
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.setInitParameter('org.eclipse.jetty.servlet.Default.useFileMappedBuffer', serverParams.productMode ? 'true' : 'false')
+    context.classLoader = new WebAppClassLoader(context)
+    context.addLifeCycleListener(new LifeCycleListenerAdapter() {
+      public void lifeCycleStopped(LifeCycle event) {
+        context.classLoader = null
+      }
+    })
     return context
   }
 

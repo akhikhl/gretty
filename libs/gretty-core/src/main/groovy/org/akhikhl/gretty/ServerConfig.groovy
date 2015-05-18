@@ -55,7 +55,6 @@ class ServerConfig {
   Integer servicePort
   Integer statusPort
   Boolean secureRandom
-  String springBootMainClass
   String springBootVersion
   String springLoadedVersion
   String springVersion

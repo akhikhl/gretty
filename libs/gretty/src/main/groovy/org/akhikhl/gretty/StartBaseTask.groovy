@@ -160,7 +160,7 @@ abstract class StartBaseTask extends DefaultTask {
   }
 
   Launcher getLauncher(LauncherConfig config) {
-    ProjectUtils.anyWebAppUsesSpringBoot(project, config.getWebAppConfigs()) ? new SpringBootLauncher(project, config) : new DefaultLauncher(project, config)
+    new DefaultLauncher(project, config)
   }
 
   Collection<URL> getRunnerClassPath() {

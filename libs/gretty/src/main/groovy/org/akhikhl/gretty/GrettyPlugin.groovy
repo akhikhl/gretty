@@ -11,6 +11,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import groovy.util.XmlSlurper
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -31,34 +32,13 @@ class GrettyPlugin implements Plugin<Project> {
         if(runtimeConfig)
           extendsFrom runtimeConfig
         exclude module: 'spring-boot-starter-tomcat'
+        exclude module: 'spring-boot-starter-jetty'
         exclude group: 'org.eclipse.jetty'
         exclude group: 'org.eclipse.jetty.websocket'
       }
       grettyNoSpringBoot {
         extendsFrom project.configurations.gretty
-        exclude group: 'org.springframework.boot', module: 'spring-boot'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-autoconfigure'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
-      }
-      grettyRunnerSpringBootBase
-      grettyRunnerSpringBoot {
-        extendsFrom project.configurations.grettyRunnerSpringBootBase
-      }
-      grettyRunnerSpringBootJettyBase {
-        extendsFrom project.configurations.grettyRunnerSpringBoot
-      }
-      grettyRunnerSpringBootJetty {
-        extendsFrom project.configurations.grettyRunnerSpringBootJettyBase
-      }
-      grettyRunnerSpringBootTomcatBase {
-        extendsFrom project.configurations.grettyRunnerSpringBoot
-      }
-      grettyRunnerSpringBootTomcat {
-        extendsFrom project.configurations.grettyRunnerSpringBootTomcatBase
+        exclude group: 'org.springframework.boot'
       }
       grettySpringLoaded {
         transitive = false
@@ -66,13 +46,7 @@ class GrettyPlugin implements Plugin<Project> {
       productRuntime {
         if(runtimeConfig)
           extendsFrom runtimeConfig
-        exclude group: 'org.springframework.boot', module: 'spring-boot'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-autoconfigure'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+        exclude group: 'org.springframework.boot'
       }
     }
 
@@ -100,39 +74,6 @@ class GrettyPlugin implements Plugin<Project> {
 
     project.dependencies {
       grettyStarter "org.akhikhl.gretty:gretty-starter:$grettyVersion"
-      grettyRunnerSpringBootBase "org.akhikhl.gretty:gretty-runner-spring-boot:$grettyVersion", {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
-      }
-      grettyRunnerSpringBoot "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-      }
-      grettyRunnerSpringBoot "org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}", {
-        exclude group: 'org.apache.tomcat.embed'
-      }
-      grettyRunnerSpringBootJettyBase "org.akhikhl.gretty:gretty-runner-spring-boot-jetty:$grettyVersion", {
-        // concrete implementation is chosen depending on servletContainer property
-        exclude group: 'org.akhikhl.gretty', module: 'gretty-runner-jetty9'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-      }
-      grettyRunnerSpringBootJetty "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}", {
-        exclude group: 'org.eclipse.jetty'
-        exclude group: 'org.eclipse.jetty.websocket'
-        exclude group: 'javax.servlet', module: 'javax.servlet-api'
-      }
-      grettyRunnerSpringBootTomcatBase "org.akhikhl.gretty:gretty-runner-spring-boot-tomcat:$grettyVersion", {
-        // concrete implementation is chosen depending on servletContainer property
-        exclude group: 'org.apache.tomcat.embed'
-        exclude group: 'javax.servlet', module: 'javax.servlet-api'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-jetty'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-      }
-      grettyRunnerSpringBootTomcat "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}", {
-        exclude group: 'org.apache.tomcat.embed'
-        exclude group: 'javax.servlet', module: 'javax.servlet-api'
-      }
       grettySpringLoaded "org.springframework:springloaded:$springLoadedVersion"
     }
 
@@ -150,18 +91,20 @@ class GrettyPlugin implements Plugin<Project> {
       closure(project)
     }
 
-    if(project.gretty.springBoot)
-      project.dependencies {
-        if(project.configurations.findByName('compile')) {
-          compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}", {
-            exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-          }
-          compile "org.springframework:spring-messaging:$springVersion"
-          compile "org.springframework:spring-websocket:$springVersion"
-          compile "ch.qos.logback:logback-classic:$logbackVersion"
-        }
-        springBoot "org.springframework.boot:spring-boot-starter-jetty:${springBootVersion}"
+    if(project.gretty.springBoot) {
+      String configName = project.configurations.findByName('compile') ? 'compile' : 'springBoot'
+      project.dependencies.add configName, "org.springframework.boot:spring-boot-starter-web:$springBootVersion", {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
       }
+      project.dependencies.add configName, "org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}", {
+        exclude group: 'org.apache.tomcat.embed'
+      }
+      project.dependencies.add configName, "org.springframework:spring-messaging:$springVersion"
+      project.dependencies.add configName, "org.springframework:spring-websocket:$springVersion"
+      project.dependencies.add configName, "ch.qos.logback:logback-classic:$logbackVersion"
+      configName = project.configurations.findByName('runtime') ? 'runtime' : 'springBoot'
+      project.dependencies.add configName, "org.akhikhl.gretty:gretty-springboot:$grettyVersion"
+    }
 
     for(String overlay in project.gretty.overlays)
       project.dependencies.add 'grettyProvidedCompile', project.project(overlay)

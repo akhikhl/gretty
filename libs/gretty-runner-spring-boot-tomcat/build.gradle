@@ -1,7 +1,0 @@
-apply from: rootProject.file('libs/common.gradle')
-
-dependencies {
-  compile project(':libs:gretty-runner-spring-boot')
-  compile project(':libs:gretty-runner-tomcat')
-  runtime "org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion"
-}

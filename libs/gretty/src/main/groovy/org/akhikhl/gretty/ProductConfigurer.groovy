@@ -298,16 +298,7 @@ Version: ${project.version}"""
 
   protected FileCollection getRunnerFileCollection() {
     def servletContainerConfig = ServletContainerConfig.getConfig(sconfig.servletContainer)
-    def files = project.configurations.grettyNoSpringBoot
-    if(ProjectUtils.anyWebAppUsesSpringBoot(project, wconfigs)) {
-      files += project.configurations[servletContainerConfig.servletContainerRunnerConfig]
-      if(servletContainerConfig.servletContainerType == 'jetty')
-        files += project.configurations.grettyRunnerSpringBootJetty
-      else if(servletContainerConfig.servletContainerType == 'tomcat')
-        files += project.configurations.grettyRunnerSpringBootTomcat
-    } else
-      files += project.configurations[servletContainerConfig.servletContainerRunnerConfig]
-    files
+    project.configurations.grettyNoSpringBoot + project.configurations[servletContainerConfig.servletContainerRunnerConfig]
   }
 
   private String getRunnerLogbackConfig() {
@@ -334,12 +325,6 @@ Version: ${project.version}"""
             consoleLogEnabled: sconfig.consoleLogEnabled,
             fileLogEnabled: sconfig.fileLogEnabled
     ]).toString()
-  }
-
-  protected String getSpringBootMainClass() {
-    sconfig.springBootMainClass ?:
-    SpringBootMainClassFinder.findMainClass(project) ?:
-    wconfigs.findResult { it.projectPath ? SpringBootMainClassFinder.findMainClass(project.project(it.projectPath)) : null }
   }
 
   private String getStarterLogbackConfig() {
@@ -400,7 +385,7 @@ Version: ${project.version}"""
 
     // there are cases when springBootMainClass was accessed too early (in configuration phase),
     // so we neeed to recalculate it.
-    if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) } && jsonConfig.content.springBootMainClass == null) {
+    if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) && it.springBootMainClass == null }) {
       for(WebAppConfig wconfig in wconfigs)
         ProjectUtils.prepareToRun(project, wconfig)
       jsonConfig = writeConfigToJson()
@@ -509,8 +494,6 @@ Version: ${project.version}"""
           serverConfigFile 'conf/' + getFileName(sconfig.serverConfigFile)
         if(sconfig.secureRandom != null)
           secureRandom sconfig.secureRandom
-        if(wconfigs.find { ProjectUtils.isSpringBootApp(project, it) })
-          springBootMainClass self.getSpringBootMainClass()
         if(sconfig.singleSignOn != null)
           singleSignOn sconfig.singleSignOn
         if(sconfig.enableNaming != null)
@@ -539,8 +522,8 @@ Version: ${project.version}"""
             contextConfigFile appConfigDir + '/' + getFileName(wconfig.contextConfigFile)
           if(ProjectUtils.isSpringBootApp(project, wconfig))
             springBoot true
-          if(wconfig.springBootSources)
-            springBootSources wconfig.springBootSources
+          if(wconfig.springBootMainClass)
+            springBootMainClass wconfig.springBootMainClass
         }
       }
     } // json

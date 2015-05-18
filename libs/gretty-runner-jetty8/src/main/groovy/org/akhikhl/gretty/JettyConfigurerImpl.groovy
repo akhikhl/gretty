@@ -44,8 +44,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
   private HashSessionManager sharedSessionManager
 
   @Override
-  void addLifeCycleListener(server, listener) {
-    server.addLifeCycleListener(listener as LifeCycle.Listener)
+  void addLifeCycleListener(lifecycle, listener) {
+    lifecycle.addLifeCycleListener(listener as LifeCycleListenerAdapter)
   }
 
   @Override
@@ -201,6 +201,13 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addServerClass('groovy.')
     context.addServerClass('groovyx.')
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
+    context.classLoader = new WebAppClassLoader(context)
+    context.addLifeCycleListener(new LifeCycleListenerAdapter() {
+      public void lifeCycleStopped(LifeCycle event) {
+        context.classLoader = null
+      }
+    })
+    context.setAttribute('org.eclipse.jetty.server.webapp.ContainerExcludeJarPattern', getAnnotationExcludeJarPattern())
     return context
   }
 
@@ -224,6 +231,17 @@ class JettyConfigurerImpl implements JettyConfigurer {
     if(res.exists())
       return res.getURL()
     null
+  }
+
+  private String getAnnotationExcludeJarPattern() {
+    String result
+    URLConnection resConn = this.getClass().getResource('AnnotationExcludeJarPattern.txt').openConnection()
+    // this fixes exceptions when reloading classes in running application
+    resConn.setUseCaches(false)
+    resConn.getInputStream().withStream {
+      result = it.readLines('UTF-8').join('|')
+    }
+    result
   }
 
   @Override

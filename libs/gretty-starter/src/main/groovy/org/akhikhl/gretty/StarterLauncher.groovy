@@ -38,10 +38,6 @@ class StarterLauncher extends LauncherBase {
     starterConfig.servletContainer.description
   }
 
-  protected String getServerManagerFactory() {
-    config.getWebAppConfigs().find { it.springBoot } ? 'org.akhikhl.gretty.SpringBootServerManagerFactory' : 'org.akhikhl.gretty.ServerManagerFactory'
-  }
-
   @Override
   protected void javaExec(JavaExecParams params) {
     String javaExe = PlatformUtils.isWindows() ? 'java.exe' : 'java'
@@ -68,22 +64,5 @@ class StarterLauncher extends LauncherBase {
   @Override
   protected void rebuildWebapps() {
     println 'Cannot rebuild application in StarterLauncher'
-  }
-
-  @Override
-  protected void writeRunConfigJson(json) {
-    super.writeRunConfigJson(json)
-    json.with {
-      if(config.getServerConfig().springBootMainClass)
-        springBootMainClass config.getServerConfig().springBootMainClass
-    }
-  }
-
-  protected void writeWebAppClassPath(json, WebAppConfig wconfig) {
-    if(wconfig.springBoot) {
-      json.springBoot true
-      return // webapp classpath is passed directly to the runner
-    }
-    super.writeWebAppClassPath(json, wconfig)
   }
 }

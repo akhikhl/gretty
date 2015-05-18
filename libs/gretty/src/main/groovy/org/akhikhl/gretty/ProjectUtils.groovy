@@ -241,19 +241,8 @@ final class ProjectUtils {
 
   static void prepareToRun(Project project, WebAppConfig wconfig) {
     wconfig.prepareToRun()
-    Set springBootSources = new LinkedHashSet()
-    if(wconfig.springBootSources) {
-      if(wconfig.springBootSources instanceof Collection)
-        springBootSources += wconfig.springBootSources
-      else
-        springBootSources += wconfig.springBootSources.toString().split(',').collect { it.trim() }
-    }
-    if(wconfig.projectPath && wconfig.projectPath != project.path && isSpringBootApp(project, wconfig)) {
-      String mainClass = SpringBootMainClassFinder.findMainClass(project.project(wconfig.projectPath))
-      if(mainClass && mainClass.contains('.'))
-        springBootSources += mainClass.substring(0, mainClass.lastIndexOf('.'))
-    }
-    wconfig.springBootSources = springBootSources.join(',')
+    if(!wconfig.springBootMainClass && wconfig.projectPath && isSpringBootApp(project, wconfig))
+      wconfig.springBootMainClass = SpringBootMainClassFinder.findMainClass(project.project(wconfig.projectPath))
   }
 
   static Set<URL> resolveClassPath(Project project, Collection<URL> classPath) {

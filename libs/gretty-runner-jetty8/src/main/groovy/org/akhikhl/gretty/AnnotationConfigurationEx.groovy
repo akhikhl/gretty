@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 
 import org.eclipse.jetty.annotations.*
 import org.eclipse.jetty.annotations.AnnotationParser.DiscoverableAnnotationHandler
+import org.eclipse.jetty.util.MultiMap
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.webapp.WebAppContext
 
@@ -36,6 +37,14 @@ class AnnotationConfigurationEx extends AnnotationConfiguration {
       }
     }
 
+    MultiMap map = new MultiMap()
+    context.setAttribute(CLASS_INHERITANCE_MAP, map)
+    _classInheritanceHandler = new ClassInheritanceHandler(map) {
+      public void handle(String className, int version, int access, String signature, String superName, String[] interfaces) {
+        super.handle(className, version, access, signature, superName, interfaces)
+      }
+    }
+
     //Regardless of metadata, if there are any ServletContainerInitializers with @HandlesTypes, then we need to scan all the
     //classes so we can call their onStartup() methods correctly
     createServletContainerInitializerAnnotationHandlers(context, getNonExcludedInitializers(context))
@@ -49,11 +58,20 @@ class AnnotationConfigurationEx extends AnnotationConfiguration {
     }
   }
 
+  @Override
+  protected AnnotationParser createAnnotationParser() {
+    return new AnnotationParserEx()
+  }
+
   private void parseAnnotations(WebAppContext context) {
 
     def containerIncludeJarPattern = context.getAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern')
     if(containerIncludeJarPattern)
       containerIncludeJarPattern = java.util.regex.Pattern.compile(containerIncludeJarPattern)
+
+    def containerExcludeJarPattern = context.getAttribute('org.eclipse.jetty.server.webapp.ContainerExcludeJarPattern')
+    if(containerExcludeJarPattern)
+      containerExcludeJarPattern = java.util.regex.Pattern.compile(containerExcludeJarPattern)
 
     AnnotationParser parser = createAnnotationParser()
 
@@ -63,6 +81,8 @@ class AnnotationConfigurationEx extends AnnotationConfiguration {
       if (res == null)
         continue
       if(containerIncludeJarPattern != null && !(url.toString() =~ containerIncludeJarPattern))
+        continue
+      if(containerExcludeJarPattern != null && (url.toString() =~ containerExcludeJarPattern))
         continue
 
       parser.clearHandlers()
@@ -74,19 +94,18 @@ class AnnotationConfigurationEx extends AnnotationConfiguration {
       parser.registerHandler(_classInheritanceHandler)
       parser.registerHandlers(_containerInitializerAnnotationHandlers)
 
-      parser.parse(res,
-        new ClassNameResolver() {
+      parser.parse(res, new ClassNameResolver() {
 
-          @Override
-          public boolean isExcluded (String name) {
-            return context.isSystemClass(name)
-          }
+        @Override
+        public boolean isExcluded (String name) {
+          return context.isSystemClass(name)
+        }
 
-          @Override
-          public boolean shouldOverride (String name) {
-            //looking at webapp classpath, found already-parsed class of same name - did it come from system or duplicate in webapp?
-            return !context.isParentLoaderPriority()
-          }
+        @Override
+        public boolean shouldOverride (String name) {
+          //looking at webapp classpath, found already-parsed class of same name - did it come from system or duplicate in webapp?
+          return !context.isParentLoaderPriority()
+        }
       })
     }
   }

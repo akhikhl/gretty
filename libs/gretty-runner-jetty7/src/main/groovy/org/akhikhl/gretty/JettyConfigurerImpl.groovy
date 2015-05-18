@@ -44,8 +44,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
   private HashSessionManager sharedSessionManager
 
   @Override
-  void addLifeCycleListener(server, listener) {
-    server.addLifeCycleListener(listener as LifeCycle.Listener)
+  void addLifeCycleListener(lifecycle, listener) {
+    lifecycle.addLifeCycleListener(listener as LifeCycle.Listener)
   }
 
   @Override

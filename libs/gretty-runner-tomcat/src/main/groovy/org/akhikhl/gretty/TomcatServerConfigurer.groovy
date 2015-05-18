@@ -216,6 +216,10 @@ class TomcatServerConfigurer {
       parentClassLoader.addServerClass('groovyx.')
       URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
       URLClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
+      if(webapp.springBoot) {
+        Class AppServletInitializer = Class.forName('org.akhikhl.gretty.AppServletInitializer', true, classLoader)
+        AppServletInitializer.springBootMainClass = webapp.springBootMainClass
+      }
       context.addLifecycleListener(new SpringloadedCleanup())
       context.setParentClassLoader(classLoader)
       context.setJarScanner(configurer.createJarScanner(context.getJarScanner(), new JarSkipPatterns()))

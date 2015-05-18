@@ -47,7 +47,7 @@ class WebAppConfig {
   String inplaceMode
 
   Boolean springBoot
-  def springBootSources
+  String springBootMainClass
 
   void classPath(Object... args) {
     if(args) {

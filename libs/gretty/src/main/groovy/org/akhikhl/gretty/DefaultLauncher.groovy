@@ -36,7 +36,9 @@ class DefaultLauncher extends LauncherBase {
   }
 
   protected Collection<URL> getRunnerClassPath() {
-    (project.configurations.gretty + project.configurations[getServletContainerConfig().servletContainerRunnerConfig]).files.collect { it.toURI().toURL() }
+    def files = project.configurations.grettyNoSpringBoot.files +
+        project.configurations[getServletContainerConfig().servletContainerRunnerConfig].files
+    (files.collect { it.toURI().toURL() }) as LinkedHashSet
   }
 
   protected Map getServletContainerConfig() {
