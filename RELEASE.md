@@ -1,3 +1,17 @@
+## Gretty 1.2.3 release announcement
+
+May 18, 2015: Gretty version 1.2.3 is out and immediately available at github, bintray, maven central and gradle plugin portal!
+
+Gretty version 1.2.3 introduces the following changes:
+
+1. Resolved issue #175 "SpringBoot applications are not isolated from one another in farm and product runs"
+
+2. Resolved issues with logging: #164, #145, #133
+
+3. Upgraded to Tomcat 7.0.61 and Tomcat 8.0.22
+
+4. Upgrade and tests on Gradle 2.4 (Gradle versions >= 1.10 are still supported)
+
 ## Gretty 1.2.2 release announcement
 
 Apr 20, 2015: Gretty version 1.2.2 is out and immediately available at github, bintray, maven central and gradle plugin portal!

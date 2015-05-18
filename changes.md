@@ -4,6 +4,16 @@
 
 ### What's new:
 
+#### Version 1.2.3
+
+1. Resolved issue #175 "SpringBoot applications are not isolated from one another in farm and product runs"
+
+2. Resolved issues with logging: #164, #145, #133
+
+3. Upgraded to Tomcat 7.0.61 and Tomcat 8.0.22
+
+4. Upgrade and tests on Gradle 2.4 (Gradle versions >= 1.10 are still supported)
+
 #### Version 1.2.2
 
 Gretty version 1.2.2 fixes [issue #163](https://github.com/akhikhl/gretty/issues/152): MissingPropertyException when running Tomcat with HTTPS.
