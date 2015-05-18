@@ -24,7 +24,6 @@ class GrettyPlugin implements Plugin<Project> {
   protected static final Logger log = LoggerFactory.getLogger(GrettyPlugin)
 
   private void addConfigurations(Project project) {
-    def runtimeConfig = project.configurations.findByName('runtime')
     project.configurations {
       compile {
         exclude module: 'spring-boot-starter-tomcat'
@@ -33,8 +32,6 @@ class GrettyPlugin implements Plugin<Project> {
       gretty
       grettyStarter
       springBoot {
-        if(runtimeConfig)
-          extendsFrom runtimeConfig
         exclude module: 'spring-boot-starter-tomcat'
         exclude module: 'spring-boot-starter-jetty'
         exclude group: 'org.eclipse.jetty'
@@ -47,22 +44,32 @@ class GrettyPlugin implements Plugin<Project> {
       grettySpringLoaded {
         transitive = false
       }
-      grettyProductRuntime {
-        if(runtimeConfig)
-          extendsFrom runtimeConfig
-      }
+      grettyProductRuntime
+      grettyProvidedCompile
+      project.configurations.findByName('compile')?.extendsFrom grettyProvidedCompile
     }
-
-    if(!project.configurations.findByName('grettyProvidedCompile'))
-      project.configurations {
-        grettyProvidedCompile
-        project.configurations.findByName('compile')?.extendsFrom grettyProvidedCompile
-      }
 
     ServletContainerConfig.getConfigs().each { configName, config ->
       project.configurations.create config.servletContainerRunnerConfig
     }
+  }
 
+  private void addConfigurationsAfterEvaluate(Project project) {
+    def runtimeConfig = project.configurations.findByName('runtime')
+    project.configurations {
+      springBoot {
+        if (runtimeConfig)
+          extendsFrom runtimeConfig
+      }
+      grettyProductRuntime {
+        if (runtimeConfig)
+          extendsFrom runtimeConfig
+      }
+    }
+    // need to configure providedCompile, so that war excludes grettyProvidedCompile artifacts
+    def providedCompile = project.configurations.findByName('providedCompile')
+    if(providedCompile)
+      providedCompile.extendsFrom project.configurations.grettyProvidedCompile
     SpringBootResolutionStrategy.apply(project)
   }
 
@@ -574,6 +581,10 @@ class GrettyPlugin implements Plugin<Project> {
 
     if(project.extensions.findByName('gretty')) {
 
+      addConfigurationsAfterEvaluate(project)
+      addTaskDependencies(project)
+      new ProductsConfigurer(project).configureProducts()
+
       if(project.gretty.autoConfigureRepositories)
         addRepositories(project)
 
@@ -653,9 +664,6 @@ class GrettyPlugin implements Plugin<Project> {
       tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
     }
 
-    addExtensions(project)
-    addConfigurations(project)
-
     if(!project.tasks.findByName('run'))
       project.task('run', group: 'gretty') {
         description = 'Starts web-app inplace, in interactive mode. Same as appRun task.'
@@ -666,9 +674,8 @@ class GrettyPlugin implements Plugin<Project> {
         description = 'Starts web-app inplace, in debug and interactive mode. Same as appRunDebug task.'
       }
 
-    addTaskDependencies(project)
-
-    new ProductsConfigurer(project).configureProducts()
+    addExtensions(project)
+    addConfigurations(project)
 
     if(!project.rootProject.hasProperty('gretty_')) {
       Project rootProject = project.rootProject

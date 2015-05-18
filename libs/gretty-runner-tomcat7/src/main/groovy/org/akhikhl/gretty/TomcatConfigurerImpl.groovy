@@ -27,12 +27,6 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   private static final Logger log = LoggerFactory.getLogger(TomcatConfigurerImpl)
 
-  protected static boolean isServletApi(String filePath) {
-    filePath.matches(/^.*servlet-api.*\.jar$/)
-  }
-
-  protected Set virtualWebInfLibs = new LinkedHashSet()
-
   @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
 
@@ -55,7 +49,7 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   @Override
   JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns) {
-    new JarScannerEx(skipPatterns, virtualWebInfLibs)
+    new JarScannerEx(skipPatterns)
   }
 
   @Override
@@ -77,10 +71,9 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
     Set classpathJarParentDirs = new LinkedHashSet()
 
-    webappParams.webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.each {
+    webappParams.webappClassPath.findAll { it.endsWith('.jar') }.each {
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
       classpathJarParentDirs.add jarFile.parentFile.absolutePath
-      virtualWebInfLibs.add('/WEB-INF/lib/' + jarFile.name)
     }
 
     extraResourcePaths += classpathJarParentDirs.collect { "/WEB-INF/lib=$it" }

@@ -87,7 +87,11 @@ final class ProjectUtils {
       urls.addAll proj.sourceSets.main.output.files.collect { it.toURI().toURL() }
     def dependencyConfig = proj.configurations.findByName(dependencyConfigName)
     if(dependencyConfig) {
-      urls.addAll((dependencyConfig.fileCollection({ !(it instanceof ProjectDependency) }) - proj.configurations.grettyProvidedCompile).collect { it.toURI().toURL() })
+      def files = dependencyConfig.fileCollection { !(it instanceof ProjectDependency) }
+      def grettyProvidedCompileConfig = proj.configurations.findByName('grettyProvidedCompile')
+      if(grettyProvidedCompileConfig)
+        files = files - grettyProvidedCompileConfig
+      urls.addAll(files.collect { it.toURI().toURL() })
       dependencyConfig.allDependencies.withType(ProjectDependency).each { dep ->
         addProjectClassPathWithDependencies(urls, dep.getDependencyProject(), dependencyConfigName)
       }
@@ -100,7 +104,11 @@ final class ProjectUtils {
       def addProjectClassPath
       addProjectClassPath = { Project proj ->
         urls.addAll(project.tasks.jar.archivePath.toURI().toURL())
-        urls.addAll((proj.configurations[dependencyConfig] - proj.configurations.grettyProvidedCompile).files.collect { it.toURI().toURL() })
+        def files = proj.configurations[dependencyConfig]
+        def grettyProvidedCompileConfig = proj.configurations.findByName('grettyProvidedCompile')
+        if(grettyProvidedCompileConfig)
+          files = files - grettyProvidedCompileConfig
+        urls.addAll(files.files.collect { it.toURI().toURL() })
         // ATTENTION: order of overlay classpath is important!
         if(proj.extensions.findByName('gretty'))
           for(String overlay in proj.gretty.overlays.reverse())

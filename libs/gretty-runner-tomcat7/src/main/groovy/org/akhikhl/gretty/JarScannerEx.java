@@ -35,8 +35,6 @@ import org.apache.tomcat.util.scan.Constants;
  * original version includes:
  * <ul>
  * <li>skipPatterns parameter, allowing to specify jar skip patterns.</li>
- * <li>virtualWebInfLibs parameter, allowing to specify which jars in
- * WEB-INF/lib are "virtual" and should be skipped.</li>
  * </ul>
  *
  * @author akhikhl
@@ -48,11 +46,9 @@ public class JarScannerEx implements JarScanner {
   private static final Set<String> defaultJarsToSkip = new HashSet<String>();
 
   protected final JarSkipPatterns skipPatterns;
-  protected final Set virtualWebInfLibs;
 
-  JarScannerEx(JarSkipPatterns skipPatterns, Set virtualWebInfLibs) {
+  JarScannerEx(JarSkipPatterns skipPatterns) {
     this.skipPatterns = skipPatterns;
-    this.virtualWebInfLibs = virtualWebInfLibs;
   }
 
   /**
@@ -165,7 +161,6 @@ public class JarScannerEx implements JarScanner {
       while (it.hasNext()) {
         String path = it.next();
         if (path.endsWith(Constants.JAR_EXT)
-                && !virtualWebInfLibs.contains(path)
                 && !Matcher.matchName(ignoredJars,
                         path.substring(path.lastIndexOf("/") + 1))) {
           // Need to scan this JAR

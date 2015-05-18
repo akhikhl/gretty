@@ -55,10 +55,8 @@ class JarSkipPatterns {
     // gretty-specific
     'commons-configuration*.jar',
     'ecj-*.jar',
-    'gretty-runner*.jar',
     'groovy-all*.jar',
     'groovy-backports-*.jar',
-    'javax.servlet*.jar',
     'jcl-over-slf4j*.jar',
     'jul-to-slf4j*.jar',
     'logback*.jar',
