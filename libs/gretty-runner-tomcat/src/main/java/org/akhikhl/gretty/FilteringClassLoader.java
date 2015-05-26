@@ -50,7 +50,7 @@ public class FilteringClassLoader extends URLClassLoader {
   public Enumeration<URL> getResources(String name) throws IOException {
     for(String serverResource : serverResources)
       if(name.startsWith(serverResource))
-        return Collections.emptyEnumeration();
+        return Collections.enumeration(Collections.<URL>emptySet());
     return super.getResources(name);
   }
 }
