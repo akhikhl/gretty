@@ -13,6 +13,9 @@ import org.gradle.api.Project
 import groovy.util.XmlSlurper
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.file.CopySpec
+import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.tasks.Copy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 /**
@@ -139,7 +142,7 @@ class GrettyPlugin implements Plugin<Project> {
     def runtimeConfig = project.configurations.findByName('runtime')
     if(runtimeConfig) {
       def artifacts = runtimeConfig.copyRecursive().resolvedConfiguration.resolvedArtifacts
-      if(artifacts.find { it.name == 'slf4j-api' } && !artifacts.find { it.name in ['slf4j-nop', 'slf4j-simple', 'slf4j-log4j12', 'slf4j-jdk14', 'logback-classic'] }) {
+      if(artifacts.find { it.name == 'slf4j-api' } && !artifacts.find { it.name in ['slf4j-nop', 'slf4j-simple', 'slf4j-log4j12', 'slf4j-jdk14', 'logback-classic', 'log4j-slf4j-impl'] }) {
         project.dependencies {
           compile "org.slf4j:slf4j-nop:$slf4jVersion"
         }
@@ -203,23 +206,33 @@ class GrettyPlugin implements Plugin<Project> {
 
     if(project.tasks.findByName('classes')) { // JVM project?
 
-      project.task('prepareInplaceWebAppFolder', group: 'gretty') {
+      project.task('prepareInplaceWebAppFolder', group: 'gretty', type: Copy) {
+
         description = 'Copies webAppDir of this web-app and all overlays (if any) to ${buildDir}/inplaceWebapp'
+
         def getInplaceMode = {
-            project.tasks.findByName('appRun').effectiveInplaceMode
+          project.tasks.findByName('appRun').effectiveInplaceMode
         }
-        inputs.dir ProjectUtils.getWebAppDir(project)
+
         // We should track changes in inplaceMode value or plugin would show UP-TO-DATE for this task
         // even if inplaceMode was changed
         inputs.property('inplaceMode', getInplaceMode)
-        outputs.dir "${project.buildDir}/inplaceWebapp"
-        doLast {
-            if(getInplaceMode() != 'hard') {
-                // Skipping this task for hard inplaceMode.
-                ProjectUtils.prepareInplaceWebAppFolder(project)
-            }
+
+        onlyIf { getInplaceMode() != 'hard' }
+
+        for(String overlay in project.gretty.overlays) {
+          Project overlayProject = project.project(overlay)
+          dependsOn { overlayProject.tasks.findByName('prepareInplaceWebAppFolder') }
+          from "${overlayProject.buildDir}/inplaceWebapp"
         }
 
+        from { ProjectUtils.getWebAppDir(project) }
+
+        def closure = project.gretty.webappCopy
+        closure = closure.rehydrate(it, closure.owner, closure.thisObject)
+        closure()
+
+        into "${project.buildDir}/inplaceWebapp"
       }
 
       project.task('prepareInplaceWebAppClasses', group: 'gretty') {
