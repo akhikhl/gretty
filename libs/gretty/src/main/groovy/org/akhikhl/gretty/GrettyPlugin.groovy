@@ -675,14 +675,12 @@ class GrettyPlugin implements Plugin<Project> {
       tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
     }
 
-    if(!project.tasks.findByName('run')) {
+    if(!project.tasks.findByName('run'))
       project.task('run', group: 'gretty') {
         description = 'Starts web-app inplace, in interactive mode. Same as appRun task.'
+        dependsOn 'appRun'
       }
-
-      project.tasks.run.dependsOn 'appRun'
-    }
-
+    
     if(!project.tasks.findByName('debug'))
       project.task('debug', group: 'gretty') {
         description = 'Starts web-app inplace, in debug and interactive mode. Same as appRunDebug task.'
