@@ -250,7 +250,11 @@ class GrettyPlugin implements Plugin<Project> {
 
       def archiveTask = project.tasks.findByName('war') ?: project.tasks.jar
 
-      archiveTask.configure project.gretty.webappCopy
+      archiveTask.configure {
+        def closure = project.gretty.webappCopy
+        closure = closure.rehydrate(it, closure.owner, closure.thisObject)
+        closure()
+      }
 
       if(project.gretty.overlays) {
 
