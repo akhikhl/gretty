@@ -64,13 +64,16 @@ final class JettyScannerManager implements ScannerManager {
       }
   }
 
-  private void configureFastReload() {
+  private void configureFastReload(List<File> scanDirs) {
     fastReloadMap = [:]
     for(WebAppConfig webapp in webapps)
       if(webapp.inplace && webapp.projectPath) {
         def proj = project.project(webapp.projectPath)
-        fastReloadMap[webapp.projectPath] = ProjectReloadUtils.getReloadSpecs(proj, webapp.fastReload) { p ->
-          [ new FileReloadSpec(baseDir: ProjectUtils.getWebAppDir(p)) ]
+        List<FileReloadSpec> fastReloadSpecs = ProjectReloadUtils.getFastReloadSpecs(proj, webapp.fastReload)
+        fastReloadMap[webapp.projectPath] = fastReloadSpecs
+        for(FileReloadSpec spec in fastReloadSpecs) {
+          if(!scanDirs.find { File scanDir -> spec.baseDir.absolutePath.startsWith(scanDir.absolutePath) })
+            scanDirs.add(spec.baseDir)
         }
       }
   }
@@ -111,8 +114,6 @@ final class JettyScannerManager implements ScannerManager {
         }
       }
     }
-    for(File f in scanDirs)
-      log.debug 'scanDir: {}', f
     return scanDirs as List
   }
 
@@ -238,8 +239,12 @@ final class JettyScannerManager implements ScannerManager {
       return
     }
     scanner = new Scanner()
-    scanner.scanDirs = getEffectiveScanDirs()
-    configureFastReload()
+    List<File> scanDirs = getEffectiveScanDirs()
+    configureFastReload(scanDirs)
+    for(File f in scanDirs)
+      log.info 'scanDir: {}', f
+    log.info 'fastReloadMap={}', fastReloadMap
+    scanner.scanDirs = scanDirs
     configureScanner()
     log.info 'Enabling hot deployment with interval of {} second(s)', sconfig.scanInterval
     scanner.start()

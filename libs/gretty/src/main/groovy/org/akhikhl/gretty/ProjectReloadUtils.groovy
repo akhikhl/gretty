@@ -59,7 +59,7 @@ class ProjectReloadUtils {
     }
   }
 
-  static List<FileReloadSpec> getReloadSpecs(Project project, List reloadSpecs, Closure defaultReloadSpecsForProject) {
+  static List<FileReloadSpec> getFastReloadSpecs(Project project, List reloadSpecs) {
     reloadSpecs = reloadSpecs == null ? [] : ([] + reloadSpecs)
     def collectOverlayReloadSpecs
     collectOverlayReloadSpecs = { Project proj ->
@@ -77,7 +77,7 @@ class ProjectReloadUtils {
     if(reloadSpecs.find { (it instanceof Boolean) && it }) {
       def addDefaultReloadSpecs
       addDefaultReloadSpecs = { Project proj ->
-        def projectReloadSpecs = defaultReloadSpecsForProject(proj) ?: []
+        def projectReloadSpecs = [ new FileReloadSpec(baseDir: ProjectUtils.getWebAppDir(proj)) ]
         result.addAll(projectReloadSpecs)
         for(def overlay in proj.gretty.overlays)
           addDefaultReloadSpecs(proj.project(overlay))
