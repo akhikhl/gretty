@@ -49,6 +49,7 @@ class TomcatServerManager implements ServerManager {
       tomcat.start()
       result = true
     } catch(Throwable x) {
+      log.error 'Error starting server', x
       if(startEvent) {
         Map startInfo = new TomcatServerStartInfo().getInfo(tomcat, null, params)
         startInfo.status = 'error starting server'

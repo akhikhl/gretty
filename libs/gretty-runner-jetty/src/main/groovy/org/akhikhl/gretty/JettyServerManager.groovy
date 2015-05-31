@@ -45,6 +45,7 @@ final class JettyServerManager implements ServerManager {
       server.start()
       result = true
     } catch(Throwable x) {
+      log.error 'Error starting server', x
       if(startEvent) {
         Map startInfo = new JettyServerStartInfo().getInfo(server, configurer, params)
         startInfo.status = 'error starting server'
