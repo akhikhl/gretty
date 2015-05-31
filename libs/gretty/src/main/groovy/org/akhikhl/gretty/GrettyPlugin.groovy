@@ -129,8 +129,12 @@ class GrettyPlugin implements Plugin<Project> {
         def webXml = new XmlSlurper().parse(webXmlFile)
         if(webXml.filter.find { it.'filter-class'.text() == 'org.akhikhl.gretty.RedirectFilter' }) {
           project.dependencies {
-            compile "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}", {
+            runtime "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}", {
               exclude group: 'javax.servlet', module: 'servlet-api'
+              if(project.configurations.runtime.copyRecursive().getResolvedConfiguration().getFiles { dependency ->
+                dependency.group == 'org.codehaus.groovy' && dependency.name == 'groovy-all'
+              })
+                exclude group: 'org.codehaus.groovy', module: 'groovy-all'
             }
           }
           alteredDependencies = true
