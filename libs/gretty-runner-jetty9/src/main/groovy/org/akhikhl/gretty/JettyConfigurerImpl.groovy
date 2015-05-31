@@ -41,8 +41,10 @@ class JettyConfigurerImpl implements JettyConfigurer {
   private HashSessionManager sharedSessionManager
 
   @Override
-  void addLifeCycleListener(lifecycle, listener) {
-    lifecycle.addLifeCycleListener(listener as LifeCycleListenerAdapter)
+  def addLifeCycleListener(lifecycle, listener) {
+    def lifeCycleListener = listener as LifeCycleListenerAdapter
+    lifecycle.addLifeCycleListener(lifeCycleListener)
+    lifeCycleListener
   }
 
   @Override
@@ -249,6 +251,11 @@ class JettyConfigurerImpl implements JettyConfigurer {
       new AnnotationConfiguration(),
       new JettyWebXmlConfiguration()
     ]
+  }
+
+  @Override
+  void removeLifeCycleListener(lifecycle, listener) {
+    lifecycle.removeLifeCycleListener(listener)
   }
 
   @Override

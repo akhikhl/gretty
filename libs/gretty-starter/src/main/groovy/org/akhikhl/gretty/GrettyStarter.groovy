@@ -117,7 +117,15 @@ class GrettyStarter {
     sconfig.logbackConfigFile = resolveFile(sconfig.logbackConfigFile)
 
     if(command == 'stop' || command == 'restart') {
-      ServiceProtocol.send(sconfig.servicePort, command)
+      File portPropertiesFile = StarterLauncher.getPortPropertiesFile(basedir)
+      if(!portPropertiesFile.exists())
+        throw new Exception("Gretty seems to be not running, cannot send command '$command' to it.")
+      Properties portProps = new Properties()
+      portPropertiesFile.withReader 'UTF-8', {
+        portProps.load(it)
+      }
+      int servicePort = portProps.servicePort as int
+      ServiceProtocol.send(servicePort, command)
       return
     }
 
@@ -198,6 +206,11 @@ class GrettyStarter {
       }
     }
 
-    new StarterLauncher(basedir, config, launcherConfig).launch()
+    Launcher launcher = new StarterLauncher(basedir, config, launcherConfig)
+    try {
+      launcher.launch()
+    } finally {
+      launcher.dispose()
+    }
   }
 }

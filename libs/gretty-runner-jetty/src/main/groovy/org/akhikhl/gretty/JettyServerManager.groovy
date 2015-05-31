@@ -33,23 +33,38 @@ final class JettyServerManager implements ServerManager {
   }
 
   @Override
-  void startServer() {
-    startServer(null)
-  }
-
-  @Override
   void startServer(ServerStartEvent startEvent) {
     assert server == null
 
     log.debug '{} starting.', params.servletContainerDescription
 
     server = new JettyServerConfigurer(configurer, params).createAndConfigureServer()
-    server.start()
 
-    if(startEvent)
-      startEvent.onServerStart(new JettyServerStartInfo().getInfo(server, configurer, params))
+    boolean result = false
+    try {
+      server.start()
+      result = true
+    } catch(Throwable x) {
+      if(startEvent) {
+        Map startInfo = new JettyServerStartInfo().getInfo(server, configurer, params)
+        startInfo.status = 'error starting server'
+        startInfo.error = true
+        startInfo.errorMessage = x.getMessage() ?: x.getClass().getName()
+        StringWriter sw = new StringWriter()
+        x.printStackTrace(new PrintWriter(sw))
+        startInfo.stackTrace = sw.toString()
+        startEvent.onServerStart(startInfo)
+      } else
+        throw x
+    }
 
-    log.debug '{} started.', params.servletContainerDescription
+    if(result) {
+      if(startEvent) {
+        Map startInfo = new JettyServerStartInfo().getInfo(server, configurer, params)
+        startEvent.onServerStart(startInfo)
+      }
+      log.debug '{} started.', params.servletContainerDescription
+    }
   }
 
   @Override

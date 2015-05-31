@@ -9,6 +9,7 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,15 +24,28 @@ abstract class FarmServiceTask extends DefaultTask {
 
   String farmName = ''
 
+  /**
+   * Please don't use servicePort, it will be removed in Gretty 2.0
+   */
+  @Deprecated
   Integer servicePort
 
   @TaskAction
   void action() {
+    String command = getCommand()
+    File portPropertiesFile = DefaultLauncher.getPortPropertiesFile(project)
+    if(!portPropertiesFile.exists())
+      throw new GradleException("Gretty seems to be not running, cannot send command '$command' to it.")
+    Properties portProps = new Properties()
+    portPropertiesFile.withReader 'UTF-8', {
+      portProps.load(it)
+    }
+    int servicePort = portProps.servicePort as int
     FarmConfigurer configurer = new FarmConfigurer(project)
     FarmExtension farm = new FarmExtension(project, servicePort: servicePort)
     configurer.configureFarm(farm, configurer.getProjectFarm(farmName))
-    log.debug 'Sending command {} to port {}', command, farm.servicePort
-    ServiceProtocol.send(farm.servicePort, command)
+    log.debug 'Sending command {} to port {}', command, servicePort
+    ServiceProtocol.send(servicePort, command)
   }
 
   abstract String getCommand()

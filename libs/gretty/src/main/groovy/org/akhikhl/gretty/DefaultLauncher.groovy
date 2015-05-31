@@ -18,6 +18,16 @@ import org.gradle.tooling.ProjectConnection
  */
 class DefaultLauncher extends LauncherBase {
 
+  static File getPortPropertiesFile(Project project) {
+    project.file("${project.buildDir}/gretty_ports.properties")
+  }
+
+  static Collection<URL> getRunnerClassPath(Project project, ServerConfig sconfig) {
+    def files = project.configurations.grettyNoSpringBoot.files +
+        project.configurations[ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerRunnerConfig].files
+    (files.collect { it.toURI().toURL() }) as LinkedHashSet
+  }
+
   protected Project project
 
   ScannerManager scannerManager
@@ -28,21 +38,18 @@ class DefaultLauncher extends LauncherBase {
   }
 
   protected void afterJavaExec() {
+    super.afterJavaExec()
     scannerManager?.stopScanner()
   }
 
   protected void beforeJavaExec() {
+    super.beforeJavaExec()
     scannerManager?.startScanner()
+    project.file("${project.buildDir}/gretty_ports")
   }
 
-  protected Collection<URL> getRunnerClassPath() {
-    def files = project.configurations.grettyNoSpringBoot.files +
-        project.configurations[getServletContainerConfig().servletContainerRunnerConfig].files
-    (files.collect { it.toURI().toURL() }) as LinkedHashSet
-  }
-
-  protected Map getServletContainerConfig() {
-    ServletContainerConfig.getConfig(sconfig.servletContainer)
+  protected File getPortPropertiesFile() {
+    getPortPropertiesFile(project)
   }
 
   @Override
@@ -52,13 +59,13 @@ class DefaultLauncher extends LauncherBase {
 
   @Override
   protected String getServletContainerDescription() {
-    getServletContainerConfig().servletContainerDescription
+    ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerDescription
   }
 
   @Override
   protected void javaExec(JavaExecParams params) {
     project.javaexec { JavaExecSpec spec ->
-      def runnerClasspath = getRunnerClassPath()
+      def runnerClasspath = getRunnerClassPath(project, sconfig)
       if(log.isDebugEnabled())
         for(def path in runnerClasspath)
           log.debug 'Runner classpath: {}', path

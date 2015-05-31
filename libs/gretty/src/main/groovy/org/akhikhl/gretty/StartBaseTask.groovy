@@ -27,18 +27,42 @@ abstract class StartBaseTask extends DefaultTask {
   protected final List<Closure> prepareServerConfigClosures = []
   protected final List<Closure> prepareWebAppConfigClosures = []
 
-  def serverStartInfo
+  Map serverStartInfo
 
   @TaskAction
   void action() {
     LauncherConfig config = getLauncherConfig()
-    Launcher launcher = getLauncher(config)
+    Launcher launcher = new DefaultLauncher(project, config)
     launcher.scannerManager = new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
-    if(getIntegrationTest())
-      project.ext.grettyLaunchThread = launcher.launchThread()
-    else
-      launcher.launch()
-    serverStartInfo = launcher.serverStartInfo
+    if(getIntegrationTest()) {
+      boolean result = false
+      try {
+        launcher.beforeLaunch()
+        try {
+          project.ext.grettyLauncher = launcher
+          project.ext.grettyLaunchThread = launcher.launchThread()
+          result = true
+        } finally {
+          // Need to call afterLaunch in case of unsuccessful launch.
+          // If launch was successful, afterLaunch will be called in AppAfterIntegrationTestTask or FarmAfterIntegrationTestTask
+          if(!result)
+            launcher.afterLaunch()
+        }
+      } finally {
+        // Need to dispose of launcher in case of unsuccessful launch.
+        // If launch was successful, launcher will be shut down in AppAfterIntegrationTestTask or FarmAfterIntegrationTestTask
+        if(!result)
+          launcher.dispose()
+      }
+    }
+    else {
+      try {
+        launcher.launch()
+      } finally {
+        launcher.dispose()
+      }
+    }
+    serverStartInfo = launcher.getServerStartInfo()
   }
 
   protected final void doPrepareServerConfig(ServerConfig sconfig) {
@@ -156,16 +180,8 @@ abstract class StartBaseTask extends DefaultTask {
     sconfig.managedClassReload
   }
 
-  Launcher getLauncher() {
-    getLauncher(getLauncherConfig())
-  }
-
-  Launcher getLauncher(LauncherConfig config) {
-    new DefaultLauncher(project, config)
-  }
-
   Collection<URL> getRunnerClassPath() {
-    getLauncher().runnerClassPath
+    DefaultLauncher.getRunnerClassPath(project, getStartConfig().serverConfig)
   }
 
   protected abstract StartConfig getStartConfig()
@@ -178,7 +194,6 @@ abstract class StartBaseTask extends DefaultTask {
    */
   Map<String, Collection<URL> > getWebappClassPaths() {
     LauncherConfig config = getLauncherConfig()
-    Launcher launcher = getLauncher(config)
     WebAppClassPathResolver resolver = config.getWebAppClassPathResolver()
     config.getWebAppConfigs().collectEntries { wconfig ->
       [ wconfig.contextPath, resolver.resolveWebAppClassPath(wconfig) ]

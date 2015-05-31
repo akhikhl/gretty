@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 import org.eclipse.jetty.util.Scanner
 import org.eclipse.jetty.util.Scanner.BulkListener
 import org.eclipse.jetty.util.Scanner.ScanCycleListener
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
@@ -225,8 +226,17 @@ final class JettyScannerManager implements ScannerManager {
       }
     }
 
-    if(shouldRestart)
-      ServiceProtocol.send(sconfig.servicePort, 'restart')
+    if(shouldRestart) {
+      File portPropertiesFile = DefaultLauncher.getPortPropertiesFile(project)
+      if(!portPropertiesFile.exists())
+        throw new GradleException("Gretty seems to be not running, cannot send command 'restart' to it.")
+      Properties portProps = new Properties()
+      portPropertiesFile.withReader 'UTF-8', {
+        portProps.load(it)
+      }
+      int servicePort = portProps.servicePort as int
+      ServiceProtocol.send(servicePort, 'restart')
+    }
   }
 
   @Override

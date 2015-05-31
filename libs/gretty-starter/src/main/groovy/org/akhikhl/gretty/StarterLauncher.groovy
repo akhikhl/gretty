@@ -17,6 +17,10 @@ import org.slf4j.LoggerFactory
  */
 class StarterLauncher extends LauncherBase {
 
+  static File getPortPropertiesFile(File basedir) {
+    new File(basedir, 'temp/gretty_ports.properties')
+  }
+
   protected static final Logger log = LoggerFactory.getLogger(StarterLauncher)
 
   private final File basedir
@@ -26,6 +30,11 @@ class StarterLauncher extends LauncherBase {
     super(config)
     this.basedir = basedir
     this.starterConfig = starterConfig
+  }
+
+  @Override
+  protected File getPortPropertiesFile() {
+    return getPortPropertiesFile(basedir)
   }
 
   @Override

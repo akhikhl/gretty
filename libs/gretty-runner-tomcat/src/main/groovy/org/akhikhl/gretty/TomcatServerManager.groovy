@@ -37,23 +37,38 @@ class TomcatServerManager implements ServerManager {
   }
 
   @Override
-  void startServer() {
-    startServer(null)
-  }
-
-  @Override
   void startServer(ServerStartEvent startEvent) {
     assert tomcat == null
 
     log.debug '{} starting.', params.servletContainerDescription
 
     tomcat = new TomcatServerConfigurer(configurer, params).createAndConfigureServer()
-    tomcat.start()
 
-    if(startEvent)
-      startEvent.onServerStart(new TomcatServerStartInfo().getInfo(tomcat, null, params))
+    boolean result = false
+    try {
+      tomcat.start()
+      result = true
+    } catch(Throwable x) {
+      if(startEvent) {
+        Map startInfo = new TomcatServerStartInfo().getInfo(tomcat, null, params)
+        startInfo.status = 'error starting server'
+        startInfo.error = true
+        startInfo.errorMessage = x.getMessage() ?: x.getClass().getName()
+        StringWriter sw = new StringWriter()
+        x.printStackTrace(new PrintWriter(sw))
+        startInfo.stackTrace = sw.toString()
+        startEvent.onServerStart(startInfo)
+      } else
+        throw x
+    }
 
-    log.debug '{} started.', params.servletContainerDescription
+    if(result) {
+      if (startEvent) {
+        Map startInfo = new TomcatServerStartInfo().getInfo(tomcat, null, params)
+        startEvent.onServerStart(startInfo)
+      }
+      log.debug '{} started.', params.servletContainerDescription
+    }
   }
 
   @Override

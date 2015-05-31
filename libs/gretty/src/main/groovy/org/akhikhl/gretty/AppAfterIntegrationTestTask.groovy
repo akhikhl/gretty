@@ -29,6 +29,9 @@ class AppAfterIntegrationTestTask extends AppStopTask {
     if(project.ext.has('grettyLaunchThread') && project.ext.grettyLaunchThread != null) {
       project.ext.grettyLaunchThread.join()
       project.ext.grettyLaunchThread = null
+      project.ext.grettyLauncher.afterLaunch()
+      project.ext.grettyLauncher.dispose()
+      project.ext.grettyLauncher = null
     }
     System.out.println 'Server stopped.'
   }

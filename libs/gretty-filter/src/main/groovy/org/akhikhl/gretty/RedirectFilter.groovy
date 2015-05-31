@@ -56,7 +56,8 @@ class RedirectFilter implements Filter {
   protected Integer httpPort
   protected Integer httpsPort
   protected File webappDir
-  protected long configFileLastModified
+  protected URL filterConfigUrl
+  protected long configFileLastModified = 0
   protected Object filtersLock = new Object()
   protected List filters = []
 
@@ -158,9 +159,10 @@ class RedirectFilter implements Filter {
 
   @Override
   public void init(FilterConfig config) throws ServletException {
-    if(config.servletContext.hasProperty('contextHandler')) {
+    ServletContext servletContext = config.getServletContext()
+    if(servletContext.hasProperty('contextHandler')) {
       // jetty-specific
-      def server = config.servletContext.contextHandler.server
+      def server = servletContext.contextHandler.server
       server.connectors.each { conn ->
         if(server.version.startsWith('7.') || server.version.startsWith('8.')) {
           if(conn.getClass().getName() == 'org.eclipse.jetty.server.bio.SocketConnector')
@@ -188,31 +190,65 @@ class RedirectFilter implements Filter {
     }
     log.debug 'found httpPort={}', httpPort
     log.debug 'found httpsPort={}', httpsPort
-    webappDir = new File(config.getServletContext().getRealPath(''))
-    loadFilters()
+    String webappDirPath = servletContext.getRealPath('/')
+    webappDir = webappDirPath ? new File(webappDirPath) : null
+    filterConfigUrl = servletContext.getResource('/WEB-INF/filter.groovy')
+    println "DBG filterConfigUrl=$filterConfigUrl"
   }
 
   protected loadFilters() {
     List newFilters = []
-    File configFile = new File(webappDir, 'WEB-INF/filter.groovy')
-    if(configFile.exists()) {
-      if(configFileLastModified == configFile.lastModified())
-        return
-      configFileLastModified = configFile.lastModified()
-      Binding binding = new Binding()
-      binding.filter = { Map options, Closure closure ->
-        newFilters.add([options: options, closure: closure])
+    if (filterConfigUrl.protocol == 'jar') {
+      if(configFileLastModified == 0) {
+        String configText
+        filterConfigUrl.openStream().withStream { InputStream filterConfigStream ->
+          if(filterConfigStream != null)
+            configText = filterConfigStream.getText('UTF-8')
+        }
+        if(configText) {
+          Binding binding = new Binding()
+          binding.filter = { Map options, Closure closure ->
+            newFilters.add([options: options, closure: closure])
+          }
+          def importCustomizer = new ImportCustomizer()
+          importCustomizer.addImport 'URIBuilder', 'groovyx.net.http.URIBuilder'
+          def configuration = new CompilerConfiguration()
+          configuration.addCompilationCustomizers(importCustomizer)
+          def shell = new GroovyShell(this.getClass().getClassLoader(), binding, configuration)
+          def script = shell.parse(configText)
+          script.run()
+        }
+        synchronized (filtersLock) {
+          configFileLastModified = new Date().getTime()
+          filters = newFilters
+        }
       }
-      def importCustomizer = new ImportCustomizer()
-      importCustomizer.addImport 'URIBuilder', 'groovyx.net.http.URIBuilder'
-      def configuration = new CompilerConfiguration()
-      configuration.addCompilationCustomizers(importCustomizer)
-      def shell = new GroovyShell(this.getClass().getClassLoader(), binding, configuration)
-      def script = shell.parse(configFile)
-      script.run()
-    }
-    synchronized (filtersLock) {
-      filters = newFilters
+    } else if(filterConfigUrl.protocol == 'file') {
+      boolean configModified = true
+      long configFileLastModified = new Date().getTime()
+      File configFile = new File(filterConfigUrl.toURI())
+      if(configFile.exists()) {
+        configModified = this.configFileLastModified != configFile.lastModified()
+        if(configModified) {
+          configFileLastModified = configFile.lastModified()
+          Binding binding = new Binding()
+          binding.filter = { Map options, Closure closure ->
+            newFilters.add([options: options, closure: closure])
+          }
+          def importCustomizer = new ImportCustomizer()
+          importCustomizer.addImport 'URIBuilder', 'groovyx.net.http.URIBuilder'
+          def configuration = new CompilerConfiguration()
+          configuration.addCompilationCustomizers(importCustomizer)
+          def shell = new GroovyShell(this.getClass().getClassLoader(), binding, configuration)
+          def script = shell.parse(configFile)
+          script.run()
+        }
+      }
+      if(configModified)
+        synchronized (filtersLock) {
+          this.configFileLastModified = configFileLastModified
+          filters = newFilters
+        }
     }
   }
 }

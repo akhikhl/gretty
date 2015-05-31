@@ -16,7 +16,7 @@ import org.slf4j.Logger
  */
 interface JettyConfigurer {
 
-  void addLifeCycleListener(lifecycle, listener)
+  def addLifeCycleListener(lifecycle, listener)
 
   void applyContextConfigFile(webAppContext, URL contextConfigFile)
 
@@ -41,6 +41,8 @@ interface JettyConfigurer {
   URL findResourceURL(baseResource, String path)
 
   List getConfigurations(Map webappParams)
+
+  void removeLifeCycleListener(lifecycle, listener)
 
   void setConfigurationsToWebAppContext(context, List configurations)
 

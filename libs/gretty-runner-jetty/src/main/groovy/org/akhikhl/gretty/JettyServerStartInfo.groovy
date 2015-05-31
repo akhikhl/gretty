@@ -23,7 +23,7 @@ class JettyServerStartInfo {
     log = LoggerFactory.getLogger(this.getClass())
   }
 
-  def getInfo(server, JettyConfigurer configurer, Map params) {
+  Map getInfo(server, JettyConfigurer configurer, Map params) {
 
     def portsInfo = server.getConnectors().collect { it.port }
     portsInfo = (portsInfo.size() == 1 ? 'port ' : 'ports ') + portsInfo.join(', ')
@@ -72,7 +72,7 @@ class JettyServerStartInfo {
 
     collectContextInfo(server.handler)
 
-    def serverStartInfo = [ status: 'successfully started' ]
+    Map serverStartInfo = [ status: 'successfully started' ]
 
     serverStartInfo.host = httpConn?.host ?: httpsConn?.host
     if(serverStartInfo.host == '0.0.0.0')

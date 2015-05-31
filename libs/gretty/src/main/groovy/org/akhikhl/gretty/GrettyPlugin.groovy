@@ -206,9 +206,26 @@ class GrettyPlugin implements Plugin<Project> {
 
     if(project.tasks.findByName('classes')) { // JVM project?
 
+      project.task('createInplaceWebAppFolder', group: 'gretty') {
+
+        description = 'Creates directory ${buildDir}/inplaceWebapp'
+
+        File inplaceWebappDir = new File("${project.buildDir}/inplaceWebapp")
+
+        outputs.upToDateWhen {
+          inplaceWebappDir.exists()
+        }
+
+        doFirst {
+          inplaceWebappDir.mkdirs()
+        }
+      }
+
       project.task('prepareInplaceWebAppFolder', group: 'gretty', type: Copy) {
 
         description = 'Copies webAppDir of this web-app and all overlays (if any) to ${buildDir}/inplaceWebapp'
+
+        dependsOn project.tasks.createInplaceWebAppFolder
 
         def getInplaceMode = {
           project.tasks.findByName('appRun').effectiveInplaceMode

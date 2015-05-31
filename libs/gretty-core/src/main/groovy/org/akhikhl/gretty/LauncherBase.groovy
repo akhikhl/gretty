@@ -10,7 +10,7 @@ package org.akhikhl.gretty
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import java.util.concurrent.Callable
+
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
@@ -23,28 +23,94 @@ import org.slf4j.LoggerFactory
  */
 abstract class LauncherBase implements Launcher {
 
+  protected static int[] findFreePorts(int count) {
+    List result = []
+    try {
+      List sockets = []
+      try {
+        while(count-- > 0) {
+          ServerSocket socket = new ServerSocket(0)
+          sockets.add(socket)
+          result.add(socket.getLocalPort())
+        }
+      } finally {
+        for(ServerSocket socket in sockets)
+          socket.close()
+      }
+    } catch (IOException e) {
+    }
+    return result as int[]
+  }
+
   protected static final Logger log = LoggerFactory.getLogger(LauncherBase)
 
   protected final LauncherConfig config
   protected final ServerConfig sconfig
   protected final Iterable<WebAppConfig> webAppConfigs
-  protected serverStartInfo
+  protected ExecutorService executorService
+
+  protected int servicePort = -1
+  protected int statusPort = -1
+
+  protected AsyncResponse asyncResponse
+
+  protected Map serverStartInfo
 
   LauncherBase(LauncherConfig config) {
     this.config = config
     sconfig = config.getServerConfig()
     webAppConfigs = config.getWebAppConfigs()
+    executorService = Executors.newSingleThreadExecutor()
   }
 
   protected void afterJavaExec() {
   }
 
+  @Override
+  void afterLaunch() {
+    getPortPropertiesFile().delete()
+    asyncResponse = null
+  }
+
   protected void beforeJavaExec() {
+  }
+
+  @Override
+  void beforeLaunch() {
+    File portPropertiesFile = getPortPropertiesFile()
+    portPropertiesFile.parentFile.mkdirs()
+    if(portPropertiesFile.exists()) {
+      Properties portProps = new Properties()
+      portPropertiesFile.withReader 'UTF-8', {
+        portProps.load(it)
+      }
+      int servicePort = portProps.servicePort as int
+      int statusPort = portProps.statusPort as int
+      def asyncResponse = new AsyncResponse(executorService, statusPort)
+      if(asyncResponse.getStatus(servicePort) == 'started')
+        throw new RuntimeException('Web-server is already running.')
+    }
+    (servicePort, statusPort) = findFreePorts(2)
+    log.debug 'servicePort: {}, statusPort: {}', servicePort, statusPort
+    Properties props = new Properties()
+    props.servicePort = servicePort as String
+    props.statusPort = statusPort as String
+    portPropertiesFile.withWriter 'UTF-8', {
+      props.store(it, null)
+    }
+    asyncResponse = new AsyncResponse(executorService, statusPort)
+  }
+
+  @Override
+  void dispose() {
+    executorService.shutdown()
   }
 
   protected static fileToString(file) {
     file instanceof File ? file.absolutePath : file.toString()
   }
+
+  protected abstract File getPortPropertiesFile()
 
   private getRunConfigJson() {
     def json = new JsonBuilder()
@@ -62,80 +128,75 @@ abstract class LauncherBase implements Launcher {
 
   protected abstract String getServletContainerDescription()
 
-  def getServerStartInfo() {
+  Map getServerStartInfo() {
     serverStartInfo
+  }
+
+  private void interactiveLoop() {
+    def hint = 'Press \'q\' or \'Q\' to stop the server or any other key to restart.'
+    System.out.println hint
+    // Based on Jetty-Maven-Plugin console scanner
+    infinite:
+    while (true) {
+      while (System.in.available() > 0) {
+        def input = System.in.read()
+        if (input >= 0) {
+          char c = input as char
+          if (c == 'q' || c == 'Q') {
+            stopServer()
+            break infinite
+          } else {
+            if (sconfig.interactiveMode == 'rebuildAndRestartOnKeyPress') {
+              rebuildWebapps()
+            }
+            log.debug 'Sending command: {}', 'restartWithEvent'
+            def futureResponse = asyncResponse.getResponse()
+            ServiceProtocol.send(servicePort, 'restartWithEvent')
+            // Waiting for restart complete event
+            def status = futureResponse.get()
+            log.debug "Received status: ${status}"
+            System.out.println hint
+            // dumping input
+            while (System.in.available() > 0) {
+              long available = System.in.available()
+              for (int i = 0; i < available; i++) {
+                // Stream ended suddenly
+                if (System.in.read() == -1) {
+                  break
+                }
+              }
+            }
+          }
+        }
+      }
+      // Sleep to prevent busy wait
+      Thread.sleep(500)
+    }
   }
 
   protected abstract void javaExec(JavaExecParams params)
 
-  protected abstract void rebuildWebapps()
-
   @Override
   void launch() {
-    Thread thread = launchThread()
-    def stopServer = {
-      log.debug 'Sending command: {}', 'stop'
-      ServiceProtocol.send(sconfig.servicePort, 'stop')
-    }
-    if(config.getInteractive()) {
-      if(sconfig.interactiveMode == 'restartOnKeyPress' || sconfig.interactiveMode == 'rebuildAndRestartOnKeyPress') {
-        def hint = 'Press \'q\' or \'Q\' to stop the server or any other key to restart.'
-        System.out.println hint
-        ExecutorService executorService = Executors.newSingleThreadExecutor()
-          try {
-            // Based on Jetty-Maven-Plugin console scanner
-            infinite:
-            while(true) {
-              while(System.in.available() > 0) {
-                def input = System.in.read()
-                if(input >= 0) {
-                  char c = input as char
-                  if(c == 'q' || c == 'Q') {
-                    stopServer()
-                    break infinite
-                  } else {
-                    if(sconfig.interactiveMode == 'rebuildAndRestartOnKeyPress') {
-                      rebuildWebapps()
-                    }
-                    log.debug 'Sending command: {}', 'restartWithEvent'
-                    def futureStatus = executorService.submit({
-                      ServiceProtocol.readMessage(sconfig.statusPort)
-                    } as Callable)
-                    ServiceProtocol.send(sconfig.servicePort, 'restartWithEvent')
-                    // Waiting for restart complete event
-                    def status = futureStatus.get()
-                    log.debug "Received status: ${status}"
-                    //
-                    System.out.println hint
-                    // dumping input
-                    while (System.in.available() > 0) {
-                      long available = System.in.available()
-                      for (int i = 0; i < available; i++) {
-                        // Stream ended suddenly
-                        if (System.in.read() == -1) {
-                          break
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              // Sleep to prevent busy wait
-              Thread.sleep(500)
-            }
-          } finally {
-              executorService.shutdown()
-          }
-      } else if(sconfig.interactiveMode == 'stopOnKeyPress') {
+    beforeLaunch()
+    try {
+      Thread thread = launchThread()
+      if (config.getInteractive()) {
+        if (sconfig.interactiveMode == 'restartOnKeyPress' || sconfig.interactiveMode == 'rebuildAndRestartOnKeyPress') {
+          interactiveLoop()
+        } else if (sconfig.interactiveMode == 'stopOnKeyPress') {
           System.out.println 'Press any key to stop the server.'
           System.in.read()
           stopServer()
-      } else {
-        log.warn 'Unexpected interactiveMode: {}', sconfig.interactiveMode
-      }
-    } else
-      System.out.println "Run '${config.getStopCommand()}' to stop the server."
-    thread.join()
+        } else {
+          log.warn 'Unexpected interactiveMode: {}', sconfig.interactiveMode
+        }
+      } else
+        System.out.println "Run '${config.getStopCommand()}' to stop the server."
+      thread.join()
+    } finally {
+      afterLaunch()
+    }
   }
 
   @Override
@@ -144,114 +205,77 @@ abstract class LauncherBase implements Launcher {
     for(WebAppConfig wconfig in webAppConfigs)
       prepareToRun(wconfig)
 
-    log.debug 'servicePort: {}, statusPort: {}', sconfig.servicePort, sconfig.statusPort
-
     Thread thread
-    ExecutorService executorService = Executors.newSingleThreadExecutor()
-    try {
-      def listeningForStatusLock = new Object()
-      boolean listeningForStatus
 
-      def asyncReadStatus = {
-        listeningForStatus = false
-        def future = executorService.submit({
-          synchronized(listeningForStatusLock) {
-            listeningForStatus = true
-          }
-          ServiceProtocol.readMessage(sconfig.statusPort)
-        } as Callable)
-        while(true) {
-          synchronized(listeningForStatusLock) {
-            if(listeningForStatus)
-              break
-          }
-          Thread.sleep(100)
-        }
-        future
+    def status = asyncResponse.getStatus(servicePort)
+
+    if(status == 'started')
+      throw new RuntimeException('Web-server is already running.')
+
+    Future futureResponse = asyncResponse.getResponse()
+
+    thread = Thread.start {
+      for(Closure c in sconfig.onStart) {
+        c.delegate = sconfig
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
       }
-
-      Future futureStatus = asyncReadStatus()
-
-      def handleConnectionError = { e ->
-        log.debug 'Sending "notStarted" to status port...'
-        ServiceProtocol.send(sconfig.statusPort, 'notStarted')
-      }
-
       try {
-        log.debug 'Sending "status" command to (probably) running server...'
-        ServiceProtocol.send(sconfig.servicePort, 'status')
-      } catch(java.net.ConnectException e) {
-        handleConnectionError(e)
-      } catch(java.net.SocketException e) {
-        handleConnectionError(e)
-      }
-
-      log.debug 'Reading response...'
-      def status = futureStatus.get()
-      log.debug 'Got response: {}', status
-
-      if(status == 'started')
-        throw new RuntimeException('Web-server is already running.')
-
-      futureStatus = asyncReadStatus()
-      thread = Thread.start {
-        for(Closure c in sconfig.onStart) {
+        beforeJavaExec()
+        try {
+          JavaExecParams params = new JavaExecParams()
+          params.main = 'org.akhikhl.gretty.Runner'
+          params.args = [ "--servicePort=${servicePort}", "--statusPort=${statusPort}", "--serverManagerFactory=${getServerManagerFactory()}" ]
+          params.debug = config.getDebug()
+          params.debugSuspend = config.getDebugSuspend()
+          params.debugPort = config.getDebugPort()
+          params.jvmArgs = sconfig.jvmArgs
+          params.systemProperties = sconfig.systemProperties
+          if(!sconfig.secureRandom) {
+            // Speeding up tomcat startup, according to http://wiki.apache.org/tomcat/HowTo/FasterStartUp
+            // ATTENTION: replacing the blocking entropy source (/dev/random) with a non-blocking one
+            // actually reduces security because you are getting less-random data.
+            params.systemProperty 'java.security.egd', 'file:/dev/./urandom'
+          }
+          javaExec(params)
+        } finally {
+          afterJavaExec()
+        }
+      } finally {
+        for(Closure c in sconfig.onStop) {
           c.delegate = sconfig
           c.resolveStrategy = Closure.DELEGATE_FIRST
           c()
         }
-        try {
-          beforeJavaExec()
-          try {
-            JavaExecParams params = new JavaExecParams()
-            params.main = 'org.akhikhl.gretty.Runner'
-            params.args = [ "--servicePort=${sconfig.servicePort}", "--statusPort=${sconfig.statusPort}", "--serverManagerFactory=${getServerManagerFactory()}" ]
-            params.debug = config.getDebug()
-            params.debugSuspend = config.getDebugSuspend()
-            params.debugPort = config.getDebugPort()
-            params.jvmArgs = sconfig.jvmArgs
-            params.systemProperties = sconfig.systemProperties
-            if(!sconfig.secureRandom) {
-              // Speeding up tomcat startup, according to http://wiki.apache.org/tomcat/HowTo/FasterStartUp
-              // ATTENTION: replacing the blocking entropy source (/dev/random) with a non-blocking one
-              // actually reduces security because you are getting less-random data.
-              params.systemProperty 'java.security.egd', 'file:/dev/./urandom'
-            }
-            javaExec(params)
-          } finally {
-            afterJavaExec()
-          }
-        } finally {
-          for(Closure c in sconfig.onStop) {
-            c.delegate = sconfig
-            c.resolveStrategy = Closure.DELEGATE_FIRST
-            c()
-          }
-        }
       }
-
-      log.debug 'Reading response...'
-      status = futureStatus.get()
-      log.debug 'Got response: {}', status
-
-      futureStatus = asyncReadStatus()
-      def runConfigJson = getRunConfigJson()
-      log.debug 'Sending parameters to port {}', sconfig.servicePort
-      log.debug runConfigJson.toPrettyString()
-      ServiceProtocol.send(sconfig.servicePort, runConfigJson.toString())
-      status = futureStatus.get()
-      log.debug 'Got start status: {}', status
-      serverStartInfo = new JsonSlurper().parseText(status)
-
-    } finally {
-      executorService.shutdown()
     }
+
+    futureResponse.get()
+
+    futureResponse = asyncResponse.getResponse()
+    def runConfigJson = getRunConfigJson()
+    log.debug 'Sending parameters to port {}', servicePort
+    log.debug runConfigJson.toPrettyString()
+    ServiceProtocol.send(servicePort, runConfigJson.toString())
+    status = futureResponse.get()
+    log.debug 'Got start status: {}', status
+    serverStartInfo = new JsonSlurper().parseText(status)
+
+    if(serverStartInfo.error)
+      throw new Exception(serverStartInfo.errorMessage)
 
     thread
   }
 
   protected void prepareToRun(WebAppConfig wconfig) {
     wconfig.prepareToRun()
+  }
+
+  protected abstract void rebuildWebapps()
+
+  protected void stopServer() {
+    log.debug 'Sending command: {}', 'stop'
+    ServiceProtocol.send(servicePort, 'stop')
   }
 
   protected void writeLoggingConfig(json) {

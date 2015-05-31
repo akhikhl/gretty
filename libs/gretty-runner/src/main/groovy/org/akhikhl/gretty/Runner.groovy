@@ -34,13 +34,6 @@ final class Runner {
     }
   }
 
-  class RestartEvent implements ServerStartEvent {
-      @Override
-      void onServerStart(Map serverStartInfo) {
-          ServiceProtocol.send(params.statusPort, 'restartComplete')
-      }
-  }
-
   static void main(String[] args) {
     def cli = new CliBuilder()
     cli.with {
@@ -137,11 +130,11 @@ final class Runner {
         }
         else if(data == 'restart') {
           serverManager.stopServer()
-          serverManager.startServer()
+          serverManager.startServer(null)
         }
         else if(data == 'restartWithEvent') {
           serverManager.stopServer()
-          serverManager.startServer(new RestartEvent())
+          serverManager.startServer(new ServerStartEventImpl())
         }
       }
     } finally {
