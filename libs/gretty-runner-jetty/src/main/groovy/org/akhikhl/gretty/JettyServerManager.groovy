@@ -46,6 +46,10 @@ final class JettyServerManager implements ServerManager {
       result = true
     } catch(Throwable x) {
       log.error 'Error starting server', x
+      if(x.getClass().getName() == 'org.eclipse.jetty.util.MultiException') {
+        for(Throwable xx in x.getThrowables())
+          log.error 'Error', xx
+      }
       if(startEvent) {
         Map startInfo = new JettyServerStartInfo().getInfo(server, configurer, params)
         startInfo.status = 'error starting server'
