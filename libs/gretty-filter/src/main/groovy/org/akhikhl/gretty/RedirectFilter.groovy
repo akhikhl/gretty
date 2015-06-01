@@ -1,10 +1,8 @@
 package org.akhikhl.gretty
 
 import groovy.servlet.ServletCategory
-import groovy.util.Expando
 import groovyx.net.http.URIBuilder
 import javax.servlet.*
-import javax.servlet.http.HttpServletRequest
 import java.util.regex.Pattern
 import javax.management.ObjectName
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -197,7 +195,7 @@ class RedirectFilter implements Filter {
 
   protected loadFilters() {
     List newFilters = []
-    if (filterConfigUrl.protocol == 'jar') {
+    if (filterConfigUrl.protocol == 'jar' || filterConfigUrl.protocol == 'jndi') {
       if(configFileLastModified == 0) {
         String configText
         filterConfigUrl.openStream().withStream { InputStream filterConfigStream ->
