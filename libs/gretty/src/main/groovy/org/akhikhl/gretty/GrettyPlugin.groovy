@@ -122,27 +122,6 @@ class GrettyPlugin implements Plugin<Project> {
     for(String overlay in project.gretty.overlays)
       project.dependencies.add 'grettyProvidedCompile', project.project(overlay)
 
-    ProjectUtils.withOverlays(project).find { proj ->
-      boolean alteredDependencies = false
-      File webXmlFile = new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/web.xml')
-      if(webXmlFile.exists()) {
-        def webXml = new XmlSlurper().parse(webXmlFile)
-        if(webXml.filter.find { it.'filter-class'.text() == 'org.akhikhl.gretty.RedirectFilter' }) {
-          project.dependencies {
-            runtime "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}", {
-              exclude group: 'javax.servlet', module: 'servlet-api'
-              if(project.configurations.runtime.copyRecursive().getResolvedConfiguration().getFiles { dependency ->
-                dependency.group == 'org.codehaus.groovy' && dependency.name == 'groovy-all'
-              })
-                exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-            }
-          }
-          alteredDependencies = true
-        }
-      }
-      alteredDependencies
-    }
-
     def runtimeConfig = project.configurations.findByName('runtime')
     if(runtimeConfig) {
       def artifacts = runtimeConfig.copyRecursive().resolvedConfiguration.resolvedArtifacts
