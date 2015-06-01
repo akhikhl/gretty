@@ -193,7 +193,6 @@ class RedirectFilter implements Filter {
     String webappDirPath = servletContext.getRealPath('/')
     webappDir = webappDirPath ? new File(webappDirPath) : null
     filterConfigUrl = servletContext.getResource('/WEB-INF/filter.groovy')
-    println "DBG filterConfigUrl=$filterConfigUrl"
   }
 
   protected loadFilters() {
