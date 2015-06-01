@@ -8,8 +8,6 @@
  */
 package org.akhikhl.gretty
 
-import java.beans.PropertyChangeEvent
-import java.beans.PropertyChangeListener
 import org.apache.catalina.Host
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
@@ -17,11 +15,9 @@ import org.apache.catalina.LifecycleListener
 import org.apache.catalina.authenticator.SingleSignOn
 import org.apache.catalina.connector.Connector
 import org.apache.catalina.core.StandardContext
-import org.apache.catalina.core.StandardService
 import org.apache.catalina.loader.WebappLoader
 import org.apache.catalina.realm.MemoryRealm
 import org.apache.catalina.startup.Catalina
-import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
 import org.apache.catalina.startup.Tomcat.DefaultWebXmlListener
 import org.apache.catalina.startup.Tomcat.FixContextListener
@@ -214,6 +210,9 @@ class TomcatServerConfigurer {
       parentClassLoader.addServerClass('org.codehaus.groovy.')
       parentClassLoader.addServerClass('groovy.')
       parentClassLoader.addServerClass('groovyx.')
+      parentClassLoader.addServerClass('groovyjarjarantlr.')
+      parentClassLoader.addServerClass('groovyjarjarasm.')
+      parentClassLoader.addServerClass('groovyjarjarcommonscli.')
       URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
       URLClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
       if(webapp.springBoot) {

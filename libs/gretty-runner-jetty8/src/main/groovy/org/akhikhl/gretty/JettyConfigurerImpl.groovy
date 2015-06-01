@@ -202,6 +202,9 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.addServerClass('org.codehaus.groovy.')
     context.addServerClass('groovy.')
     context.addServerClass('groovyx.')
+    context.addServerClass('groovyjarjarantlr.')
+    context.addServerClass('groovyjarjarasm.')
+    context.addServerClass('groovyjarjarcommonscli.')
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.classLoader = new WebAppClassLoader(context)
     context.addLifeCycleListener(new LifeCycleListenerAdapter() {
