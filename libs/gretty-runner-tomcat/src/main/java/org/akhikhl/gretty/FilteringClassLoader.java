@@ -8,6 +8,10 @@
  */
 package org.akhikhl.gretty;
 
+import sun.misc.CompoundEnumeration;
+import sun.misc.Resource;
+import sun.misc.URLClassPath;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -41,16 +45,49 @@ public class FilteringClassLoader extends URLClassLoader {
   @Override
   protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
     for(String serverClass : serverClasses)
-      if(name.startsWith(serverClass))
+      if(name.startsWith(serverClass)) {
+        Class<?> c = findLoadedClass(name);
+        if(c == null)
+          c = findClass(name);
+        if(c != null) {
+          if(resolve)
+            resolveClass(c);
+          return c;
+        }
         throw new ClassNotFoundException(name);
+      }
     return super.loadClass(name, resolve);
   }
 
   @Override
   public Enumeration<URL> getResources(String name) throws IOException {
     for(String serverResource : serverResources)
-      if(name.startsWith(serverResource))
-        return Collections.enumeration(Collections.<URL>emptySet());
+      if(name.startsWith(serverResource)) {
+        Enumeration<URL>[] tmp = (Enumeration<URL>[]) new Enumeration<?>[2];
+        tmp[0] = getBootstrapResources(name);
+        tmp[1] = findResources(name);
+        return new CompoundEnumeration(tmp);
+      }
     return super.getResources(name);
+  }
+
+  private static Enumeration<URL> getBootstrapResources(String name)
+          throws IOException
+  {
+    final Enumeration<Resource> e =
+            getBootstrapClassPath().getResources(name);
+    return new Enumeration<URL> () {
+      public URL nextElement() {
+        return e.nextElement().getURL();
+      }
+      public boolean hasMoreElements() {
+        return e.hasMoreElements();
+      }
+    };
+  }
+
+  // Returns the URLClassPath that is used for finding system resources.
+  static URLClassPath getBootstrapClassPath() {
+    return sun.misc.Launcher.getBootstrapClassPath();
   }
 }
