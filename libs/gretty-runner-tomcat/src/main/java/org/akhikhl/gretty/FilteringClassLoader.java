@@ -22,7 +22,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 /**
- * Implements concept of server classes similar to Jetty server classes.
+ * Properly implements "server classes" concept.
  *
  * @author akhikhl
  */
