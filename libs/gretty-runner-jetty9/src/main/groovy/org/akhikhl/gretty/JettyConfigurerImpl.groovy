@@ -201,17 +201,18 @@ class JettyConfigurerImpl implements JettyConfigurer {
     List<String> webappClassPath = webappParams.webappClassPath
     JettyWebAppContext context = new JettyWebAppContext()
     context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect { new File(it) })
-    context.addServerClass('ch.qos.logback.')
-    context.addServerClass('org.slf4j.')
-    context.addServerClass('org.codehaus.groovy.')
-    context.addServerClass('groovy.')
-    context.addServerClass('groovyx.')
-    context.addServerClass('groovyjarjarantlr.')
-    context.addServerClass('groovyjarjarasm.')
-    context.addServerClass('groovyjarjarcommonscli.')
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
     context.setInitParameter('org.eclipse.jetty.servlet.Default.useFileMappedBuffer', serverParams.productMode ? 'true' : 'false')
-    context.classLoader = new WebAppClassLoader(context)
+    FilteringClassLoader classLoader = new FilteringClassLoader(context)
+    classLoader.addServerClass('ch.qos.logback.')
+    classLoader.addServerClass('org.slf4j.')
+    classLoader.addServerClass('org.codehaus.groovy.')
+    classLoader.addServerClass('groovy.')
+    classLoader.addServerClass('groovyx.')
+    classLoader.addServerClass('groovyjarjarantlr.')
+    classLoader.addServerClass('groovyjarjarasm.')
+    classLoader.addServerClass('groovyjarjarcommonscli.')
+    context.classLoader = classLoader
     context.addLifeCycleListener(new LifeCycleListenerAdapter() {
       public void lifeCycleStopped(LifeCycle event) {
         context.classLoader = null
