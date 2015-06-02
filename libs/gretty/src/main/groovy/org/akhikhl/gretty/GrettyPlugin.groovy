@@ -211,7 +211,9 @@ class GrettyPlugin implements Plugin<Project> {
           from "${overlayProject.buildDir}/inplaceWebapp"
         }
 
-        with project.copySpec(project.gretty.webappCopy)
+        def closure = project.gretty.webappCopy
+        closure = closure.rehydrate(it, closure.owner, closure.thisObject)
+        closure()
 
         into "${project.buildDir}/inplaceWebapp"
       }
