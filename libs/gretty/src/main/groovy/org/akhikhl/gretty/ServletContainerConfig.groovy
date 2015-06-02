@@ -29,7 +29,7 @@ class ServletContainerConfig {
       if(webXmlFile.exists()) {
         def webXml = new XmlSlurper().parse(webXmlFile)
         if(webXml.filter.find { it.'filter-class'.text() == 'org.akhikhl.gretty.RedirectFilter' }) {
-          project.dependencies.add runnerConfig, "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}", {
+          project.dependencies.add 'runtime', "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}", {
             exclude group: 'javax.servlet', module: 'servlet-api'
           }
           alteredDependencies = true
