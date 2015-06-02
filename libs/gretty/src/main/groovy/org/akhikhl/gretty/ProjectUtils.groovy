@@ -253,7 +253,7 @@ final class ProjectUtils {
       wconfig.springBootMainClass = SpringBootMainClassFinder.findMainClass(project.project(wconfig.projectPath))
   }
 
-  static Set<URL> resolveClassPath(Project project, Collection<URL> classPath) {
+  static Set<URL> resolveClassPath(Project project, Collection classPath) {
     def resolvedClassPath = new LinkedHashSet()
     if(classPath == null)
       return resolvedClassPath

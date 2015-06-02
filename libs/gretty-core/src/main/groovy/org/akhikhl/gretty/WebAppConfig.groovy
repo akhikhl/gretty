@@ -37,7 +37,7 @@ class WebAppConfig {
   def resourceBase
   List extraResourceBases
 
-  Set<URL> classPath
+  Set<String> classPath
 
   String projectPath
   Boolean inplace
@@ -52,10 +52,16 @@ class WebAppConfig {
   void classPath(Object... args) {
     if(args) {
       if(classPath == null)
-        classPath = new LinkedHashSet<URL>()
+        classPath = new LinkedHashSet<String>()
       for(def arg in args) {
         if(arg != null) {
-          URL url = arg instanceof URL ? arg : (arg instanceof File ? ((File)arg).toURI().toURL() : new URL(arg.toString()) )
+          String url
+          if (arg instanceof URL)
+            url = ((URL)arg).toString()
+          else if (arg instanceof File)
+            url = ((File)arg).getPath()
+          else
+            url = arg.toString()
           classPath.add(url)
         }
       }

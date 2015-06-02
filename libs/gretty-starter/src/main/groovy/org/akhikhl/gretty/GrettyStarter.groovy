@@ -193,8 +193,14 @@ class GrettyStarter {
           Collection<URL> resolveWebAppClassPath(WebAppConfig wconfig) {
             Set<URL> resolvedClassPath = new LinkedHashSet<URL>()
             if(wconfig.classPath) {
-              for(URL url in wconfig.classPath)
-                resolvedClassPath.add(resolveFile(new File(url.toURI())).toURI().toURL())
+              for(String elem in wconfig.classPath) {
+                URL url
+                if(elem =~ /.{2,}\:.+/)
+                  url = new URL(elem)
+                else
+                  url = resolveFile(new File(elem)).toURI().toURL()
+                resolvedClassPath.add(url)
+              }
             }
             resolvedClassPath
           }
