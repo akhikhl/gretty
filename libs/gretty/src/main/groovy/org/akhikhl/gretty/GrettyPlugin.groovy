@@ -189,9 +189,38 @@ class GrettyPlugin implements Plugin<Project> {
 
     if(project.tasks.findByName('classes')) { // JVM project?
 
+      project.task('prepareInplaceWebAppFolder', group: 'gretty', type: Copy) {
+
+        description = 'Copies webAppDir of this web-app and all overlays (if any) to ${buildDir}/inplaceWebapp'
+
+        def getInplaceMode = {
+          project.tasks.findByName('appRun').effectiveInplaceMode
+        }
+
+        // We should track changes in inplaceMode value or plugin would show UP-TO-DATE for this task
+        // even if inplaceMode was changed
+        inputs.property('inplaceMode', getInplaceMode)
+
+        onlyIf { getInplaceMode() != 'hard' }
+
+        from ProjectUtils.getWebAppDir(project)
+
+        for (String overlay in project.gretty.overlays) {
+          Project overlayProject = project.project(overlay)
+          dependsOn { overlayProject.tasks.findByName('prepareInplaceWebAppFolder') }
+          from "${overlayProject.buildDir}/inplaceWebapp"
+        }
+
+        with project.copySpec(project.gretty.webappCopy)
+
+        into "${project.buildDir}/inplaceWebapp"
+      }
+
       project.task('createInplaceWebAppFolder', group: 'gretty') {
 
         description = 'Creates directory ${buildDir}/inplaceWebapp'
+
+        dependsOn project.tasks.prepareInplaceWebAppFolder
 
         File inplaceWebappDir = new File("${project.buildDir}/inplaceWebapp")
 
@@ -204,37 +233,6 @@ class GrettyPlugin implements Plugin<Project> {
         }
       }
 
-      project.task('prepareInplaceWebAppFolder', group: 'gretty', type: Copy) {
-
-        description = 'Copies webAppDir of this web-app and all overlays (if any) to ${buildDir}/inplaceWebapp'
-
-        dependsOn project.tasks.createInplaceWebAppFolder
-
-        def getInplaceMode = {
-          project.tasks.findByName('appRun').effectiveInplaceMode
-        }
-
-        // We should track changes in inplaceMode value or plugin would show UP-TO-DATE for this task
-        // even if inplaceMode was changed
-        inputs.property('inplaceMode', getInplaceMode)
-
-        onlyIf { getInplaceMode() != 'hard' }
-
-        for(String overlay in project.gretty.overlays) {
-          Project overlayProject = project.project(overlay)
-          dependsOn { overlayProject.tasks.findByName('prepareInplaceWebAppFolder') }
-          from "${overlayProject.buildDir}/inplaceWebapp"
-        }
-
-        from { ProjectUtils.getWebAppDir(project) }
-
-        def closure = project.gretty.webappCopy
-        closure = closure.rehydrate(it, closure.owner, closure.thisObject)
-        closure()
-
-        into "${project.buildDir}/inplaceWebapp"
-      }
-
       project.task('prepareInplaceWebAppClasses', group: 'gretty') {
         description = 'Compiles classes of this web-app and all overlays (if any)'
         dependsOn project.tasks.classes
@@ -244,7 +242,7 @@ class GrettyPlugin implements Plugin<Project> {
 
       project.task('prepareInplaceWebApp', group: 'gretty') {
         description = 'Prepares inplace web-app'
-        dependsOn project.tasks.prepareInplaceWebAppFolder
+        dependsOn project.tasks.createInplaceWebAppFolder
         dependsOn project.tasks.prepareInplaceWebAppClasses
       }
 
