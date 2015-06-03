@@ -203,13 +203,15 @@ class GrettyPlugin implements Plugin<Project> {
 
         onlyIf { getInplaceMode() != 'hard' }
 
-        from ProjectUtils.getWebAppDir(project)
+        // Attention: call order is important here! Overlay files must be copied prior to this web-app files.
 
         for (String overlay in project.gretty.overlays) {
           Project overlayProject = project.project(overlay)
           dependsOn { overlayProject.tasks.findByName('prepareInplaceWebAppFolder') }
           from "${overlayProject.buildDir}/inplaceWebapp"
         }
+
+        from ProjectUtils.getWebAppDir(project)
 
         def closure = project.gretty.webappCopy
         closure = closure.rehydrate(it, closure.owner, closure.thisObject)
