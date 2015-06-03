@@ -5,7 +5,7 @@ buildscript {
   }
   
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty:1.2.4-SNAPSHOT'
+    classpath 'org.akhikhl.gretty:gretty:1.2.5-SNAPSHOT'
   }
 }
 

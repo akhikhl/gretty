@@ -23,6 +23,7 @@ apply from: rootProject.file('integrationTests.gradle')
 gretty {
   contextPath = '/helloGrettyOverlay'
   overlay ':helloGretty'
+  servletContainer = 'jetty7'
 }
 
 rootProject.tasks.testAll.dependsOn { project.tasks.integrationTestAllContainers }

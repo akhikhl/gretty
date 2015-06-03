@@ -1,3 +1,27 @@
+## Gretty 1.2.4 release announcement
+
+June 2, 2015: Gretty version 1.2.4 is out and immediately available at github, bintray, maven central and gradle plugin portal!
+
+Gretty version 1.2.4 introduces the following changes:
+
+1. Properties servicePort and statusPort are deprecated and not used anymore. Gretty automatically selects available TCP ports for communication with it's runner process.
+
+2. Classpath isolation improved. If your web-app uses Groovy, you are free to choose whatever version of it - it will not conflict with the Groovy version used by Gretty runner.
+
+3. Resolved issue #185 "No warning when port service is already in use"
+
+4. Resolved issue #182 "Unable to use log4j-slf4j-impl"
+
+5. Resolved issue #178 "Classpath with property files added to the jetty"
+
+6. Resolved issue #173 "webappCopy doesn't seem to setup inputs/outputs"
+
+7. Resolved issue #145 "Logging via log4j backend doesn't work"
+
+8. Resolved issue #42 "allow to specify custom groovyVersion"
+
+9. Upgraded to Tomcat 7.0.62 and Tomcat 8.0.23
+
 ## Gretty 1.2.3 release announcement
 
 May 18, 2015: Gretty version 1.2.3 is out and immediately available at github, bintray, maven central and gradle plugin portal!
