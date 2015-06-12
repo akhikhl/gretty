@@ -200,8 +200,9 @@ class TomcatServerConfigurer {
 
     for(Map webapp in params.webApps) {
       StandardContext context = params.contextClass ? params.contextClass.newInstance() : new StandardContext()
-      context.setName(webapp.contextPath)
-      context.setPath(webapp.contextPath)
+      String effectiveContextPath = webapp.contextPath == "/" ? "" : webapp.contextPath
+      context.setName(effectiveContextPath)
+      context.setPath(effectiveContextPath)
       configurer.setResourceBase(context, webapp)
       // context.setLogEffectiveWebXml(true) // enable for debugging webxml merge
       FilteringClassLoader parentClassLoader = new FilteringClassLoader(params.parentClassLoader ?: this.getClass().getClassLoader())
