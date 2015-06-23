@@ -38,6 +38,7 @@ class WebAppConfig {
   List extraResourceBases
 
   Set<String> classPath
+  String webInfIncludeJarPattern
 
   String projectPath
   Boolean inplace
