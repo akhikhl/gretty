@@ -45,6 +45,10 @@ class FarmStartTask extends StartBaseTask {
       if(wconfig.inplace && wconfig.inplaceMode == 'hard') {
           logger.warn("You\'re running webapp (${wconfig.projectPath}) in hard inplaceMode: Overlay and filtering features of gretty will be disabled!")
       }
+
+      if(wconfig.webXml) {
+        logger.warn('You\'ve configured gretty to use the web.xml file located at ' + wconfig.webXml + '.')
+      }
     }
 
     new StartConfig() {

@@ -7,18 +7,15 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
 import org.apache.catalina.WebResourceRoot
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
-import org.apache.catalina.webresources.DirResourceSet
 import org.apache.catalina.webresources.StandardRoot
 import org.apache.tomcat.JarScanner
 import org.apache.tomcat.util.descriptor.web.WebXml
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -73,6 +70,10 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
     if(webappParams.extraResourceBases)
       webappParams.extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
+
+
+    if (webappParams.webXml)
+      context.setAltDDName(webappParams.webXml);
 
     Set classpathJarParentDirs = webappParams.webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect({
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)

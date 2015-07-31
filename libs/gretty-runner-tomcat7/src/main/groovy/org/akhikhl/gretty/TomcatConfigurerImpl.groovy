@@ -7,18 +7,15 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
 import org.apache.catalina.Globals
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.deploy.WebXml
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
-import org.apache.naming.resources.ProxyDirContext
 import org.apache.naming.resources.VirtualDirContext
 import org.apache.tomcat.JarScanner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -68,6 +65,9 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
     if(webappParams.extraResourceBases)
       extraResourcePaths += webappParams.extraResourceBases.collect { "/=$it" }
+
+    if (webappParams.webXml)
+      context.setAltDDName(webappParams.webXml);
 
     Set classpathJarParentDirs = new LinkedHashSet()
 
