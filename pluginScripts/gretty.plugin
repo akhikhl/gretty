@@ -5,20 +5,26 @@ buildscript {
         name 'mavenCentralProxy'
         url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
         if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+            println "USING AUTH"
             credentials {
                 username mavenUser
                 password mavenPassword
             }
+        } else {
+            println "ACCESSING NEXUS ANONYMOUSLY"
         }
     }
     maven {
         name 'nexusReleases'
         url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
         if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+            println "USING AUTH"
             credentials {
                 username mavenUser
                 password mavenPassword
             }
+        } else {
+            println "ACCESSING NEXUS ANONYMOUSLY"
         }
     }
   }
@@ -34,20 +40,26 @@ repositories {
         name 'mavenCentralProxy'
         url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
         if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+            println "USING AUTH"
             credentials {
                 username mavenUser
                 password mavenPassword
             }
+        } else {
+            println "ACCESSING NEXUS ANONYMOUSLY"
         }
     }
     maven {
         name 'nexusReleases'
         url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
         if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+            println "USING AUTH"
             credentials {
                 username mavenUser
                 password mavenPassword
             }
+        } else {
+            println "ACCESSING NEXUS ANONYMOUSLY"
         }
     }
 }
