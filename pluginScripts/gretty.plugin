@@ -4,27 +4,17 @@ buildscript {
     maven {
         name 'mavenCentralProxy'
         url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
-        if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
-            println "USING AUTH"
-            credentials {
-                username mavenUser
-                password mavenPassword
-            }
-        } else {
-            println "ACCESSING NEXUS ANONYMOUSLY"
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
         }
     }
     maven {
         name 'nexusReleases'
         url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
-        if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
-            println "USING AUTH"
-            credentials {
-                username mavenUser
-                password mavenPassword
-            }
-        } else {
-            println "ACCESSING NEXUS ANONYMOUSLY"
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
         }
     }
   }
@@ -39,27 +29,17 @@ repositories {
   maven {
         name 'mavenCentralProxy'
         url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
-        if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
-            println "USING AUTH"
-            credentials {
-                username mavenUser
-                password mavenPassword
-            }
-        } else {
-            println "ACCESSING NEXUS ANONYMOUSLY"
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
         }
     }
     maven {
         name 'nexusReleases'
         url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
-        if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
-            println "USING AUTH"
-            credentials {
-                username mavenUser
-                password mavenPassword
-            }
-        } else {
-            println "ACCESSING NEXUS ANONYMOUSLY"
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
         }
     }
 }
