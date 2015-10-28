@@ -1,22 +1,21 @@
+def repo = { repoName, repoUrl ->
+    name repoName
+    url repoUrl
+    if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+        credentials {
+            username 'iUlAnuK6'
+            password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
+        }
+    }
+}
+
+def nrRepo = repo.ncurry(0, 'nexusReleases', 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases')
+def mcpRepo = repo.ncurry(0, 'mavenCentralProxy', 'https://nexus.soma.salesforce.com/nexus/content/groups/public/')
+
 buildscript {
   repositories {
-    //jcenter()
-    maven {
-        name 'mavenCentralProxy'
-        url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
-        credentials {
-          username 'iUlAnuK6'
-          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
-        }
-    }
-    maven {
-        name 'nexusReleases'
-        url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
-        credentials {
-          username 'iUlAnuK6'
-          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
-        }
-    }
+    maven nrRepo
+    maven mcpRepo
   }
   
   dependencies {
@@ -25,23 +24,8 @@ buildscript {
 }
 
 repositories {
-  //jcenter()
-  maven {
-        name 'mavenCentralProxy'
-        url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
-        credentials {
-          username 'iUlAnuK6'
-          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
-        }
-    }
-    maven {
-        name 'nexusReleases'
-        url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
-        credentials {
-          username 'iUlAnuK6'
-          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
-        }
-    }
+    maven nrRepo
+    maven mcpRepo
 }
 
 if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
