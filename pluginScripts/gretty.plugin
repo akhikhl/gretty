@@ -1,6 +1,26 @@
 buildscript {
   repositories {
-    jcenter()
+    //jcenter()
+    maven {
+        name 'mavenCentralProxy'
+        url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
+        if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+            credentials {
+                username mavenUser
+                password mavenPassword
+            }
+        }
+    }
+    maven {
+        name 'nexusReleases'
+        url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
+        if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+            credentials {
+                username mavenUser
+                password mavenPassword
+            }
+        }
+    }
   }
   
   dependencies {
@@ -9,7 +29,27 @@ buildscript {
 }
 
 repositories {
-  jcenter()
+  //jcenter()
+  maven {
+        name 'mavenCentralProxy'
+        url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
+        if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+            credentials {
+                username mavenUser
+                password mavenPassword
+            }
+        }
+    }
+    maven {
+        name 'nexusReleases'
+        url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
+        if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+            credentials {
+                username mavenUser
+                password mavenPassword
+            }
+        }
+    }
 }
 
 if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
