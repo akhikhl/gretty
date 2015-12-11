@@ -3,11 +3,19 @@ buildscript {
     //jcenter()
     maven {
         name 'mavenCentralProxy'
-        url 'http://nexusprod:8080/nexus/content/groups/public/'
+        url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
+        }
     }
     maven {
         name 'nexusReleases'
-        url 'http://nexusprod:8080/nexus/content/repositories/releases'
+        url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
+        }
     }
   }
   
@@ -20,11 +28,19 @@ repositories {
   //jcenter()
   maven {
         name 'mavenCentralProxy'
-        url 'http://nexusprod:8080/nexus/content/groups/public/'
+        url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
+        }
     }
     maven {
         name 'nexusReleases'
-        url 'http://nexusprod:8080/nexus/content/repositories/releases'
+        url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
+        }
     }
 }
 
