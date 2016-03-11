@@ -38,7 +38,7 @@ task integrationTest(type: Test, dependsOn: 'test') {
 
 dependencies {
   // specific to concrete test harness
-  testCompile "org.codehaus.groovy:groovy-all:$groovy_version"
+  testCompile "org.codehaus.groovy:groovy:$groovy_version"
   testCompile "org.spockframework:spock-core:$spock_version"
   testCompile "org.gebish:geb-spock:$gebVersion"
   testCompile "org.seleniumhq.selenium:selenium-support:$seleniumVersion"

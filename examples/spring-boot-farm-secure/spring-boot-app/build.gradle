@@ -3,7 +3,7 @@ apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle')
 
 dependencies {
-  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+  compile "org.codehaus.groovy:groovy:$groovy_version"
   compile 'org.webjars:bootstrap:3.2.0'
   compile 'org.webjars:jquery:2.1.1'
 }
