@@ -118,6 +118,20 @@ final class JettyScannerManager implements ScannerManager {
     return scanDirs as List
   }
 
+  private List<File> getProjectScanDirs(WebAppConfig webapp) {
+    Set<File> scanDirs = new LinkedHashSet<>()
+    if(webapp.projectPath) {
+      def proj = project.project(webapp.projectPath)
+      collectScanDirs(scanDirs, webapp.scanDependencies, proj)
+      for(def dir in webapp.scanDirs) {
+        if(!(dir instanceof File))
+          dir = proj.file(dir.toString())
+        scanDirs.add(dir)
+      }
+    }
+    return scanDirs as List
+  }
+
   protected static isWebConfigFile(File f) {
     webConfigFiles.contains(f.name)
   }
@@ -158,7 +172,9 @@ final class JettyScannerManager implements ScannerManager {
         }
       }
       WebAppConfig wconfig = webapps.find {
-        it.projectPath && f.startsWith(project.project(it.projectPath).projectDir.absolutePath)
+        getProjectScanDirs(it).find {
+          f.startsWith(it.absolutePath)
+        }
       }
       if(wconfig != null) {
         log.info 'changed file {} affects project {}', f, wconfig.projectPath
