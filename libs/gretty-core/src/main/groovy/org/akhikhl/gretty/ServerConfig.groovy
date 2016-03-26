@@ -73,6 +73,8 @@ class ServerConfig {
    */
   Boolean enableNaming
 
+  String redeployMode
+
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
@@ -86,6 +88,7 @@ class ServerConfig {
     result.consoleLogEnabled = true
     result.fileLogEnabled = true
     result.logFileName = serverName
+    result.redeployMode = 'restart'
     result.logDir = "${System.getProperty('user.home')}/logs" as String
     return result
   }

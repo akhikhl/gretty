@@ -151,8 +151,7 @@ final class JettyScannerManager implements ScannerManager {
       webAppProjectReloads[projectPath] += reloadMode
     }
 
-    boolean shouldRestart = false
-
+    List<WebAppConfig> webAppConfigsToRestart = []
     for(String f in changedFiles) {
       if(f.endsWith('.jar')) {
         List<WebAppConfig> dependantWebAppProjects = webapps.findAll {
@@ -164,19 +163,18 @@ final class JettyScannerManager implements ScannerManager {
               log.info 'changed file {} is dependency of {}, the latter will be recompiled', f, wconfig.projectPath
               reloadProject(wconfig.projectPath, 'compile')
               if(managedClassReload)
-                shouldRestart = true
+                webAppConfigsToRestart.add(wconfig)
               // Otherwise there's no need to restart. When compilation finishes, scanner will wake up again and then restart.
             }
           }
           continue
         }
       }
-      WebAppConfig wconfig = webapps.find {
+      webapps.findAll {
         getProjectScanDirs(it).find {
           f.startsWith(it.absolutePath)
         }
-      }
-      if(wconfig != null) {
+      }.each { wconfig ->
         log.info 'changed file {} affects project {}', f, wconfig.projectPath
         def proj = project.project(wconfig.projectPath)
         if(proj.sourceSets.main.allSource.srcDirs.find { f.startsWith(it.absolutePath) }) {
@@ -191,24 +189,24 @@ final class JettyScannerManager implements ScannerManager {
                 log.info 'file {} is in managed output of {}, servlet-container will not be restarted', f, wconfig.projectPath
               else {
                 log.info 'file {} is in output of {}, but it runs as WAR, servlet-container will be restarted', f, wconfig.projectPath
-                shouldRestart = true
+                webAppConfigsToRestart.add(wconfig)
               }
             } else {
               log.info 'file {} is in output of {}, servlet-container will be restarted', f, wconfig.projectPath
-              shouldRestart = true
+              webAppConfigsToRestart.add(wconfig)
             }
           }
         } else if (isWebConfigFile(new File(f))) {
           if(wconfig.reloadOnConfigChange) {
             log.info 'file {} is configuration file, servlet-container will be restarted', f
             reloadProject(wconfig.projectPath, 'compile')
-            shouldRestart = true
+            webAppConfigsToRestart.add(wconfig)
           }
         } else if(f.startsWith(new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/lib').absolutePath)) {
           if(wconfig.reloadOnLibChange) {
             log.info 'file {} is in WEB-INF/lib, servlet-container will be restarted', f
             reloadProject(wconfig.projectPath, 'compile')
-            shouldRestart = true
+            webAppConfigsToRestart.add(wconfig)
           }
         } else if(ProjectReloadUtils.satisfiesOneOfReloadSpecs(f, fastReloadMap[proj.path])) {
           log.info 'file {} is in fastReload directories', f
@@ -216,7 +214,7 @@ final class JettyScannerManager implements ScannerManager {
         } else {
           log.info 'file {} is not in fastReload directories, switching to fullReload', f
           reloadProject(wconfig.projectPath, 'compile')
-          shouldRestart = true
+          webAppConfigsToRestart.add(wconfig)
         }
       }
     }
@@ -242,7 +240,7 @@ final class JettyScannerManager implements ScannerManager {
       }
     }
 
-    if(shouldRestart) {
+    if(webAppConfigsToRestart) {
       File portPropertiesFile = DefaultLauncher.getPortPropertiesFile(project)
       if(!portPropertiesFile.exists())
         throw new GradleException("Gretty seems to be not running, cannot send command 'restart' to it.")
@@ -251,7 +249,11 @@ final class JettyScannerManager implements ScannerManager {
         portProps.load(it)
       }
       int servicePort = portProps.servicePort as int
-      ServiceProtocol.send(servicePort, 'restart')
+      if(sconfig.redeployMode == 'restart') {
+        ServiceProtocol.send(servicePort, 'restart')
+      } else if(sconfig.redeployMode == 'redeploy') {
+        ServiceProtocol.send(servicePort, "redeploy ${webAppConfigsToRestart.collect {it.contextPath}.toSet().join(' ')}")
+      }
     }
   }
 
