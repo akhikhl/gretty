@@ -16,5 +16,6 @@ interface ServerManager {
 	void setParams(Map params)
   void startServer(ServerStartEvent startEvent)
   void stopServer()
+  void redeploy(List<String> webapps)
 }
 

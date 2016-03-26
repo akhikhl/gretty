@@ -199,80 +199,84 @@ class TomcatServerConfigurer {
       tomcat.host.addValve(new SingleSignOn())
 
     for(Map webapp in params.webApps) {
-      StandardContext context = params.contextClass ? params.contextClass.newInstance() : new StandardContext()
-      context.setName(webapp.contextPath)
-      context.setPath(webapp.contextPath)
-      configurer.setResourceBase(context, webapp)
-      // context.setLogEffectiveWebXml(true) // enable for debugging webxml merge
-      FilteringClassLoader parentClassLoader = new FilteringClassLoader(params.parentClassLoader ?: this.getClass().getClassLoader())
-      parentClassLoader.addServerClass('ch.qos.logback.')
-      parentClassLoader.addServerClass('org.slf4j.')
-      parentClassLoader.addServerClass('org.codehaus.groovy.')
-      parentClassLoader.addServerClass('groovy.')
-      parentClassLoader.addServerClass('groovyx.')
-      parentClassLoader.addServerClass('groovyjarjarantlr.')
-      parentClassLoader.addServerClass('groovyjarjarasm.')
-      parentClassLoader.addServerClass('groovyjarjarcommonscli.')
-      URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
-      URLClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
-      if(webapp.springBoot) {
-        Class AppServletInitializer = Class.forName('org.akhikhl.gretty.AppServletInitializer', true, classLoader)
-        AppServletInitializer.springBootMainClass = webapp.springBootMainClass
-      }
-      context.addLifecycleListener(new SpringloadedCleanup())
-      context.setParentClassLoader(classLoader)
-      context.setJarScanner(configurer.createJarScanner(context.getJarScanner(), new JarSkipPatterns()))
-      WebappLoader loader = new WebappLoader(classLoader)
-      loader.setLoaderClass(TomcatEmbeddedWebappClassLoader.class.getName())
-      loader.setDelegate(true)
-      context.setLoader(loader)
-
-      webapp.initParams?.each { key, value ->
-        context.addParameter(key, value)
-      }
-
-      def realmConfigFile = webapp.realmConfigFile ?: params.realmConfigFile
-      if(realmConfigFile && new File(realmConfigFile).exists()) {
-        log.info '{} -> realm config {}', webapp.contextPath, realmConfigFile
-        def realm = new MemoryRealm()
-        realm.setPathname(realmConfigFile)
-        context.setRealm(realm)
-      } else
-        context.addLifecycleListener(new FixContextListener())
-
-      context.configFile = tomcat.getWebappConfigFile(webapp.resourceBase, webapp.contextPath)
-      if(!context.configFile && webapp.contextConfigFile)
-        context.configFile = new File(webapp.contextConfigFile).toURI().toURL()
-      if(context.configFile)
-        log.info 'Configuring {} with {}', webapp.contextPath, context.configFile
-
-      context.addLifecycleListener(configurer.createContextConfig(classpathUrls))
-
-      if(configureContext) {
-        configureContext.delegate = this
-        configureContext(webapp, context)
-      }
-
-      if(!context.findChild('default'))
-        context.addLifecycleListener(new DefaultWebXmlListener())
-
-      if(log.isDebugEnabled())
-        context.addLifecycleListener(new LifecycleListener() {
-          @Override
-          public void lifecycleEvent(LifecycleEvent event) {
-            if (event.type == Lifecycle.CONFIGURE_START_EVENT) {
-              def pipeline = context.getPipeline()
-              log.debug 'START: context={}, pipeline: {} #{}', context.path, pipeline, System.identityHashCode(pipeline)
-              log.debug '  valves:'
-              for(def v in pipeline.getValves())
-                log.debug '    {} #{}', v, System.identityHashCode(v)
-            }
-          }
-        })
-
+      StandardContext context = createContext(webapp, tomcat, configureContext)
       tomcat.host.addChild(context)
     }
 
     tomcat
+  }
+
+  public StandardContext createContext(Map webapp, Tomcat tomcat, Closure configureContext = null) {
+    StandardContext context = params.contextClass ? params.contextClass.newInstance() : new StandardContext()
+    context.setName(webapp.contextPath)
+    context.setPath(webapp.contextPath)
+    configurer.setResourceBase(context, webapp)
+    // context.setLogEffectiveWebXml(true) // enable for debugging webxml merge
+    FilteringClassLoader parentClassLoader = new FilteringClassLoader(params.parentClassLoader ?: this.getClass().getClassLoader())
+    parentClassLoader.addServerClass('ch.qos.logback.')
+    parentClassLoader.addServerClass('org.slf4j.')
+    parentClassLoader.addServerClass('org.codehaus.groovy.')
+    parentClassLoader.addServerClass('groovy.')
+    parentClassLoader.addServerClass('groovyx.')
+    parentClassLoader.addServerClass('groovyjarjarantlr.')
+    parentClassLoader.addServerClass('groovyjarjarasm.')
+    parentClassLoader.addServerClass('groovyjarjarcommonscli.')
+    URL[] classpathUrls = (webapp.webappClassPath ?: []).collect { new URL(it) } as URL[]
+    URLClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
+    if (webapp.springBoot) {
+      Class AppServletInitializer = Class.forName('org.akhikhl.gretty.AppServletInitializer', true, classLoader)
+      AppServletInitializer.springBootMainClass = webapp.springBootMainClass
+    }
+    context.addLifecycleListener(new SpringloadedCleanup())
+    context.setParentClassLoader(classLoader)
+    context.setJarScanner(configurer.createJarScanner(context.getJarScanner(), new JarSkipPatterns()))
+    WebappLoader loader = new WebappLoader(classLoader)
+    loader.setLoaderClass(TomcatEmbeddedWebappClassLoader.class.getName())
+    loader.setDelegate(true)
+    context.setLoader(loader)
+
+    webapp.initParams?.each { key, value ->
+      context.addParameter(key, value)
+    }
+
+    def realmConfigFile = webapp.realmConfigFile ?: params.realmConfigFile
+    if (realmConfigFile && new File(realmConfigFile).exists()) {
+      log.info '{} -> realm config {}', webapp.contextPath, realmConfigFile
+      def realm = new MemoryRealm()
+      realm.setPathname(realmConfigFile)
+      context.setRealm(realm)
+    } else
+      context.addLifecycleListener(new FixContextListener())
+
+    context.configFile = tomcat.getWebappConfigFile(webapp.resourceBase, webapp.contextPath)
+    if (!context.configFile && webapp.contextConfigFile)
+      context.configFile = new File(webapp.contextConfigFile).toURI().toURL()
+    if (context.configFile)
+      log.info 'Configuring {} with {}', webapp.contextPath, context.configFile
+
+    context.addLifecycleListener(configurer.createContextConfig(classpathUrls))
+
+    if (configureContext) {
+      configureContext.delegate = this
+      configureContext(webapp, context)
+    }
+
+    if (!context.findChild('default'))
+      context.addLifecycleListener(new DefaultWebXmlListener())
+
+    if (log.isDebugEnabled())
+      context.addLifecycleListener(new LifecycleListener() {
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+          if (event.type == Lifecycle.CONFIGURE_START_EVENT) {
+            def pipeline = context.getPipeline()
+            log.debug 'START: context={}, pipeline: {} #{}', context.path, pipeline, System.identityHashCode(pipeline)
+            log.debug '  valves:'
+            for (def v in pipeline.getValves())
+              log.debug '    {} #{}', v, System.identityHashCode(v)
+          }
+        }
+      })
+    context
   }
 }

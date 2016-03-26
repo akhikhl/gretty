@@ -7,9 +7,6 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
-import org.slf4j.Logger
-
 /**
  *
  * @author akhikhl
@@ -47,4 +44,10 @@ interface JettyConfigurer {
   void setConfigurationsToWebAppContext(context, List configurations)
 
   void setHandlersToServer(server, List handlers)
+
+  List getHandlersByContextPaths(server, List contextPaths)
+
+  void removeHandlerFromServer(server, handler)
+
+  void addHandlerToServer(server, handler)
 }
