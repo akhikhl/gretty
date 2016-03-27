@@ -3,6 +3,8 @@ jdk:
   - oraclejdk7
   - openjdk7
   - oraclejdk8
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
   directories:
     - $HOME/.gradle/caches
@@ -13,7 +15,7 @@ env:
   global:
     - secure: "cBrXDV4ylU13IdF3yiVZvbVmkcXxnh7uEdC3PBELvORvxEh//1pG2sHntByIvbRQmP0Ea20eHyJA2bb1uWawsvBN3RjlpO9TfEknkY5YKgxkBZHrv7muSznU2L89nIqM1zt9li18RhaWJ/YYhArXyuvRW507o2FISaPGZLR0Kto="
     - secure: "TUFvtQqTxkkOLTxEXt6uNJLzBu+ERpM1pokSXKXlxrv0NCm+xLmMnP02ci1+wJT60Aes6dpog5Zsf1jA9zazkwh9eUA01wTL/KKnkc6zlI9P1eHwn8ReK1tBVs6Bg6kjcGZfovApjGo5mVvybEhMoccpH3fbQc9GH9aj3HjR5Uw="
-  - JAVA_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M"
+    - JAVA_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M"
 
 deploy:
   skip_cleanup: true
