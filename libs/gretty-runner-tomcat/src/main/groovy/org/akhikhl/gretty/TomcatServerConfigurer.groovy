@@ -102,7 +102,7 @@ class TomcatServerConfigurer {
         httpConn.port = params.httpPort ?: ServerDefaults.defaultHttpPort
 
       if(params.httpIdleTimeout)
-        httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout)
+        httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout.toString())
 
       httpConn.setProperty('maxPostSize', '0') // unlimited post size
 
