@@ -1,6 +1,7 @@
 ![logo](http://akhikhl.github.io/gretty/media/gretty_logo_1.x.png "gretty logo")
 
 [![Build Status](http://img.shields.io/travis/saladinkzn/gretty.svg)](https://travis-ci.org/saladinkzn/gretty)
+![Maintenance Status](http://img.shields.io/maintenance/yes/2016.svg)
 [![Snapshot](http://img.shields.io/badge/current-1.2.5--SNAPSHOT-47b31f.svg)](https://github.com/saladinkzn/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
