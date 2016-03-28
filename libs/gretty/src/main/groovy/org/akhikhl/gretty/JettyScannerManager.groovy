@@ -151,7 +151,7 @@ final class JettyScannerManager implements ScannerManager {
       webAppProjectReloads[projectPath] += reloadMode
     }
 
-    List<WebAppConfig> webAppConfigsToRestart = []
+    Set<WebAppConfig> webAppConfigsToRestart = []
     for(String f in changedFiles) {
       if(f.endsWith('.jar')) {
         List<WebAppConfig> dependantWebAppProjects = webapps.findAll {
@@ -253,6 +253,8 @@ final class JettyScannerManager implements ScannerManager {
         ServiceProtocol.send(servicePort, 'restart')
       } else if(sconfig.redeployMode == 'redeploy') {
         ServiceProtocol.send(servicePort, "redeploy ${webAppConfigsToRestart.collect {it.contextPath}.toSet().join(' ')}")
+      } else {
+        throw new IllegalStateException("Unknown redeployMode: ${sconfig.redeployMode}")
       }
     }
   }
