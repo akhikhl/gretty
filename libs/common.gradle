@@ -114,7 +114,7 @@ bintray {
   configurations = ['archives']
   pkg {
     repo = 'maven'
-    name = thisProject.projectId
+    name = "${thisProject.projectId}-fork"
     desc = thisProject.description
     licenses = [ thisProject.license ]
     labels = thisProject.projectLabels.split(',')
