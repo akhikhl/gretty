@@ -1,3 +1,25 @@
+## Gretty-Fork 1.2.5 release announcement
+
+March 28, 2016: Gretty-Fork version 1.2.5 is out and available at bintray.
+
+Gretty version 1.2.5 introduces the following changes:
+
+1. scanDependencies property is working again.
+
+2. redeployMode=redeploy support to redeploy changed web applications only.
+
+3. Jetty is updated to version 9.2.15
+
+4. Spring loaded was updated to 1.2.5.RELEASE [Pull request details](https://github.com/akhikhl/gretty/pull/237)
+
+5. Merged fix for `contextPath = '/'` in tomcat [Pull request details](https://github.com/akhikhl/gretty/pull/194)
+
+6. Merged patch replacing groovy-all dependency with groovy modules [Pull request details](https://github.com/akhikhl/gretty/pull/246)
+
+7. Fixed issue setting keepAliveTimeout [Issue details](https://github.com/akhikhl/gretty/issues/241)
+
+8. Added support for NeedClientAuth param [Issue details](https://github.com/akhikhl/gretty/issues/224)
+
 ## Gretty 1.2.4 release announcement
 
 June 2, 2015: Gretty version 1.2.4 is out and immediately available at github, bintray, maven central and gradle plugin portal!

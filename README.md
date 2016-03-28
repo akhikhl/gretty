@@ -19,10 +19,9 @@ Fork-specific information here: [wiki](https://github.com/saladinkzn/gretty/wiki
 
 #### :star: What's new
 
-June 2, 2015: Gretty 1.2.4 is out and immediately available at [Gradle plugin portal](http://plugins.gradle.org/plugin/org.akhikhl.gretty), 
-[Bintray](https://bintray.com/saladinkzn/maven/gretty-fork/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22).
+March 28, 2016: Gretty 1.2.5 is out and immediately available at [Bintray](http://bintray.com/saladinkzn/maven/gretty-fork/view)
 
-See [Gretty 1.2.4 release announcement](RELEASE.md#gretty-124-release-announcement) for more information.
+See [Gretty 1.2.5 release announcement](RELEASE.md#gretty-125-release-announcement) for more information.
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
@@ -45,6 +44,6 @@ All releases of Gretty are available at [Bintray](https://bintray.com/saladinkzn
 
 #### Copyright and License
 
-Copyright 2013-2015 (c) Timur Shakurov, Andrey Hihlovskiy and [contributors](CONTRIBUTORS).
+Copyright 2013-2016 (c) Timur Shakurov, Andrey Hihlovskiy and [contributors](CONTRIBUTORS).
 
 All versions, present and past, of Gretty are licensed under [MIT license](LICENSE).

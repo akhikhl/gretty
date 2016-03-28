@@ -4,6 +4,24 @@
 
 ### What's new:
 
+#### Version 1.2.5
+
+1. scanDependencies property is working again.
+
+2. redeployMode=redeploy support to redeploy changed web applications only.
+
+3. Jetty is updated to version 9.2.15
+
+4. Spring loaded was updated to 1.2.5.RELEASE
+
+5. Merged fix for `contextPath = '/'` in tomcat
+
+6. Merged patch replacing groovy-all dependency with groovy modules
+
+7. Fixed issue setting keepAliveTimeout
+
+8. Added support for NeedClientAuth param
+
 #### Version 1.2.4
 
 1. Properties servicePort and statusPort are deprecated and not used anymore. Gretty automatically selects available TCP ports for communication with it's runner process.

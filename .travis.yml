@@ -26,7 +26,7 @@ deploy:
       jdk: oraclejdk8
   - provider: script
     skip_cleanup: true
-    script: ./gradlew bintrayDeploy artifactoryPublish -PbintrayUSer=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY}
+    script: ./gradlew bintrayDeploy -PbintrayUSer=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY}
     on:
       tags: true
       jdk: oraclejdk8
