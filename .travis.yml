@@ -18,9 +18,15 @@ env:
     - JAVA_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M"
 
 deploy:
-  skip_cleanup: true
-  provider: script
-  script: ./gradlew artifactoryPublish -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY}
-  on:
-    branch: master
-    jdk: oraclejdk8
+  - provider: script
+    skip_cleanup: true
+    script: ./gradlew artifactoryPublish -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY}
+    on:
+      branch: master
+      jdk: oraclejdk8
+  - provider: script
+    skip_cleanup: true
+    script: ./gradlew bintrayDeploy artifactoryPublish -PbintrayUSer=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY}
+    on:
+      tags: true
+      jdk: oraclejdk8
