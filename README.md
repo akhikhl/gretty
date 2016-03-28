@@ -14,9 +14,7 @@ A complete list of Gretty features is available in [feature overview](http://akh
 
 #### Where to start
 
-If you are new with Gretty, try [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
-
-Fork-specific information here: [wiki](https://github.com/saladinkzn/gretty/wiki)
+If you are new with Gretty, try [getting started](http://saladinkzn.github.io/gretty-doc/Getting-started.html) page.
 
 #### :star: What's new
 
