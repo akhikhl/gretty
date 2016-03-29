@@ -76,6 +76,8 @@ class ServerConfig {
   String redeployMode
   String scanner
 
+  List<Integer> auxPortRange
+
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []

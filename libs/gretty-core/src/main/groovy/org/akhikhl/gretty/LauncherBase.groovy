@@ -23,15 +23,31 @@ import org.slf4j.LoggerFactory
  */
 abstract class LauncherBase implements Launcher {
 
-  protected static int[] findFreePorts(int count) {
+  protected static int[] findFreePorts(int count, List<Integer> range = null) {
     List result = []
     try {
       List sockets = []
       try {
-        while(count-- > 0) {
-          ServerSocket socket = new ServerSocket(0)
-          sockets.add(socket)
-          result.add(socket.getLocalPort())
+        if(!range) {
+          while(count-- > 0) {
+            ServerSocket socket = new ServerSocket(0)
+            sockets.add(socket)
+            result.add(socket.getLocalPort())
+          }
+        } else {
+          for(Integer port in range) {
+            try {
+              ServerSocket socket = new ServerSocket(port)
+              sockets.add(socket)
+              result.add(socket.getLocalPort())
+              if(--count == 0) {
+                break;
+              }
+            } catch (IOException io) { }
+          }
+          if(count > 0) {
+            throw new IllegalStateException("Unable to find enough ports");
+          }
         }
       } finally {
         for(ServerSocket socket in sockets)
@@ -90,7 +106,7 @@ abstract class LauncherBase implements Launcher {
       if(asyncResponse.getStatus(servicePort) == 'started')
         throw new RuntimeException('Web-server is already running.')
     }
-    (servicePort, statusPort) = findFreePorts(2)
+    (servicePort, statusPort) = findFreePorts(2, sconfig.auxPortRange)
     log.debug 'servicePort: {}, statusPort: {}', servicePort, statusPort
     Properties props = new Properties()
     props.servicePort = servicePort as String

@@ -99,6 +99,8 @@ final class JDKScannerManager extends BaseScannerManager {
             } catch (InterruptedException ex) {
                 logger.info "Thread stopped"
                 Thread.currentThread().interrupt()
+            } catch (ClosedWatchServiceException cwex) {
+                logger.info 'Watch service was closed'
             }
         }
         pollingThread.name = 'Polling thread'
