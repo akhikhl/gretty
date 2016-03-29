@@ -74,6 +74,7 @@ class ServerConfig {
   Boolean enableNaming
 
   String redeployMode
+  String scanner
 
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
@@ -90,6 +91,7 @@ class ServerConfig {
     result.logFileName = serverName
     result.redeployMode = 'restart'
     result.logDir = "${System.getProperty('user.home')}/logs" as String
+    result.scanner = 'jetty'
     return result
   }
 

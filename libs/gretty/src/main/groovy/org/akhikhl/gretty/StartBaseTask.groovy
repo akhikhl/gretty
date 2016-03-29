@@ -68,10 +68,18 @@ abstract class StartBaseTask extends DefaultTask {
   }
 
   private ScannerManager createScannerManager(LauncherConfig config) {
-    if(JDKScannerManager.available()) {
-      return new JDKScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
-    } else {
-      return new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
+    switch (config.serverConfig.scanner) {
+      case 'jdk':
+        if(JDKScannerManager.available()) {
+          return new JDKScannerManager(project, config.serverConfig, config.webAppConfigs, config.managedClassReload)
+        } else {
+          logger.error('JDK scanner was specified but it\'s not available. Falling back to jetty scanner')
+          return new JettyScannerManager(project, config.serverConfig, config.webAppConfigs, config.managedClassReload)
+        }
+      case 'jetty':
+        return new JettyScannerManager(project, config.serverConfig, config.webAppConfigs, config.managedClassReload)
+      default:
+        throw new IllegalArgumentException("Unknown scanner config: ${config.serverConfig.scanner}")
     }
   }
 

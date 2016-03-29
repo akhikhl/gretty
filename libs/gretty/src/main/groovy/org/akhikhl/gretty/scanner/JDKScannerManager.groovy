@@ -56,6 +56,10 @@ final class JDKScannerManager extends BaseScannerManager {
 
 
         dirs.each {
+            if(!it.exists()) {
+                return
+            }
+            it.toPath().register(watcherService, KINDS)
             it.eachDirRecurse {
                 it.toPath().register(watcherService, KINDS)
             }

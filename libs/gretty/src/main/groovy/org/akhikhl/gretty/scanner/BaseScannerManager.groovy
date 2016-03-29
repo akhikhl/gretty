@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 abstract class BaseScannerManager implements ScannerManager {
     private static final Logger log = LoggerFactory.getLogger(BaseScannerManager.class)
 
-    private static final webConfigFiles = [
+    protected static final webConfigFiles = [
       'web.xml', 'web-fragment.xml',
       'jetty.xml', 'jetty7.xml', 'jetty8.xml', 'jetty9.xml',
       'jetty-env.xml', 'jetty7-env.xml', 'jetty8-env.xml', 'jetty9-env.xml',
@@ -103,7 +103,7 @@ abstract class BaseScannerManager implements ScannerManager {
         return scanDirs as List
     }
 
-    private static isWebConfigFile(File f) {
+    protected static isWebConfigFile(File f) {
         webConfigFiles.contains(f.name)
     }
 
