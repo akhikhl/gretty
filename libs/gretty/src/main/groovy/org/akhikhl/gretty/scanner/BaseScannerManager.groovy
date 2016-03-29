@@ -212,7 +212,7 @@ abstract class BaseScannerManager implements ScannerManager {
         }
 
         if(webAppConfigsToRestart) {
-            File portPropertiesFile = DefaultLauncher.getPortPropertiesFile(project)
+            File portPropertiesFile = DefaultLauncher.getPortPropertiesFile(project, sconfig)
             if(!portPropertiesFile.exists())
                 throw new GradleException("Gretty seems to be not running, cannot send command 'restart' to it.")
             Properties portProps = new Properties()

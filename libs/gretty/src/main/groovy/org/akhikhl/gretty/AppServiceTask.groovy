@@ -32,7 +32,12 @@ abstract class AppServiceTask extends DefaultTask {
   @TaskAction
   void action() {
     String command = getCommand()
-    File portPropertiesFile = DefaultLauncher.getPortPropertiesFile(project)
+    //
+    ServerConfig serverConfig = new ServerConfig()
+    ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
+    ProjectUtils.resolveServerConfig(project, serverConfig)
+    //
+    File portPropertiesFile = DefaultLauncher.getPortPropertiesFile(project, serverConfig)
     if(!portPropertiesFile.exists())
       throw new GradleException("Gretty seems to be not running, cannot send command '$command' to it.")
     Properties portProps = new Properties()
@@ -40,9 +45,7 @@ abstract class AppServiceTask extends DefaultTask {
       portProps.load(it)
     }
     int servicePort = portProps.servicePort as int
-    ServerConfig serverConfig = new ServerConfig(servicePort: servicePort)
-    ConfigUtils.complementProperties(serverConfig, project.gretty.serverConfig, ProjectUtils.getDefaultServerConfig(project))
-    ProjectUtils.resolveServerConfig(project, serverConfig)
+
     log.debug 'Sending command {} to port {}', command, servicePort
     ServiceProtocol.send(servicePort, command)
   }

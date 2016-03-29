@@ -18,8 +18,8 @@ import org.gradle.tooling.ProjectConnection
  */
 class DefaultLauncher extends LauncherBase {
 
-  static File getPortPropertiesFile(Project project) {
-    project.file("${project.buildDir}/gretty_ports.properties")
+  static File getPortPropertiesFile(Project project, ServerConfig serverConfig) {
+    project.file("${project.buildDir}/${serverConfig.portPropertiesFileName}")
   }
 
   static Collection<URL> getRunnerClassPath(Project project, ServerConfig sconfig) {
@@ -49,7 +49,7 @@ class DefaultLauncher extends LauncherBase {
   }
 
   protected File getPortPropertiesFile() {
-    getPortPropertiesFile(project)
+    getPortPropertiesFile(project, sconfig)
   }
 
   @Override
