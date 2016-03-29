@@ -7,6 +7,8 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
+
+import org.akhikhl.gretty.scanner.JDKScannerManager
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
@@ -33,7 +35,7 @@ abstract class StartBaseTask extends DefaultTask {
   void action() {
     LauncherConfig config = getLauncherConfig()
     Launcher launcher = new DefaultLauncher(project, config)
-    launcher.scannerManager = new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
+    launcher.scannerManager = createScannerManager(config)
     if(getIntegrationTest()) {
       boolean result = false
       try {
@@ -63,6 +65,14 @@ abstract class StartBaseTask extends DefaultTask {
       }
     }
     serverStartInfo = launcher.getServerStartInfo()
+  }
+
+  private ScannerManager createScannerManager(LauncherConfig config) {
+    if(JDKScannerManager.available()) {
+      return new JDKScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
+    } else {
+      return new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
+    }
   }
 
   protected final void doPrepareServerConfig(ServerConfig sconfig) {
