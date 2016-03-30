@@ -13,7 +13,6 @@ import org.eclipse.jetty.security.authentication.ClientCertAuthenticator;
 import org.eclipse.jetty.security.authentication.DeferredAuthentication;
 import org.eclipse.jetty.security.authentication.SessionAuthentication;
 import org.eclipse.jetty.server.Authentication;
-import org.eclipse.jetty.server.HttpChannel;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.UserIdentity;
 import org.eclipse.jetty.util.MultiMap;
@@ -94,7 +93,7 @@ public class SSOClientCertAuthenticator extends ClientCertAuthenticator {
                             if (j_post!=null)
                             {
                                 LOG.debug("auth rePOST {}->{}",authentication,j_uri);
-                                Request base_request = HttpChannel.getCurrentHttpChannel().getRequest();
+                                Request base_request = Request.getBaseRequest(req);
                                 base_request.setContentParameters(j_post);
                             }
                             session.removeAttribute(__J_URI);

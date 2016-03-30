@@ -13,7 +13,7 @@ dependencies {
   compile "org.eclipse.jetty:jetty-servlet:$jetty9_version"
   compile "org.eclipse.jetty:jetty-webapp:$jetty9_version"
   compile "org.eclipse.jetty:jetty-security:$jetty9_version"
-  compile "org.eclipse.jetty:jetty-jsp:$jetty9_version"
+  compile "org.eclipse.jetty:apache-jsp:$jetty9_version"
   compile "org.eclipse.jetty:jetty-annotations:$jetty9_version"
   compile "org.eclipse.jetty:jetty-plus:$jetty9_version"
   compile "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jetty9_version"
