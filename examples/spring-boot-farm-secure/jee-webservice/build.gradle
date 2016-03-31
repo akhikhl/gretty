@@ -3,7 +3,7 @@ apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle')
 
 dependencies {
-  testCompile "org.akhikhl.gretty:gretty-spock:$gretty_version"
+  testCompile "ru.shadam.gretty:gretty-spock:$gretty_version"
 }
 
 gretty {
