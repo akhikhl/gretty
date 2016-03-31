@@ -13,6 +13,7 @@ import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.security.authentication.DeferredAuthentication;
 import org.eclipse.jetty.security.authentication.SessionAuthentication;
 import org.eclipse.jetty.server.Authentication;
+import org.eclipse.jetty.server.HttpChannel;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.UserIdentity;
 import org.eclipse.jetty.util.MultiMap;
@@ -93,7 +94,7 @@ public class SSOBasicAuthenticator extends BasicAuthenticator {
                             if (j_post!=null)
                             {
                                 LOG.debug("auth rePOST {}->{}",authentication,j_uri);
-                                Request base_request = Request.getBaseRequest(req);
+                                Request base_request = HttpChannel.getCurrentHttpChannel().getRequest();
                                 base_request.setContentParameters(j_post);
                             }
                             session.removeAttribute(__J_URI);

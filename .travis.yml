@@ -11,7 +11,7 @@ cache:
     - $HOME/.gradle/wrapper
 before_install:
   chmod +x gradlew
-sceript: gradlew buildExamples
+script: gradlew buildExamples
 env:
   global:
     - secure: "cBrXDV4ylU13IdF3yiVZvbVmkcXxnh7uEdC3PBELvORvxEh//1pG2sHntByIvbRQmP0Ea20eHyJA2bb1uWawsvBN3RjlpO9TfEknkY5YKgxkBZHrv7muSznU2L89nIqM1zt9li18RhaWJ/YYhArXyuvRW507o2FISaPGZLR0Kto="
