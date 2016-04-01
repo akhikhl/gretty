@@ -23,6 +23,7 @@ processResources {
     jetty8ServletApi: project.jetty8_servlet_api,
     jetty8ServletApiVersion: project.jetty8_servlet_api_version,
     jetty9Version: project.jetty9_version,
+    jetty93Version: project.jetty93_version,
     jetty9ServletApi: project.jetty9_servlet_api,
     jetty9ServletApiVersion: project.jetty9_servlet_api_version,
     tomcat7Version: project.tomcat7_version,

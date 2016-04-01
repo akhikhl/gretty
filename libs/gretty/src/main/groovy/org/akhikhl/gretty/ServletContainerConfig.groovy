@@ -145,8 +145,8 @@ class ServletContainerConfig {
     if(SystemUtils.isJavaVersionAtLeast(1.8f)) {
       configs['jetty9.3'] = [
         servletContainerType: 'jetty',
-        servletContainerVersion: jetty9Version,
-        servletContainerDescription: "Jetty $jetty9Version",
+        servletContainerVersion: jetty93Version,
+        servletContainerDescription: "Jetty $jetty93Version",
         servletContainerRunnerConfig: 'grettyRunnerJetty93',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty93:$grettyVersion"
