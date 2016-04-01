@@ -48,6 +48,7 @@ class ServletContainerConfig {
     String jetty8ServletApi = Externalized.getString('jetty8ServletApi')
     String jetty8ServletApiVersion = Externalized.getString('jetty8ServletApiVersion')
     String jetty9Version = Externalized.getString('jetty9Version')
+    String jetty93Version = Externalized.getString('jetty93Version')
     String jetty9ServletApi = Externalized.getString('jetty9ServletApi')
     String jetty9ServletApiVersion = Externalized.getString('jetty9ServletApiVersion')
     String tomcat7Version = Externalized.getString('tomcat7Version')
@@ -106,6 +107,23 @@ class ServletContainerConfig {
             grettyProvidedCompile 'javax.websocket:javax.websocket-api:1.0'
           }
         }
+      ],
+      'jetty9.3': [
+              servletContainerType: 'jetty',
+              servletContainerVersion: jetty9Version,
+              servletContainerDescription: "Jetty $jetty9Version",
+              servletContainerRunnerConfig: 'grettyRunnerJetty93',
+              servletContainerRunnerDependencies: { project ->
+                project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty93:$grettyVersion"
+                addRedirectFilter(project, servletContainerRunnerConfig)
+              },
+              servletApiVersion: jetty9ServletApiVersion,
+              servletApiDependencies: { project ->
+                project.dependencies {
+                  grettyProvidedCompile jetty9ServletApi
+                  grettyProvidedCompile 'javax.websocket:javax.websocket-api:1.0'
+                }
+              }
       ],
       'tomcat7': [
         servletContainerType: 'tomcat',

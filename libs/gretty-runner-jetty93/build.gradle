@@ -1,0 +1,22 @@
+apply from: rootProject.file('libs/common.gradle')
+
+configurations {
+  compile {
+    exclude group: 'org.eclipse.jetty.orbit', module: 'javax.servlet'
+  }
+}
+
+dependencies {
+  compile project(':libs:gretty-runner-jetty')
+  compile jetty9_servlet_api
+  compile "org.eclipse.jetty:jetty-server:$jetty93_version"
+  compile "org.eclipse.jetty:jetty-servlet:$jetty93_version"
+  compile "org.eclipse.jetty:jetty-webapp:$jetty93_version"
+  compile "org.eclipse.jetty:jetty-security:$jetty93_version"
+  compile "org.eclipse.jetty:apache-jsp:$jetty93_version"
+  compile "org.eclipse.jetty:jetty-annotations:$jetty93_version"
+  compile "org.eclipse.jetty:jetty-plus:$jetty93_version"
+  compile "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jetty93_version"
+  compile "org.ow2.asm:asm:$asm_version"
+  compile "org.ow2.asm:asm-commons:$asm_version"
+}
