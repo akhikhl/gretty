@@ -3,6 +3,11 @@
 
 def subDirs = new File(rootDir, 'libs').listFiles({ File f -> new File(f, 'build.gradle').isFile() } as FileFilter)
 subDirs.each { File subdir ->
-  include subdir.absolutePath.substring(rootDir.absolutePath.length() + 1).replace(File.separator, ':')
+  def subproject = subdir.absolutePath.substring(rootDir.absolutePath.length() + 1).replace(File.separator, ':')
+  // we don't try to compile gretty-runner-jetty93 against jdk 7
+  if(subproject == 'libs:gretty-runner-jetty93' && Float.parseFloat(System.properties['java.specification.version']) < 1.8f) {
+    return
+  }
+  include subproject
 }
 

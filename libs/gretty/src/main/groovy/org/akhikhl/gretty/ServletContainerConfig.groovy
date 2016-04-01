@@ -8,6 +8,7 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.commons.lang.SystemUtils
 import org.gradle.api.Project
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -58,7 +59,7 @@ class ServletContainerConfig {
     String tomcat8ServletApi = Externalized.getString('tomcat8ServletApi')
     String tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
     def runnerGroup = "ru.shadam.gretty"
-    [ 'jetty7': [
+    def configs = [ 'jetty7': [
         servletContainerType: 'jetty',
         servletContainerVersion: jetty7Version,
         servletContainerDescription: "Jetty $jetty7Version",
@@ -108,23 +109,6 @@ class ServletContainerConfig {
           }
         }
       ],
-      'jetty9.3': [
-              servletContainerType: 'jetty',
-              servletContainerVersion: jetty9Version,
-              servletContainerDescription: "Jetty $jetty9Version",
-              servletContainerRunnerConfig: 'grettyRunnerJetty93',
-              servletContainerRunnerDependencies: { project ->
-                project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty93:$grettyVersion"
-                addRedirectFilter(project, servletContainerRunnerConfig)
-              },
-              servletApiVersion: jetty9ServletApiVersion,
-              servletApiDependencies: { project ->
-                project.dependencies {
-                  grettyProvidedCompile jetty9ServletApi
-                  grettyProvidedCompile 'javax.websocket:javax.websocket-api:1.0'
-                }
-              }
-      ],
       'tomcat7': [
         servletContainerType: 'tomcat',
         servletContainerVersion: tomcat7Version,
@@ -158,6 +142,26 @@ class ServletContainerConfig {
         }
       ]
     ]
+    if(SystemUtils.isJavaVersionAtLeast(1.8f)) {
+      configs['jetty9.3'] = [
+        servletContainerType: 'jetty',
+        servletContainerVersion: jetty9Version,
+        servletContainerDescription: "Jetty $jetty9Version",
+        servletContainerRunnerConfig: 'grettyRunnerJetty93',
+        servletContainerRunnerDependencies: { project ->
+          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty93:$grettyVersion"
+          addRedirectFilter(project, servletContainerRunnerConfig)
+        },
+        servletApiVersion: jetty9ServletApiVersion,
+        servletApiDependencies: { project ->
+          project.dependencies {
+            grettyProvidedCompile jetty9ServletApi
+            grettyProvidedCompile 'javax.websocket:javax.websocket-api:1.0'
+          }
+        }
+      ]
+    }
+    return configs
   }
 
   static getConfig(servletContainer) {
