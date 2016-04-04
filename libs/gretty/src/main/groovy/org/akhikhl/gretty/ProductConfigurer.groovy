@@ -221,6 +221,7 @@ class ProductConfigurer {
               webappsDir.add(f, appDir)
           def resolvedClassPath = new LinkedHashSet<URL>()
           resolvedClassPath.addAll(ProjectUtils.getClassPathJars(proj, 'grettyProductRuntime'))
+          resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.beforeClassPath))
           resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
           files = resolvedClassPath.collect { new File(it.path) }
           files -= getVisibleRunnerFileCollection().files

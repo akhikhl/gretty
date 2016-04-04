@@ -179,16 +179,21 @@ abstract class StartBaseTask extends DefaultTask {
             if(wconfig.projectPath) {
               def proj = self.project.project(wconfig.projectPath)
               String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtime'
+              resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.beforeClassPath))
               resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, wconfig.inplace, runtimeConfig))
               resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
-            } else if(wconfig.classPath) {
-              for(String elem in wconfig.classPath) {
-                URL url
-                if(elem =~ /.{2,}\:.+/)
-                  url = new URL(elem)
-                else
-                  url = new File(elem).toURI().toURL()
-                resolvedClassPath.add(url)
+            } else {
+              for (def classpath in [wconfig.beforeClassPath, wconfig.classPath]) {
+                if (classpath) {
+                  for (String elem in classpath) {
+                    URL url
+                    if (elem =~ /.{2,}\:.+/)
+                      url = new URL(elem)
+                    else
+                      url = new File(elem).toURI().toURL()
+                    resolvedClassPath.add(url)
+                  }
+                }
               }
             }
             resolvedClassPath
