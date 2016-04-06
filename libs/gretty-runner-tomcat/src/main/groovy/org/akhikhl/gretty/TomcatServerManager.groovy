@@ -88,7 +88,7 @@ class TomcatServerManager implements ServerManager {
   void redeploy(List<String> webapps) {
     if(tomcat != null) {
       log.debug 'redeploying {}.', webapps.join(", ")
-      def containers = webapps.collect { tomcat.host.findChild(it) }
+      def containers = webapps.collect { TomcatServerConfigurer.getEffectiveContextPath(it) }.collect { tomcat.host.findChild(it) }
       //
       containers.each { tomcat.host.removeChild(it) }
       webapps.collect { contextPath -> params.webApps.find { it.contextPath == contextPath}}.each {

@@ -208,7 +208,7 @@ class TomcatServerConfigurer {
 
   public StandardContext createContext(Map webapp, Tomcat tomcat, Closure configureContext = null) {
     StandardContext context = params.contextClass ? params.contextClass.newInstance() : new StandardContext()
-    String effectiveContextPath = webapp.contextPath == '/' ? "" : webapp.contextPath;
+    String effectiveContextPath = getEffectiveContextPath(webapp.contextPath);
     context.name = effectiveContextPath
     context.path = effectiveContextPath
     configurer.setResourceBase(context, webapp)
@@ -279,5 +279,9 @@ class TomcatServerConfigurer {
         }
       })
     context
+  }
+
+  public static String getEffectiveContextPath(String contextPath) {
+    return contextPath == '/' ? "" : contextPath
   }
 }
