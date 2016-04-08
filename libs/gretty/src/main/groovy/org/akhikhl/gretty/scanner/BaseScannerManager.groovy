@@ -7,7 +7,6 @@ import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  * @author timur.shakurov@dz.ru
  */
@@ -27,6 +26,33 @@ abstract class BaseScannerManager implements ScannerManager {
     protected boolean managedClassReload
 
     protected Map fastReloadMap
+
+    protected Closure onBeforeFastReload
+    protected Closure onFastReload
+    //
+    protected Closure onBeforeRestart
+    protected Closure onRestart
+    //
+    protected Closure onBeforeReload
+    protected Closure onReload
+
+    @Override
+    void registerFastReloadCallbacks(Closure before, Closure after) {
+        onBeforeFastReload = before
+        onFastReload = after
+    }
+
+    @Override
+    void registerRestartCallbacks(Closure before, Closure after) {
+        onBeforeRestart = before
+        onRestart = after
+    }
+
+    @Override
+    void registerReloadCallbacks(Closure before, Closure after) {
+        onBeforeReload = before
+        onReload = after
+    }
 
     BaseScannerManager(Project project, ServerConfig sconfig, List<WebAppConfig> webapps, boolean managedClassReload) {
         this.project = project
@@ -203,11 +229,13 @@ abstract class BaseScannerManager implements ScannerManager {
                 }
             } else if(reloadModes.contains('fastReload')) {
                 log.info 'Fast-reloading {}', (projectPath == ':' ? proj.name : projectPath)
+                onBeforeFastReload?.call()
                 WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
                 // TODO: maybe we should disable fastReload at all?
                 if(!(wconfig.inplace && wconfig.inplaceMode == 'hard')) {
                     ProjectUtils.prepareInplaceWebAppFolder(proj)
                 }
+                onFastReload?.call()
             }
         }
 
@@ -221,9 +249,13 @@ abstract class BaseScannerManager implements ScannerManager {
             }
             int servicePort = portProps.servicePort as int
             if(sconfig.redeployMode == 'restart') {
-                ServiceProtocol.send(servicePort, 'restart')
+                onBeforeRestart?.call()
+                ServiceProtocol.send(servicePort, 'restartWithEvent')
+                onRestart?.call()
             } else if(sconfig.redeployMode == 'redeploy') {
+                onBeforeReload?.call()
                 ServiceProtocol.send(servicePort, "redeploy ${webAppConfigsToRestart.collect {it.contextPath}.toSet().join(' ')}")
+                onReload?.call()
             } else {
                 throw new IllegalStateException("Unknown redeployMode: ${sconfig.redeployMode}")
             }

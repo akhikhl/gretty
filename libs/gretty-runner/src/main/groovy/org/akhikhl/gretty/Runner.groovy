@@ -28,7 +28,7 @@ final class Runner {
     void onServerStart(Map serverStartInfo) {
       JsonBuilder json = new JsonBuilder()
       json serverStartInfo
-      ServiceProtocol.send(params.statusPort, json.toString())
+      ServiceProtocol.sendMayFail(params.statusPort, json.toString())
     }
   }
 
@@ -137,6 +137,7 @@ final class Runner {
         else if (data.startsWith('redeploy ')) {
           List<String> webappList = data.replace('redeploy ', '').split(' ').toList()
           serverManager.redeploy(webappList)
+          ServiceProtocol.sendMayFail(params.statusPort, 'redeployed')
         }
       }
     } finally {

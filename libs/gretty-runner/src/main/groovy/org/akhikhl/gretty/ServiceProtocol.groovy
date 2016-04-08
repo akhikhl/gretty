@@ -8,11 +8,12 @@
  */
 package org.akhikhl.gretty
 
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 final class ServiceProtocol {
+
+  private static final Logger logger = LoggerFactory.getLogger(ServiceProtocol.class)
 
   static String readMessage(int port) {
     def data
@@ -50,6 +51,20 @@ final class ServiceProtocol {
       out.flush()
     } finally {
       s.close()
+    }
+  }
+
+  static void sendMayFail(int port, String command) {
+    Socket s = null
+    try {
+      s = new Socket(InetAddress.getByName('127.0.0.1'), port)
+      OutputStream out = s.getOutputStream()
+      out.write(("${command}\n<<EOF>>\n").getBytes())
+      out.flush()
+    } catch (ConnectException ignored) {
+      logger.debug(ignored.getMessage(), ignored)
+    } finally {
+      s?.close()
     }
   }
 }

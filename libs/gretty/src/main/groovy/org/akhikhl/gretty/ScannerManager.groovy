@@ -16,5 +16,11 @@ interface ScannerManager {
 	
   void startScanner()
   void stopScanner()
+
+  void registerFastReloadCallbacks(Closure before, Closure after)
+  //
+  void registerRestartCallbacks(Closure before, Closure after)
+  //
+  void registerReloadCallbacks(Closure before, Closure after)
 }
 

@@ -12,6 +12,9 @@ import org.akhikhl.gretty.scanner.JDKScannerManager
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer
+import org.springframework.boot.devtools.livereload.LiveReloadServer
+
 /**
  * Base task for starting jetty
  *
@@ -35,7 +38,10 @@ abstract class StartBaseTask extends DefaultTask {
   void action() {
     LauncherConfig config = getLauncherConfig()
     Launcher launcher = new DefaultLauncher(project, config)
-    launcher.scannerManager = createScannerManager(config)
+    if(config.serverConfig.liveReloadEnabled) {
+      launcher.optionalLiveReloadServer = new OptionalLiveReloadServer(new LiveReloadServer())
+    }
+    launcher.scannerManager = createScannerManager(config, launcher.optionalLiveReloadServer)
     if(getIntegrationTest()) {
       boolean result = false
       try {
@@ -67,7 +73,7 @@ abstract class StartBaseTask extends DefaultTask {
     serverStartInfo = launcher.getServerStartInfo()
   }
 
-  private ScannerManager createScannerManager(LauncherConfig config) {
+  private ScannerManager createScannerManager(LauncherConfig config, OptionalLiveReloadServer optionalLiveReloadServer) {
     switch (config.serverConfig.scanner) {
       case 'jdk':
         if(JDKScannerManager.available()) {

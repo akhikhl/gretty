@@ -80,6 +80,8 @@ class ServerConfig {
 
   String portPropertiesFileName
 
+  Boolean liveReloadEnabled
+
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
@@ -97,6 +99,7 @@ class ServerConfig {
     result.logDir = "${System.getProperty('user.home')}/logs" as String
     result.scanner = 'jetty'
     result.portPropertiesFileName = 'gretty_ports.properties'
+    result.liveReloadEnabled = false
     return result
   }
 

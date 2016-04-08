@@ -11,6 +11,9 @@ import org.gradle.api.Project
 import org.gradle.process.JavaExecSpec
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
+import org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer
+
+import java.util.concurrent.Future
 
 /**
  *
@@ -32,6 +35,8 @@ class DefaultLauncher extends LauncherBase {
 
   ScannerManager scannerManager
 
+  OptionalLiveReloadServer optionalLiveReloadServer
+
   DefaultLauncher(Project project, LauncherConfig config) {
     super(config)
     this.project = project
@@ -46,6 +51,25 @@ class DefaultLauncher extends LauncherBase {
     super.beforeJavaExec()
     scannerManager?.startScanner()
     project.file("${project.buildDir}/gretty_ports")
+    optionalLiveReloadServer?.startServer()
+    //
+    scannerManager?.registerFastReloadCallbacks((Closure) null, { -> optionalLiveReloadServer.triggerReload() })
+    //
+    if(optionalLiveReloadServer) {
+      Future response
+      scannerManager?.registerRestartCallbacks(
+              { -> response = asyncResponse.getResponse() },
+              { -> response.get(); optionalLiveReloadServer.triggerReload() }
+      )
+    }
+    //
+    if(optionalLiveReloadServer) {
+      Future response2
+      scannerManager?.registerReloadCallbacks(
+              { -> response2 = asyncResponse.getResponse() },
+              { -> response2.get(); optionalLiveReloadServer.triggerReload() }
+      )
+    }
   }
 
   protected File getPortPropertiesFile() {
