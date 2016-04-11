@@ -12,7 +12,7 @@ package org.akhikhl.gretty
  *
  * @author akhikhl
  */
-interface zServerManager {
+interface ServerManager {
 	void setParams(Map params)
   void startServer(ServerStartEvent startEvent)
   void stopServer()
