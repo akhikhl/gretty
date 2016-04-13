@@ -53,17 +53,15 @@ class DefaultLauncher extends LauncherBase {
     project.file("${project.buildDir}/gretty_ports")
     optionalLiveReloadServer?.startServer()
     //
-    scannerManager?.registerFastReloadCallbacks((Closure) null, { -> optionalLiveReloadServer.triggerReload() })
-    //
     if(optionalLiveReloadServer) {
+      scannerManager?.registerFastReloadCallbacks((Closure) null, { -> optionalLiveReloadServer.triggerReload() })
+      //
       Future response
       scannerManager?.registerRestartCallbacks(
               { -> response = asyncResponse.getResponse() },
               { -> response.get(); optionalLiveReloadServer.triggerReload() }
       )
-    }
-    //
-    if(optionalLiveReloadServer) {
+      //
       Future response2
       scannerManager?.registerReloadCallbacks(
               { -> response2 = asyncResponse.getResponse() },
