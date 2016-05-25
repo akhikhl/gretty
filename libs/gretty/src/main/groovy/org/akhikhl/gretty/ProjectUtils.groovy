@@ -154,13 +154,22 @@ final class ProjectUtils {
     return result
   }
 
-  static WebAppConfig getDefaultWebAppConfigForMavenDependency(Project project, String dependency) {
+  static WebAppConfig getDefaultWebAppConfigForMavenDependency(Project project, String dependency, List<String> dependencies = []) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + dependency.split(':')[1]
     result.resourceBase = {
       def gav = dependency.split(':')
       def artifact = project.configurations.farm.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1] }
       artifact.file.absolutePath
+    }
+    if(dependencies) {
+      result.classPath = dependencies.collect {
+        def gav = it.split(':')
+        def artifact = project.configurations.farm.resolvedConfiguration.resolvedArtifacts.find {
+          it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1]
+        }
+        artifact.file.absolutePath
+      } as Set<String>
     }
     return result
   }
