@@ -64,9 +64,9 @@ class FarmConfigurer {
     sourceFarm
   }
 
-  WebAppConfig getWebAppConfigForMavenDependency(Map options, String dependency, List<String> dependencies = null) {
+  WebAppConfig getWebAppConfigForMavenDependency(Map options, String dependency, List<String> dependencies = null, String configurationName) {
     WebAppConfig wconfig = new WebAppConfig()
-    ConfigUtils.complementProperties(wconfig, options, ProjectUtils.getDefaultWebAppConfigForMavenDependency(project, dependency, dependencies))
+    ConfigUtils.complementProperties(wconfig, options, ProjectUtils.getDefaultWebAppConfigForMavenDependency(project, dependency, dependencies, configurationName))
     wconfig.inplace = false // always war-file, ignore options.inplace
     ProjectUtils.resolveWebAppConfig(null, wconfig, sconfig)
     wconfig
@@ -141,13 +141,14 @@ class FarmConfigurer {
       else if (warFile)
         webappConfig = getWebAppConfigForWarFile(options, warFile)
       else {
-        project.configurations.maybeCreate('farm')
-        project.dependencies.add 'farm', wref
+        def configurationName = 'farm' + wref
+        project.configurations.maybeCreate(configurationName)
+        project.dependencies.add configurationName, wref
         List<String> dependencies = options?.dependencies as List<String>
         dependencies?.each {
-          project.dependencies.add 'farm', it
+          project.dependencies.add configurationName, it
         }
-        webappConfig = getWebAppConfigForMavenDependency(options, wref, dependencies)
+        webappConfig = getWebAppConfigForMavenDependency(options, wref, dependencies, configurationName)
       }
       destWebAppConfigs.add(webappConfig)
     }
