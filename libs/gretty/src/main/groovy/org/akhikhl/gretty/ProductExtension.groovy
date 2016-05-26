@@ -22,6 +22,8 @@ class ProductExtension {
 
   // key is project path or war path, value is options
   Map webAppRefs = [:]
+  //
+  boolean includeVersion = false
 
   void webapp(Map options = [:], w) {
     if(w instanceof Project)

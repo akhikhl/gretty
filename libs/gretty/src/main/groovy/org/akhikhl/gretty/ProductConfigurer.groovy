@@ -43,7 +43,7 @@ class ProductConfigurer {
     this.baseOutputDir = baseOutputDir
     this.productName = productName
     this.product = product
-    outputDir = new File(baseOutputDir, productName ?: project.name)
+    outputDir = new File(baseOutputDir, productName ?: product.includeVersion ? "${project.name}-${project.version}" : project.name)
   }
 
   void configureProduct() {
@@ -166,7 +166,7 @@ class ProductConfigurer {
       version = project.version
       destinationDir = baseOutputDir
 
-      from outputDir, { into project.name }
+      from outputDir, { into outputDir.name }
 
       doLast {
         ant.checksum file: it.archivePath

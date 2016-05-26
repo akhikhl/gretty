@@ -82,7 +82,7 @@ class GrettyPlugin implements Plugin<Project> {
     String logbackVersion = Externalized.getString('logbackVersion')
 
     project.dependencies {
-      grettyStarter "org.akhikhl.gretty:gretty-starter:$grettyVersion"
+      grettyStarter "ru.shadam.gretty:gretty-starter:$grettyVersion"
       grettySpringLoaded "org.springframework:springloaded:$springLoadedVersion"
     }
 
