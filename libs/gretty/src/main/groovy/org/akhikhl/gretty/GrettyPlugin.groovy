@@ -8,12 +8,16 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.commons.io.FilenameUtils
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import java.nio.file.Paths
+
 /**
  *
  * @author akhikhl
@@ -127,6 +131,27 @@ class GrettyPlugin implements Plugin<Project> {
         }
       }
     }
+
+    project.farms.farmsMap.each { fname, farm ->
+      farm.webAppRefs.each { wref, options ->
+        def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref, false)
+        def type = typeAndResult[0] as FarmWebappType
+        def result = typeAndResult[1]
+
+        def configurationName = ProjectUtils.getFarmConfigurationName(fname)
+        if(FarmWebappType.WAR_DEPENDENCY == type) {
+          project.configurations.maybeCreate(configurationName)
+          project.dependencies.add configurationName, result
+        }
+
+        if(type in [FarmWebappType.WAR_DEPENDENCY, FarmWebappType.WAR_FILE]) {
+          project.configurations.maybeCreate(configurationName)
+          options.dependencies?.each {
+            project.dependencies.add configurationName, it
+          }
+        }
+      }
+    }
   }
 
   private void addExtensions(Project project) {
@@ -158,12 +183,12 @@ class GrettyPlugin implements Plugin<Project> {
   private void addTaskDependencies(Project project) {
 
     project.tasks.whenObjectAdded { task ->
-      if(GradleUtils.instanceOf(task, 'org.akhikhl.gretty.AppStartTask'))
+      if (GradleUtils.instanceOf(task, 'org.akhikhl.gretty.AppStartTask'))
         task.dependsOn {
           // We don't need any task for hard inplace mode.
           task.effectiveInplace ? project.tasks.prepareInplaceWebApp : project.tasks.prepareArchiveWebApp
         }
-      else if(GradleUtils.instanceOf(task, 'org.akhikhl.gretty.FarmStartTask'))
+      else if (GradleUtils.instanceOf(task, 'org.akhikhl.gretty.FarmStartTask')) {
         task.dependsOn {
           task.getWebAppConfigsForProjects().findResults {
             def proj = project.project(it.projectPath)
@@ -178,6 +203,27 @@ class GrettyPlugin implements Plugin<Project> {
             projTask
           }
         }
+
+        def farmName = task.farmName
+        project.farms.farmsMap[farmName].webAppRefs.each { wref, options ->
+          def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref, false)
+          def type = typeAndResult[0]
+          if(type in [FarmWebappType.WAR_FILE, FarmWebappType.WAR_DEPENDENCY]) {
+            if (options.overlays) {
+              def warFile
+              if (type == FarmWebappType.WAR_FILE) {
+                warFile = typeAndResult[1]
+              } else if (type == FarmWebappType.WAR_DEPENDENCY) {
+                warFile = ProjectUtils.getFileFromConfiguration(project, ProjectUtils.getFarmConfigurationName(farmName), typeAndResult[1])
+              }
+
+              def warFileName = warFile.name
+              def farmOverlayArchive = project.tasks.findByName("farmOverlayArchive${farmName}${warFileName}")
+              task.dependsOn farmOverlayArchive
+            }
+          }
+        }
+      }
     }
   }
 
@@ -494,6 +540,60 @@ class GrettyPlugin implements Plugin<Project> {
     } // JVM project
 
     project.farms.farmsMap.each { fname, farm ->
+      def overlayTasks = []
+      farm.webAppRefs.each { wref, options ->
+        def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref, false)
+        def type = typeAndResult[0] as FarmWebappType
+        switch (type) {
+          case FarmWebappType.WAR_FILE:
+          case FarmWebappType.WAR_DEPENDENCY:
+            def overlays = options.overlays
+            if (overlays) {
+              log.info("Farm {} contains webapp {} with overlays: {}", fname, wref, options.overlays)
+
+              def warFile
+              if(type == FarmWebappType.WAR_FILE) {
+                warFile = typeAndResult[1]
+              } else if (type == FarmWebappType.WAR_DEPENDENCY) {
+                warFile = ProjectUtils.getFileFromConfiguration(project, ProjectUtils.getFarmConfigurationName(fname), typeAndResult[1])
+              }
+
+              def outputFolder = Paths.get(project.buildDir.absolutePath, 'farms', fname, 'explodedWebapps', FilenameUtils.removeExtension(warFile.name)).toFile()
+              def outputFolderPath = outputFolder.absolutePath
+
+              def explodeWebappTask = project.task("farmExplodeWebapp$fname${warFile.name}", group: 'gretty') {
+                description = 'Explode webapp and all overlays into ${buildDir}/farms/${fname}/explodedWebapps/${wref}'
+                for(String overlay in overlays) {
+                  dependsOn "$overlay:assemble" as  String
+                }
+                for(String overlay in overlays)
+                  inputs.file { ProjectUtils.getFinalArchivePath(project.project(overlay)) }
+                inputs.file warFile
+                outputs.dir outputFolder
+                doLast {
+                  ProjectUtils.prepareExplodedFarmWebAppFolder(project, warFile, overlays, outputFolderPath)
+                }
+              }
+
+              // TODO: gradle way of doing this?
+              def repackagedArchive = Paths.get(project.buildDir.absolutePath, 'farms', fname, 'explodedWebapps', warFile.name).toFile().absolutePath
+              def archiveWebappTask = project.task("farmOverlayArchive$fname${warFile.name}", group: 'gretty') {
+                description = 'Creates archive from exploded web-app in ${buildDir}/farms/${fname}/explodedWebapps/${wref}'
+                dependsOn explodeWebappTask
+                inputs.dir outputFolder
+                outputs.file repackagedArchive
+                doLast {
+                  ant.zip destfile: repackagedArchive, basedir: outputFolderPath
+                }
+              }
+
+              overlayTasks.addAll([explodeWebappTask, archiveWebappTask])
+
+              options.finalArchivePath = repackagedArchive
+            }
+            break
+        }
+      }
 
       String farmDescr = fname ? "farm '${fname}'" : 'default farm'
 
@@ -677,7 +777,7 @@ class GrettyPlugin implements Plugin<Project> {
       tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
     }
 
-    if(!project.tasks.findByName('run'))
+    if(!project.tasks.findByName('run') && project.tasks.findByName('appRun'))
       project.task('run', group: 'gretty') {
         description = 'Starts web-app inplace, in interactive mode. Same as appRun task.'
         dependsOn 'appRun'

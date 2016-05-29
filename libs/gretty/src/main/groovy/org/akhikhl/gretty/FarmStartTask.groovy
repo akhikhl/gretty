@@ -38,7 +38,7 @@ class FarmStartTask extends StartBaseTask {
     doPrepareServerConfig(tempFarm.serverConfig)
 
     List<WebAppConfig> wconfigs = []
-    configurer.resolveWebAppRefs(tempFarm.webAppRefs, wconfigs, inplace, inplaceMode)
+    configurer.resolveWebAppRefs(farmName, tempFarm.webAppRefs, wconfigs, inplace, inplaceMode)
     for(WebAppConfig wconfig in wconfigs) {
       doPrepareWebAppConfig(wconfig)
 

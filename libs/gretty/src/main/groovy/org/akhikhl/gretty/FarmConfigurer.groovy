@@ -64,9 +64,9 @@ class FarmConfigurer {
     sourceFarm
   }
 
-  WebAppConfig getWebAppConfigForMavenDependency(Map options, String dependency, List<String> dependencies = null, String configurationName) {
+  WebAppConfig getWebAppConfigForMavenDependency(Map options, String dependency, String farmName) {
     WebAppConfig wconfig = new WebAppConfig()
-    ConfigUtils.complementProperties(wconfig, options, ProjectUtils.getDefaultWebAppConfigForMavenDependency(project, dependency, dependencies, configurationName))
+    ConfigUtils.complementProperties(wconfig, options, ProjectUtils.getDefaultWebAppConfigForMavenDependency(project, farmName,  dependency, options.dependencies))
     wconfig.inplace = false // always war-file, ignore options.inplace
     ProjectUtils.resolveWebAppConfig(null, wconfig, sconfig)
     wconfig
@@ -114,59 +114,67 @@ class FarmConfigurer {
   }
 
   // attention: this method may modify project configurations and dependencies.
-  void resolveWebAppRefs(Map wrefs, Collection<WebAppConfig> destWebAppConfigs, Boolean inplace = null, String inplaceMode = null) {
+  void resolveWebAppRefs(String farmName, Map wrefs, Collection<WebAppConfig> destWebAppConfigs, Boolean inplace = null, String inplaceMode = null) {
     wrefs.each { wref, options ->
       if(options.inplace != null)
         inplace = options.inplace
-      def proj = resolveWebAppRefToProject(wref)
-      def warFile
-      if(!proj) {
-        warFile = resolveWebAppRefToWarFile(wref)
-        if(!warFile) {
-          wref = wref.toString()
-          def gav = wref.split(':')
-          if(gav.length != 3)
-            throw new GradleException("'${wref}' is not an existing project or file or maven dependency.")
-          log.info '{} is not an existing project or war-file, treating it as a maven dependency', wref
-          if(!options.suppressMavenToProjectResolution) {
-            proj = project.rootProject.allprojects.find { it.group == gav[0] && it.name == gav[1] }
-            if(proj)
-              log.info '{} comes from project {}, so using project instead of maven dependency', wref, proj.path
-          }
-        }
+      def proj, warFile
+
+      // little hack for overlays:
+      if(options.finalArchivePath) {
+        wref = options.finalArchivePath
       }
+
+      def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref)
+      def type = typeAndResult[0]
+      def result = typeAndResult[1]
+      switch (type) {
+        case FarmWebappType.PROJECT:
+          proj = result
+          break
+        case FarmWebappType.WAR_FILE:
+          warFile = result
+          break
+        case FarmWebappType.DEPENDENCY_TO_PROJECT:
+          proj = result
+          log.info '{} comes from project {}, so using project instead of maven dependency', wref, proj.path
+          break
+        case FarmWebappType.WAR_DEPENDENCY:
+          log.info '{} is not an existing project or war-file, treating it as a maven dependency', wref
+          break
+      }
+
       WebAppConfig webappConfig
       if(proj)
         webappConfig = getWebAppConfigForProject(options, proj, inplace, inplaceMode)
       else if (warFile)
         webappConfig = getWebAppConfigForWarFile(options, warFile)
       else {
-        def configurationName = 'farm' + wref
-        project.configurations.maybeCreate(configurationName)
-        project.dependencies.add configurationName, wref
-        List<String> dependencies = options?.dependencies as List<String>
-        dependencies?.each {
-          project.dependencies.add configurationName, it
-        }
-        webappConfig = getWebAppConfigForMavenDependency(options, wref, dependencies, configurationName)
+        webappConfig = getWebAppConfigForMavenDependency(options, wref, farmName)
       }
       destWebAppConfigs.add(webappConfig)
     }
   }
 
+  /**
+   *
+   * @param webAppRef
+   * @return
+   * @deprecated use {@link FarmConfigurerUtil} instead
+   */
+  @Deprecated
   Project resolveWebAppRefToProject(webAppRef) {
-    def proj
-    if(webAppRef instanceof Project)
-      proj = webAppRef
-    else if(webAppRef instanceof String || webAppRef instanceof GString)
-      proj = project.findProject(webAppRef)
-    proj
+    FarmConfigurerUtil.resolveWebAppRefToProject(project, webAppRef)
   }
 
+  /**
+   *
+   * @param webAppRef
+   * @return
+   * @deprecated use {@link FarmConfigurerUtil} instead
+   */
+  @Deprecated
   File resolveWebAppRefToWarFile(webAppRef) {
-    File warFile = webAppRef instanceof File ? webAppRef : new File(webAppRef.toString())
-    if(!warFile.isFile() && !warFile.isAbsolute())
-      warFile = new File(project.projectDir, warFile.path)
-    warFile.isFile() ? warFile.absoluteFile : null
+    FarmConfigurerUtil.resolveWebAppRefToWarFile(project, webAppRef)
   }
 }

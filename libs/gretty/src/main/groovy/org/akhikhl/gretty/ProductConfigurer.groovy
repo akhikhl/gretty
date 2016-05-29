@@ -369,7 +369,7 @@ Version: ${project.version}"""
     sconfig = productFarm.serverConfig
     wconfigs = []
     // we don't need to pass inplaceMode here cuz inplace=false anyway
-    configurer.resolveWebAppRefs(productFarm.webAppRefs, wconfigs, false)
+    configurer.resolveWebAppRefs(productName, productFarm.webAppRefs, wconfigs, false)
     for(WebAppConfig wconfig in wconfigs)
       ProjectUtils.prepareToRun(project, wconfig)
     CertificateGenerator.maybeGenerate(project, sconfig)

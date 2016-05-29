@@ -154,23 +154,29 @@ final class ProjectUtils {
     return result
   }
 
-  static WebAppConfig getDefaultWebAppConfigForMavenDependency(Project project, String dependency, List<String> dependencies = [], String configurationName) {
+  static String getFarmConfigurationName(farmName) {
+    return 'farm' + farmName
+  }
+
+  static File getFileFromConfiguration(Project project, String configurationName, String dependency) {
+    def gav = dependency.split(':')
+    def artifact = project.configurations[configurationName].resolvedConfiguration.resolvedArtifacts.find {
+      it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1]
+    }
+    artifact.file
+  }
+
+  static WebAppConfig getDefaultWebAppConfigForMavenDependency(Project project, String farmName, String dependency, List<String> dependencies = []) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + dependency.split(':')[1]
+    def configurationName = getFarmConfigurationName(farmName)
+    def resolvedDependency = getFileFromConfiguration(project, configurationName, dependency)
     result.resourceBase = {
-      def gav = dependency.split(':')
-      def artifact = project.configurations[configurationName].resolvedConfiguration.resolvedArtifacts.find {
-        it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1]
-      }
-      artifact.file.absolutePath
+      resolvedDependency.absolutePath
     }
     if(dependencies) {
       result.classPath = dependencies.collect {
-        def gav = it.split(':')
-        def artifact = project.configurations[configurationName].resolvedConfiguration.resolvedArtifacts.find {
-          it.moduleVersion.id.group == gav[0] && it.moduleVersion.id.name == gav[1]
-        }
-        artifact.file.absolutePath
+        getFileFromConfiguration(project, configurationName, it).absolutePath
       } as Set<String>
     }
     return result
@@ -237,6 +243,20 @@ final class ProjectUtils {
     project.copy {
       from project.zipTree((project.tasks.findByName('war') ?: project.tasks.jar).archivePath)
       into "${project.buildDir}/explodedWebapp"
+    }
+  }
+
+  static void prepareExplodedFarmWebAppFolder(Project project, File war, List<String> overlays, String targetFolder) {
+    for(String overlay in overlays) {
+      def overlayProject = project.project(overlay)
+      project.copy {
+        from overlayProject.zipTree(getFinalArchivePath(overlayProject))
+        into targetFolder
+      }
+    }
+    project.copy {
+      from project.zipTree(war)
+      into targetFolder
     }
   }
 
