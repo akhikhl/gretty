@@ -8,18 +8,16 @@
  */
 package org.akhikhl.gretty
 
-import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.process.JavaForkOptions
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
-
 /**
  *
  * @author akhikhl
  */
-class JacocoHelper implements JavaForkOptions, ExtensionAware {
+class JacocoHelper extends DummyTask implements JavaForkOptions, ExtensionAware {
 
   private final String taskName
   private final ExtensionContainer extensions
@@ -37,7 +35,7 @@ class JacocoHelper implements JavaForkOptions, ExtensionAware {
   }
 
   // needed by JacocoPluginExtension.applyTo, dummy
-  void doFirst(Closure closure) {
+  Task doFirst(Closure closure) {
   }
 
   // needed by JacocoPluginExtension.applyTo
