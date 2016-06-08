@@ -134,7 +134,7 @@ class GrettyPlugin implements Plugin<Project> {
 
     project.farms.farmsMap.each { fname, farm ->
       farm.webAppRefs.each { wref, options ->
-        def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref, false)
+        def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref)
         def type = typeAndResult[0] as FarmWebappType
         def result = typeAndResult[1]
 
@@ -206,7 +206,7 @@ class GrettyPlugin implements Plugin<Project> {
 
         def farmName = task.farmName
         project.farms.farmsMap[farmName].webAppRefs.each { wref, options ->
-          def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref, false)
+          def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref)
           def type = typeAndResult[0]
           if(type in [FarmWebappType.WAR_FILE, FarmWebappType.WAR_DEPENDENCY]) {
             if (options.overlays) {
@@ -542,7 +542,7 @@ class GrettyPlugin implements Plugin<Project> {
     project.farms.farmsMap.each { fname, farm ->
       def overlayTasks = []
       farm.webAppRefs.each { wref, options ->
-        def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref, false)
+        def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref)
         def type = typeAndResult[0] as FarmWebappType
         switch (type) {
           case FarmWebappType.WAR_FILE:
