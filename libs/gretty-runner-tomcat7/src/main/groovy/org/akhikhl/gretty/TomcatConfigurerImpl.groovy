@@ -13,12 +13,10 @@ import org.apache.catalina.core.StandardContext
 import org.apache.catalina.deploy.WebXml
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
-import org.apache.naming.resources.ProxyDirContext
 import org.apache.naming.resources.VirtualDirContext
 import org.apache.tomcat.JarScanner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -73,7 +71,7 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
     webappParams.webappClassPath.findAll { it.endsWith('.jar') }.each {
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
-      classpathJarParentDirs.add jarFile.parentFile.absolutePath
+      classpathJarParentDirs.add jarFile.absolutePath
     }
 
     extraResourcePaths += classpathJarParentDirs.collect { "/WEB-INF/lib=$it" }
