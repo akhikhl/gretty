@@ -1,0 +1,34 @@
+buildscript {
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		jcenter()
+	}
+
+	dependencies {
+		classpath 'ru.shadam.gretty:gretty:1.2.6-SNAPSHOT'
+	}
+}
+
+apply plugin: 'groovy'
+apply plugin: 'org.akhikhl.gretty'
+apply from: rootProject.file('integrationTests.gradle')
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	jcenter()
+}
+
+dependencies {
+	compile 'io.reactivex:rxjava:1.1.5'
+}
+
+ext {
+	integrationTestContainers = ['tomcat7', 'tomcat8']
+}
+
+gretty {
+	servletContainer = 'tomcat7'
+	contextPath = '/bug'
+}

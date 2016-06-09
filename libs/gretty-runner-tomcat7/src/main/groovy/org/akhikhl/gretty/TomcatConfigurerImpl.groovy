@@ -67,18 +67,19 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     if(webappParams.extraResourceBases)
       extraResourcePaths += webappParams.extraResourceBases.collect { "/=$it" }
 
-    Set classpathJarParentDirs = new LinkedHashSet()
+    Set<File> classpathJarParentDirs = new LinkedHashSet()
 
     webappParams.webappClassPath.findAll { it.endsWith('.jar') }.each {
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
-      classpathJarParentDirs.add jarFile.absolutePath
+      classpathJarParentDirs.add jarFile
     }
 
-    extraResourcePaths += classpathJarParentDirs.collect { "/WEB-INF/lib=$it" }
+    def webInfLibs = classpathJarParentDirs.toList()
 
-    if(extraResourcePaths) {
-      VirtualDirContext vdc = new VirtualDirContext()
+    if(extraResourcePaths || webInfLibs) {
+      VirtualDirContext vdc = new VirtualDirContextEx()
       vdc.setExtraResourcePaths(extraResourcePaths.join(','))
+      vdc.webInfJars = webInfLibs
       context.setResources(vdc)
     }
   }
