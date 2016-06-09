@@ -1,0 +1,61 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    jcenter()
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
+  }
+
+  dependencies {
+    classpath "ru.shadam.gretty:gretty:$gretty_version"
+  }
+}
+
+repositories {
+  mavenLocal()
+  jcenter()
+  maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
+}
+
+apply plugin: 'groovy' // this is needed for spock
+apply plugin: 'org.akhikhl.gretty'
+
+test {
+  include '**/Test*.*'
+  include '**/*Test.*'
+  exclude '**/*IT.*'
+}
+
+task integrationTest(type: Test, dependsOn: 'test') {
+  outputs.upToDateWhen { false }
+  include '**/*IT.*'
+  // we explain to integrationTest that contextPath under test is "helloGretty", not "testWar"
+  ext.contextPath = 'helloGretty'
+  // specific to concrete test harness
+  doFirst {
+    systemProperty 'geb.build.reportsDir', reporting.file('geb')
+  }
+}
+
+dependencies {
+  // specific to concrete test harness
+  testCompile "org.codehaus.groovy:groovy:$groovy_version"
+  testCompile "org.spockframework:spock-core:$spock_version"
+  testCompile "org.gebish:geb-spock:$gebVersion"
+  testCompile "org.seleniumhq.selenium:selenium-support:$seleniumVersion"
+  testCompile "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion"
+}
+
+farm {
+  webapp "$group:helloGretty:$version", suppressMavenToProjectResolution: true
+//  webapp project
+  
+  // this is needed only if WAR-file is generated in the same project tree
+  afterEvaluate {
+    project.tasks.farmBeforeIntegrationTest.dependsOn ':helloGretty:publishToMavenLocal'
+  }
+}
+
+// this is needed only for inclusion into testAll chain
+rootProject.tasks.testAll.dependsOn { project.tasks.farmIntegrationTest }
+
+
