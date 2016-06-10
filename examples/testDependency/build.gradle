@@ -47,12 +47,11 @@ dependencies {
 
 farm {
   webapp "$group:helloGretty:$version", suppressMavenToProjectResolution: true
-//  webapp project
-  
-  // this is needed only if WAR-file is generated in the same project tree
-  afterEvaluate {
-    project.tasks.farmBeforeIntegrationTest.dependsOn ':helloGretty:publishToMavenLocal'
-  }
+}
+
+// this is needed only if WAR-file is generated in the same project tree
+afterEvaluate {
+	project.tasks.farmBeforeIntegrationTest.dependsOn ':helloGretty:publishToMavenLocal'
 }
 
 // this is needed only for inclusion into testAll chain
