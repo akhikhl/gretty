@@ -5,7 +5,7 @@ buildscript {
   }
   
   dependencies {
-    classpath 'ru.shadam.gretty:gretty:1.2.6-SNAPSHOT'
+    classpath 'ru.shadam.gretty:gretty:1.4.0-SNAPSHOT'
   }
 }
 

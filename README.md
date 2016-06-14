@@ -3,7 +3,7 @@
 [![Build Status](http://img.shields.io/travis/saladinkzn/gretty.svg)](https://travis-ci.org/saladinkzn/gretty)
 ![Maintenance Status](http://img.shields.io/maintenance/yes/2016.svg)
 [![Latest release](http://img.shields.io/badge/release-1.3.0-47b31f.svg)](https://github.com/saladinkzn/gretty/tags/v1.3.0)
-[![Snapshot](http://img.shields.io/badge/current-1.3.0--SNAPSHOT-47b31f.svg)](https://github.com/saladinkzn/gretty/tree/master)
+[![Snapshot](http://img.shields.io/badge/current-1.4.0--SNAPSHOT-47b31f.svg)](https://github.com/saladinkzn/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
