@@ -1,0 +1,17 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'ru.shadam.gretty:gretty:1.3.0'
+  }
+}
+
+repositories {
+  jcenter()
+}
+
+if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
+  project.apply(plugin: org.akhikhl.gretty.GrettyPlugin)
+

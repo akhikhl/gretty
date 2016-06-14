@@ -2,8 +2,8 @@
 
 [![Build Status](http://img.shields.io/travis/saladinkzn/gretty.svg)](https://travis-ci.org/saladinkzn/gretty)
 ![Maintenance Status](http://img.shields.io/maintenance/yes/2016.svg)
-[![Latest release](http://img.shields.io/badge/release-1.2.5-47b31f.svg)](https://github.com/saladinkzn/gretty/tags/v1.2.5)
-[![Snapshot](http://img.shields.io/badge/current-1.2.6--SNAPSHOT-47b31f.svg)](https://github.com/saladinkzn/gretty/tree/master)
+[![Latest release](http://img.shields.io/badge/release-1.3.0-47b31f.svg)](https://github.com/saladinkzn/gretty/tags/v1.3.0)
+[![Snapshot](http://img.shields.io/badge/current-1.3.0--SNAPSHOT-47b31f.svg)](https://github.com/saladinkzn/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
@@ -20,16 +20,15 @@ If you are new with Gretty, try [getting started](http://saladinkzn.github.io/gr
 
 #### :star: What's new
 
-March 28, 2016: Gretty 1.2.5 is out and immediately available at [Bintray](http://bintray.com/saladinkzn/maven/gretty-fork/view)
+June 14, 2016: Gretty 1.3.0 is out and immediately available at [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22ru.shadam.gretty%22).
 
-See [Gretty 1.2.5 release announcement](RELEASE.md#gretty-125-release-announcement) for more information.
+See [Gretty 1.3.0 release announcement](RELEASE.md#gretty-fork-130-release-announcement) for more information.
 
 See also: [complete list of changes](changes.md) in this and previous versions.
 
 #### Documentation
 
-You can learn about all Gretty (pre-fork) features in [online documentation](http://akhikhl.github.io/gretty-doc/).
-Docs for new features will be available soon.
+You can learn about all Gretty features in [online documentation](http://saladinkzn.github.io/gretty-doc/).
 
 #### System requirements
 

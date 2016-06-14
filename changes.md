@@ -1,9 +1,29 @@
-[Project home](https://github.com/akhikhl/gretty) | [Documentation](http://akhikhl.github.io/gretty-doc/) | [Feature overview](http://akhikhl.github.io/gretty-doc/Feature-overview.html)
+[Project home](https://github.com/saladinkzn/gretty) | [Documentation](http://saladinkzn.github.io/gretty-doc/) | [Feature overview](http://saladinkzn.github.io/gretty-doc/Feature-overview.html)
 
 [![logo](http://akhikhl.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
 
 ### What's new:
 
+#### Version 1.3.0
+
+ 1. New scanner for jdk 7+
+ 
+ 2. Fix for: akhikhl#239 (Gretty service port)
+ 
+ 3. Fix for: akhikhl#195 (Possibility to run multiple gretty builds on different ports)
+ 
+ 4. Support overlays for war webapps in farms #4
+ 
+ 5. Update jetty to 9.3 (by providing separate 'container' because latest jetty 9.3 is compiled with jdk 8)
+ 
+ 6. Add support for inserting paths before application output folders (will fix #6)
+ 
+ 7. Add support for dependencies option in farm webapp configuration. #13
+ 
+ 8. New feature: akhikhl#262 (Changing product name)
+ 
+ 9. Fix for duplicate entries in getResources(path) in tomcat 7 and 8 #20
+ 
 #### Version 1.2.5
 
 1. scanDependencies property is working again.
