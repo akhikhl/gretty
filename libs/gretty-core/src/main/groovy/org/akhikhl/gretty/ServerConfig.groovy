@@ -34,6 +34,7 @@ class ServerConfig {
   String sslKeyManagerPassword
   def sslTrustStorePath
   String sslTrustStorePassword
+  Boolean sslNeedClientAuth
   def realm
   def realmConfigFile
   def serverConfigFile

@@ -485,6 +485,8 @@ Version: ${project.version}"""
           }
           if(sconfig.sslTrustStorePassword)
             sslTrustStorePassword sconfig.sslTrustStorePassword
+          if(sconfig.sslNeedClientAuth)
+            sslNeedClientAuth sconfig.sslNeedClientAuth
         }
         if(sconfig.realm)
           realm sconfig.realm

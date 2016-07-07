@@ -1,17 +1,50 @@
 buildscript {
   repositories {
-    jcenter()
+    //jcenter()
+    mavenLocal()
+    maven {
+        name 'mavenCentralProxy'
+        url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
+        }
+    }
+    maven {
+        name 'nexusReleases'
+        url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
+        }
+    }
   }
   
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty:1.2.4'
+    classpath 'org.akhikhl.gretty:gretty:1.2.5-SNAPSHOT'
   }
 }
 
 repositories {
-  jcenter()
+  //jcenter()
+  mavenLocal()
+  maven {
+        name 'mavenCentralProxy'
+        url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
+        }
+    }
+    maven {
+        name 'nexusReleases'
+        url 'https://nexus.soma.salesforce.com/nexus/content/repositories/releases'
+        credentials {
+          username 'iUlAnuK6'
+          password 'FrOO17o3M/w4MhGdeYjdkDlWL2BZ78KHXRBemwLNfG0u'
+        }
+    }
 }
 
 if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
   project.apply(plugin: org.akhikhl.gretty.GrettyPlugin)
-
