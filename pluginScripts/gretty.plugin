@@ -1,6 +1,7 @@
 buildscript {
   repositories {
     //jcenter()
+    mavenLocal()
     maven {
         name 'mavenCentralProxy'
         url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'
@@ -20,12 +21,13 @@ buildscript {
   }
   
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty:1.2.4'
+    classpath 'org.akhikhl.gretty:gretty:1.2.5-SNAPSHOT'
   }
 }
 
 repositories {
   //jcenter()
+  mavenLocal()
   maven {
         name 'mavenCentralProxy'
         url 'https://nexus.soma.salesforce.com/nexus/content/groups/public/'

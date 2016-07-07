@@ -147,6 +147,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
         }
         if(params.sslTrustStorePassword)
           sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
+        if(params.sslNeedClientAuth)
+          sslContextFactory.setNeedClientAuth(params.sslNeedClientAuth);
       }
 
       if(params.httpsIdleTimeout)

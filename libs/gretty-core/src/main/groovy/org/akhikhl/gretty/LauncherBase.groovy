@@ -322,6 +322,8 @@ abstract class LauncherBase implements Launcher {
           sslTrustStorePath self.fileToString(sconfig.sslTrustStorePath)
         if(sconfig.sslTrustStorePassword)
           sslTrustStorePassword sconfig.sslTrustStorePassword
+        if(sconfig.sslNeedClientAuth)
+          sslNeedClientAuth sconfig.sslNeedClientAuth
       }
       if(sconfig.realm)
         realm sconfig.realm
