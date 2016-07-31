@@ -1,7 +1,36 @@
 language: groovy
 jdk:
   - oraclejdk7
-  - openjdk7
   - oraclejdk8
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+    - $HOME/.gradle/caches
+    - $HOME/.gradle/wrapper
+before_install:
+  chmod +x gradlew
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+script: ./gradlew build
 env:
-  - JAVA_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M"
+  global:
+    - secure: "X4/PDZwZrdOH6ysA2ADhTxqk2OG6bZ8FL6gLTGxwNWb3pnmGCWklHI2lyVEK2LCz++SD8ANV7zmhxjUQbY6VlcYGGiNtlstYNVG7N0geo7PeMWSMJ9c8J59ETXh64/4pFQmZZR1X10piAHfY1M2yU6/pnMT7mTtYYLHX3Qm+7ik="
+    - secure: "FzPbxzDGQl8JCaPFZh9tXn3uAftachPY1weNHREXIafCvfbLxGNjk3+Ib0J4iWfMXEIoZXtQOFWBZXdJ668TwtEXjb2JfsGXt23P2BUapE56nEVJ6A7JRsbYLbb0MONVkY9la+Kz9ShfDbREehqsWqR7N/qD0UDteY1ohdghzLc="
+    - JAVA_OPTS="-XX:PermSize=512M -XX:MaxPermSize=1G"
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: ./gradlew artifactoryPublish -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY}
+    on:
+      branch: master
+      jdk: oraclejdk8
+  - provider: script
+    skip_cleanup: true
+    script: ./gradlew bintrayUpload -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY}
+    on:
+      tags: true
+      jdk: oraclejdk8

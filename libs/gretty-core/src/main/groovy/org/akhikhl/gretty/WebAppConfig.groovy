@@ -37,6 +37,7 @@ class WebAppConfig {
   def resourceBase
   List extraResourceBases
 
+  Set<String> beforeClassPath
   Set<String> classPath
 
   String projectPath
@@ -49,22 +50,30 @@ class WebAppConfig {
   Boolean springBoot
   String springBootMainClass
 
+  private static void addClassPathEntries(Set<String> classPath, Object... args) {
+    for(def arg in args) {
+      if(arg != null) {
+        String url
+        if (arg instanceof URL)
+          url = ((URL)arg).toString()
+        else if (arg instanceof File)
+          url = ((File)arg).getPath()
+        else
+          url = arg.toString()
+        classPath.add(url)
+      }
+    }
+  }
+
+  void beforeClassPath(Object... args) {
+    if(args) {
+      addClassPathEntries(beforeClassPath ?: (beforeClassPath = new LinkedHashSet<>()), args)
+    }
+  }
+
   void classPath(Object... args) {
     if(args) {
-      if(classPath == null)
-        classPath = new LinkedHashSet<String>()
-      for(def arg in args) {
-        if(arg != null) {
-          String url
-          if (arg instanceof URL)
-            url = ((URL)arg).toString()
-          else if (arg instanceof File)
-            url = ((File)arg).getPath()
-          else
-            url = arg.toString()
-          classPath.add(url)
-        }
-      }
+      addClassPathEntries(classPath ?: (classPath = new LinkedHashSet<>()), args)
     }
   }
 

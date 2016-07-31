@@ -11,11 +11,9 @@ package org.akhikhl.gretty
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.joran.JoranConfigurator
-import ch.qos.logback.classic.util.ContextInitializer
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -30,7 +28,7 @@ final class Runner {
     void onServerStart(Map serverStartInfo) {
       JsonBuilder json = new JsonBuilder()
       json serverStartInfo
-      ServiceProtocol.send(params.statusPort, json.toString())
+      ServiceProtocol.sendMayFail(params.statusPort, json.toString())
     }
   }
 
@@ -135,6 +133,11 @@ final class Runner {
         else if(data == 'restartWithEvent') {
           serverManager.stopServer()
           serverManager.startServer(new ServerStartEventImpl())
+        }
+        else if (data.startsWith('redeploy ')) {
+          List<String> webappList = data.replace('redeploy ', '').split(' ').toList()
+          serverManager.redeploy(webappList)
+          ServiceProtocol.sendMayFail(params.statusPort, 'redeployed')
         }
       }
     } finally {

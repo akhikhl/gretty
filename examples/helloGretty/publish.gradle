@@ -1,0 +1,9 @@
+apply(plugin: 'maven-publish')
+
+publishing {
+  publications {
+    mavenWeb(MavenPublication) {
+      from components.web
+    }
+  }
+}

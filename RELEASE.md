@@ -1,3 +1,49 @@
+## Gretty-Fork 1.3.0 release announcement
+
+June 14, 2016: Gretty-Fork version 1.3.0 is out and available at github, bintray and maven central
+
+Gretty 1.3.0 introduces the following changes:
+
+1. New scanner for jdk 7+
+
+2. Fix for: akhikhl#239 (Gretty service port)
+
+3. Fix for: akhikhl#195 (Possibility to run multiple gretty builds on different ports)
+
+4. Support overlays for war webapps in farms #4
+
+5. Update jetty to 9.3 (by providing separate 'container' because latest jetty 9.3 is compiled with jdk 8)
+
+6. Add support for inserting paths before application output folders (will fix #6)
+
+7. Add support for dependencies option in farm webapp configuration. #13
+
+8. New feature: akhikhl#262 (Changing product name)
+
+9. Fix for duplicate entries in getResources(path) in tomcat 7 and 8 #20
+
+## Gretty-Fork 1.2.5 release announcement
+
+March 28, 2016: Gretty-Fork version 1.2.5 is out and available at bintray.
+
+Gretty version 1.2.5 introduces the following changes:
+
+1. scanDependencies property is working again.
+
+2. redeployMode=redeploy support to redeploy changed web applications only.
+
+3. Jetty is updated to version 9.2.15
+
+4. Spring loaded was updated to 1.2.5.RELEASE [Pull request details](https://github.com/akhikhl/gretty/pull/237)
+
+5. Merged fix for `contextPath = '/'` in tomcat [Pull request details](https://github.com/akhikhl/gretty/pull/194)
+
+6. Merged patch replacing groovy-all dependency with groovy modules [Pull request details](https://github.com/akhikhl/gretty/pull/246)
+
+7. Fixed issue setting keepAliveTimeout [Issue details](https://github.com/akhikhl/gretty/issues/241)
+
+8. Added support for NeedClientAuth param [Issue details](https://github.com/akhikhl/gretty/issues/224)
+
 ## Gretty 1.2.4 release announcement
 
 June 2, 2015: Gretty version 1.2.4 is out and immediately available at github, bintray, maven central and gradle plugin portal!

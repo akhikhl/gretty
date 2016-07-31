@@ -8,13 +8,9 @@
  */
 package org.akhikhl.gretty
 
-import org.apache.catalina.Context
-import org.apache.catalina.connector.Connector
-import org.apache.catalina.core.StandardContext
 import org.apache.catalina.startup.Tomcat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -31,6 +27,10 @@ class TomcatServerManager implements ServerManager {
     this.configurer = configurer
   }
 
+  private TomcatServerConfigurer createServerConfigurer() {
+    return new TomcatServerConfigurer(configurer, params);
+  }
+
   @Override
   void setParams(Map params) {
     this.params = params
@@ -42,7 +42,7 @@ class TomcatServerManager implements ServerManager {
 
     log.debug '{} starting.', params.servletContainerDescription
 
-    tomcat = new TomcatServerConfigurer(configurer, params).createAndConfigureServer()
+    tomcat = createServerConfigurer().createAndConfigureServer()
 
     boolean result = false
     try {
@@ -81,6 +81,20 @@ class TomcatServerManager implements ServerManager {
       tomcat.destroy()
       tomcat = null
       log.debug '{} stopped.', params.servletContainerDescription
+    }
+  }
+
+  @Override
+  void redeploy(List<String> webapps) {
+    if(tomcat != null) {
+      log.debug 'redeploying {}.', webapps.join(", ")
+      def containers = webapps.collect { TomcatServerConfigurer.getEffectiveContextPath(it) }.collect { tomcat.host.findChild(it) }
+      //
+      containers.each { tomcat.host.removeChild(it) }
+      webapps.collect { contextPath -> params.webApps.find { it.contextPath == contextPath}}.each {
+        def context = createServerConfigurer().createContext(it, tomcat)
+        tomcat.host.addChild(context)
+      }
     }
   }
 }

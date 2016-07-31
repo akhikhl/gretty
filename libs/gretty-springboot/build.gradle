@@ -2,7 +2,7 @@ apply from: rootProject.file('libs/common.gradle')
 
 dependencies {
   providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
-  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+  compile "org.codehaus.groovy:groovy:$groovy_version"
   compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion", {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
   }

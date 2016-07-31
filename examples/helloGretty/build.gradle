@@ -19,6 +19,7 @@ repositories {
 apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle')
+apply from: 'publish.gradle'
 
 dependencies {
   compile 'org.webjars:bootstrap:3.2.0'

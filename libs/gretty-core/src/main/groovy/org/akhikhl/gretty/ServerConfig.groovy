@@ -34,6 +34,7 @@ class ServerConfig {
   String sslKeyManagerPassword
   def sslTrustStorePath
   String sslTrustStorePassword
+  boolean sslNeedClientAuth
   def realm
   def realmConfigFile
   def serverConfigFile
@@ -72,6 +73,15 @@ class ServerConfig {
    */
   Boolean enableNaming
 
+  String redeployMode
+  String scanner
+
+  List<Integer> auxPortRange
+
+  String portPropertiesFileName
+
+  Boolean liveReloadEnabled
+
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
@@ -85,7 +95,11 @@ class ServerConfig {
     result.consoleLogEnabled = true
     result.fileLogEnabled = true
     result.logFileName = serverName
+    result.redeployMode = 'restart'
     result.logDir = "${System.getProperty('user.home')}/logs" as String
+    result.scanner = 'jetty'
+    result.portPropertiesFileName = 'gretty_ports.properties'
+    result.liveReloadEnabled = false
     return result
   }
 

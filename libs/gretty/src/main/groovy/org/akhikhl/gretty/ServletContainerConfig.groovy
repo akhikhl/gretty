@@ -8,6 +8,7 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.commons.lang.SystemUtils
 import org.gradle.api.Project
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -48,6 +49,7 @@ class ServletContainerConfig {
     String jetty8ServletApi = Externalized.getString('jetty8ServletApi')
     String jetty8ServletApiVersion = Externalized.getString('jetty8ServletApiVersion')
     String jetty9Version = Externalized.getString('jetty9Version')
+    String jetty93Version = Externalized.getString('jetty93Version')
     String jetty9ServletApi = Externalized.getString('jetty9ServletApi')
     String jetty9ServletApiVersion = Externalized.getString('jetty9ServletApiVersion')
     String tomcat7Version = Externalized.getString('tomcat7Version')
@@ -56,13 +58,15 @@ class ServletContainerConfig {
     String tomcat8Version = Externalized.getString('tomcat8Version')
     String tomcat8ServletApi = Externalized.getString('tomcat8ServletApi')
     String tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
-    [ 'jetty7': [
+    def runnerGroup = "org.akhikhl.gretty"
+    def configs = [ 'jetty7': [
         servletContainerType: 'jetty',
         servletContainerVersion: jetty7Version,
         servletContainerDescription: "Jetty $jetty7Version",
         servletContainerRunnerConfig: 'grettyRunnerJetty7',
         servletContainerRunnerDependencies: { project ->
-          project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-jetty7:$grettyVersion"
+
+          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty7:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
         },
         servletApiVersion: jetty7ServletApiVersion,
@@ -78,7 +82,7 @@ class ServletContainerConfig {
         servletContainerDescription: "Jetty $jetty8Version",
         servletContainerRunnerConfig: 'grettyRunnerJetty8',
         servletContainerRunnerDependencies: { project ->
-          project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-jetty8:$grettyVersion"
+          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty8:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
         },
         servletApiVersion: jetty8ServletApiVersion,
@@ -94,7 +98,7 @@ class ServletContainerConfig {
         servletContainerDescription: "Jetty $jetty9Version",
         servletContainerRunnerConfig: 'grettyRunnerJetty9',
         servletContainerRunnerDependencies: { project ->
-          project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-jetty9:$grettyVersion"
+          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty9:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
         },
         servletApiVersion: jetty9ServletApiVersion,
@@ -111,7 +115,7 @@ class ServletContainerConfig {
         servletContainerDescription: "Tomcat $tomcat7Version",
         servletContainerRunnerConfig: 'grettyRunnerTomcat7',
         servletContainerRunnerDependencies: { project ->
-          project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat7:$grettyVersion"
+          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-tomcat7:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
         },
         servletApiVersion: tomcat7ServletApiVersion,
@@ -127,7 +131,7 @@ class ServletContainerConfig {
         servletContainerDescription: "Tomcat $tomcat8Version",
         servletContainerRunnerConfig: 'grettyRunnerTomcat8',
         servletContainerRunnerDependencies: { project ->
-          project.dependencies.add servletContainerRunnerConfig, "org.akhikhl.gretty:gretty-runner-tomcat8:$grettyVersion"
+          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-tomcat8:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
         },
         servletApiVersion: tomcat8ServletApiVersion,
@@ -138,6 +142,26 @@ class ServletContainerConfig {
         }
       ]
     ]
+    if(SystemUtils.isJavaVersionAtLeast(1.8f)) {
+      configs['jetty9.3'] = [
+        servletContainerType: 'jetty',
+        servletContainerVersion: jetty93Version,
+        servletContainerDescription: "Jetty $jetty93Version",
+        servletContainerRunnerConfig: 'grettyRunnerJetty93',
+        servletContainerRunnerDependencies: { project ->
+          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty93:$grettyVersion"
+          addRedirectFilter(project, servletContainerRunnerConfig)
+        },
+        servletApiVersion: jetty9ServletApiVersion,
+        servletApiDependencies: { project ->
+          project.dependencies {
+            grettyProvidedCompile jetty9ServletApi
+            grettyProvidedCompile 'javax.websocket:javax.websocket-api:1.0'
+          }
+        }
+      ]
+    }
+    return configs
   }
 
   static getConfig(servletContainer) {

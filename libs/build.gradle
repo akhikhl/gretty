@@ -37,7 +37,7 @@ if(!bintrayDryRun)
   task bintraySign(type: RestTask) {
     description 'Push to bintray and sign it.'
     httpMethod = 'post'
-    uri = "https://api.bintray.com/gpg/${project.developerId}/maven/${project.projectId}/versions/${project.version}"
+    uri = "https://api.bintray.com/gpg/${project.developerId}/maven/${project.projectId}-fork/versions/${project.version}"
     username = project.bintrayUser
     password = project.bintrayKey
     requestBody = [ passphrase: project.bintrayKeyPhrase ]

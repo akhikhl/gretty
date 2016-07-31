@@ -7,9 +7,14 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
+
+import org.akhikhl.gretty.scanner.JDKScannerManager
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer
+import org.springframework.boot.devtools.livereload.LiveReloadServer
+
 /**
  * Base task for starting jetty
  *
@@ -33,7 +38,10 @@ abstract class StartBaseTask extends DefaultTask {
   void action() {
     LauncherConfig config = getLauncherConfig()
     Launcher launcher = new DefaultLauncher(project, config)
-    launcher.scannerManager = new JettyScannerManager(project, config.getServerConfig(), config.getWebAppConfigs(), config.getManagedClassReload())
+    if(config.serverConfig.liveReloadEnabled) {
+      launcher.optionalLiveReloadServer = new OptionalLiveReloadServer(new LiveReloadServer())
+    }
+    launcher.scannerManager = createScannerManager(config, launcher.optionalLiveReloadServer)
     if(getIntegrationTest()) {
       boolean result = false
       try {
@@ -63,6 +71,22 @@ abstract class StartBaseTask extends DefaultTask {
       }
     }
     serverStartInfo = launcher.getServerStartInfo()
+  }
+
+  private ScannerManager createScannerManager(LauncherConfig config, OptionalLiveReloadServer optionalLiveReloadServer) {
+    switch (config.serverConfig.scanner) {
+      case 'jdk':
+        if(JDKScannerManager.available()) {
+          return new JDKScannerManager(project, config.serverConfig, config.webAppConfigs, config.managedClassReload)
+        } else {
+          logger.error('JDK scanner was specified but it\'s not available. Falling back to jetty scanner')
+          return new JettyScannerManager(project, config.serverConfig, config.webAppConfigs, config.managedClassReload)
+        }
+      case 'jetty':
+        return new JettyScannerManager(project, config.serverConfig, config.webAppConfigs, config.managedClassReload)
+      default:
+        throw new IllegalArgumentException("Unknown scanner config: ${config.serverConfig.scanner}")
+    }
   }
 
   protected final void doPrepareServerConfig(ServerConfig sconfig) {
@@ -161,16 +185,21 @@ abstract class StartBaseTask extends DefaultTask {
             if(wconfig.projectPath) {
               def proj = self.project.project(wconfig.projectPath)
               String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtime'
+              resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.beforeClassPath))
               resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, wconfig.inplace, runtimeConfig))
               resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
-            } else if(wconfig.classPath) {
-              for(String elem in wconfig.classPath) {
-                URL url
-                if(elem =~ /.{2,}\:.+/)
-                  url = new URL(elem)
-                else
-                  url = new File(elem).toURI().toURL()
-                resolvedClassPath.add(url)
+            } else {
+              for (def classpath in [wconfig.beforeClassPath, wconfig.classPath]) {
+                if (classpath) {
+                  for (String elem in classpath) {
+                    URL url
+                    if (elem =~ /.{2,}\:.+/)
+                      url = new URL(elem)
+                    else
+                      url = new File(elem).toURI().toURL()
+                    resolvedClassPath.add(url)
+                  }
+                }
               }
             }
             resolvedClassPath

@@ -65,56 +65,60 @@ class JettyServerConfigurer {
     List handlers = []
 
     for(Map webapp in params.webApps) {
-      def context = configurer.createWebAppContext(params, webapp)
-      context.displayName = webapp.contextPath
-      context.contextPath = webapp.contextPath
-
-      if(!params.supressSetConfigurations) {
-        List configurations = configurer.getConfigurations(webapp)
-        BaseResourceConfiguration baseRes = configurations.find { it instanceof BaseResourceConfiguration }
-        if(baseRes) {
-          baseRes.setExtraResourceBases(webapp.extraResourceBases)
-          baseRes.addBaseResourceListener this.&configureWithBaseResource.curry(webapp)
-        }
-        configurer.setConfigurationsToWebAppContext(context, configurations)
-      }
-
-      File tempDir = new File(baseDir, 'webapps-exploded' + context.contextPath)
-      tempDir.mkdirs()
-      log.debug 'jetty context temp directory: {}', tempDir
-      context.setTempDirectory(tempDir)
-      if(context.respondsTo('setPersistTempDirectory')) // not supported on older jetty versions
-        context.setPersistTempDirectory(true)
-
-      webapp.initParams?.each { key, value ->
-        context.setInitParameter(key, value)
-      }
-
-      File resourceFile = new File(webapp.resourceBase)
-
-      if(resourceFile.isDirectory())
-        context.setResourceBase(webapp.resourceBase)
-      else
-        context.setWar(webapp.resourceBase)
-
-      configurer.configureSessionManager(server, context, params, webapp)
-
-      if(configureContext) {
-        configureContext.delegate = this
-        configureContext(webapp, context)
-      }
-
-      if(webapp.springBoot) {
-        Class AppServletInitializer = Class.forName('org.akhikhl.gretty.AppServletInitializer', true, context.classLoader)
-        AppServletInitializer.springBootMainClass = webapp.springBootMainClass
-      }
-
+      def context = createContext(webapp, baseDir, server, configureContext)
       handlers.add(context)
     }
 
     configurer.setHandlersToServer(server, handlers)
 
     return server
+  }
+
+  def createContext(Map webapp, File baseDir, server, Closure configureContext = null) {
+    def context = configurer.createWebAppContext(params, webapp)
+    context.displayName = webapp.contextPath
+    context.contextPath = webapp.contextPath
+
+    if (!params.supressSetConfigurations) {
+      List configurations = configurer.getConfigurations(webapp)
+      BaseResourceConfiguration baseRes = configurations.find { it instanceof BaseResourceConfiguration }
+      if (baseRes) {
+        baseRes.setExtraResourceBases(webapp.extraResourceBases)
+        baseRes.addBaseResourceListener this.&configureWithBaseResource.curry(webapp)
+      }
+      configurer.setConfigurationsToWebAppContext(context, configurations)
+    }
+
+    File tempDir = new File(baseDir, 'webapps-exploded' + context.contextPath)
+    tempDir.mkdirs()
+    log.debug 'jetty context temp directory: {}', tempDir
+    context.setTempDirectory(tempDir)
+    if (context.respondsTo('setPersistTempDirectory')) // not supported on older jetty versions
+      context.setPersistTempDirectory(true)
+
+    webapp.initParams?.each { key, value ->
+      context.setInitParameter(key, value)
+    }
+
+    File resourceFile = new File(webapp.resourceBase)
+
+    if (resourceFile.isDirectory())
+      context.setResourceBase(webapp.resourceBase)
+    else
+      context.setWar(webapp.resourceBase)
+
+    configurer.configureSessionManager(server, context, params, webapp)
+
+    if (configureContext) {
+      configureContext.delegate = this
+      configureContext(webapp, context)
+    }
+
+    if (webapp.springBoot) {
+      Class AppServletInitializer = Class.forName('org.akhikhl.gretty.AppServletInitializer', true, context.classLoader)
+      AppServletInitializer.springBootMainClass = webapp.springBootMainClass
+    }
+    context
   }
 
   URL getContextConfigFile(baseResource, String servletContainer) {

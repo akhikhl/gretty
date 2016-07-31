@@ -11,6 +11,9 @@ import org.gradle.api.Project
 import org.gradle.process.JavaExecSpec
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
+import org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer
+
+import java.util.concurrent.Future
 
 /**
  *
@@ -18,8 +21,8 @@ import org.gradle.tooling.ProjectConnection
  */
 class DefaultLauncher extends LauncherBase {
 
-  static File getPortPropertiesFile(Project project) {
-    project.file("${project.buildDir}/gretty_ports.properties")
+  static File getPortPropertiesFile(Project project, ServerConfig serverConfig) {
+    project.file("${project.buildDir}/${serverConfig.portPropertiesFileName}")
   }
 
   static Collection<URL> getRunnerClassPath(Project project, ServerConfig sconfig) {
@@ -31,6 +34,8 @@ class DefaultLauncher extends LauncherBase {
   protected Project project
 
   ScannerManager scannerManager
+
+  OptionalLiveReloadServer optionalLiveReloadServer
 
   DefaultLauncher(Project project, LauncherConfig config) {
     super(config)
@@ -46,10 +51,27 @@ class DefaultLauncher extends LauncherBase {
     super.beforeJavaExec()
     scannerManager?.startScanner()
     project.file("${project.buildDir}/gretty_ports")
+    optionalLiveReloadServer?.startServer()
+    //
+    if(optionalLiveReloadServer) {
+      scannerManager?.registerFastReloadCallbacks((Closure) null, { -> optionalLiveReloadServer.triggerReload() })
+      //
+      Future response
+      scannerManager?.registerRestartCallbacks(
+              { -> response = asyncResponse.getResponse() },
+              { -> response.get(); optionalLiveReloadServer.triggerReload() }
+      )
+      //
+      Future response2
+      scannerManager?.registerReloadCallbacks(
+              { -> response2 = asyncResponse.getResponse() },
+              { -> response2.get(); optionalLiveReloadServer.triggerReload() }
+      )
+    }
   }
 
   protected File getPortPropertiesFile() {
-    getPortPropertiesFile(project)
+    getPortPropertiesFile(project, sconfig)
   }
 
   @Override

@@ -38,7 +38,7 @@ final class JettyServerManager implements ServerManager {
 
     log.debug '{} starting.', params.servletContainerDescription
 
-    server = new JettyServerConfigurer(configurer, params).createAndConfigureServer()
+    server = createServerConfigurer().createAndConfigureServer()
 
     boolean result = false
     try {
@@ -72,6 +72,10 @@ final class JettyServerManager implements ServerManager {
     }
   }
 
+  private JettyServerConfigurer createServerConfigurer() {
+    new JettyServerConfigurer(configurer, params)
+  }
+
   @Override
   void stopServer() {
     if(server != null) {
@@ -80,5 +84,24 @@ final class JettyServerManager implements ServerManager {
       server = null
       log.debug '{} stopped.', params.servletContainerDescription
     }
+  }
+
+  @Override
+  void redeploy(List<String> contextPaths) {
+    log.debug('redeploying {}.', contextPaths.join(' '))
+    def handlers = configurer.getHandlersByContextPaths(server, contextPaths)
+    handlers.each {
+      log.error("removing handlers: ${it}")
+      configurer.removeHandlerFromServer(server, it)
+    }
+    //
+    def contexts = contextPaths.collect { contextPath ->
+      params.webApps.find { it.contextPath == contextPath }
+    }.collect {
+      def context = createServerConfigurer().createContext(it, new File(params.baseDir), server)
+      configurer.addHandlerToServer(server, context)
+      context
+    }
+    contexts.each { it.start() }
   }
 }

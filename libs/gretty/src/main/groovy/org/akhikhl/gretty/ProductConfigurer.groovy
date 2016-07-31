@@ -43,7 +43,7 @@ class ProductConfigurer {
     this.baseOutputDir = baseOutputDir
     this.productName = productName
     this.product = product
-    outputDir = new File(baseOutputDir, productName ?: project.name)
+    outputDir = new File(baseOutputDir, productName ?: product.includeVersion ? "${project.name}-${project.version}" : project.name)
   }
 
   void configureProduct() {
@@ -166,7 +166,7 @@ class ProductConfigurer {
       version = project.version
       destinationDir = baseOutputDir
 
-      from outputDir, { into project.name }
+      from outputDir, { into outputDir.name }
 
       doLast {
         ant.checksum file: it.archivePath
@@ -221,6 +221,7 @@ class ProductConfigurer {
               webappsDir.add(f, appDir)
           def resolvedClassPath = new LinkedHashSet<URL>()
           resolvedClassPath.addAll(ProjectUtils.getClassPathJars(proj, 'grettyProductRuntime'))
+          resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.beforeClassPath))
           resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))
           files = resolvedClassPath.collect { new File(it.path) }
           files -= getVisibleRunnerFileCollection().files
@@ -368,7 +369,7 @@ Version: ${project.version}"""
     sconfig = productFarm.serverConfig
     wconfigs = []
     // we don't need to pass inplaceMode here cuz inplace=false anyway
-    configurer.resolveWebAppRefs(productFarm.webAppRefs, wconfigs, false)
+    configurer.resolveWebAppRefs(productName, productFarm.webAppRefs, wconfigs, false)
     for(WebAppConfig wconfig in wconfigs)
       ProjectUtils.prepareToRun(project, wconfig)
     CertificateGenerator.maybeGenerate(project, sconfig)
@@ -485,6 +486,8 @@ Version: ${project.version}"""
           }
           if(sconfig.sslTrustStorePassword)
             sslTrustStorePassword sconfig.sslTrustStorePassword
+          if(sconfig.sslNeedClientAuth)
+            sslNeedClientAuth sconfig.sslNeedClientAuth
         }
         if(sconfig.realm)
           realm sconfig.realm

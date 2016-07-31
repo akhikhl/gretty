@@ -33,7 +33,12 @@ abstract class FarmServiceTask extends DefaultTask {
   @TaskAction
   void action() {
     String command = getCommand()
-    File portPropertiesFile = DefaultLauncher.getPortPropertiesFile(project)
+    //
+    FarmConfigurer configurer = new FarmConfigurer(project)
+    FarmExtension farm = new FarmExtension(project)
+    configurer.configureFarm(farm, configurer.getProjectFarm(farmName))
+    //
+    File portPropertiesFile = DefaultLauncher.getPortPropertiesFile(project, farm.serverConfig)
     if(!portPropertiesFile.exists())
       throw new GradleException("Gretty seems to be not running, cannot send command '$command' to it.")
     Properties portProps = new Properties()
@@ -41,9 +46,7 @@ abstract class FarmServiceTask extends DefaultTask {
       portProps.load(it)
     }
     int servicePort = portProps.servicePort as int
-    FarmConfigurer configurer = new FarmConfigurer(project)
-    FarmExtension farm = new FarmExtension(project, servicePort: servicePort)
-    configurer.configureFarm(farm, configurer.getProjectFarm(farmName))
+    //
     log.debug 'Sending command {} to port {}', command, servicePort
     ServiceProtocol.send(servicePort, command)
   }

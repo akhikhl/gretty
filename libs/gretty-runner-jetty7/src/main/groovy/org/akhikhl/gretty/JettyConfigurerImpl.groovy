@@ -139,6 +139,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
       }
       if(params.sslTrustStorePassword)
         sslContextFactory.setTrustStorePassword(params.sslTrustStorePassword)
+      if(params.sslNeedClientAuth)
+        sslContextFactory.setNeedClientAuth(params.sslNeedClientAuth)
 
       if(params.httpsIdleTimeout)
         httpsConn.maxIdleTime = params.httpsIdleTimeout
@@ -262,18 +264,16 @@ class JettyConfigurerImpl implements JettyConfigurer {
     webAppContext.setConfigurations(configurations as Configuration[])
   }
 
+  private ContextHandlerCollection findContextHandlerCollection(Handler handler) {
+    if(handler instanceof ContextHandlerCollection)
+      return handler
+    if(handler.respondsTo('getHandlers'))
+      return handler.getHandlers().findResult { findContextHandlerCollection(it) }
+    return null
+  }
+
   @Override
   void setHandlersToServer(server, List handlers) {
-
-    def findContextHandlerCollection
-    findContextHandlerCollection = { handler ->
-      if(handler instanceof ContextHandlerCollection)
-        return handler
-      if(handler.respondsTo('getHandlers'))
-        return handler.getHandlers().findResult { findContextHandlerCollection(it) }
-      null
-    }
-
     ContextHandlerCollection contexts = findContextHandlerCollection(server.handler)
     if(!contexts)
       contexts = new ContextHandlerCollection()
@@ -281,5 +281,27 @@ class JettyConfigurerImpl implements JettyConfigurer {
     contexts.setHandlers(handlers as Handler[])
     if(server.handler == null)
       server.handler = contexts
+  }
+
+  @Override
+  List getHandlersByContextPaths(Object server, List contextPaths) {
+    ContextHandlerCollection context = findContextHandlerCollection(server.handler)
+    return context.getHandlers().findAll {
+      if(it.respondsTo("getContextPath")) {
+        contextPaths.contains(it.getContextPath())
+      }
+    }
+  }
+
+  @Override
+  void removeHandlerFromServer(server, handler) {
+    ContextHandlerCollection collection = findContextHandlerCollection(server.handler)
+    collection.removeHandler(handler)
+  }
+
+  @Override
+  void addHandlerToServer(server, handler) {
+    ContextHandlerCollection collection = findContextHandlerCollection(server.handler)
+    collection.addHandler(handler)
   }
 }
