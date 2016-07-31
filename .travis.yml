@@ -17,8 +17,8 @@ before_script:
 script: ./gradlew build
 env:
   global:
-    - secure: "cBrXDV4ylU13IdF3yiVZvbVmkcXxnh7uEdC3PBELvORvxEh//1pG2sHntByIvbRQmP0Ea20eHyJA2bb1uWawsvBN3RjlpO9TfEknkY5YKgxkBZHrv7muSznU2L89nIqM1zt9li18RhaWJ/YYhArXyuvRW507o2FISaPGZLR0Kto="
-    - secure: "TUFvtQqTxkkOLTxEXt6uNJLzBu+ERpM1pokSXKXlxrv0NCm+xLmMnP02ci1+wJT60Aes6dpog5Zsf1jA9zazkwh9eUA01wTL/KKnkc6zlI9P1eHwn8ReK1tBVs6Bg6kjcGZfovApjGo5mVvybEhMoccpH3fbQc9GH9aj3HjR5Uw="
+    - secure: "X4/PDZwZrdOH6ysA2ADhTxqk2OG6bZ8FL6gLTGxwNWb3pnmGCWklHI2lyVEK2LCz++SD8ANV7zmhxjUQbY6VlcYGGiNtlstYNVG7N0geo7PeMWSMJ9c8J59ETXh64/4pFQmZZR1X10piAHfY1M2yU6/pnMT7mTtYYLHX3Qm+7ik="
+    - secure: "FzPbxzDGQl8JCaPFZh9tXn3uAftachPY1weNHREXIafCvfbLxGNjk3+Ib0J4iWfMXEIoZXtQOFWBZXdJ668TwtEXjb2JfsGXt23P2BUapE56nEVJ6A7JRsbYLbb0MONVkY9la+Kz9ShfDbREehqsWqR7N/qD0UDteY1ohdghzLc="
     - JAVA_OPTS="-XX:PermSize=512M -XX:MaxPermSize=1G"
 
 deploy:
