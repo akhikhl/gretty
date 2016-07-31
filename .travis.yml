@@ -14,7 +14,7 @@ before_script:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
-script: gradlew testAllExamples
+script: ./gradlew build
 env:
   global:
     - secure: "cBrXDV4ylU13IdF3yiVZvbVmkcXxnh7uEdC3PBELvORvxEh//1pG2sHntByIvbRQmP0Ea20eHyJA2bb1uWawsvBN3RjlpO9TfEknkY5YKgxkBZHrv7muSznU2L89nIqM1zt9li18RhaWJ/YYhArXyuvRW507o2FISaPGZLR0Kto="
