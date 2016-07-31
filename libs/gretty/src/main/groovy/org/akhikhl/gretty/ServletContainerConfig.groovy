@@ -30,7 +30,7 @@ class ServletContainerConfig {
       if(webXmlFile.exists()) {
         def webXml = new XmlSlurper().parse(webXmlFile)
         if(webXml.filter.find { it.'filter-class'.text() == 'org.akhikhl.gretty.RedirectFilter' }) {
-          project.dependencies.add 'runtime', "ru.shadam.gretty:gretty-filter:${project.ext.grettyVersion}", {
+          project.dependencies.add 'runtime', "org.akhikhl.gretty:gretty-filter:${project.ext.grettyVersion}", {
             exclude group: 'javax.servlet', module: 'servlet-api'
           }
           alteredDependencies = true
@@ -58,7 +58,7 @@ class ServletContainerConfig {
     String tomcat8Version = Externalized.getString('tomcat8Version')
     String tomcat8ServletApi = Externalized.getString('tomcat8ServletApi')
     String tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
-    def runnerGroup = "ru.shadam.gretty"
+    def runnerGroup = "org.akhikhl.gretty"
     def configs = [ 'jetty7': [
         servletContainerType: 'jetty',
         servletContainerVersion: jetty7Version,

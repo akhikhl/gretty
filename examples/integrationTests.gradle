@@ -11,7 +11,7 @@ buildscript {
   }
 
   dependencies {
-    classpath "ru.shadam.gretty:gretty:$gretty_version"
+    classpath "org.akhikhl.gretty:gretty:$gretty_version"
   }
 }
 

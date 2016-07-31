@@ -6,7 +6,7 @@ buildscript {
   }
 
   dependencies {
-    classpath "ru.shadam.gretty:gretty:$gretty_version"
+    classpath "org.akhikhl.gretty:gretty:$gretty_version"
   }
 }
 
@@ -21,7 +21,7 @@ apply plugin: 'org.akhikhl.gretty'
 apply from: rootProject.file('integrationTests.gradle')
 
 dependencies {
-  compile "ru.shadam.gretty:gretty-spock:$gretty_version"
+  compile "org.akhikhl.gretty:gretty-spock:$gretty_version"
   compile "org.glassfish.jersey.containers:jersey-container-servlet-core:$jersey_version"
 }
 

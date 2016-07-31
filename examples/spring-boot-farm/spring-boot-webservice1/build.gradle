@@ -4,7 +4,7 @@ apply from: rootProject.file('integrationTests.gradle')
 
 dependencies {
   compile "org.codehaus.groovy:groovy:$groovy_version"
-  testCompile "ru.shadam.gretty:gretty-spock:$gretty_version"
+  testCompile "org.akhikhl.gretty:gretty-spock:$gretty_version"
 }
 
 gretty {

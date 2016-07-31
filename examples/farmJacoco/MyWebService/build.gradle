@@ -14,7 +14,7 @@ jacoco {
 }
 
 dependencies {
-  testCompile "ru.shadam.gretty:gretty-spock:$gretty_version"
+  testCompile "org.akhikhl.gretty:gretty-spock:$gretty_version"
 }
 
 // client-side exec-file, not related to gretty
