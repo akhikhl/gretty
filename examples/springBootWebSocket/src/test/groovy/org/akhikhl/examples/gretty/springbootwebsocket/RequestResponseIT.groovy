@@ -13,7 +13,7 @@ class RequestResponseIT extends GebReportingSpec {
     port = System.getProperty('gretty.port') as int
     contextPath = System.getProperty('gretty.contextPath')
   }
-  
+
   def 'should get expected static page'() {
   setup:
     go "http://${host}:${port}${contextPath}/index.html"
@@ -26,9 +26,9 @@ class RequestResponseIT extends GebReportingSpec {
     go "http://${host}:${port}${contextPath}/index.html"
   expect:
     $('#connect').click()
+    waitFor { $('#conversationDiv').displayed }
     $('#name').value('John')
     $('#sendName').click()
     $('#response p').text() == 'Hello, John!'
   }
 }
-
