@@ -3,9 +3,9 @@ buildscript {
     jcenter()
     maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
   }
-  
+
   dependencies {
-    classpath 'ru.shadam.gretty:gretty:1.4.0-SNAPSHOT'
+    classpath 'org.akhikhl.gretty:gretty:1.4.1-SNAPSHOT'
   }
 }
 
@@ -16,4 +16,3 @@ repositories {
 
 if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
   project.apply(plugin: org.akhikhl.gretty.GrettyPlugin)
-

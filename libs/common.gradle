@@ -11,7 +11,7 @@ repositories {
   mavenLocal()
   jcenter()
 }
-  
+
 group = rootProject.group
 version = rootProject.version
 
@@ -114,7 +114,7 @@ bintray {
   configurations = ['archives']
   pkg {
     repo = 'maven'
-    name = "${thisProject.projectId}-fork"
+    name = thisProject.projectId
     desc = thisProject.description
     licenses = [ thisProject.license ]
     labels = thisProject.projectLabels.split(',')
@@ -128,4 +128,3 @@ if(!bintrayDryRun)
   bintrayUpload.finalizedBy parent.tasks.bintraySign
 
 } // afterEvaluate
-
