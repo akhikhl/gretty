@@ -29,6 +29,7 @@ class RequestResponseIT extends GebReportingSpec {
     waitFor { $('#conversationDiv').displayed }
     $('#name').value('John')
     $('#sendName').click()
+    waitFor { $('#response p').text() }
     $('#response p').text() == 'Hello, John!'
   }
 }
