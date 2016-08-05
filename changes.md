@@ -1,29 +1,45 @@
-[Project home](https://github.com/saladinkzn/gretty) | [Documentation](http://saladinkzn.github.io/gretty-doc/) | [Feature overview](http://saladinkzn.github.io/gretty-doc/Feature-overview.html)
+[Project home](https://github.com/akhikhl/gretty) | [Documentation](http://akhikhl.github.io/gretty-doc/) | [Feature overview](http://akhikhl.github.io/gretty-doc/Feature-overview.html)
 
 [![logo](http://akhikhl.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
 
 ### What's new:
 
+#### Version 1.4.0
+
+Aug 5, 2016: Gretty version 1.4.0 is out and available at github, bintray and maven central
+
+Gretty 1.4.0 introduces the following changes:
+
+1. All changes by @saladinkzn were merged back to mainstream.
+
+2. Upgraded gradle wrapper to 2.14.1 (https://github.com/akhikhl/gretty/pull/276)
+
+2. Component upgrades (https://github.com/akhikhl/gretty/pull/277)
+
+3. Fixed failing springBootWebSocket example (https://github.com/akhikhl/gretty/pull/278)
+
+4. Fixed issue #247: Could not find property 'main' on task ':run' (https://github.com/akhikhl/gretty/pull/279)
+
 #### Version 1.3.0
 
  1. New scanner for jdk 7+
- 
+
  2. Fix for: akhikhl#239 (Gretty service port)
- 
+
  3. Fix for: akhikhl#195 (Possibility to run multiple gretty builds on different ports)
- 
+
  4. Support overlays for war webapps in farms #4
- 
+
  5. Update jetty to 9.3 (by providing separate 'container' because latest jetty 9.3 is compiled with jdk 8)
- 
+
  6. Add support for inserting paths before application output folders (will fix #6)
- 
+
  7. Add support for dependencies option in farm webapp configuration. #13
- 
+
  8. New feature: akhikhl#262 (Changing product name)
- 
+
  9. Fix for duplicate entries in getResources(path) in tomcat 7 and 8 #20
- 
+
 #### Version 1.2.5
 
 1. scanDependencies property is working again.
@@ -198,15 +214,15 @@ Maintenance release. Fixed bug: "readonly property" exception when trying to gen
 
 - Resolved issue #89, "How to configure fastReload?".
 
-- Upgrades: 
+- Upgrades:
   - gradle wrapper to version 2.1
   - Groovy to version 2.3.7
   - SpringBoot to version 1.1.7.RELEASE
   - Embedded Tomcat 7 to version 7.0.55
-  - Embedded Tomcat 8 to version 8.0.14 
+  - Embedded Tomcat 8 to version 8.0.14
   - Embedded Jetty 9 to version 9.2.3.v20140905
   - asm to version 5.0.3
-  
+
 - Implemented support of Gradle 1.10 (still, using Gradle 2.1 is highly recommended!).
 
 - fixed issues with groovy-all versions and logback versions in the webapp classpath
@@ -252,7 +268,7 @@ Maintenance release. Fixed bug: "readonly property" exception when trying to gen
 Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed to jettyEnvXmlFile. If you are using jettyEnvXml, please adjust your gradle scripts accordingly.
 
 #### Version 1.0.0
- 
+
 - Unified all Gretty plugins to a single plugin "org.akhikhl.gretty".
 
 - Introduced [servlet container selection via servletContainer property](http://akhikhl.github.io/gretty-doc/Switching-between-servlet-containers.html).
@@ -277,7 +293,7 @@ Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed
 - Upgraded to Jetty 9.2.1.v20140609. See [Jetty Release 9.2.0 announcement](http://dev.eclipse.org/mhonarc/lists/jetty-announce/msg00065.html)
  and [Jetty 9.2.1.v20140609 release announcement](http://dev.eclipse.org/mhonarc/lists/jetty-announce/msg00066.html) for technical details
  on new Jetty version.
- 
+
 - Upgraded to Spring Boot 1.1.1.RELEASE.
 
 #### Version 0.0.24
@@ -399,4 +415,3 @@ Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed
 #### Version 0.0.4
 
 - Implemented [hot deployment](http://akhikhl.github.io/gretty-doc/Hot-deployment.html).
-
