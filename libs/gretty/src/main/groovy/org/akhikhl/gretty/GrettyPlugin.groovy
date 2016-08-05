@@ -351,8 +351,6 @@ class GrettyPlugin implements Plugin<Project> {
         debug = true
       }
 
-      project.tasks.debug.dependsOn 'appRunDebug'
-
       project.task('appStart', type: AppStartTask, group: 'gretty') {
         description = 'Starts web-app inplace (stopped by \'appStop\').'
         interactive = false
@@ -719,6 +717,18 @@ class GrettyPlugin implements Plugin<Project> {
         if(!integrationTestTaskAssigned)
           integrationTestTask null // default binding
       }
+
+      if(!project.tasks.findByName('run') && project.hasProperty('gretty_runTask') && Boolean.valueOf(project.gretty_runTask))
+        project.task('run', group: 'gretty') {
+          description = 'Starts web-app inplace, in interactive mode. Same as appRun task.'
+          dependsOn 'appRun'
+        }
+
+      if(!project.tasks.findByName('debug') && project.hasProperty('gretty_debugTask') && Boolean.valueOf(project.gretty_debugTask))
+        project.task('debug', group: 'gretty') {
+          description = 'Starts web-app inplace, in debug and interactive mode. Same as appRunDebug task.'
+          dependsOn 'appRunDebug'
+        }
     }
   }
 
@@ -776,17 +786,6 @@ class GrettyPlugin implements Plugin<Project> {
       tomcat8ServletApi = Externalized.getString('tomcat8ServletApi')
       tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
     }
-
-    if(!project.tasks.findByName('run') && project.tasks.findByName('appRun'))
-      project.task('run', group: 'gretty') {
-        description = 'Starts web-app inplace, in interactive mode. Same as appRun task.'
-        dependsOn 'appRun'
-      }
-    
-    if(!project.tasks.findByName('debug'))
-      project.task('debug', group: 'gretty') {
-        description = 'Starts web-app inplace, in debug and interactive mode. Same as appRunDebug task.'
-      }
 
     addExtensions(project)
     addConfigurations(project)
