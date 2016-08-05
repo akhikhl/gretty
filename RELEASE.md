@@ -1,3 +1,19 @@
+## Gretty 1.4.0 release announcement
+
+Aug 5, 2016: Gretty version 1.4.0 is out and available at github, bintray and maven central
+
+Gretty 1.4.0 introduces the following changes:
+
+1. All changes by @saladinkzn were merged back to mainstream.
+
+2. Upgraded gradle wrapper to 2.14.1 (https://github.com/akhikhl/gretty/pull/276)
+
+2. Component upgrades (https://github.com/akhikhl/gretty/pull/277)
+
+3. Fixed failing springBootWebSocket example (https://github.com/akhikhl/gretty/pull/278)
+
+4. Fixed issue #247: Could not find property 'main' on task ':run' (https://github.com/akhikhl/gretty/pull/279)
+
 ## Gretty-Fork 1.3.0 release announcement
 
 June 14, 2016: Gretty-Fork version 1.3.0 is out and available at github, bintray and maven central
@@ -168,8 +184,8 @@ Also Gretty version 1.1.8 includes upgrades of the following components to their
 
 Gretty version 1.1.7 is out and immediately available at github, bintray, maven central and gradle plugin portal!
 
-Gretty version 1.1.7 introduces new feature: [redirect filter](http://akhikhl.github.io/gretty-doc/Redirect-filter.html). 
-The feature is completely independent from the rest of Gretty and can be deployed as part of WAR-file. 
+Gretty version 1.1.7 introduces new feature: [redirect filter](http://akhikhl.github.io/gretty-doc/Redirect-filter.html).
+The feature is completely independent from the rest of Gretty and can be deployed as part of WAR-file.
 Charming thing about redirect filter is that it provides groovy-based configuration DSL.
 
 ## Gretty 1.1.6 release announcement
