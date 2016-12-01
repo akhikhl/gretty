@@ -112,14 +112,19 @@ bintray {
   user = project.bintrayUser
   key = project.bintrayKey
   configurations = ['archives']
+  publications = ['mavenJava']
+  
   pkg {
     repo = 'maven'
-    name = thisProject.projectId
+    name = "${thisProject.projectId}-fork"
     desc = thisProject.description
-    licenses = [ thisProject.license ]
+    licenses = [ 'MIT' ]
+    vcsUrl = thisProject.vcs_url
     labels = thisProject.projectLabels.split(',')
   }
+  
   dryRun = thisProject.bintrayDryRun
+  publish = true
 }
 
 bintrayUpload.dependsOn assemble
