@@ -122,16 +122,6 @@ class GrettyPlugin implements Plugin<Project> {
     for(String overlay in project.gretty.overlays)
       project.dependencies.add 'grettyProvidedCompile', project.project(overlay)
 
-    def runtimeConfig = project.configurations.findByName('runtime')
-    if(runtimeConfig) {
-      def artifacts = runtimeConfig.copyRecursive().resolvedConfiguration.resolvedArtifacts
-      if(artifacts.find { it.name == 'slf4j-api' } && !artifacts.find { it.name in ['slf4j-nop', 'slf4j-simple', 'slf4j-log4j12', 'slf4j-jdk14', 'logback-classic', 'log4j-slf4j-impl'] }) {
-        project.dependencies {
-          compile "org.slf4j:slf4j-nop:$slf4jVersion"
-        }
-      }
-    }
-
     project.farms.farmsMap.each { fname, farm ->
       farm.webAppRefs.each { wref, options ->
         def typeAndResult = FarmConfigurerUtil.resolveWebAppType(project, options.suppressMavenToProjectResolution, wref)
