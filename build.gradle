@@ -6,7 +6,7 @@ buildscript {
 
   dependencies {
     classpath 'org.apache.commons:commons-lang3:3.4'
-    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
     classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.1.0'
   }
 }
@@ -17,6 +17,7 @@ apply plugin: 'com.jfrog.artifactory'
 
 ext {
   project_website = "https://github.com/${developerId}/${projectId}"
+  vcs_url = "${project_website}.git"
   project_scm = "scm:git@github.com:${developerId}/${projectId}.git"
   license_url = "https://raw.github.com/${developerId}/${projectId}/master/LICENSE"
 
