@@ -82,6 +82,17 @@ class ServerConfig {
 
   Boolean liveReloadEnabled
 
+  int findFreePort() {
+    int[] ports = findFreePorts(1)
+    if(ports.length == 0)
+      throw new Exception("Could not find free port")
+    ports[0]
+  }
+
+  int[] findFreePorts(int count, List<Integer> range = null) {
+    LauncherBase.findFreePorts(count, range)
+  }
+
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
