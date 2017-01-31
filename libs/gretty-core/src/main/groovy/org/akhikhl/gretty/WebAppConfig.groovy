@@ -39,6 +39,7 @@ class WebAppConfig {
 
   Set<String> beforeClassPath
   Set<String> classPath
+  String webInfIncludeJarPattern
 
   String projectPath
   Boolean inplace

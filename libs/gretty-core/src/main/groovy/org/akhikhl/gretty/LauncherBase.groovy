@@ -377,6 +377,9 @@ abstract class LauncherBase implements Launcher {
             contextConfigFile self.fileToString(wconfig.contextConfigFile)
           if(wconfig.springBootMainClass)
             springBootMainClass wconfig.springBootMainClass
+          if(wconfig.webInfIncludeJarPattern)
+            webInfIncludeJarPattern wconfig.webInfIncludeJarPattern
+
         }
       }
     }
