@@ -56,6 +56,9 @@ ext {
   if( !has( 'bintrayDryRun' ) )
     bintrayDryRun = false
 
+  if( !has('artifactory_contextUrl'))
+    artifactory_contextUrl = 'https://oss.jfrog.org/artifactory'
+
   jetty7_servlet_api = "javax.servlet:servlet-api:$jetty7_servlet_api_version" as String
   jetty8_servlet_api = "javax.servlet:javax.servlet-api:$jetty8_servlet_api_version" as String
   jetty9_servlet_api = "javax.servlet:javax.servlet-api:$jetty9_servlet_api_version" as String
@@ -102,7 +105,7 @@ task('wrapper', type: Wrapper) {
 }
 
 artifactory {
-  contextUrl = 'https://oss.jfrog.org/artifactory'
+  contextUrl = artifactory_contextUrl
   publish {
     repository {
       if (project.version.endsWith('-SNAPSHOT'))
