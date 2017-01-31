@@ -101,6 +101,9 @@ class TomcatServerConfigurer {
       if(!httpConn.port || httpConn.port < 0)
         httpConn.port = params.httpPort ?: ServerDefaults.defaultHttpPort
 
+      if(httpConn.port == PortUtils.RANDOM_FREE_PORT)
+        httpConn.port = PortUtils.findFreePort()
+
       if(params.httpIdleTimeout)
         httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout.toString())
 

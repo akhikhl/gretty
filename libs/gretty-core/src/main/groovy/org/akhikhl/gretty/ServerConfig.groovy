@@ -17,6 +17,9 @@ import groovy.transform.ToString
 @ToString
 class ServerConfig {
 
+  // attention: this constant must always have the same value as PortUtils.RANDOM_FREE_PORT
+  static final int RANDOM_FREE_PORT = -1
+
   List<String> jvmArgs
   Map<String, String> systemProperties
   String servletContainer
@@ -82,17 +85,6 @@ class ServerConfig {
 
   Boolean liveReloadEnabled
 
-  int findFreePort() {
-    int[] ports = findFreePorts(1)
-    if(ports.length == 0)
-      throw new Exception("Could not find free port")
-    ports[0]
-  }
-
-  int[] findFreePorts(int count, List<Integer> range = null) {
-    LauncherBase.findFreePorts(count, range)
-  }
-
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
@@ -120,8 +112,14 @@ class ServerConfig {
     serverConfigFile
   }
 
+  // use httpPort instead
+  @Deprecated
   Integer getPort() {
     httpPort
+  }
+
+  int getRandomFreePort() {
+    RANDOM_FREE_PORT
   }
 
   void jvmArg(Object a) {
@@ -170,6 +168,8 @@ class ServerConfig {
     serverConfigFile = newValue
   }
 
+  // use httpPort instead
+  @Deprecated
   void setPort(Integer newValue) {
     httpPort = newValue
   }
