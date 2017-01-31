@@ -128,7 +128,7 @@ abstract class StartBaseTask extends DefaultTask {
   }
 
   JacocoTaskExtension getJacoco() {
-    if(jacocoHelper == null && project.extensions.findByName('jacoco')) {
+    if(jacocoHelper == null && project.extensions.findByName('jacoco') && project.gretty.jacocoEnabled) {
       jacocoHelper = new JacocoHelper(this)
       jacocoHelper.jacoco.enabled = getDefaultJacocoEnabled()
     }

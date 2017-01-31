@@ -16,6 +16,7 @@ class GrettyExtension extends GrettyConfig {
 
   int debugPort = 5005
   boolean debugSuspend = true
+  boolean jacocoEnabled = true;
 
   protected List overlays = []
 
