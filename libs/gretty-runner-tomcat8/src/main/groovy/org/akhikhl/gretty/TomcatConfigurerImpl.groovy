@@ -7,7 +7,6 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
 import org.apache.catalina.WebResourceRoot
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.startup.ContextConfig
@@ -71,6 +70,10 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
     if(webappParams.extraResourceBases)
       webappParams.extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
+
+
+    if (webappParams.webXml)
+      context.setAltDDName(webappParams.webXml);
 
     Set classpathJarParentDirs = webappParams.webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect({
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)

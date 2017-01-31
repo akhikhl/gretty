@@ -364,6 +364,7 @@ abstract class LauncherBase implements Launcher {
             springBoot true
           self.writeWebAppClassPath(delegate, wconfig)
           contextPath wconfig.contextPath
+          webXml wconfig.webXml
           resourceBase self.fileToString(wconfig.resourceBase)
           if(wconfig.extraResourceBases)
             extraResourceBases wconfig.extraResourceBases.collect({ self.fileToString(it) })

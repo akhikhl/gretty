@@ -7,7 +7,6 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-
 import org.apache.catalina.Globals
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.deploy.WebXml
@@ -66,6 +65,9 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
     if(webappParams.extraResourceBases)
       extraResourcePaths += webappParams.extraResourceBases.collect { "/=$it" }
+
+    if (webappParams.webXml)
+      context.setAltDDName(webappParams.webXml);
 
     Set<File> classpathJarParentDirs = new LinkedHashSet()
 
