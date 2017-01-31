@@ -48,6 +48,11 @@ class WebAppConfig {
    */
   String inplaceMode
 
+  /*
+   * Specifies a custom location for the web.xml file
+   */
+  String webXml
+
   Boolean springBoot
   String springBootMainClass
 
