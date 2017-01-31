@@ -20,6 +20,7 @@ farm {
   webapp ':spring-boot-farm:spring-boot-webservice1'
   webapp ':spring-boot-farm:spring-boot-webservice2'
   webapp ':spring-boot-farm:jee-webservice'
+  webapp ':spring-boot-farm:spring-web-mvc-webservice'
 }
 
 ext {
