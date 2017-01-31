@@ -1,13 +1,18 @@
-// This script automatically discovers sub-projects.
-// It should not contain any project-specific information.
-
-def subDirs = new File(rootDir, 'libs').listFiles({ File f -> new File(f, 'build.gradle').isFile() } as FileFilter)
-subDirs.each { File subdir ->
-  def subproject = subdir.absolutePath.substring(rootDir.absolutePath.length() + 1).replace(File.separator, ':')
-  // we don't try to compile gretty-runner-jetty93 against jdk 7
-  if(subproject == 'libs:gretty-runner-jetty93' && Float.parseFloat(System.properties['java.specification.version']) < 1.8f) {
-    return
-  }
-  include subproject
-}
-
+rootProject.name = rootProjectName
+include 'libs:gretty-core'
+include 'libs:gretty'
+include 'libs:gretty-filter'
+include 'libs:gretty-runner'
+include 'libs:gretty-runner-jetty'
+include 'libs:gretty-runner-jetty7'
+include 'libs:gretty-runner-jetty8'
+include 'libs:gretty-runner-jetty9'
+// we don't try to compile gretty-runner-jetty93 against jdk prior to 8
+if(JavaVersion.current().isJava8Compatible())
+  include 'libs:gretty-runner-jetty93'
+include 'libs:gretty-runner-tomcat'
+include 'libs:gretty-runner-tomcat7'
+include 'libs:gretty-runner-tomcat8'
+include 'libs:gretty-spock'
+include 'libs:gretty-springboot'
+include 'libs:gretty-starter'

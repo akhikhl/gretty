@@ -9,6 +9,8 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.Task
+import org.gradle.api.internal.TaskInputsInternal
+import org.gradle.api.internal.TaskOutputsInternal
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.process.JavaForkOptions
@@ -19,17 +21,13 @@ import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
  */
 class JacocoHelper extends DummyTask implements JavaForkOptions, ExtensionAware {
 
-  private final String taskName
-  private final ExtensionContainer extensions
-  private final File projectDir
+  private final Task task
 
   @Delegate
   private final JavaForkOptions javaForkOptions
 
   JacocoHelper(Task task) {
-    this.taskName = task.name
-    this.extensions = task.extensions
-    this.projectDir = task.project.projectDir
+    this.task = task
     javaForkOptions = [:] as JavaForkOptions
     task.project.jacoco.applyTo(this)
   }
@@ -40,20 +38,30 @@ class JacocoHelper extends DummyTask implements JavaForkOptions, ExtensionAware 
 
   // needed by JacocoPluginExtension.applyTo
   ExtensionContainer getExtensions() {
-    extensions
+    task.getExtensions()
+  }
+
+  @Override
+  TaskInputsInternal getInputs() {
+    task.getInputs()
   }
 
   // needed by JacocoPluginExtension.applyTo
   JacocoTaskExtension getJacoco() {
-    extensions.jacoco
+    task.extensions.jacoco
   }
 
   // needed by JacocoPluginExtension.applyTo
   String getName() {
-    taskName
+    task.getName()
+  }
+
+  @Override
+  TaskOutputsInternal getOutputs() {
+    task.getOutputs()
   }
 
   File getWorkingDir() {
-    projectDir
+    task.project.projectDir
   }
 }

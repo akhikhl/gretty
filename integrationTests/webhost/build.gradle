@@ -1,0 +1,10 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+dependencies {
+  compile project(':webfragment')
+}
+
+defineIntegrationTest()
+testAll.dependsOn defineIntegrationTestAllContainers(['jetty8', 'jetty9', 'tomcat7', 'tomcat8'])

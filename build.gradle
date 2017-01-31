@@ -1,19 +1,43 @@
 buildscript {
+  project.ext {
+    if(has('privateRepoDir')) {
+      privateRepoDir = privateRepoDir instanceof File ? privateRepoDir.path : privateRepoDir.toString()
+      if(!new File(privateRepoDir).isAbsolute())
+        privateRepoDir = new File(projectDir, privateRepoDir).canonicalPath
+    } else
+      privateRepoDir = new File(project.buildDir, 'privateRepo').canonicalPath
+  }
+
   repositories {
-    mavenLocal()
+    maven {
+      url "file:$privateRepoDir"
+    }
     jcenter()
+    maven {
+      url 'http://dl.bintray.com/content/noamt/gradle-plugins'
+    }
   }
 
   dependencies {
     classpath 'org.apache.commons:commons-lang3:3.4'
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
     classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.1.0'
+    classpath 'org._10ne.gradle:rest-gradle-plugin:0.3.2'
+    classpath 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
   }
 }
+
+import org._10ne.gradle.rest.RestPlugin
+import org._10ne.gradle.rest.RestTask
+import groovyx.net.http.ContentType
 
 apply plugin: 'base' // import clean task
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.artifactory'
+apply plugin: RestPlugin
+
+ext {
+}
 
 ext {
   project_website = "https://github.com/${developerId}/${projectId}"
@@ -28,36 +52,53 @@ ext {
 
   if( !has( 'bintrayKeyPhrase' ) )
     bintrayKeyPhrase = ''
-    
+
   if( !has( 'bintrayDryRun' ) )
     bintrayDryRun = false
+
+  jetty7_servlet_api = "javax.servlet:servlet-api:$jetty7_servlet_api_version" as String
+  jetty8_servlet_api = "javax.servlet:javax.servlet-api:$jetty8_servlet_api_version" as String
+  jetty9_servlet_api = "javax.servlet:javax.servlet-api:$jetty9_servlet_api_version" as String
+  tomcat7_servlet_api = "javax.servlet:javax.servlet-api:$tomcat7_servlet_api_version" as String
+  tomcat8_servlet_api = "javax.servlet:javax.servlet-api:$tomcat8_servlet_api_version" as String
 }
 
-task('build')
+if(!bintrayDryRun)
+  task bintraySign(type: RestTask) {
+    description 'Push to bintray and sign it.'
+    httpMethod = 'post'
+    uri = "https://api.bintray.com/gpg/${project.developerId}/maven/${project.projectId}/versions/${project.version}"
+    username = project.bintrayUser
+    password = project.bintrayKey
+    requestBody = [ passphrase: project.bintrayKeyPhrase ]
+    contentType = ContentType.JSON
+  }
 
-task('buildExamples', type: GradleBuild) {
-  dir = file('examples')
+task('buildIntegrationTests', type: GradleBuild) {
+  dir = file('integrationTests')
   tasks = [ 'build' ]
   project.tasks.build.finalizedBy it
+  onlyIf { !project.tasks.build.getState().getFailure() }
 }
 
-task('testAll', dependsOn: build)
+task('testAll', dependsOn: tasks.build)
 
-task('testAllExamples', type: GradleBuild) {
-  dependsOn buildExamples
-  dir = file('examples')
+task('testAllIntegrationTests', type: GradleBuild) {
+  dependsOn buildIntegrationTests
+  dir = file('integrationTests')
   tasks = [ 'testAll' ]
   project.tasks.testAll.finalizedBy it
+  onlyIf { !project.tasks.testAll.getState().getFailure() }
 }
 
-task('cleanExamples', type: GradleBuild) {
-  dir = file('examples')
+task('cleanIntegrationTests', type: GradleBuild) {
+  dir = file('integrationTests')
   tasks = [ 'clean' ]
   project.tasks.clean.dependsOn it
 }
 
 task('wrapper', type: Wrapper) {
-  gradleVersion = '2.4'
+  gradleVersion = '2.14.1'
 }
 
 artifactory {
@@ -78,4 +119,3 @@ artifactory {
     }
   }
 }
-

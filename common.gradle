@@ -1,0 +1,145 @@
+// include this file in subprojects:
+// apply from: rootProject.file('libs/common.gradle')
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'com.jfrog.bintray'
+
+repositories {
+  maven {
+    url "file:$privateRepoDir"
+  }
+  jcenter()
+}
+
+group = rootProject.group
+version = rootProject.version
+
+configurations {
+  providedCompile
+  compile.extendsFrom providedCompile
+}
+
+afterEvaluate {
+
+dependencies {
+  testCompile "org.codehaus.groovy:groovy-all:${groovy_version}"
+  testCompile "org.spockframework:spock-core:${spock_version}"
+}
+
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+
+task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, description: 'Creates javadoc jar') {
+  dependsOn javadoc
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+  if(tasks.findByName('groovydoc')) {
+    dependsOn groovydoc
+    from groovydoc.destinationDir
+  }
+}
+
+artifacts {
+  archives sourcesJar, javadocJar
+}
+
+def thisProject = project
+
+def configurePom = {
+  resolveStrategy = Closure.DELEGATE_FIRST
+  packaging 'jar'
+  description thisProject.description
+  url thisProject.project_website
+
+  scm {
+    url thisProject.project_scm
+    connection thisProject.project_scm
+    developerConnection thisProject.project_scm
+  }
+
+  licenses {
+    license {
+      name thisProject.license
+      url thisProject.license_url
+      distribution 'repo'
+    }
+  }
+
+  developers {
+    developer {
+      id thisProject.developerId
+      name thisProject.developerName
+    }
+  }
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+      pom.withXml {
+        asNode().children().last() + configurePom
+      }
+      artifact tasks.sourcesJar
+      artifact tasks.javadocJar
+    }
+  }
+
+  repositories {
+    maven {
+      name 'private'
+      url "file:/${project.rootProject.ext.privateRepoDir}"
+    }
+  }
+}
+
+install.repositories.mavenInstaller.pom*.whenConfigured { pom ->
+  pom.project {
+    name thisProject.name
+    configurePom.rehydrate(delegate, owner, thisObject).call()
+  }
+}
+
+project.task('publishToPrivateRepository') {
+  dependsOn "publishMavenJavaPublicationToPrivateRepository"
+}
+
+project.tasks.build.dependsOn project.tasks.publishToPrivateRepository
+rootProject.tasks.buildIntegrationTests.dependsOn project.tasks.publishToPrivateRepository
+rootProject.tasks.testAllIntegrationTests.dependsOn project.tasks.publishToPrivateRepository
+
+tasks.artifactoryPublish {
+  dependsOn { project.tasks.generatePomFileForMavenJavaPublication }
+  publications 'mavenJava'
+}
+
+bintray {
+  user = project.bintrayUser
+  key = project.bintrayKey
+  configurations = ['archives']
+  pkg {
+    repo = 'maven'
+    name = thisProject.projectId
+    desc = thisProject.description
+    licenses = [ thisProject.license ]
+    labels = thisProject.projectLabels.split(',')
+  }
+  dryRun = thisProject.bintrayDryRun
+}
+
+tasks.bintrayUpload.dependsOn assemble
+
+if(!bintrayDryRun) {
+  tasks.bintrayUpload.finalizedBy rootProject.tasks.bintraySign
+  rootProject.tasks.bintraySign.onlyIf { !tasks.bintrayUpload.getStatus().getFailure() }
+}
+
+} // afterEvaluate

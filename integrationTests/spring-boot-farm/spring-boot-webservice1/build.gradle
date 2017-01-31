@@ -1,0 +1,13 @@
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+dependencies {
+  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+}
+
+gretty {
+  springBoot = true
+}
+
+defineIntegrationTest()
+testAll.dependsOn defineIntegrationTestAllContainers(['jetty8', 'jetty9', 'tomcat7', 'tomcat8'])

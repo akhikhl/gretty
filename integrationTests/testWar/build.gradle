@@ -1,0 +1,27 @@
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+task integrationTest(type: Test) {
+  outputs.upToDateWhen { false }
+  include '**/*IT.*'
+  // we explain to integrationTest that contextPath under test is "helloGretty", not "testWar"
+  ext.contextPath = 'helloGretty'
+  // specific to concrete test harness
+  doFirst {
+    systemProperty 'geb.build.reportsDir', reporting.file('geb')
+  }
+}
+
+farm {
+  webapp '../helloGretty/build/libs/helloGretty.war'
+  integrationTestProject project
+}
+
+afterEvaluate {
+  // this is needed because integrationTest task does not belong to webapps listed in farms
+  project.tasks.farmIntegrationTest.dependsOn project.tasks.integrationTest
+  // this is needed only if WAR-file is generated in the same project tree
+  project.tasks.farmBeforeIntegrationTest.dependsOn ':helloGretty:build'
+}
+
+tasks.testAll.dependsOn { tasks.farmIntegrationTest }

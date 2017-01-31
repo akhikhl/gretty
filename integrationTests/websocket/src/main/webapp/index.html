@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Websocket chat</title>
+  </head>
+  <body>
+    <h1>Websocket chat</h1>
+    <div><a id="openNewChat" href="#" target="_blank">Open new chat</a></div>
+    <textarea id="chat-content" style="width: 500px; height: 300px"></textarea><br/>
+    <input type="text" id="username" placeholder="Choose username"/>
+    <input type="text" id="message" placeholder="Enter chat message"/>
+    <input type="button" id="btnSend" value="Send"/>
+
+    <script src="webjars/jquery/2.1.1/jquery.min.js"></script>
+    <script src="webjars/sockjs-client/0.3.4-1/sockjs.min.js"></script>
+    <script src="js/index.js" ></script>
+  </body>
+</html>

@@ -4,22 +4,134 @@ import org.gradle.api.Action
 import org.gradle.api.AntBuilder
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.internal.TaskInputsInternal
+import org.gradle.api.internal.TaskInternal
+import org.gradle.api.internal.TaskOutputsInternal
+import org.gradle.api.internal.tasks.ContextAwareTaskAction
+import org.gradle.api.internal.tasks.TaskExecuter
+import org.gradle.api.internal.tasks.TaskStateInternal
+import org.gradle.api.internal.tasks.execution.TaskValidator
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.LoggingManager
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.TaskDependency
-import org.gradle.api.tasks.TaskInputs
-import org.gradle.api.tasks.TaskOutputs
-import org.gradle.api.tasks.TaskState
+import org.gradle.internal.Factory
+import org.gradle.logging.StandardOutputCapture
 
 /**
  * Dummy implementation of task plugin
  *
  * @author sala
  */
-class DummyTask implements Task {
+class DummyTask implements TaskInternal {
+
+  @Override
+  List<ContextAwareTaskAction> getTaskActions() {
+    return null
+  }
+
+  @Override
+  Set<ClassLoader> getActionClassLoaders() {
+    return null
+  }
+
+  @Override
+  Spec<? super TaskInternal> getOnlyIf() {
+    return null
+  }
+
+  @Override
+  void execute() {
+
+  }
+
+  @Override
+  StandardOutputCapture getStandardOutputCapture() {
+    return null
+  }
+
+  @Override
+  TaskExecuter getExecuter() {
+    return null
+  }
+
+  @Override
+  void setExecuter(TaskExecuter taskExecuter) {
+
+  }
+
+  @Override
+  TaskInputsInternal getInputs() {
+    return null
+  }
+
+  @Override
+  TaskOutputsInternal getOutputs() {
+    return null
+  }
+
+  @Override
+  File getTemporaryDir() {
+    return null
+  }
+
+  @Override
+  Task mustRunAfter(Object... objects) {
+    return null
+  }
+
+  @Override
+  void setMustRunAfter(Iterable<?> iterable) {
+
+  }
+
+  @Override
+  TaskDependency getMustRunAfter() {
+    return null
+  }
+
+  @Override
+  Task finalizedBy(Object... objects) {
+    return null
+  }
+
+  @Override
+  void setFinalizedBy(Iterable<?> iterable) {
+
+  }
+
+  @Override
+  TaskDependency getFinalizedBy() {
+    return null
+  }
+
+  @Override
+  TaskDependency shouldRunAfter(Object... objects) {
+    return null
+  }
+
+  @Override
+  void setShouldRunAfter(Iterable<?> iterable) {
+
+  }
+
+  @Override
+  TaskDependency getShouldRunAfter() {
+    return null
+  }
+
+  @Override
+  List<TaskValidator> getValidators() {
+    return null
+  }
+
+  @Override
+  void addValidator(TaskValidator taskValidator) {
+
+  }
+
   @Override
   String getName() {
     return null
@@ -81,7 +193,7 @@ class DummyTask implements Task {
   }
 
   @Override
-  TaskState getState() {
+  TaskStateInternal getState() {
     return null
   }
 
@@ -201,63 +313,33 @@ class DummyTask implements Task {
   }
 
   @Override
-  TaskInputs getInputs() {
+  boolean getImpliesSubProjects() {
+    return false
+  }
+
+  @Override
+  void setImpliesSubProjects(boolean b) {
+
+  }
+
+  @Override
+  Factory<File> getTemporaryDirFactory() {
     return null
   }
 
   @Override
-  TaskOutputs getOutputs() {
-    return null
-  }
-
-  @Override
-  File getTemporaryDir() {
-    return null
-  }
-
-  @Override
-  Task mustRunAfter(Object... objects) {
-    return null
-  }
-
-  @Override
-  void setMustRunAfter(Iterable<?> iterable) {
+  void prependParallelSafeAction(Action<? super Task> action) {
 
   }
 
   @Override
-  TaskDependency getMustRunAfter() {
-    return null
-  }
-
-  @Override
-  Task finalizedBy(Object... objects) {
-    return null
-  }
-
-  @Override
-  void setFinalizedBy(Iterable<?> iterable) {
+  void appendParallelSafeAction(Action<? super Task> action) {
 
   }
 
   @Override
-  TaskDependency getFinalizedBy() {
-    return null
-  }
-
-  @Override
-  TaskDependency shouldRunAfter(Object... objects) {
-    return null
-  }
-
-  @Override
-  void setShouldRunAfter(Iterable<?> iterable) {
-
-  }
-
-  @Override
-  TaskDependency getShouldRunAfter() {
-    return null
+  boolean isHasCustomActions() {
+    return false
   }
 
   @Override
@@ -268,5 +350,10 @@ class DummyTask implements Task {
   @Override
   ExtensionContainer getExtensions() {
     return null
+  }
+
+  @Override
+  org.gradle.util.Path getIdentityPath() {
+    null
   }
 }

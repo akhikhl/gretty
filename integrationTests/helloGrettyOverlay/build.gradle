@@ -1,0 +1,12 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+gretty {
+  contextPath = '/helloGrettyOverlay'
+  overlay ':helloGretty'
+  servletContainer = 'jetty7'
+}
+
+defineIntegrationTest()
+testAll.dependsOn defineIntegrationTestAllContainers()

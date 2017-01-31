@@ -1,0 +1,15 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+dependencies {
+  compile 'javax.servlet:jstl:1.2'
+}
+
+gretty {
+  servletContainer = 'jetty9'
+  contextPath = '/'
+}
+
+defineIntegrationTest()
+testAll.dependsOn defineIntegrationTestAllContainers()

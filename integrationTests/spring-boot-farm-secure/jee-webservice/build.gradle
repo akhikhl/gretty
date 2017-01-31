@@ -1,0 +1,12 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+gretty {
+  httpEnabled = false
+  httpsEnabled = true
+  realm = 'auth'
+  realmConfigFile = '../security'
+}
+
+defineIntegrationTest()

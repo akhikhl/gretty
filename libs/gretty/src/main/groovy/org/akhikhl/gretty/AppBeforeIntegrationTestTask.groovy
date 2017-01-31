@@ -8,11 +8,9 @@
  */
 package org.akhikhl.gretty
 
-import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaForkOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl

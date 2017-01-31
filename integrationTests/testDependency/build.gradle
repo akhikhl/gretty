@@ -1,0 +1,30 @@
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+task integrationTest(type: Test) {
+  outputs.upToDateWhen { false }
+  include '**/*IT.*', '**/*Spec.*', '**/*Test.*'
+  testClassesDir = project.sourceSets.integrationTest.output.classesDir
+  classpath = project.sourceSets.integrationTest.runtimeClasspath
+  // Thus we explain to gretty that contextPath under test is "helloGretty", not "testDependency".
+  // But when there's only one webapp in the farm, then even this is not needed -
+  // Gretty will guess the contextPath from it.
+  // ext.contextPath = 'helloGretty'
+}
+
+farm {
+  // suppressMavenToProjectResolution is only needed if both conditions are true:
+  // a) dependency webapp resides in the same project tree
+  // b) we want to start webapp as war
+  webapp "$group:helloGretty:$version", suppressMavenToProjectResolution: true
+  integrationTestProject project
+}
+
+afterEvaluate {
+  // this is needed because integrationTest task does not belong to webapps listed in farms
+  project.tasks.farmIntegrationTest.dependsOn project.tasks.integrationTest
+  // this is needed only if WAR-file is generated in the same project tree
+	project.tasks.farmBeforeIntegrationTest.dependsOn ':helloGretty:publishToPrivateRepository'
+}
+
+tasks.testAll.dependsOn { tasks.farmIntegrationTest }

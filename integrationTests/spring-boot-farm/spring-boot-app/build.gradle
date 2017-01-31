@@ -1,0 +1,32 @@
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.FarmIntegrationTestPlugin'
+
+dependencies {
+  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+}
+
+gretty {
+  springBoot = true
+}
+
+farm {
+  managedClassReload = true
+  servletContainer = 'jetty8'
+  httpPort = 8081
+  webapp project
+  webapp ':spring-boot-farm:spring-boot-webservice1'
+  webapp ':spring-boot-farm:spring-boot-webservice2'
+  webapp ':spring-boot-farm:jee-webservice'
+}
+
+defineIntegrationTest()
+
+testAll.dependsOn defineFarmIntegrationTestAllContainers(['jetty8', 'jetty9', 'tomcat7', 'tomcat8'], {
+  webapp project
+  webapp ':spring-boot-farm:spring-boot-webservice1'
+  webapp ':spring-boot-farm:spring-boot-webservice2'
+  webapp ':spring-boot-farm:jee-webservice'
+})

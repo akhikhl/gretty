@@ -1,0 +1,31 @@
+apply plugin: 'groovy'
+
+import org.apache.tools.ant.filters.*
+
+dependencies {
+  compile gradleApi()
+  compile "commons-configuration:commons-configuration:$commons_configuration_version"
+  compile "de.undercouch:gradle-download-task:$gradle_download_task_version"
+  compile "org.akhikhl.gretty:gretty:$version"
+}
+
+def projectProps = [
+  projectGroup: project.group,
+  projectName: project.name,
+  projectVersion: project.version,
+  buildDate: new Date().format('yyyy-MM-dd'),
+  buildUser: System.getProperty('user.name'),
+  buildOrigin: ('hostname'.execute().text.trim()),
+  gebVersion: project.gebVersion,
+  geckoDriverVersion: project.geckoDriverVersion,
+  groovy_version: project.groovy_version,
+  seleniumVersion: project.seleniumVersion,
+  spock_version: project.spock_version
+]
+
+processResources {
+  inputs.properties projectProps
+  filesMatching('**/project.properties') {
+    filter ReplaceTokens, tokens: projectProps
+  }
+}

@@ -1,4 +1,4 @@
-apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('common.gradle')
 
 dependencies {
   compile "org.codehaus.groovy:groovy:$groovy_version"

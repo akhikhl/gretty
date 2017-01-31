@@ -26,15 +26,15 @@ class FarmExtension extends FarmConfig {
   private final List afterEvaluate_ = []
 
   FarmExtension(Map options = [:], Project project) {
+    super(options)
     this.project = project
-    for(def e in options) {
-      def key = e.key
-      if(key == 'webAppRefs')
-        key = 'webAppRefs_'
-      else if(key == 'includes')
-        key = 'includes_'
-      this[key] = e.value
-    }
+    if(options.containsKey('integrationTestTask'))
+      this.integrationTestTask = options.integrationTestTask
+    def includes = options.includes_ ?: options.includes
+    if(includes)
+      this.includes_.addAll(includes as Collection)
+    if(options.containsKey('afterEvaluate'))
+      afterEvaluate_.add(options.afterEvaluate as Closure)
   }
 
   void afterEvaluate(Closure closure) {

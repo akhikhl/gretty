@@ -1,0 +1,35 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+apply plugin: 'jacoco'
+
+jacoco {
+  toolVersion = '+'
+}
+
+defineIntegrationTest()
+
+// client-side exec-file, not related to gretty
+tasks.integrationTest.jacoco {
+  append = false
+  destinationFile = new File(project.buildDir, 'jacoco/integrationTest_client.exec')
+}
+
+// client-side report, not related to gretty
+task('integrationTestClientReport', type: JacocoReport) {
+
+  tasks.integrationTest.finalizedBy it
+
+  executionData tasks.integrationTest
+
+  sourceDirectories = project.files(project.sourceSets.test.allSource.srcDirs)
+  classDirectories = project.sourceSets.test.output
+
+  def reportDir = project.reporting.file("jacoco/integrationTest_client/html")
+  reports {
+    html.destination = reportDir
+  }
+  doLast {
+    println "Jacoco report for client created: file://${reportDir.toURI().path}"
+  }
+}

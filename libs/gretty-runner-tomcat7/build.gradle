@@ -1,4 +1,4 @@
-apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('common.gradle')
 
 dependencies {
   compile project(':libs:gretty-runner-tomcat')
@@ -6,4 +6,3 @@ dependencies {
   compile "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat7_version"
   compile "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat7_version"
 }
-

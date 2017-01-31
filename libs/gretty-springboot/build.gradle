@@ -1,4 +1,4 @@
-apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('common.gradle')
 
 dependencies {
   providedCompile 'javax.servlet:javax.servlet-api:3.0.1'

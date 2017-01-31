@@ -1,0 +1,89 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+apply plugin: 'jacoco'
+
+dependencies {
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+}
+
+jacoco {
+  toolVersion = '+'
+}
+
+defineIntegrationTest()
+
+farm {
+  webapp project
+  webapp ':farmJacoco:MyWebService'
+
+  // farm.afterEvaluate is invoked when farm tasks were already created
+  afterEvaluate {
+
+    // one server-side exec-file for all webapps
+    tasks.farmBeforeIntegrationTest.jacoco {
+      append = false
+      destinationFile = new File(project.buildDir, 'jacoco/farmIntegrationTest_server.exec')
+    }
+
+    // one server-side coverage-report for all webapps
+    task('farmIntegrationTestServerReport', type: JacocoReport) {
+
+      tasks.farmAfterIntegrationTest.finalizedBy it
+
+      executionData tasks.farmBeforeIntegrationTest
+
+      sourceDirectories = project.files(project.sourceSets.main.allSource.srcDirs)
+      classDirectories = project.sourceSets.main.output
+
+      doFirst {
+        // Other webapp projects should be added in execution phase, not configuration phase.
+        // When accessing webapp projects in configuration phase,
+        // their properties (including sourceSets) are yet undefined.
+        for(Project webappProject in tasks.farmBeforeIntegrationTest.webAppProjects) {
+          if(webappProject != project) {
+            additionalSourceDirs webappProject.files(webappProject.sourceSets.main.allSource.srcDirs)
+            additionalClassDirs webappProject.sourceSets.main.output
+          }
+        }
+      }
+
+      def reportDir = project.reporting.file("jacoco/farmIntegrationTest_server/html")
+      reports {
+        html.destination = reportDir
+      }
+      doLast {
+        println "Jacoco report for server created: file://${reportDir.toURI().path}"
+      }
+    }
+
+  } // afterEvaluate
+} // farm
+
+// client-side exec-file, not related to gretty
+tasks.integrationTest.jacoco {
+  append = false
+  destinationFile = new File(project.buildDir, 'jacoco/integrationTest_client.exec')
+}
+
+// client-side report, not related to gretty
+task('integrationTestClientReport', type: JacocoReport) {
+
+  tasks.integrationTest.finalizedBy it
+
+  executionData tasks.integrationTest
+
+  sourceDirectories = project.files(project.sourceSets.test.allSource.srcDirs)
+  classDirectories = project.sourceSets.test.output
+
+  def reportDir = project.reporting.file("jacoco/integrationTest_client/html")
+  reports {
+    html.destination = reportDir
+  }
+  doLast {
+    println "Jacoco report for client created: file://${reportDir.toURI().path}"
+  }
+}
+
+testAll.dependsOn { farmIntegrationTest }

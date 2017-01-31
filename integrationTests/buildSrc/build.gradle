@@ -1,0 +1,80 @@
+ext {
+  if(has('privateRepoDir')) {
+    privateRepoDir = privateRepoDir instanceof File ? privateRepoDir.path : privateRepoDir.toString()
+    if(!new File(privateRepoDir).isAbsolute())
+      privateRepoDir = new File(projectDir, privateRepoDir).canonicalPath
+  } else
+    privateRepoDir = new File(project.projectDir, '../build/privateRepo').canonicalPath
+}
+
+def topGradleProps = new Properties()
+new File(projectDir, '../../gradle.properties').withInputStream {
+  topGradleProps.load(it)
+}
+ext.topGradleProps = topGradleProps.asImmutable()
+
+def parentGradleProps = new Properties()
+new File(projectDir, '../gradle.properties').withInputStream {
+  parentGradleProps.load(it)
+}
+ext.parentGradleProps = parentGradleProps.asImmutable()
+
+topGradleProps.each { key, value ->
+  if(key != 'group' && key != 'version' && key != 'rootProjectName')
+    project.ext[key] = value
+}
+
+parentGradleProps.each { key, value ->
+  if(key != 'group' && key != 'version' && key != 'rootProjectName')
+    project.ext[key] = value
+}
+
+allprojects {
+  group = rootProject.ext.parentGradleProps.group
+  version = rootProject.ext.topGradleProps.version
+}
+
+subprojects {
+  apply plugin: 'maven-publish'
+
+  repositories {
+    maven {
+      name 'private'
+      url "file:/${project.rootProject.ext.privateRepoDir}"
+    }
+    jcenter()
+  }
+
+  afterEvaluate {
+    if(plugins.findPlugin('java')) {
+
+      sourceCompatibility = 1.7
+      targetCompatibility = 1.7
+
+      [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+      publishing {
+        publications {
+          mavenJava(MavenPublication) {
+            from components.java
+          }
+        }
+
+        repositories {
+          maven {
+            name 'private'
+            url "file:/${project.rootProject.ext.privateRepoDir}"
+          }
+        }
+      } // publishing
+
+      project.task('publishToPrivateRepository', group: 'idiomatic') {
+        dependsOn "publishMavenJavaPublicationToPrivateRepository"
+        mustRunAfter project.tasks.check
+      }
+
+      project.build.dependsOn project.tasks.publishToPrivateRepository
+
+    } // findPlugin java
+  } // afterEvaluate
+} // subprojects

@@ -1,4 +1,4 @@
-apply from: rootProject.file('libs/common.gradle')
+apply from: rootProject.file('common.gradle')
 
 dependencies {
   compile project(':libs:gretty-runner')
@@ -9,4 +9,3 @@ dependencies {
   compile "org.apache.tomcat.embed:tomcat-embed-core:$tomcat7_version"
   compile "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat7_version"
 }
-

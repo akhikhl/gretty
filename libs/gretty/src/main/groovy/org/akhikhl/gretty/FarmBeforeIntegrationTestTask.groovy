@@ -7,7 +7,8 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-import org.gradle.api.Project
+
+import org.gradle.api.Task
 import org.gradle.process.JavaForkOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -37,18 +38,24 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
       if(thisFarmIndex > 0)
         result.addAll farms[0..thisFarmIndex - 1].collect { project.tasks['farmAfterIntegrationTest' + it] }
       result = result.findAll { otherTask ->
-        thisTask.integrationTestTask != otherTask.integrationTestTask || !thisTask.getWebAppProjects().intersect(otherTask.getWebAppProjects())
+        thisTask.integrationTestTask != otherTask.integrationTestTask || !thisTask.getIntegrationTestProjects().intersect(otherTask.getIntegrationTestProjects())
       }
       result
     }
     doFirst {
-      getWebAppProjects().each { proj ->
+      getIntegrationTestProjects().each { proj ->
         proj.tasks.each { t ->
           if(GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppBeforeIntegrationTestTask') ||
              GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppAfterIntegrationTestTask'))
             if(t.enabled)
               t.enabled = false
         }
+      }
+      project.tasks.each { t ->
+        if(GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppBeforeIntegrationTestTask') ||
+            GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppAfterIntegrationTestTask'))
+          if(t.enabled)
+            t.enabled = false
       }
       project.subprojects.each { proj ->
         proj.tasks.each { t ->
@@ -96,8 +103,8 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     integrationTestTask_ = integrationTestTask
     def thisTask = this
     project.rootProject.allprojects.each { proj ->
-      proj.tasks.all { t ->
-        if(getWebAppProjects().contains(t.project)) {
+      proj.tasks.all { Task t ->
+        if(getIntegrationTestProjects().contains(proj)) {
           if (t.name == thisTask.integrationTestTask) {
             t.mustRunAfter thisTask
             thisTask.mustRunAfter proj.tasks.testClasses
@@ -106,7 +113,7 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
             if (GradleUtils.instanceOf(t, 'org.gradle.process.JavaForkOptions'))
               t.doFirst {
                 if (thisTask.didWork)
-                  passSystemPropertiesToIntegrationTask(proj, t)
+                  passSystemPropertiesToIntegrationTestTask(t, t)
               }
           } else if (GradleUtils.instanceOf(t, 'org.akhikhl.gretty.AppBeforeIntegrationTestTask') && t.integrationTestTask == thisTask.integrationTestTask)
             t.mustRunAfter thisTask // need this to be able to disable AppBeforeIntegrationTestTask in doFirst
@@ -116,29 +123,29 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     integrationTestTaskAssigned = true
   }
 
-  protected void passSystemPropertiesToIntegrationTask(Project webappProject, JavaForkOptions task) {
+  protected void passSystemPropertiesToIntegrationTestTask(Task integrationTestTask, JavaForkOptions javaForkOptions) {
 
     def host = serverStartInfo.host
 
-    task.systemProperty 'gretty.host', host
+    javaForkOptions.systemProperty 'gretty.host', host
 
-    FarmConfigurer configurer = new FarmConfigurer(project)
-    FarmExtension tempFarm = new FarmExtension(project)
-    configurer.configureFarm(tempFarm, new FarmExtension(project, serverConfig: serverConfig, webAppRefs: webAppRefs), configurer.getProjectFarm(farmName))
-    def options = tempFarm.webAppRefs.find { key, value -> configurer.resolveWebAppRefToProject(key) == webappProject }.value
-    def webappConfig = configurer.getWebAppConfigForProject(options, webappProject, inplace, inplaceMode)
-    ProjectUtils.prepareToRun(project, webappConfig)
-
-    def contextPath
-    if(task.hasProperty('contextPath') && task.contextPath != null) {
-      contextPath = task.contextPath
+    String contextPath
+    if(integrationTestTask.ext.has('contextPath') && integrationTestTask.ext.contextPath != null) {
+      contextPath = integrationTestTask.ext.contextPath
       if(!contextPath.startsWith('/'))
         contextPath = '/' + contextPath
     }
-    else
-      contextPath = webappConfig.contextPath
+    else {
+      Iterable<WebAppConfig> webAppConfigs = getStartConfig().getWebAppConfigs()
+      if(webAppConfigs) {
+        WebAppConfig webAppConfig = webAppConfigs.find { it.projectPath == integrationTestTask.project.path }
+        if (webAppConfig == null)
+          webAppConfig = webAppConfigs.first()
+        contextPath = webAppConfig.contextPath
+      }
+    }
 
-    task.systemProperty 'gretty.contextPath', contextPath
+    javaForkOptions.systemProperty 'gretty.contextPath', contextPath
 
     String preferredProtocol
     String preferredBaseURI
@@ -146,11 +153,11 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     def httpPort = serverStartInfo.httpPort
     String httpBaseURI
     if(httpPort) {
-      task.systemProperty 'gretty.port', httpPort
-      task.systemProperty 'gretty.httpPort', httpPort
+      javaForkOptions.systemProperty 'gretty.port', httpPort
+      javaForkOptions.systemProperty 'gretty.httpPort', httpPort
       httpBaseURI = "http://${host}:${httpPort}${contextPath}"
-      task.systemProperty 'gretty.baseURI', httpBaseURI
-      task.systemProperty 'gretty.httpBaseURI', httpBaseURI
+      javaForkOptions.systemProperty 'gretty.baseURI', httpBaseURI
+      javaForkOptions.systemProperty 'gretty.httpBaseURI', httpBaseURI
       preferredProtocol = 'http'
       preferredBaseURI = httpBaseURI
     }
@@ -158,18 +165,18 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     def httpsPort = serverStartInfo.httpsPort
     String httpsBaseURI
     if(httpsPort) {
-      task.systemProperty 'gretty.httpsPort', httpsPort
+      javaForkOptions.systemProperty 'gretty.httpsPort', httpsPort
       httpsBaseURI = "https://${host}:${httpsPort}${contextPath}"
-      task.systemProperty 'gretty.httpsBaseURI', httpsBaseURI
+      javaForkOptions.systemProperty 'gretty.httpsBaseURI', httpsBaseURI
       preferredProtocol = 'https'
       preferredBaseURI = httpsBaseURI
     }
 
     if(preferredProtocol)
-      task.systemProperty 'gretty.preferredProtocol', preferredProtocol
+      javaForkOptions.systemProperty 'gretty.preferredProtocol', preferredProtocol
     if(preferredBaseURI)
-      task.systemProperty 'gretty.preferredBaseURI', preferredBaseURI
+      javaForkOptions.systemProperty 'gretty.preferredBaseURI', preferredBaseURI
 
-    task.systemProperty 'gretty.farm', (farmName ?: 'default')
+    javaForkOptions.systemProperty 'gretty.farm', (farmName ?: 'default')
   }
 }

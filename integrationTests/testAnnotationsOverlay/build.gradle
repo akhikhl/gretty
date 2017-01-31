@@ -1,0 +1,11 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+gretty {
+  overlay ':testAnnotations'
+}
+
+// annotations are not supported in jetty7
+
+testAll.dependsOn defineIntegrationTestAllContainers(['jetty8', 'jetty9', 'tomcat7', 'tomcat8'])

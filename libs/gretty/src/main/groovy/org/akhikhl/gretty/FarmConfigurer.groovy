@@ -35,6 +35,7 @@ class FarmConfigurer {
     ProjectUtils.resolveServerConfig(project, dstFarm.serverConfig)
     for(def f in srcFarms) {
       mergeWebAppRefMaps(dstFarm.webAppRefs_, f.webAppRefs)
+      dstFarm.integrationTestProjects_.addAll(f.integrationTestProjects)
       dstFarm.includes_.addAll(f.includes)
     }
     if(!dstFarm.webAppRefs && !dstFarm.includes)
@@ -55,6 +56,12 @@ class FarmConfigurer {
     if(!result && project.extensions.findByName('gretty'))
       result[project.path] = [:]
     result
+  }
+
+  Iterable<Project> getIntegrationTestProjects(List integrationTestProjects) {
+    integrationTestProjects.findResults { projectRef ->
+      FarmConfigurerUtil.resolveProjectRefToProject(project, projectRef)
+    }
   }
 
   FarmExtension getProjectFarm(String sourceFarmName) {
@@ -93,14 +100,14 @@ class FarmConfigurer {
     wrefs.findResults { wref, options ->
       if(options.inplace != null)
         inplace = options.inplace
-      def proj = resolveWebAppRefToProject(wref)
+      def proj = FarmConfigurerUtil.resolveProjectRefToProject(project, wref)
       proj ? getWebAppConfigForProject(options, proj, inplace, inplaceMode) : null
     }
   }
 
   Iterable<Project> getWebAppProjects(Map wrefs) {
-    wrefs.findResults { wref, options ->
-      resolveWebAppRefToProject(wref)
+    wrefs.keySet().findResults { wref ->
+      FarmConfigurerUtil.resolveProjectRefToProject(project, wref)
     }
   }
 
@@ -164,7 +171,7 @@ class FarmConfigurer {
    */
   @Deprecated
   Project resolveWebAppRefToProject(webAppRef) {
-    FarmConfigurerUtil.resolveWebAppRefToProject(project, webAppRef)
+    FarmConfigurerUtil.resolveProjectRefToProject(project, webAppRef)
   }
 
   /**

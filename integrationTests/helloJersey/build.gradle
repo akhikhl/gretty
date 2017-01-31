@@ -1,0 +1,15 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+dependencies {
+  compile "org.glassfish.jersey.containers:jersey-container-servlet-core:$jersey_version"
+  integrationTestCompile "javax.servlet:servlet-api:$jetty7_servlet_api_version"
+}
+
+war {
+  archiveName 'helloJersey.war'
+}
+
+defineIntegrationTest()
+testAll.dependsOn defineIntegrationTestAllContainers()

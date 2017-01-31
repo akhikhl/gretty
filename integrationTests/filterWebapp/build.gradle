@@ -1,0 +1,27 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+import org.apache.tools.ant.filters.*
+
+dependencies {
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+  // We use Velocity for example of template processing within the webapp.
+  compile 'org.apache.velocity:velocity:1.7'
+}
+
+gretty {
+  webappCopy {
+    // Enable filtering on all xml files in WEB-INF
+    filesMatching 'WEB-INF/*.xml', { FileCopyDetails fileDetails ->
+      logger.warn 'File filtered: {}', fileDetails.path
+      filter ReplaceTokens, tokens: [
+        'paramValue' : 'test123'
+      ]
+    }
+  }
+}
+
+defineIntegrationTest()
+testAll.dependsOn defineIntegrationTestAllContainers()

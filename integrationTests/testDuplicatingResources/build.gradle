@@ -1,0 +1,19 @@
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+dependencies {
+	compile 'io.reactivex:rxjava:1.1.5'
+}
+
+ext {
+	integrationTestContainers = ['tomcat7', 'tomcat8']
+}
+
+gretty {
+	servletContainer = 'tomcat7'
+	contextPath = '/bug'
+}
+
+defineIntegrationTest()
+testAll.dependsOn defineIntegrationTestAllContainers()

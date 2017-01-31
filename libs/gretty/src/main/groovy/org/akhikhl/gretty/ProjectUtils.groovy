@@ -169,10 +169,9 @@ final class ProjectUtils {
   static WebAppConfig getDefaultWebAppConfigForMavenDependency(Project project, String farmName, String dependency, List<String> dependencies = []) {
     WebAppConfig result = new WebAppConfig()
     result.contextPath = '/' + dependency.split(':')[1]
-    def configurationName = getFarmConfigurationName(farmName)
-    def resolvedDependency = getFileFromConfiguration(project, configurationName, dependency)
+    String configurationName = getFarmConfigurationName(farmName)
     result.resourceBase = {
-      resolvedDependency.absolutePath
+      getFileFromConfiguration(project, configurationName, dependency).absolutePath
     }
     if(dependencies) {
       result.classPath = dependencies.collect {

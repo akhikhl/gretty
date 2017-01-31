@@ -7,12 +7,12 @@ import org.gradle.api.Project
  */
 class FarmConfigurerUtil {
 
-  static Project resolveWebAppRefToProject(Project project, webAppRef) {
+  static Project resolveProjectRefToProject(Project project, projectRef) {
     def proj
-    if(webAppRef instanceof Project)
-      proj = webAppRef
-    else if(webAppRef instanceof String || webAppRef instanceof GString)
-      proj = project.findProject(webAppRef)
+    if(projectRef instanceof Project)
+      proj = projectRef
+    else if(projectRef instanceof String || projectRef instanceof GString)
+      proj = project.findProject(projectRef)
     proj
   }
 
@@ -24,7 +24,7 @@ class FarmConfigurerUtil {
   }
 
   static Tuple resolveWebAppType(Project project, suppressMavenToProjectResolution, wref) {
-    def proj = resolveWebAppRefToProject(project, wref)
+    def proj = resolveProjectRefToProject(project, wref)
     if(proj) {
       return new Tuple(FarmWebappType.PROJECT, proj)
     }

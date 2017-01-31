@@ -1,7 +1,0 @@
-apply plugin: 'org.akhikhl.gretty'
-
-farm {
-  include ':multifarm:MyWebApp'
-  include ':multifarm:MyWebApp2'
-}
-
