@@ -4,7 +4,7 @@ ext {
     if(!new File(privateRepoDir).isAbsolute())
       privateRepoDir = new File(projectDir, privateRepoDir).canonicalPath
   } else
-    privateRepoDir = new File(project.projectDir, '../build/privateRepo').canonicalPath
+    privateRepoDir = new File(project.projectDir, '../../build/privateRepo').canonicalPath
 }
 
 def topGradleProps = new Properties()

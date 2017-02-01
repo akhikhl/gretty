@@ -5,7 +5,7 @@ buildscript {
       if(!new File(privateRepoDir).isAbsolute())
         privateRepoDir = new File(projectDir, privateRepoDir).canonicalPath
     } else
-      privateRepoDir = new File(project.buildDir, 'privateRepo').canonicalPath
+      privateRepoDir = new File(project.projectDir, '../build/privateRepo').canonicalPath
   }
 
   def parentGradleProps = new Properties()
