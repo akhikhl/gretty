@@ -2,13 +2,15 @@
 
 [![logo](http://akhikhl.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
 
-### What's new:
+### Version 1.4.1
 
-#### Version 1.4.0
+* The most significant change is compatibility with Gradle 3.3.
 
-Aug 5, 2016: Gretty version 1.4.0 is out and available at github, bintray and maven central
+* Pull Requests #198, #205, #266, #293, #297 and #312 were merged into master.
 
-Gretty 1.4.0 introduces the following changes:
+* Issues #296, #300, #307, #317, #320, #322, #323 were resolved.
+
+### Version 1.4.0
 
 1. All changes by @saladinkzn were merged back to mainstream.
 
@@ -20,7 +22,7 @@ Gretty 1.4.0 introduces the following changes:
 
 4. Fixed issue #247: Could not find property 'main' on task ':run' (https://github.com/akhikhl/gretty/pull/279)
 
-#### Version 1.3.0
+### Version 1.3.0
 
  1. New scanner for jdk 7+
 
@@ -40,7 +42,7 @@ Gretty 1.4.0 introduces the following changes:
 
  9. Fix for duplicate entries in getResources(path) in tomcat 7 and 8 #20
 
-#### Version 1.2.5
+### Version 1.2.5
 
 1. scanDependencies property is working again.
 
@@ -58,7 +60,7 @@ Gretty 1.4.0 introduces the following changes:
 
 8. Added support for NeedClientAuth param
 
-#### Version 1.2.4
+### Version 1.2.4
 
 1. Properties servicePort and statusPort are deprecated and not used anymore. Gretty automatically selects available TCP ports for communication with it's runner process.
 
@@ -78,7 +80,7 @@ Gretty 1.4.0 introduces the following changes:
 
 9. Upgraded to Tomcat 7.0.62 and Tomcat 8.0.23
 
-#### Version 1.2.3
+### Version 1.2.3
 
 1. Resolved issue #175 "SpringBoot applications are not isolated from one another in farm and product runs"
 
@@ -88,11 +90,11 @@ Gretty 1.4.0 introduces the following changes:
 
 4. Upgrade and tests on Gradle 2.4 (Gradle versions >= 1.10 are still supported)
 
-#### Version 1.2.2
+### Version 1.2.2
 
-Gretty version 1.2.2 fixes [issue #163](https://github.com/akhikhl/gretty/issues/152): MissingPropertyException when running Tomcat with HTTPS.
+This is a maintenance release, fixing a single [issue #163](https://github.com/akhikhl/gretty/issues/152): MissingPropertyException when running Tomcat with HTTPS.
 
-#### Version 1.2.1
+### Version 1.2.1
 
 Gretty version 1.2.1 introduces the following changes:
 
@@ -118,7 +120,7 @@ spring-boot: 1.1.9.RELEASE -> 1.2.3.RELEASE
 spring-loaded: 1.2.1.RELEASE -> 1.2.3.RELEASE
 ```
 
-#### Version 1.2.0
+### Version 1.2.0
 
 Gretty version 1.2.0 introduces the following changes:
 
@@ -126,7 +128,7 @@ Gretty version 1.2.0 introduces the following changes:
 * Fix for class reloading with WAR tasks. Now if some class is changed (recompiled), the web-application restarts as expected.
 * Fix for the bug: slf4j/logback libraries are excluded from webapps packed into Gretty product.
 
-#### Version 1.1.9
+### Version 1.1.9
 
 Gretty version 1.1.9 introduces full isolation of it's own logging system (slf4j/logback)
 from the constituent web-applications. Now web-applications are free to use any logging system -
@@ -137,14 +139,16 @@ and web-applications are defined in child projects.
 
 At last Gretty 1.1.9 includes upgrades of the following components to their latest versions:
 
+```
 jetty7: 7.6.15.v20140411 -> 7.6.16.v20140903
 jetty9: 9.2.3.v20140905 -> 9.2.7.v20150116
 selenium: 2.44.0 -> 2.45.0
 spock: 0.7-groovy-2.0 -> 1.0-groovy-2.4
 tomcat7: 7.0.55 -> 7.0.59
 tomcat8: 8.0.15 -> 8.0.20
+```
 
-#### Version 1.1.8
+### Version 1.1.8
 
 Gretty version 1.1.8 introduces new parameters for [fine-tuning of debugging tasks](http://akhikhl.github.io/gretty-doc/Debugger-support.html#_fine_tuning).
 
@@ -158,19 +162,26 @@ Also Gretty version 1.1.8 includes upgrades of the following components to their
 - Selenium : 2.43.1 -> 2.44.0
 - Spring Boot : 1.1.8.RELEASE -> 1.1.9.RELEASE
 
-#### Version 1.1.7
+### Version 1.1.7
 
 New feature: [redirect filter](http://akhikhl.github.io/gretty-doc/Redirect-filter.html).
+
+The feature is completely independent from the rest of Gretty and can be deployed as part of WAR-file.
+Charming thing about redirect filter is that it provides groovy-based configuration DSL.
 
 Resolved issue #102: [How to do integration test in a multi-project setup](https://github.com/akhikhl/gretty/issues/102).
 
 Resolved issue with host name in generated certificates, when gretty config does not define sslHost property.
 
-#### Version 1.1.6
+### Version 1.1.6
 
 Maintenance release. Fixed bug: "readonly property" exception when trying to generate Gretty product.
 
-#### Version 1.1.5
+Gretty version 1.1.5 brings new bug, preventing Gretty product generation.
+If you run buildProduct task and experience "readonly property" exception,
+please switch to Gretty 1.1.6 - it fixes the problem.
+
+### Version 1.1.5
 
 - New feature: [composite farms](http://akhikhl.github.io/gretty-doc/Composite-farms.html).
 
@@ -192,7 +203,7 @@ Maintenance release. Fixed bug: "readonly property" exception when trying to gen
 
 - Resolved issue #93: [Groovy version conflicts when running farmStart with a war file](https://github.com/akhikhl/gretty/issues/93).
 
-#### Version 1.1.4
+### Version 1.1.4
 
 - New feature: [inplaceMode property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_inplacemode), when assigned to "hard", instructs Gretty to serve files directly from src/main/webapp, bypassing file copy on change.
 
@@ -227,13 +238,13 @@ Maintenance release. Fixed bug: "readonly property" exception when trying to gen
 
 - fixed issues with groovy-all versions and logback versions in the webapp classpath
 
-#### Version 1.1.3
+### Version 1.1.3
 
 - New feature: [virtual mapping of gradle dependencies](http://akhikhl.github.io/gretty-doc/Web-app-virtual-webinflibs.html) (of the web-application) to "WEB-INF/lib" directory. This feature is needed by web frameworks accessing jar files in "WEB-INF/lib" (e.g. Freemarker).
 
 - Fix for compatibility problem with Gradle 1.12 and introduction of Gradle version check.
 
-#### Version 1.1.2
+### Version 1.1.2
 
 - New feature: [webapp extra resource bases](http://akhikhl.github.io/gretty-doc/Web-app-extra-resource-bases.html).
 
@@ -245,13 +256,13 @@ Maintenance release. Fixed bug: "readonly property" exception when trying to gen
 
 - Fixed issues: #41, #44, #45, #49, #52, #53, #54, #56, #57, #60, #61.
 
-#### Version 1.1.1
+### Version 1.1.1
 
 - Fixed breaking change in 1.1.0: properties jettyXmlFile and jettyEnvXmlFile are supported again (although deprecated, please use serverConfigFile and contextConfigFile properties instead).
 
 - Changed the default value of [managedClassReload property](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_managedclassreload) to false. Please set it to true, if you need springloaded integration.
 
-#### Version 1.1.0
+### Version 1.1.0
 
 - New feature: [generation of self-contained runnable products](http://akhikhl.github.io/gretty-doc/Product-generation.html).
 
@@ -267,7 +278,7 @@ Maintenance release. Fixed bug: "readonly property" exception when trying to gen
 
 Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed to jettyEnvXmlFile. If you are using jettyEnvXml, please adjust your gradle scripts accordingly.
 
-#### Version 1.0.0
+### Version 1.0.0
 
 - Unified all Gretty plugins to a single plugin "org.akhikhl.gretty".
 
@@ -285,7 +296,7 @@ Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed
 
 - Added start task functions [prepareServerConfig and prepareWebAppConfig](http://akhikhl.github.io/gretty-doc/Gretty-task-classes.html#_property_inheritance_override) for property inheritance override in gretty tasks.
 
-#### Version 0.0.25
+### Version 0.0.25
 
 - Adopted new plugin identification scheme suggested at the portal [http://plugins.gradle.org](http://plugins.gradle.org).
  See more information at [Gretty gradle plugins](http://akhikhl.github.io/gretty-doc/Gretty-gradle-plugins.html).
@@ -296,13 +307,13 @@ Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed
 
 - Upgraded to Spring Boot 1.1.1.RELEASE.
 
-#### Version 0.0.24
+### Version 0.0.24
 
 - Implemented [spring-boot support](http://akhikhl.github.io/gretty-doc/spring-boot-support.html).
 
 - Improved compatibility with JRE-6.
 
-#### Version 0.0.23
+### Version 0.0.23
 
 - Implemented [HTTPS support](http://akhikhl.github.io/gretty-doc/HTTPS-support.html).
 
@@ -310,11 +321,11 @@ Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed
 
 - Introduced convenience functions ServerConfig.jvmArgs, ServerConfig.jvmArg to simplify adding JVM arguments.
 
-#### Version 0.0.22
+### Version 0.0.22
 
 - Implemented [Jacoco code coverage support](http://akhikhl.github.io/gretty-doc/Code-coverage-support.html) - both server-side and client-side.
 
-#### Version 0.0.21
+### Version 0.0.21
 
 - Fixed issue [gretty-farm plugin throws IllegalStateException: zip file closed](https://github.com/akhikhl/gretty/issues/24)
 
@@ -322,15 +333,15 @@ Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed
 
 - Fixed bug: stack-overflow exception when warResourceBase is assigned to java.io.File
 
-#### Version 0.0.20
+### Version 0.0.20
 
 - Fixed issue [No such property: absolutePath for class: java.lang.String error is thrown on jetty* build](https://github.com/akhikhl/gretty/issues/23)
 
-#### Version 0.0.19
+### Version 0.0.19
 
 - Fixed compatibility issue: gretty would not start on JDK7, when taken from maven (not compiled from sources).
 
-#### Version 0.0.18
+### Version 0.0.18
 
 - implemented [multiple web-apps feature](http://akhikhl.github.io/gretty-doc/Multiple-web-apps-introduction.html).
 
@@ -346,11 +357,11 @@ Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed
 
 - completely rewritten documentation.
 
-#### Version 0.0.17
+### Version 0.0.17
 
 - fixed incorrect parameter passing to javaexec in GrettyStartTask, preventing debug mode.
 
-#### Version 0.0.16
+### Version 0.0.16
 
 - Reimplemented Gretty tasks as reusable classes.
 
@@ -360,51 +371,51 @@ Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed
 
 - Updated documentation, added **nice diagrams** to every task description. See more at [wiki pages](../../wiki/).
 
-#### Version 0.0.15
+### Version 0.0.15
 
 - Introduced configuration property [fastReload](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_fastreload).
 
 - Fixed JDK-8 compatibility issues.
 
-#### Version 0.0.14
+### Version 0.0.14
 
 - Introduced configuration property [jvmArgs](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_jvmargs).
 
-#### Version 0.0.13
+### Version 0.0.13
 
 - Implemented [support of web fragments](http://akhikhl.github.io/gretty-doc/Web-fragments-support.html)
 - Implemented integration tests for most of the examples
 - Introduced bintray publishing configuration in build.gradle
 
-#### Version 0.0.12
+### Version 0.0.12
 
 - Implemented [support of integration tests](http://akhikhl.github.io/gretty-doc/Integration-tests-support.html)
 
-#### Version 0.0.11
+### Version 0.0.11
 
 - Introduced configuration property [logbackConfigFile](http://akhikhl.github.io/gretty-doc/Gretty-configuration.html#_logbackconfigfile)
   (in response to [issue #6](https://github.com/akhikhl/gretty/issues/6) "Possibility to provide custom logback.xml or logback.groovy configuration")
 
-#### Version 0.0.10
+### Version 0.0.10
 
 - Fixed overlay WAR generation.
 - Upgraded to logback version 1.1.1 and slf4j version 1.7.6.
 - Updated documentation.
 
-#### Version 0.0.9
+### Version 0.0.9
 
 - Implemented out-of-the-box [JEE annotations support](http://akhikhl.github.io/gretty-doc/JEE-annotations-support.html).
 - Various bug-fixes.
 
-#### Version 0.0.8
+### Version 0.0.8
 
 - Implemented support of [jetty.xml](http://akhikhl.github.io/gretty-doc/jetty.xml-support.html) and [jetty-env.xml](http://akhikhl.github.io/gretty-doc/jetty-env.xml-support.html).
 
-#### Version 0.0.7
+### Version 0.0.7
 
 - Implemented accurate re-configuration of logback loggers and appenders on hot-deployment.
 
-#### Version 0.0.6
+### Version 0.0.6
 
 - Implemented support of [multiple jetty versions and multiple servlet API versions](http://akhikhl.github.io/gretty-doc/Switching-between-servlet-containers.html).
 
@@ -412,6 +423,6 @@ Gretty 1.1.0 brings one little incompatibility: property jettyEnvXml was renamed
 
 - Implemented [debugger support](http://akhikhl.github.io/gretty-doc/Debugger-support.html) and [logging](http://akhikhl.github.io/gretty-doc/Logging.html).
 
-#### Version 0.0.4
+### Version 0.0.4
 
 - Implemented [hot deployment](http://akhikhl.github.io/gretty-doc/Hot-deployment.html).
