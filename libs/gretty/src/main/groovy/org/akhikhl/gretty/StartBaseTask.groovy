@@ -34,6 +34,10 @@ abstract class StartBaseTask extends DefaultTask {
 
   Map serverStartInfo
 
+  StartBaseTask() {
+    getJacoco()
+  }
+
   @TaskAction
   void action() {
     LauncherConfig config = getLauncherConfig()
