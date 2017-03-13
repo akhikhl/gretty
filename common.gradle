@@ -139,7 +139,7 @@ tasks.bintrayUpload.dependsOn assemble
 
 if(!bintrayDryRun) {
   tasks.bintrayUpload.finalizedBy rootProject.tasks.bintraySign
-  rootProject.tasks.bintraySign.onlyIf { !tasks.bintrayUpload.getStatus().getFailure() }
+  rootProject.tasks.bintraySign.onlyIf { !tasks.bintrayUpload.getState().getFailure() }
 }
 
 } // afterEvaluate
