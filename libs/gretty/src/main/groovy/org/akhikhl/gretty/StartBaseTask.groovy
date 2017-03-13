@@ -10,11 +10,14 @@ package org.akhikhl.gretty
 
 import org.akhikhl.gretty.scanner.JDKScannerManager
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
+import org.gradle.api.internal.TaskInternal
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.JavaForkOptions
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer
 import org.springframework.boot.devtools.livereload.LiveReloadServer
-
 /**
  * Base task for starting jetty
  *
@@ -35,7 +38,8 @@ abstract class StartBaseTask extends DefaultTask {
   Map serverStartInfo
 
   StartBaseTask() {
-    getJacoco()
+    initJacoco()
+    getOutputs().upToDateWhen { false }
   }
 
   @TaskAction
@@ -132,11 +136,26 @@ abstract class StartBaseTask extends DefaultTask {
   }
 
   JacocoTaskExtension getJacoco() {
-    if(jacocoHelper == null && project.extensions.findByName('jacoco') && project.gretty.jacocoEnabled) {
-      jacocoHelper = new JacocoHelper(this)
+    jacocoHelper?.jacoco
+  }
+
+  private void initJacoco() {
+    if(project.extensions.findByName('jacoco') && project.gretty.jacocoEnabled) {
+      Task startTask = this
+      jacocoHelper = (TaskInternal.methods.collectEntries({ [it.name, {} ] }) +
+          JavaForkOptions.methods.collectEntries({ [it.name, {} ] }) +
+          ExtensionAware.methods.collectEntries({ [it.name, {} ] }) + [
+          getExtensions: { startTask.getExtensions() },
+          getInputs: { startTask.getInputs() },
+          getJacoco: { startTask.extensions.jacoco },
+          getName: { startTask.getName() },
+          getOutputs: { startTask.getOutputs() },
+          getProject: { startTask.project },
+          getWorkingDir: { project.projectDir },
+      ]) as JacocoHelper
+      project.jacoco.applyTo(jacocoHelper)
       jacocoHelper.jacoco.enabled = getDefaultJacocoEnabled()
     }
-    jacocoHelper?.jacoco
   }
 
   protected final LauncherConfig getLauncherConfig() {
