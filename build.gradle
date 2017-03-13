@@ -31,12 +31,27 @@ import org._10ne.gradle.rest.RestPlugin
 import org._10ne.gradle.rest.RestTask
 import groovyx.net.http.ContentType
 
-apply plugin: 'base' // import clean task
-apply plugin: 'maven-publish'
+plugins {
+  id 'base'
+  id 'maven-publish'
+  id 'com.gradle.plugin-publish' version '0.9.7'
+}
+
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: RestPlugin
 
-ext {
+pluginBundle {
+  website = 'http://akhikhl.github.io/gretty-doc/'
+  vcsUrl = 'https://github.com/akhikhl/gretty'
+  description = 'Advanced gradle plugin for running web-apps on jetty and tomcat.'
+
+  plugins {
+    gretty {
+      id = 'org.akhikhl.gretty'
+      displayName = 'Gretty plugin'
+      tags = [ 'gretty', 'jetty', 'gradle', 'plugin', 'spring', 'spring-boot' ]
+    }
+  }
 }
 
 ext {
