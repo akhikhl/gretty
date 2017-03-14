@@ -31,13 +31,13 @@ import org._10ne.gradle.rest.RestPlugin
 import org._10ne.gradle.rest.RestTask
 import groovyx.net.http.ContentType
 
-apply plugin: 'base' // import clean task
-apply plugin: 'maven-publish'
+plugins {
+  id 'base'
+  id 'maven-publish'
+}
+
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: RestPlugin
-
-ext {
-}
 
 ext {
   project_website = "https://github.com/${developerId}/${projectId}"

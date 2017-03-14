@@ -2,6 +2,14 @@
 
 [![logo](http://akhikhl.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
 
+### Version 1.4.2
+
+* Now Gretty is compatible with Gradle versions from 2.14.1 to 3.4.1
+
+* resolved issue #326: Gradle 3.3 compatibility work breaks earlier versions of Gradle
+
+* resolved issue #329: Cannot call TaskInputs.property(String, Object) on task ':jettyStart' after task has started execution
+
 ### Version 1.4.1
 
 * The most significant change is compatibility with Gradle 3.3.
