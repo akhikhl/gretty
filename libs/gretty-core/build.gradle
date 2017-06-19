@@ -14,30 +14,27 @@ dependencies {
   compile 'org.springframework.boot:spring-boot-devtools:1.3.3.RELEASE'
 }
 
-processResources {
+tasks.processResources {
   def props = [
     grettyVersion: project.version,
     jetty7Version: project.jetty7_version,
-    jetty7ServletApi: project.jetty7_servlet_api,
     jetty7ServletApiVersion: project.jetty7_servlet_api_version,
     jetty8Version: project.jetty8_version,
-    jetty8ServletApi: project.jetty8_servlet_api,
     jetty8ServletApiVersion: project.jetty8_servlet_api_version,
     jetty9Version: project.jetty9_version,
     jetty93Version: project.jetty93_version,
-    jetty9ServletApi: project.jetty9_servlet_api,
+    jetty94Version: project.jetty94_version,
     jetty9ServletApiVersion: project.jetty9_servlet_api_version,
     tomcat7Version: project.tomcat7_version,
-    tomcat7ServletApi: project.tomcat7_servlet_api,
     tomcat7ServletApiVersion: project.tomcat7_servlet_api_version,
     tomcat8Version: project.tomcat8_version,
-    tomcat8ServletApi: project.tomcat8_servlet_api,
     tomcat8ServletApiVersion: project.tomcat8_servlet_api_version,
     springBootVersion: project.springBootVersion,
     springLoadedVersion: project.springLoadedVersion,
     springVersion: project.springVersion,
     slf4jVersion: project.slf4j_version,
-    logbackVersion: project.logback_version
+    logbackVersion: project.logback_version,
+    asmVersion: project.asm_version
   ]
   inputs.properties props
   filter ReplaceTokens, tokens: props

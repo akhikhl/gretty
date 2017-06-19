@@ -42,102 +42,142 @@ class ServletContainerConfig {
 
   private static createConfigs() {
     String grettyVersion = Externalized.getString('grettyVersion')
-    String jetty7Version = Externalized.getString('jetty7Version')
-    String jetty7ServletApi = Externalized.getString('jetty7ServletApi')
-    String jetty7ServletApiVersion = Externalized.getString('jetty7ServletApiVersion')
-    String jetty8Version = Externalized.getString('jetty8Version')
-    String jetty8ServletApi = Externalized.getString('jetty8ServletApi')
-    String jetty8ServletApiVersion = Externalized.getString('jetty8ServletApiVersion')
-    String jetty9Version = Externalized.getString('jetty9Version')
-    String jetty93Version = Externalized.getString('jetty93Version')
-    String jetty9ServletApi = Externalized.getString('jetty9ServletApi')
-    String jetty9ServletApiVersion = Externalized.getString('jetty9ServletApiVersion')
-    String tomcat7Version = Externalized.getString('tomcat7Version')
-    String tomcat7ServletApi = Externalized.getString('tomcat7ServletApi')
-    String tomcat7ServletApiVersion = Externalized.getString('tomcat7ServletApiVersion')
-    String tomcat8Version = Externalized.getString('tomcat8Version')
-    String tomcat8ServletApi = Externalized.getString('tomcat8ServletApi')
-    String tomcat8ServletApiVersion = Externalized.getString('tomcat8ServletApiVersion')
     def runnerGroup = "org.akhikhl.gretty"
     def configs = [ 'jetty7': [
         servletContainerType: 'jetty',
-        servletContainerVersion: jetty7Version,
-        servletContainerDescription: "Jetty $jetty7Version",
+        servletContainerVersion: { project -> project.ext.jetty7Version },
+        servletContainerDescription: { project -> "Jetty ${project.ext.jetty7Version}" },
         servletContainerRunnerConfig: 'grettyRunnerJetty7',
         servletContainerRunnerDependencies: { project ->
-
           project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty7:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
+          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
+            force "javax.servlet:servlet-api:$project.ext.jetty7ServletApiVersion"
+            def jetty7_version = project.ext.jetty7Version
+            force "org.eclipse.jetty:jetty-server:$jetty7_version"
+            force "org.eclipse.jetty:jetty-servlet:$jetty7_version"
+            force "org.eclipse.jetty:jetty-webapp:$jetty7_version"
+            force "org.eclipse.jetty:jetty-security:$jetty7_version"
+            force "org.eclipse.jetty:jetty-jsp:$jetty7_version"
+            force "org.eclipse.jetty:jetty-plus:$jetty7_version"
+          }
         },
-        servletApiVersion: jetty7ServletApiVersion,
+        servletApiVersion: { project -> project.ext.jetty7ServletApiVersion },
         servletApiDependencies: { project ->
           project.dependencies {
-            grettyProvidedCompile jetty7ServletApi
+            grettyProvidedCompile "javax.servlet:servlet-api:$project.ext.jetty7ServletApiVersion"
           }
         }
       ],
       'jetty8': [
         servletContainerType: 'jetty',
-        servletContainerVersion: jetty8Version,
-        servletContainerDescription: "Jetty $jetty8Version",
+        servletContainerVersion: { project -> project.ext.jetty8Version },
+        servletContainerDescription: { project -> "Jetty ${project.ext.jetty8Version}" },
         servletContainerRunnerConfig: 'grettyRunnerJetty8',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty8:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
+          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
+            force "javax.servlet:javax.servlet-api:${project.ext.jetty8ServletApiVersion}"
+            def jetty8_version = project.ext.jetty8Version
+            force "org.eclipse.jetty:jetty-server:$jetty8_version"
+            force "org.eclipse.jetty:jetty-servlet:$jetty8_version"
+            force "org.eclipse.jetty:jetty-webapp:$jetty8_version"
+            force "org.eclipse.jetty:jetty-security:$jetty8_version"
+            force "org.eclipse.jetty:jetty-jsp:$jetty8_version"
+            force "org.eclipse.jetty:jetty-annotations:$jetty8_version"
+            force "org.eclipse.jetty:jetty-plus:$jetty8_version"
+          }
         },
-        servletApiVersion: jetty8ServletApiVersion,
+        servletApiVersion: { project -> project.ext.jetty8ServletApiVersion },
         servletApiDependencies: { project ->
           project.dependencies {
-            grettyProvidedCompile jetty8ServletApi
+            grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.jetty8ServletApiVersion}"
           }
         }
       ],
       'jetty9': [
         servletContainerType: 'jetty',
-        servletContainerVersion: jetty9Version,
-        servletContainerDescription: "Jetty $jetty9Version",
+        servletContainerVersion: { project -> project.ext.jetty9Version },
+        servletContainerDescription: { project -> "Jetty ${project.ext.jetty9Version}" },
         servletContainerRunnerConfig: 'grettyRunnerJetty9',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty9:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
+          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
+            force "javax.servlet:javax.servlet-api:${project.ext.jetty9ServletApiVersion}"
+            def jetty9_version = project.ext.jetty9Version
+            force "org.eclipse.jetty:jetty-server:$jetty9_version"
+            force "org.eclipse.jetty:jetty-servlet:$jetty9_version"
+            force "org.eclipse.jetty:jetty-webapp:$jetty9_version"
+            force "org.eclipse.jetty:jetty-security:$jetty9_version"
+            force "org.eclipse.jetty:jetty-jsp:$jetty9_version"
+            force "org.eclipse.jetty:jetty-annotations:$jetty9_version"
+            force "org.eclipse.jetty:jetty-plus:$jetty9_version"
+            force "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jetty9_version"
+            def asm_version = project.ext.asmVersion
+            force "org.ow2.asm:asm:$asm_version"
+            force "org.ow2.asm:asm-commons:$asm_version"
+          }
         },
-        servletApiVersion: jetty9ServletApiVersion,
+        servletApiVersion: { project -> project.ext.jetty9ServletApiVersion },
         servletApiDependencies: { project ->
           project.dependencies {
-            grettyProvidedCompile jetty9ServletApi
+            grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.jetty9ServletApiVersion}"
             grettyProvidedCompile 'javax.websocket:javax.websocket-api:1.0'
           }
         }
       ],
       'tomcat7': [
         servletContainerType: 'tomcat',
-        servletContainerVersion: tomcat7Version,
-        servletContainerDescription: "Tomcat $tomcat7Version",
+        servletContainerVersion: { project -> project.ext.tomcat7Version },
+        servletContainerDescription: { project -> "Tomcat ${project.ext.tomcat7Version}" },
         servletContainerRunnerConfig: 'grettyRunnerTomcat7',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-tomcat7:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
+          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
+            force "javax.servlet:javax.servlet-api:${project.ext.tomcat7ServletApiVersion}"
+            def tomcat7_version = project.ext.tomcat7Version
+            force "org.apache.tomcat.embed:tomcat-embed-core:$tomcat7_version"
+            force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat7_version"
+            force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat7_version"
+            force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat7_version"
+            force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat7_version"
+          }
         },
-        servletApiVersion: tomcat7ServletApiVersion,
+        servletApiVersion: { project -> project.ext.tomcat7ServletApiVersion },
         servletApiDependencies: { project ->
           project.dependencies {
-            grettyProvidedCompile tomcat7ServletApi
+            grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.tomcat7ServletApiVersion}"
           }
         }
       ],
       'tomcat8': [
         servletContainerType: 'tomcat',
-        servletContainerVersion: tomcat8Version,
-        servletContainerDescription: "Tomcat $tomcat8Version",
+        servletContainerVersion: { project -> project.ext.tomcat8Version },
+        servletContainerDescription: { project -> "Tomcat ${project.ext.tomcat8Version}" },
         servletContainerRunnerConfig: 'grettyRunnerTomcat8',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-tomcat8:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
+          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
+            force "javax.servlet:javax.servlet-api:${project.ext.tomcat8ServletApiVersion}"
+            def tomcat8_version = project.ext.tomcat8Version
+            force "org.apache.tomcat.embed:tomcat-embed-core:$tomcat8_version"
+            force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat8_version"
+            force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat8_version"
+            force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat8_version"
+            force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat8_version"
+            // this fixes incorrect dependency of tomcat-8.0.9 on ecj-4.4RC4
+            if(tomcat8_version == '8.0.9')
+              force 'org.eclipse.jdt.core.compiler:ecj:4.4'
+          }
         },
-        servletApiVersion: tomcat8ServletApiVersion,
+        servletApiVersion: { project -> project.ext.tomcat8ServletApiVersion },
         servletApiDependencies: { project ->
           project.dependencies {
-            grettyProvidedCompile tomcat8ServletApi
+            grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.tomcat8ServletApiVersion}"
           }
         }
       ]
@@ -145,20 +185,67 @@ class ServletContainerConfig {
     if(SystemUtils.isJavaVersionAtLeast(1.8f)) {
       configs['jetty9.3'] = [
         servletContainerType: 'jetty',
-        servletContainerVersion: jetty93Version,
-        servletContainerDescription: "Jetty $jetty93Version",
+        servletContainerVersion: { project -> project.ext.jetty93Version },
+        servletContainerDescription: { project -> "Jetty ${project.ext.jetty93Version}" },
         servletContainerRunnerConfig: 'grettyRunnerJetty93',
         servletContainerRunnerDependencies: { project ->
           project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty93:$grettyVersion"
           addRedirectFilter(project, servletContainerRunnerConfig)
+          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
+            force "javax.servlet:javax.servlet-api:${project.ext.jetty9ServletApiVersion}"
+            def jetty93_version = project.ext.jetty93Version
+            force "org.eclipse.jetty:jetty-server:$jetty93_version"
+            force "org.eclipse.jetty:jetty-servlet:$jetty93_version"
+            force "org.eclipse.jetty:jetty-webapp:$jetty93_version"
+            force "org.eclipse.jetty:jetty-security:$jetty93_version"
+            force "org.eclipse.jetty:apache-jsp:$jetty93_version"
+            force "org.eclipse.jetty:jetty-annotations:$jetty93_version"
+            force "org.eclipse.jetty:jetty-plus:$jetty93_version"
+            force "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jetty93_version"
+            def asm_version = project.ext.asmVersion
+            force "org.ow2.asm:asm:$asm_version"
+            force "org.ow2.asm:asm-commons:$asm_version"
+          }
         },
-        servletApiVersion: jetty9ServletApiVersion,
+        servletApiVersion: { project -> project.ext.jetty9ServletApiVersion },
         servletApiDependencies: { project ->
           project.dependencies {
-            grettyProvidedCompile jetty9ServletApi
+            grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.jetty9ServletApiVersion}"
             grettyProvidedCompile 'javax.websocket:javax.websocket-api:1.0'
           }
         }
+      ]
+      configs['jetty9.4'] = [
+          servletContainerType: 'jetty',
+          servletContainerVersion: { project -> project.ext.jetty94Version },
+          servletContainerDescription: { project -> "Jetty ${project.ext.jetty94Version}" },
+          servletContainerRunnerConfig: 'grettyRunnerJetty94',
+          servletContainerRunnerDependencies: { project ->
+            project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty94:$grettyVersion"
+            addRedirectFilter(project, servletContainerRunnerConfig)
+            project.configurations[servletContainerRunnerConfig].resolutionStrategy {
+              force "javax.servlet:javax.servlet-api:${project.ext.jetty9ServletApiVersion}"
+              def jetty94_version = project.ext.jetty94Version
+              force "org.eclipse.jetty:jetty-server:$jetty94_version"
+              force "org.eclipse.jetty:jetty-servlet:$jetty94_version"
+              force "org.eclipse.jetty:jetty-webapp:$jetty94_version"
+              force "org.eclipse.jetty:jetty-security:$jetty94_version"
+              force "org.eclipse.jetty:apache-jsp:$jetty94_version"
+              force "org.eclipse.jetty:jetty-annotations:$jetty94_version"
+              force "org.eclipse.jetty:jetty-plus:$jetty94_version"
+              force "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jetty94_version"
+              def asm_version = project.ext.asmVersion
+              force "org.ow2.asm:asm:$asm_version"
+              force "org.ow2.asm:asm-commons:$asm_version"
+            }
+          },
+          servletApiVersion: { project -> project.ext.jetty9ServletApiVersion },
+          servletApiDependencies: { project ->
+            project.dependencies {
+              grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.jetty9ServletApiVersion}"
+              grettyProvidedCompile 'javax.websocket:javax.websocket-api:1.0'
+            }
+          }
       ]
     }
     return configs
@@ -180,12 +267,12 @@ class ServletContainerConfig {
     configs.asImmutable()
   }
 
-  static String getJettyCompatibleServletContainer(String servletContainer) {
+  static String getJettyCompatibleServletContainer(Project project, String servletContainer) {
     def config = getConfig(servletContainer)
     if(config.servletContainerType == 'jetty')
       return servletContainer
     def compatibleConfigEntry = getConfigs().find { name, c ->
-      c.servletContainerType == 'jetty' && c.servletApiVersion == config.servletApiVersion
+      c.servletContainerType == 'jetty' && c.servletApiVersion(project) == config.servletApiVersion(project)
     }
     if(compatibleConfigEntry)
       return compatibleConfigEntry.key
@@ -194,12 +281,12 @@ class ServletContainerConfig {
     defaultJettyServletContainer
   }
 
-  static String getTomcatCompatibleServletContainer(String servletContainer) {
+  static String getTomcatCompatibleServletContainer(Project project, String servletContainer) {
     def config = getConfig(servletContainer)
     if(config.servletContainerType == 'tomcat')
       return servletContainer
     def compatibleConfigEntry = getConfigs().find { name, c ->
-      c.servletContainerType == 'tomcat' && c.servletApiVersion == config.servletApiVersion
+      c.servletContainerType == 'tomcat' && c.servletApiVersion(project) == config.servletApiVersion(project)
     }
     if(compatibleConfigEntry)
       return compatibleConfigEntry.key

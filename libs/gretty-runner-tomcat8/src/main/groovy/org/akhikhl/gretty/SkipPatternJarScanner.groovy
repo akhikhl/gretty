@@ -8,6 +8,8 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.tomcat.Jar
+
 import javax.servlet.ServletContext
 import org.apache.tomcat.JarScanFilter
 import org.apache.tomcat.JarScanner
@@ -43,6 +45,11 @@ class SkipPatternJarScanner extends StandardJarScanner {
       return callback
 
     return new JarScannerCallback() {
+
+      void scan(Jar jar, String webappPath, boolean isWebapp) throws IOException {
+        log.debug('jarScannerCallback.scan {}, {}, {}', jar, webappPath, isWebapp)
+        callback.scan(jar, webappPath, isWebapp)
+      }
 
       void scan(JarURLConnection urlConn, String webappPath, boolean isWebapp) throws IOException {
         log.debug('jarScannerCallback.scan {}, {}, {}', urlConn, webappPath, isWebapp)

@@ -71,8 +71,8 @@ class IntegrationTestPlugin extends BasePlugin {
       integrationTestAllContainersTask = project.task('integrationTestAllContainers')
 
       if(!integrationTestContainers)
-        // excluding jetty9.3 tests because of login bug
-        integrationTestContainers = ServletContainerConfig.getConfigNames() - ['jetty9.3']
+        // excluding jetty9.3/4 tests because of login bug
+        integrationTestContainers = ServletContainerConfig.getConfigNames() - ['jetty9.3', 'jetty9.4']
 
       integrationTestContainers.each { String container ->
 

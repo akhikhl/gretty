@@ -10,7 +10,7 @@ configurations {
 
 dependencies {
   compile project(':libs:gretty-runner-jetty')
-  compile jetty7_servlet_api
+  compile "javax.servlet:servlet-api:$jetty7_servlet_api_version"
   compile "org.eclipse.jetty:jetty-server:$jetty7_version"
   compile "org.eclipse.jetty:jetty-servlet:$jetty7_version"
   compile "org.eclipse.jetty:jetty-webapp:$jetty7_version"

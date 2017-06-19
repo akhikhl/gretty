@@ -448,8 +448,8 @@ Version: ${project.version}"""
       productName self.productName ?: project.name
       servletContainer {
         id sconfig.servletContainer
-        version servletContainerConfig.servletContainerVersion
-        description servletContainerConfig.servletContainerDescription
+        version servletContainerConfig.servletContainerVersion(project)
+        description servletContainerConfig.servletContainerDescription(project)
       }
       serverConfig {
         if(sconfig.host)

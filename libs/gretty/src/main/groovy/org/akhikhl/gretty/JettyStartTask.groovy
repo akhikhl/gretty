@@ -16,6 +16,6 @@ class JettyStartTask extends AppStartTask {
 
   @Override
   protected String getCompatibleServletContainer(String servletContainer) {
-    ServletContainerConfig.getJettyCompatibleServletContainer(servletContainer)
+    ServletContainerConfig.getJettyCompatibleServletContainer(project, servletContainer)
   }
 }

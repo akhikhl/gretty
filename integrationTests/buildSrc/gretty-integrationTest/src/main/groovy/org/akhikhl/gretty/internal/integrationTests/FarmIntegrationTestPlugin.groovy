@@ -1,14 +1,7 @@
 package org.akhikhl.gretty.internal.integrationTests
 
-import de.undercouch.gradle.tasks.download.Download
-import org.akhikhl.gretty.AppAfterIntegrationTestTask
-import org.akhikhl.gretty.AppBeforeIntegrationTestTask
 import org.akhikhl.gretty.ServletContainerConfig
-import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.testing.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -31,8 +24,8 @@ class FarmIntegrationTestPlugin extends BasePlugin {
       farmIntegrationTestAllContainersTask = project.task('farmIntegrationTestAllContainers')
 
       if(!integrationTestContainers)
-        // excluding jetty9.3 tests because of login bug
-        integrationTestContainers = ServletContainerConfig.getConfigNames() - ['jetty9.3']
+        // excluding jetty9.3/4 tests because of login bug
+        integrationTestContainers = ServletContainerConfig.getConfigNames() - ['jetty9.3', 'jetty9.4']
 
       integrationTestContainers.each { container ->
 

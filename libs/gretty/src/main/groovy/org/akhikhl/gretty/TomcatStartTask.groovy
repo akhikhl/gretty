@@ -16,6 +16,6 @@ class TomcatStartTask extends AppStartTask {
 
   @Override
   protected String getCompatibleServletContainer(String servletContainer) {
-    ServletContainerConfig.getTomcatCompatibleServletContainer(servletContainer)
+    ServletContainerConfig.getTomcatCompatibleServletContainer(project, servletContainer)
   }
 }

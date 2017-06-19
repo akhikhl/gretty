@@ -81,7 +81,7 @@ class DefaultLauncher extends LauncherBase {
 
   @Override
   protected String getServletContainerDescription() {
-    ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerDescription
+    ServletContainerConfig.getConfig(sconfig.servletContainer).servletContainerDescription(project)
   }
 
   @Override
