@@ -73,7 +73,6 @@ class GrettyPlugin implements Plugin<Project> {
     def providedCompile = project.configurations.findByName('providedCompile')
     if(providedCompile)
       providedCompile.extendsFrom project.configurations.grettyProvidedCompile
-    SpringBootResolutionStrategy.apply(project)
   }
 
   private void addDependencies(Project project) {
