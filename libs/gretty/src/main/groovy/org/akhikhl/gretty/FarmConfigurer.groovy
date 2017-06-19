@@ -39,7 +39,7 @@ class FarmConfigurer {
       dstFarm.includes_.addAll(f.includes)
     }
     if(!dstFarm.webAppRefs && !dstFarm.includes)
-      dstFarm.webAppRefs_ = getDefaultWebAppRefMap()
+      dstFarm.webAppRefs = getDefaultWebAppRefMap()
     if(dstFarm.integrationTestTask == null)
       dstFarm.integrationTestTask = srcFarms.findResult { it.integrationTestTask }
   }

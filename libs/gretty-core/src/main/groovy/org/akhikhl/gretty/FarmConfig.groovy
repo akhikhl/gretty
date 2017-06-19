@@ -54,6 +54,13 @@ class FarmConfig {
     serverConfig.setJettyXmlFile(newValue)
   }
 
+  void setWebAppRefs(Map newValue) {
+    if(!webAppRefs_.is(newValue)) {
+      webAppRefs_.clear()
+      webAppRefs_ << newValue
+    }
+  }
+
   void webapp(Map options = [:], w) {
     webAppRefs_[w] = options
   }
