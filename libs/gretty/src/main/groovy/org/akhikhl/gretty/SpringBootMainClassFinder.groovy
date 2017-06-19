@@ -16,6 +16,12 @@ import org.gradle.api.Project
  */
 class SpringBootMainClassFinder {
 
+  protected static Iterable<File> getClassesDirs(Project project) {
+    if(project.gradle.gradleVersion.startsWith('1.') || project.gradle.gradleVersion.startsWith('2.'))
+      return [ project.sourceSets.main.output.classesDir ]
+    project.sourceSets.main.output.classesDirs
+  }
+
   static String findMainClass(Project project) {
 
     def bootExtension = project.extensions.findByName('springBoot')
@@ -29,9 +35,11 @@ class SpringBootMainClassFinder {
       def findInProject
       findInProject = { Project proj ->
         if(proj.hasProperty('sourceSets')) {
-          String result = MainClassFinder.findSingleMainClass(proj.sourceSets.main.output.classesDir)
-          if(result)
-            return result
+          for(File classesDir in getClassesDirs(proj)) {
+            String result = MainClassFinder.findSingleMainClass(classesDir)
+            if (result)
+              return result
+          }
         }
         proj.subprojects.findResult findInProject
       }
@@ -42,9 +50,11 @@ class SpringBootMainClassFinder {
     def findInProject
     findInProject = { Project proj ->
       if(proj.hasProperty('sourceSets')) {
-        String result = MainClassFinder.findMainClass(proj.sourceSets.main.output.classesDir)
-        if(result)
-          return result
+        for(File classesDir in getClassesDirs(proj)) {
+          String result = MainClassFinder.findMainClass(classesDir)
+          if (result)
+            return result
+        }
       }
       proj.subprojects.findResult findInProject
     }

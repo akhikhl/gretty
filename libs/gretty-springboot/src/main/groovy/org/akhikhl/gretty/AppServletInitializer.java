@@ -7,6 +7,10 @@ public class AppServletInitializer extends SpringBootServletInitializer {
 
   public static String springBootMainClass;
 
+  public static void setSpringBootMainClass(String newValue) {
+    springBootMainClass = newValue;
+  }
+
   @Override
   protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
     try {

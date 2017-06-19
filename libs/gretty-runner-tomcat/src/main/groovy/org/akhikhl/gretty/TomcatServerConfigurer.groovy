@@ -229,7 +229,7 @@ class TomcatServerConfigurer {
     URLClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader)
     if (webapp.springBoot) {
       Class AppServletInitializer = Class.forName('org.akhikhl.gretty.AppServletInitializer', true, classLoader)
-      AppServletInitializer.springBootMainClass = webapp.springBootMainClass
+      AppServletInitializer.setSpringBootMainClass(webapp.springBootMainClass)
     }
     context.addLifecycleListener(new SpringloadedCleanup())
     context.setParentClassLoader(classLoader)

@@ -51,7 +51,10 @@ class IntegrationTestPlugin extends BasePlugin {
       integrationTestTask_ = project.task('integrationTest', type: Test) {
         outputs.upToDateWhen { false }
         include '**/*IT.*', '**/*Spec.*', '**/*Test.*'
-        testClassesDir = project.sourceSets.integrationTest.output.classesDir
+        if(project.gradle.gradleVersion.startsWith('2.') || project.gradle.gradleVersion.startsWith('3.'))
+          testClassesDir = project.sourceSets.integrationTest.output.classesDir
+        else
+          testClassesDirs = project.sourceSets.integrationTest.output.classesDirs
         classpath = project.sourceSets.integrationTest.runtimeClasspath
       }
 
@@ -76,7 +79,10 @@ class IntegrationTestPlugin extends BasePlugin {
         project.task('integrationTest_' + container, type: Test) { thisTask ->
           outputs.upToDateWhen { false }
           include '**/*IT.*', '**/*Spec.*', '**/*Test.*'
-          testClassesDir = project.sourceSets.integrationTest.output.classesDir
+          if(project.gradle.gradleVersion.startsWith('2.') || project.gradle.gradleVersion.startsWith('3.'))
+            testClassesDir = project.sourceSets.integrationTest.output.classesDir
+          else
+            testClassesDirs = project.sourceSets.integrationTest.output.classesDirs
           classpath = project.sourceSets.integrationTest.runtimeClasspath
         }
 
