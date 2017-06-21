@@ -2,7 +2,7 @@
 
 [![Build Status](http://img.shields.io/travis/akhikhl/gretty.svg)](https://travis-ci.org/akhikhl/gretty)
 ![Maintenance Status](http://img.shields.io/maintenance/yes/2017.svg)
-[![Latest release](http://img.shields.io/badge/release-2.0.0-47b31f.svg)](https://github.com/akhikhl/gretty/tags/v2.0.0)
+[![Latest release](http://img.shields.io/badge/release-2.0.0-47b31f.svg)](https://github.com/akhikhl/gretty/tree/v2.0.0)
 [![Snapshot](http://img.shields.io/badge/current-2.0.1--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
