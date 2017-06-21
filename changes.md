@@ -2,6 +2,22 @@
 
 [![logo](http://akhikhl.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/akhikhl/gretty)
 
+### Version 2.0.0
+
+* Compatibility with Gradle 4.0
+
+* Support of Jetty 9.4 (issue #365).
+
+* Now it's possible to override versions of Jetty, Tomcat and servlet API via properties in "gradle.properties" file (issue #330).
+
+* All integration tests now run against Firefox 54.
+
+* Fixed product generation.
+
+* Support of Spring Framework 4.3.9 and Spring Boot 1.5.4.
+
+* Dropped support of Java 6.
+
 ### Version 1.4.2
 
 * Now Gretty is compatible with Gradle versions from 2.14.1 to 3.4.1

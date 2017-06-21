@@ -2,8 +2,8 @@
 
 [![Build Status](http://img.shields.io/travis/akhikhl/gretty.svg)](https://travis-ci.org/akhikhl/gretty)
 ![Maintenance Status](http://img.shields.io/maintenance/yes/2017.svg)
-[![Latest release](http://img.shields.io/badge/release-1.4.2-47b31f.svg)](https://github.com/akhikhl/gretty/tags/v1.4.2)
-[![Snapshot](http://img.shields.io/badge/current-1.4.3--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
+[![Latest release](http://img.shields.io/badge/release-2.0.0-47b31f.svg)](https://github.com/akhikhl/gretty/tags/v2.0.0)
+[![Snapshot](http://img.shields.io/badge/current-2.0.1--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
@@ -20,13 +20,24 @@ If you are new with Gretty, try [getting started](http://akhikhl.github.io/grett
 
 #### :star: What's new
 
-March 13, 2017, Gretty 1.4.2 is out and immediately available at [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22).
+June 20, 2017, Gretty 2.0.0 is out and immediately available at [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22).
 
 * Changes in this version:
 
-* Compatibility with Gradle 3.4.1
+* Compatibility with Gradle 4.0
 
-* Issues #326, #329 were resolved.
+* Support of Jetty 9.4 (issue #365).
+
+* Now it's possible to override versions of Jetty, Tomcat and servlet API via properties in "gradle.properties" file (issue #330).
+  See more information in chapter [overriding servlet container versions](http://akhikhl.github.io/gretty-doc/Overriding-servlet-container-versions.html) in the documentation.
+
+* All integration tests now run against Firefox 54.
+
+* Fixed product generation.
+
+* Support of Spring Framework 4.3.9 and Spring Boot 1.5.4.
+
+* Dropped support of Java 6.
 
 See also: [complete list of changes](changes.md) for more information.
 
@@ -36,9 +47,9 @@ You can learn about all Gretty features in [online documentation](http://akhikhl
 
 #### System requirements
 
-Gretty requires JDK7 or JDK8 and Gradle 1.10 or newer (Gradle 3.3 is highly recommended!).
+Gretty requires JDK7 or JDK8 and Gradle 1.10 or newer (Gradle 4.0 is highly recommended!).
 
-Gretty also works on JDK6, although Jetty support is limited to versions 7 and 8 in this case. This is due to the fact that Jetty 9 was compiled against JDK7 and it's bytecode is not compatible with JDK6.
+Since version 2.0.0 Gretty no longer supports JDK6.
 
 #### Availability
 
