@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 
 import org.apache.commons.lang.SystemUtils
 import org.gradle.api.Project
+import org.gradle.util.VersionNumber
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -167,7 +168,8 @@ class ServletContainerConfig {
             force "org.apache.tomcat.embed:tomcat-embed-core:$tomcat8_version"
             force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat8_version"
             force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat8_version"
-            force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat8_version"
+            if (VersionNumber.parse(tomcat8_version) <= VersionNumber.parse('8.5.2'))
+              force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat8_version"
             force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat8_version"
             // this fixes incorrect dependency of tomcat-8.0.9 on ecj-4.4RC4
             if(tomcat8_version == '8.0.9')
