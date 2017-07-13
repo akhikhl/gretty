@@ -74,7 +74,7 @@ abstract class BaseScannerManager implements ScannerManager {
     }
 
     protected static void collectDependenciesSourceSets(Collection<File> scanDirs, Project p) {
-        List<Project> dependencyProjects = ProjectUtils.getDependencyProjects(p, 'compile')
+        List<Project> dependencyProjects = ProjectUtils.getDependencyProjects(p, 'implementation')
         for(Project project: dependencyProjects) {
             // adding sourceSets of dependecy project
             scanDirs.addAll(project.sourceSets.main.allSource.srcDirs)
@@ -152,7 +152,8 @@ abstract class BaseScannerManager implements ScannerManager {
         for(String f in changedFiles) {
             if(f.endsWith('.jar')) {
                 List<WebAppConfig> dependantWebAppProjects = webapps.findAll {
-                    it.projectPath && project.project(it.projectPath).configurations.compile.resolvedConfiguration.resolvedArtifacts.find { it.file.absolutePath == f }
+                    it.projectPath && project.project(it.projectPath).configurations.implementation.resolvedConfiguration.resolvedArtifacts.find {
+                        it.file.absolutePath == f }
                 }
                 if(dependantWebAppProjects) {
                     for(WebAppConfig wconfig in dependantWebAppProjects) {

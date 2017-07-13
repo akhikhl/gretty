@@ -28,7 +28,7 @@ class GrettyPlugin implements Plugin<Project> {
 
   private void addConfigurations(Project project) {
     project.configurations {
-      compile {
+      implementation {
         exclude module: 'spring-boot-starter-tomcat'
         exclude module: 'spring-boot-starter-jetty'
       }
@@ -49,7 +49,7 @@ class GrettyPlugin implements Plugin<Project> {
       }
       grettyProductRuntime
       grettyProvidedCompile
-      project.configurations.findByName('compile')?.extendsFrom grettyProvidedCompile
+      project.configurations.findByName('implementation')?.extendsFrom grettyProvidedCompile
     }
 
     ServletContainerConfig.getConfigs().each { configName, config ->
@@ -58,7 +58,7 @@ class GrettyPlugin implements Plugin<Project> {
   }
 
   private void addConfigurationsAfterEvaluate(Project project) {
-    def runtimeConfig = project.configurations.findByName('runtime')
+    def runtimeConfig = project.configurations.findByName('runtimeClasspath')
     project.configurations {
       springBoot {
         if (runtimeConfig)
@@ -103,7 +103,7 @@ class GrettyPlugin implements Plugin<Project> {
     }
 
     if(project.gretty.springBoot) {
-      String configName = project.configurations.findByName('compile') ? 'compile' : 'springBoot'
+      String configName = project.configurations.findByName('implementation') ? 'implementation' : 'springBoot'
       project.dependencies.add configName, "org.springframework.boot:spring-boot-starter-web:$springBootVersion", {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
       }
@@ -113,14 +113,14 @@ class GrettyPlugin implements Plugin<Project> {
       project.dependencies.add configName, "org.springframework:spring-messaging:$springVersion"
       project.dependencies.add configName, "org.springframework:spring-websocket:$springVersion"
       project.dependencies.add configName, "ch.qos.logback:logback-classic:$logbackVersion"
-      configName = project.configurations.findByName('runtime') ? 'runtime' : 'springBoot'
+      configName = project.configurations.findByName('runtimeOnly') ? 'runtimeOnly' : 'springBoot'
       project.dependencies.add configName, "org.gretty:gretty-springboot:$grettyVersion"
     }
 
     for(String overlay in project.gretty.overlays)
       project.dependencies.add 'grettyProvidedCompile', project.project(overlay)
 
-    def runtimeConfig = project.configurations.findByName('runtime')
+    def runtimeConfig = project.configurations.findByName('runtimeClasspath')
     if(runtimeConfig) {
       if(runtimeConfig.allDependencies.find { it.name == 'slf4j-api' } && !runtimeConfig.allDependencies.find { it.name in ['slf4j-nop', 'slf4j-simple', 'slf4j-log4j12', 'slf4j-jdk14', 'logback-classic', 'log4j-slf4j-impl'] }) {
         log.warn("Found slf4j-api dependency but no providers were found.  Did you mean to add slf4j-simple? See https://www.slf4j.org/codes.html#noProviders .")

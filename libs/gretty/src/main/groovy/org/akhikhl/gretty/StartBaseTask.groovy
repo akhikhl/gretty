@@ -208,7 +208,7 @@ abstract class StartBaseTask extends DefaultTask {
             Set<URL> resolvedClassPath = new LinkedHashSet<URL>()
             if(wconfig.projectPath) {
               def proj = self.project.project(wconfig.projectPath)
-              String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtime'
+              String runtimeConfig = ProjectUtils.isSpringBootApp(proj) ? 'springBoot' : 'runtimeClasspath'
               resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.beforeClassPath))
               resolvedClassPath.addAll(ProjectUtils.getClassPath(proj, wconfig.inplace, runtimeConfig))
               resolvedClassPath.addAll(ProjectUtils.resolveClassPath(proj, wconfig.classPath))

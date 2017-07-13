@@ -96,7 +96,7 @@ class ProductConfigurer {
         for(WebAppConfig wconfig in wconfigs) {
           // projects are already set as input in dependsOn
           if(wconfig.projectPath)
-            result.addAll project.project(wconfig.projectPath).configurations.runtime.files
+            result.addAll project.project(wconfig.projectPath).configurations.runtimeClasspath.files
           else
             result.add wconfig.resourceBase
           if(wconfig.realmConfigFile)
