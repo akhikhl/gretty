@@ -222,7 +222,7 @@ final class ProjectUtils {
 
   // ATTENTION: this function resolves compile configuration!
   static boolean isSpringBootApp(Project project) {
-    def compileConfig = project.configurations.findByName('compile')
+    def compileConfig = project.configurations.findByName('compileOnly')
     compileConfig && compileConfig.resolvedConfiguration.resolvedArtifacts.find { it.moduleVersion.id.group == 'org.springframework.boot' }
   }
 
