@@ -17,7 +17,7 @@ import org.gradle.api.Project
 class SpringBootMainClassFinder {
 
   protected static Iterable<File> getClassesDirs(Project project) {
-    if(project.gradle.gradleVersion.startsWith('1.') || project.gradle.gradleVersion.startsWith('2.'))
+    if(project.gradle.gradleVersion.startsWith('1.') || project.gradle.gradleVersion.startsWith('2.') || project.gradle.gradleVersion.startsWith('3.'))
       return [ project.sourceSets.main.output.classesDir ]
     project.sourceSets.main.output.classesDirs
   }
