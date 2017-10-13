@@ -81,7 +81,7 @@ class GrettyPlugin implements Plugin<Project> {
     String springBootVersion = project.gretty.springBootVersion ?: (project.hasProperty('springBootVersion') ? project.springBootVersion : Externalized.getString('springBootVersion'))
     String springLoadedVersion = project.gretty.springLoadedVersion ?: (project.hasProperty('springLoadedVersion') ? project.springLoadedVersion : Externalized.getString('springLoadedVersion'))
     String springVersion = project.gretty.springVersion ?: (project.hasProperty('springVersion') ? project.springVersion : Externalized.getString('springVersion'))
-    String logbackVersion = Externalized.getString('logbackVersion')
+    String logbackVersion = project.gretty.logbackVersion ?: (project.hasProperty('logbackVersion') ? project.logbackVersion :Externalized.getString('logbackVersion'))
 
     project.dependencies {
       grettyStarter "org.gretty:gretty-starter:$grettyVersion"
