@@ -1,7 +1,10 @@
 build
 .gradle
 .groovy
+.project
+.classpath
 .settings
 .nb-*
 .idea
 *.iml
+bin/
