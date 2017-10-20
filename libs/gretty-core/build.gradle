@@ -32,7 +32,6 @@ tasks.processResources {
     springBootVersion: project.springBootVersion,
     springLoadedVersion: project.springLoadedVersion,
     springVersion: project.springVersion,
-    slf4jVersion: project.slf4j_version,
     logbackVersion: project.logback_version,
     asmVersion: project.asm_version
   ]

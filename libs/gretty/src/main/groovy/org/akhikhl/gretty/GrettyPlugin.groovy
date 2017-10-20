@@ -81,7 +81,6 @@ class GrettyPlugin implements Plugin<Project> {
     String springBootVersion = project.gretty.springBootVersion ?: (project.hasProperty('springBootVersion') ? project.springBootVersion : Externalized.getString('springBootVersion'))
     String springLoadedVersion = project.gretty.springLoadedVersion ?: (project.hasProperty('springLoadedVersion') ? project.springLoadedVersion : Externalized.getString('springLoadedVersion'))
     String springVersion = project.gretty.springVersion ?: (project.hasProperty('springVersion') ? project.springVersion : Externalized.getString('springVersion'))
-    String slf4jVersion = Externalized.getString('slf4jVersion')
     String logbackVersion = Externalized.getString('logbackVersion')
 
     project.dependencies {
@@ -124,9 +123,7 @@ class GrettyPlugin implements Plugin<Project> {
     def runtimeConfig = project.configurations.findByName('runtime')
     if(runtimeConfig) {
       if(runtimeConfig.allDependencies.find { it.name == 'slf4j-api' } && !runtimeConfig.allDependencies.find { it.name in ['slf4j-nop', 'slf4j-simple', 'slf4j-log4j12', 'slf4j-jdk14', 'logback-classic', 'log4j-slf4j-impl'] }) {
-        project.dependencies {
-          compile "org.slf4j:slf4j-nop:$slf4jVersion"
-        }
+        log.warn("Found slf4j-api dependency but no providers were found.  Did you mean to add slf4j-simple? See https://www.slf4j.org/codes.html#noProviders .")
       }
     }
 
