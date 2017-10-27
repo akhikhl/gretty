@@ -1,6 +1,8 @@
 language: groovy
 jdk:
-  - oraclejdk7
+# disable jdk7 for now, see https://github.com/travis-ci/travis-ci/issues/7884#issuecomment-308451879
+# openjdk7 may provide an alternative except for https://github.com/travis-ci/travis-ci/issues/8503
+# - oraclejdk7
   - oraclejdk8
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
