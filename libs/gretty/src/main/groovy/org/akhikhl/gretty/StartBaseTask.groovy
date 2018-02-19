@@ -152,6 +152,7 @@ abstract class StartBaseTask extends DefaultTask {
           getOutputs: { startTask.getOutputs() },
           getProject: { startTask.project },
           getWorkingDir: { project.projectDir },
+          getJvmArgumentProviders: { [] }
       ]) as JacocoHelper
       project.jacoco.applyTo(jacocoHelper)
       jacocoHelper.jacoco.enabled = getDefaultJacocoEnabled()
