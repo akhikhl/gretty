@@ -8,14 +8,9 @@
  */
 package org.akhikhl.gretty;
 
-import sun.misc.CompoundEnumeration;
-import sun.misc.Resource;
-import sun.misc.URLClassPath;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.SecureClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -32,8 +27,20 @@ public class FilteringClassLoader extends URLClassLoader {
 
   private final List<String> serverResources = new ArrayList<String>();
 
+  private ClassLoader bootClassLoader;
+
   public FilteringClassLoader(ClassLoader parent) {
     super(new URL[0], parent);
+    findBootClassLoader();
+  }
+
+  protected void findBootClassLoader() {
+    bootClassLoader = getParent();
+    if (bootClassLoader != null) {
+      while(bootClassLoader.getParent() != null) {
+        bootClassLoader = bootClassLoader.getParent();
+      }
+    }
   }
 
   public void addServerClass(String serverClass) {
@@ -61,33 +68,18 @@ public class FilteringClassLoader extends URLClassLoader {
 
   @Override
   public Enumeration<URL> getResources(String name) throws IOException {
-    for(String serverResource : serverResources)
+    for(String serverResource : serverResources) {
       if(name.startsWith(serverResource)) {
-        Enumeration<URL>[] tmp = (Enumeration<URL>[]) new Enumeration<?>[2];
-        tmp[0] = getBootstrapResources(name);
-        tmp[1] = findResources(name);
-        return new CompoundEnumeration(tmp);
+        final List<URL> resources = new ArrayList<>();
+        resources.addAll(Collections.list(getBootstrapResources(name)));
+        resources.addAll(Collections.list(findResources(name)));
+        return Collections.enumeration(resources);
       }
+    }
     return super.getResources(name);
   }
 
-  private static Enumeration<URL> getBootstrapResources(String name)
-          throws IOException
-  {
-    final Enumeration<Resource> e =
-            getBootstrapClassPath().getResources(name);
-    return new Enumeration<URL> () {
-      public URL nextElement() {
-        return e.nextElement().getURL();
-      }
-      public boolean hasMoreElements() {
-        return e.hasMoreElements();
-      }
-    };
-  }
-
-  // Returns the URLClassPath that is used for finding system resources.
-  static URLClassPath getBootstrapClassPath() {
-    return sun.misc.Launcher.getBootstrapClassPath();
+  private Enumeration<URL> getBootstrapResources(String name) throws IOException {
+    return bootClassLoader.getResources(name);
   }
 }
