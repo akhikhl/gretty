@@ -9,7 +9,14 @@ cache:
     - $HOME/.gradle/caches
     - $HOME/.gradle/wrapper
 before_install:
-  chmod +x gradlew
+  - chmod +x gradlew
+  - sudo apt-get -qq update
+  - sudo apt-get install -y zip curl locate libbcprov-java
+  - |
+    sudo ln -s /usr/share/java/bcprov.jar /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/ext/bcprov.jar \
+    && sudo awk -F . -v OFS=. 'BEGIN{n=2}/^security\.provider/ {split($3, posAndEquals, "=");$3=n++"="posAndEquals[2];print;next} 1' /etc/java-7-openjdk/security/java.security > /tmp/java.security \
+    && sudo echo "security.provider.1=org.bouncycastle.jce.provider.BouncyCastleProvider" >> /tmp/java.security \
+    && sudo mv /tmp/java.security /etc/java-7-openjdk/security/java.security
 before_script:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
