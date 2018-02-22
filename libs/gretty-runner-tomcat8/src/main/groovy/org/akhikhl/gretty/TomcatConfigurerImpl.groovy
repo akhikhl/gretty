@@ -24,10 +24,6 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   private static final Logger log = LoggerFactory.getLogger(TomcatConfigurerImpl)
 
-  protected static boolean isServletApi(String filePath) {
-    filePath.matches(/^.*servlet-api.*\.jar$/)
-  }
-
   @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
 
@@ -75,7 +71,7 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
     if (webappParams.webXml)
       context.setAltDDName(webappParams.webXml);
 
-    Set classpathJarParentDirs = webappParams.webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect({
+    Set classpathJarParentDirs = webappParams.webappClassPath.findAll { it.endsWith('.jar') }.collect({
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
       jarFile
     }) as Set
