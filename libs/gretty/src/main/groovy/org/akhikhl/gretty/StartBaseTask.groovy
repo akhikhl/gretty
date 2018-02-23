@@ -145,6 +145,7 @@ abstract class StartBaseTask extends DefaultTask {
       jacocoHelper = (TaskInternal.methods.collectEntries({ [it.name, {} ] }) +
           JavaForkOptions.methods.collectEntries({ [it.name, {} ] }) +
           ExtensionAware.methods.collectEntries({ [it.name, {} ] }) + [
+          getJvmArgumentProviders: { [] },
           getExtensions: { startTask.getExtensions() },
           getInputs: { startTask.getInputs() },
           getJacoco: { startTask.extensions.jacoco },
