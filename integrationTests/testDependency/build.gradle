@@ -1,5 +1,5 @@
-apply plugin: 'org.akhikhl.gretty'
-apply plugin: 'org.akhikhl.gretty.internal.integrationTests.IntegrationTestPlugin'
+apply plugin: 'org.gretty'
+apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 task integrationTest(type: Test) {
   outputs.upToDateWhen { false }

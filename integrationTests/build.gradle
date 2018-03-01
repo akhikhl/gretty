@@ -27,8 +27,8 @@ buildscript {
   }
 
   dependencies {
-    classpath "org.akhikhl.gretty:gretty:${parentGradleProps.version}"
-    classpath "org.akhikhl.gretty.internal.integrationTests:gretty-integrationTest:${parentGradleProps.version}"
+    classpath "org.gretty:gretty:${parentGradleProps.version}"
+    classpath "org.gretty.internal.integrationTests:gretty-integrationTest:${parentGradleProps.version}"
   }
 }
 
