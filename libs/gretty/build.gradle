@@ -18,12 +18,12 @@ dependencies {
 
 pluginBundle {
   website = 'http://akhikhl.github.io/gretty-doc/'
-  vcsUrl = 'https://github.com/akhikhl/gretty'
+  vcsUrl = 'https://github.com/${developerId}/gretty'
   description = 'Advanced gradle plugin for running web-apps on jetty and tomcat.'
 
   plugins {
     gretty {
-      id = 'org.akhikhl.gretty'
+      id = 'org.gretty'
       displayName = 'Gretty plugin'
       tags = [ 'gretty', 'jetty', 'gradle', 'plugin', 'spring', 'spring-boot' ]
     }

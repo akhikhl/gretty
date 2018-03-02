@@ -34,7 +34,7 @@ class IntegrationTestPlugin extends BasePlugin {
       integrationTestCompile "org.gebish:geb-spock:${project.gebVersion}"
       integrationTestCompile "org.seleniumhq.selenium:selenium-support:${project.seleniumVersion}"
       integrationTestCompile "org.seleniumhq.selenium:selenium-firefox-driver:${project.seleniumVersion}"
-      integrationTestCompile "org.akhikhl.gretty:gretty-spock:${project.version}"
+      integrationTestCompile "org.gretty:gretty-spock:${project.version}"
     }
   }
 

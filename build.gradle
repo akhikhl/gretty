@@ -50,6 +50,12 @@ ext {
   if( !has( 'bintrayKey' ) )
     bintrayKey = ''
 
+  if( !has( 'bintrayRepo' ) )
+    bintrayRepo = ''
+
+  if( !has( 'bintrayPackage' ) )
+    bintrayPackage = ''
+
   if( !has( 'bintrayKeyPhrase' ) )
     bintrayKeyPhrase = ''
 
@@ -64,7 +70,7 @@ if(!bintrayDryRun)
   task bintraySign(type: RestTask) {
     description 'Push to bintray and sign it.'
     httpMethod = 'post'
-    uri = "https://api.bintray.com/gpg/${project.developerId}/maven/${project.projectId}/versions/${project.version}"
+    uri = "https://api.bintray.com/gpg/${project.bintrayUser}/${project.bintrayRepo}/${project.bintrayPackage}/versions/${project.version}"
     username = project.bintrayUser
     password = project.bintrayKey
     requestBody = [ passphrase: project.bintrayKeyPhrase ]

@@ -24,13 +24,13 @@ env:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: ./gradlew artifactoryPublish -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY}
+    script: ./gradlew artifactoryPublish -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY} -PbintrayRepo=${BINTRAY_REPO} -PbintrayPackage=${BINTRAY_PACKAGE}
     on:
       branch: master
       jdk: oraclejdk8
   - provider: script
     skip_cleanup: true
-    script: ./gradlew bintrayUpload -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY}
+    script: ./gradlew bintrayUpload -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY} -PbintrayRepo=${BINTRAY_REPO} -PbintrayPackage=${BINTRAY_PACKAGE}
     on:
       tags: true
       jdk: oraclejdk8
