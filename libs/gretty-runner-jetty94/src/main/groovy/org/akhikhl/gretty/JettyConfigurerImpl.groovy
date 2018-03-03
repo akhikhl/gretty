@@ -32,10 +32,6 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   private static final Logger log = LoggerFactory.getLogger(JettyConfigurerImpl)
 
-  protected static boolean isServletApi(String filePath) {
-    filePath.matches(/^.*servlet-api.*\.jar$/)
-  }
-
   private SSOAuthenticatorFactory ssoAuthenticatorFactory
   private SessionHandler sharedSessionHandler
 
@@ -204,8 +200,8 @@ class JettyConfigurerImpl implements JettyConfigurer {
   def createWebAppContext(Map serverParams, Map webappParams) {
     List<String> webappClassPath = webappParams.webappClassPath
     JettyWebAppContext context = new JettyWebAppContext()
-    context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') && !isServletApi(it) }.collect { new File(it) })
-    context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.findAll { !isServletApi(it) }.join(';'))
+    context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') }.collect { new File(it) })
+    context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.join(';'))
     context.setInitParameter('org.eclipse.jetty.servlet.Default.useFileMappedBuffer', serverParams.productMode ? 'true' : 'false')
     context.setAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern',
         '.*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$');
