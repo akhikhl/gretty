@@ -62,7 +62,7 @@ final class Runner {
       logbackConfigText = new File(serverParams.logbackConfigFile).getText('UTF-8')
     }
     else
-      logbackConfigText = this.getClass().getResourceAsStream('/grettyRunnerLogback.groovy').getText('UTF-8')
+      logbackConfigText = Runner.class.getResourceAsStream('/grettyRunnerLogback.groovy').getText('UTF-8')
     Binding binding = new Binding()
     binding.loggingLevel = stringToLoggingLevel(serverParams.loggingLevel)
     binding.consoleLogEnabled = Boolean.valueOf(serverParams.consoleLogEnabled == null ? true : serverParams.consoleLogEnabled)
