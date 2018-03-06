@@ -3,6 +3,7 @@ package org.akhikhl.gretty.internal.integrationTests
 import org.akhikhl.gretty.AppAfterIntegrationTestTask
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
 import org.akhikhl.gretty.ServletContainerConfig
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.testing.Test
@@ -73,6 +74,12 @@ class IntegrationTestPlugin extends BasePlugin {
       if(!integrationTestContainers)
         // excluding jetty9.3/4 tests because of login bug
         integrationTestContainers = ServletContainerConfig.getConfigNames() - ['jetty9.3', 'jetty9.4']
+
+      if(JavaVersion.current().isJava9Compatible()) {
+        // excluding jetty7 and jetty8 under JDK9, can no longer compile JSPs to default 1.5 target,
+        // see https://github.com/gretty-gradle-plugin/gretty/issues/15
+        integrationTestContainers -= ['jetty7', 'jetty8']
+      }
 
       integrationTestContainers.each { String container ->
 
