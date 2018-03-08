@@ -22,7 +22,7 @@ class ServletContainerConfig {
 
   protected static final Logger log = LoggerFactory.getLogger(ServletContainerConfig)
 
-	private static configs = createConfigs()
+  private static configs = createConfigs()
 
   private static void addRedirectFilter(Project project, String runnerConfig) {
     ProjectUtils.withOverlays(project).find { proj ->
