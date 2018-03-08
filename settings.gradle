@@ -15,7 +15,9 @@ if(JavaVersion.current().isJava8Compatible()) {
 include 'libs:gretty-runner-tomcat'
 include 'libs:gretty-runner-tomcat7'
 include 'libs:gretty-runner-tomcat8'
-include 'libs:gretty-runner-tomcat9'
+if (JavaVersion.current().isJava8Compatible()) {
+  include 'libs:gretty-runner-tomcat9'
+}
 include 'libs:gretty-spock'
 include 'libs:gretty-springboot'
 include 'libs:gretty-starter'
