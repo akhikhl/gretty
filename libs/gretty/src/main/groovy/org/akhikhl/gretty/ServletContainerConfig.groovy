@@ -8,7 +8,7 @@
  */
 package org.akhikhl.gretty
 
-import org.apache.commons.lang.SystemUtils
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.util.VersionNumber
 import org.slf4j.Logger
@@ -184,7 +184,7 @@ class ServletContainerConfig {
         }
       ]
     ]
-    if(SystemUtils.isJavaVersionAtLeast(1.8f)) {
+    if (JavaVersion.current().isJava8Compatible()) {
       configs['jetty9.3'] = [
         servletContainerType: 'jetty',
         servletContainerVersion: { project -> project.ext.jetty93Version },
