@@ -2,21 +2,21 @@
 
 [![Build Status](https://travis-ci.org/gretty-gradle-plugin/gretty.svg?branch=master)](https://travis-ci.org/gretty-gradle-plugin/gretty)
 ![Maintenance Status](http://img.shields.io/maintenance/yes/2018.svg)
-[![Latest release](http://img.shields.io/badge/release-2.0.0-47b31f.svg)](https://github.com/akhikhl/gretty/tree/v2.0.0)
-[![Snapshot](http://img.shields.io/badge/current-2.0.1--SNAPSHOT-47b31f.svg)](https://github.com/akhikhl/gretty/tree/master)
+[![Latest release](http://img.shields.io/badge/release-2.0.0-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/v2.0.0)
+[![Snapshot](http://img.shields.io/badge/current-2.0.1--SNAPSHOT-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/master)
 [![License](http://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
 It supports Jetty versions 7, 8 and 9, Tomcat versions 7 and 8, multiple web-apps and many more.
 It wraps servlet container functions as convenient Gradle tasks and configuration DSL.
 
-A complete list of Gretty features is available in [feature overview](http://akhikhl.github.io/gretty-doc/Feature-overview.html).
+A complete list of Gretty features is available in [feature overview](http://gretty-gradle-plugin.github.io/gretty-doc/Feature-overview.html).
 
 #### Where to start
 
 [![Join the chat at https://gitter.im/saladinkzn/gretty](https://badges.gitter.im/saladinkzn/gretty.svg)](https://gitter.im/saladinkzn/gretty?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-If you are new with Gretty, try [getting started](http://akhikhl.github.io/gretty-doc/Getting-started.html) page.
+If you are new with Gretty, try [getting started](http://gretty-gradle-plugin.github.io/gretty-doc/Getting-started.html) page.
 
 #### :star: What's new
 
@@ -29,7 +29,7 @@ June 20, 2017, Gretty 2.0.0 is out and immediately available at [Bintray](https:
 * Support of Jetty 9.4 (issue #365).
 
 * Now it's possible to override versions of Jetty, Tomcat and servlet API via properties in "gradle.properties" file (issue #330).
-  See more information in chapter [overriding servlet container versions](http://akhikhl.github.io/gretty-doc/Overriding-servlet-container-versions.html) in the documentation.
+  See more information in chapter [overriding servlet container versions](http://gretty-gradle-plugin.github.io/gretty-doc/Overriding-servlet-container-versions.html) in the documentation.
 
 * All integration tests now run against Firefox 54.
 
@@ -43,7 +43,7 @@ See also: [complete list of changes](changes.md) for more information.
 
 #### Documentation
 
-You can learn about all Gretty features in [online documentation](http://akhikhl.github.io/gretty-doc/).
+You can learn about all Gretty features in [online documentation](http://gretty-gradle-plugin.github.io/gretty-doc/).
 
 #### System requirements
 
