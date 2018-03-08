@@ -56,8 +56,22 @@ ext {
   if( !has( 'bintrayPackage' ) )
     bintrayPackage = ''
 
-  if( !has( 'bintrayKeyPhrase' ) )
-    bintrayKeyPhrase = ''
+  bintrayGpgRequestBody = [:]
+
+  if( !has( 'bintraySubject' ) )
+    bintraySubject = ''
+  else
+    bintrayGpgRequestBody.put('subject', bintraySubject)
+
+  if( !has( 'gpgPassphrase' ) )
+    gpgPassphrase = ''
+  else
+    bintrayGpgRequestBody.put('passphrase', gpgPassphrase)
+
+  if( !has( 'gpgKey' ) )
+    gpgKey = ''
+  else
+    bintrayGpgRequestBody.put('private_key', gpgKey)
 
   if( !has( 'bintrayDryRun' ) )
     bintrayDryRun = false
@@ -73,7 +87,7 @@ if(!bintrayDryRun)
     uri = "https://api.bintray.com/gpg/${project.bintrayUser}/${project.bintrayRepo}/${project.bintrayPackage}/versions/${project.version}"
     username = project.bintrayUser
     password = project.bintrayKey
-    requestBody = [ passphrase: project.bintrayKeyPhrase ]
+    requestBody = project.bintrayGpgRequestBody
     contentType = ContentType.JSON
   }
 
