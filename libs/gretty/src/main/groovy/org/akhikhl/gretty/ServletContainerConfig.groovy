@@ -249,6 +249,30 @@ class ServletContainerConfig {
             }
           }
       ]
+      configs['tomcat9'] = [
+        servletContainerType: 'tomcat',
+        servletContainerVersion: { project -> project.ext.tomcat9Version },
+        servletContainerDescription: { project -> "Tomcat ${project.ext.tomcat9Version}" },
+        servletContainerRunnerConfig: 'grettyRunnerTomcat9',
+        servletContainerRunnerDependencies: { project ->
+          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-tomcat9:$grettyVersion"
+          addRedirectFilter(project, servletContainerRunnerConfig)
+          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
+            force "javax.servlet:javax.servlet-api:${project.ext.tomcat9ServletApiVersion}"
+            def tomcat9_version = project.ext.tomcat9Version
+            force "org.apache.tomcat.embed:tomcat-embed-core:$tomcat9_version"
+            force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat9_version"
+            force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat9_version"
+            force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat9_version"
+          }
+        },
+        servletApiVersion: { project -> project.ext.tomcat9ServletApiVersion },
+        servletApiDependencies: { project ->
+          project.dependencies {
+            grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.tomcat9ServletApiVersion}"
+          }
+        }
+      ]
     }
     return configs
   }
