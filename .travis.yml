@@ -36,9 +36,3 @@ deploy:
     on:
       branch: master
       jdk: oraclejdk8
-  - provider: script
-    skip_cleanup: true
-    script: ./gradlew bintrayUpload -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY} -PbintrayRepo=${BINTRAY_REPO} -PbintrayPackage=${BINTRAY_PACKAGE}
-    on:
-      tags: true
-      jdk: oraclejdk8
