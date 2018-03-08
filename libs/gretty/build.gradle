@@ -17,7 +17,7 @@ dependencies {
 }
 
 pluginBundle {
-  website = 'http://akhikhl.github.io/gretty-doc/'
+  website = 'https://gretty-gradle-plugin.github.io/gretty-doc/'
   vcsUrl = 'https://github.com/${developerId}/gretty'
   description = 'Advanced gradle plugin for running web-apps on jetty and tomcat.'
 
