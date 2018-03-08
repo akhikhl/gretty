@@ -169,9 +169,9 @@ class GrettyPlugin implements Plugin<Project> {
       mavenLocal()
       jcenter()
       mavenCentral()
-      maven { url 'http://repo.spring.io/release' }
-      maven { url 'http://repo.spring.io/milestone' }
-      maven { url 'http://repo.spring.io/snapshot' }
+      maven { url 'https://repo.spring.io/release' }
+      maven { url 'https://repo.spring.io/milestone' }
+      maven { url 'https://repo.spring.io/snapshot' }
     }
   }
 

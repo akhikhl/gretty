@@ -248,7 +248,7 @@ abstract class LauncherBase implements Launcher {
           params.jvmArgs = sconfig.jvmArgs
           params.systemProperties = sconfig.systemProperties
           if(!sconfig.secureRandom) {
-            // Speeding up tomcat startup, according to http://wiki.apache.org/tomcat/HowTo/FasterStartUp
+            // Speeding up tomcat startup, according to https://wiki.apache.org/tomcat/HowTo/FasterStartUp
             // ATTENTION: replacing the blocking entropy source (/dev/random) with a non-blocking one
             // actually reduces security because you are getting less-random data.
             params.systemProperty 'java.security.egd', 'file:/dev/./urandom'

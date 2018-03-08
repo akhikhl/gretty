@@ -14,7 +14,7 @@ buildscript {
     }
     jcenter()
     maven {
-      url 'http://dl.bintray.com/content/noamt/gradle-plugins'
+      url 'https://dl.bintray.com/content/noamt/gradle-plugins'
     }
   }
 
