@@ -59,6 +59,6 @@ All releases of Gretty are available at [Bintray](https://bintray.com/akhikhl/ma
 
 #### Copyright and License
 
-Copyright 2013-2017 (c) Andrey Hihlovskiy, Timur Shakurov and [contributors](CONTRIBUTORS).
+Copyright 2013-2018 (c) Andrey Hihlovskiy, Timur Shakurov and [contributors](CONTRIBUTORS).
 
 All versions, present and past, of Gretty are licensed under [MIT license](LICENSE).
