@@ -126,11 +126,20 @@ bintray {
   key = project.bintrayKey
   configurations = ['archives']
   pkg {
-    repo = 'maven'
-    name = thisProject.projectId
+    repo = thisProject.bintrayRepo
+    name = thisProject.bintrayPackage
     desc = thisProject.description
     licenses = [ thisProject.license ]
+    vcsUrl = thisProject.project_scm
     labels = thisProject.projectLabels.split(',')
+    version {
+      name = thisProject.version
+      vcsTag = thisProject.version
+      gpg {
+        sign = true
+        passphrase = thisProject.gpgPassphrase
+      }
+    }
   }
   dryRun = thisProject.bintrayDryRun
 }
