@@ -41,7 +41,7 @@ apply plugin: RestPlugin
 
 ext {
   project_website = "https://github.com/${developerId}/${projectId}"
-  project_scm = "scm:git@github.com:${developerId}/${projectId}.git"
+  project_scm = "https://github.com/${developerId}/${projectId}.git"
   license_url = "https://raw.github.com/${developerId}/${projectId}/master/LICENSE"
 
   if( !has( 'bintrayUser' ) )
