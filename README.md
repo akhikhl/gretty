@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/gretty-gradle-plugin/gretty.svg?branch=master)](https://travis-ci.org/gretty-gradle-plugin/gretty)
 ![Maintenance Status](https://img.shields.io/maintenance/yes/2018.svg)
-[![Latest release](https://img.shields.io/badge/release-2.0.0-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/v2.0.0)
-[![Snapshot](https://img.shields.io/badge/current-2.0.1--SNAPSHOT-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/master)
+[![Latest release](https://img.shields.io/badge/release-2.1.0-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/v2.1.0)
+[![Snapshot](https://img.shields.io/badge/current-2.1.1--SNAPSHOT-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/master)
 [![License](https://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
