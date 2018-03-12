@@ -2,6 +2,26 @@
 
 [![logo](https://gretty-gradle-plugin.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/gretty-gradle-plugin/gretty)
 
+### Version 2.1.0 (gretty.org)
+
+* Project fork - plugin-group is now org.gretty.
+
+* Compatibility with Gradle 4.6 (with thanks to Stefan Wolf)
+
+* Compatability with JDK9. Note that some latest container versions do not have full JDK9 compatibility at the time of release.
+
+* Tomcat 9 support (with thanks to Boris Petrov).
+
+* Upgraded default Jetty 9.4 to latest.
+
+* Updated SpringLoaded version, fixed #408.
+
+* Updated ASM version.
+
+* Updated Groovy version.
+
+* Gretty no longer adds org.slf4j:slf4j-nop:1.7.12 if SLF4J impl is missing, fixed #394.
+
 ### Version 2.0.0
 
 * Compatibility with Gradle 4.0

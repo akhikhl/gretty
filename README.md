@@ -20,24 +20,31 @@ If you are new with Gretty, try [getting started](https://gretty-gradle-plugin.g
 
 #### :star: What's new
 
-June 20, 2017, Gretty 2.0.0 is out and immediately available at [Bintray](https://bintray.com/akhikhl/maven/gretty/view) and [Maven Central](https://search.maven.org/#search|ga|1|g%3A%22org.akhikhl.gretty%22).
+March 12, 2018, Gretty(.org) 2.1.0 is out and immediately available at [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
+
+This release is a fork of the original project by Andrey Hihlovskiy (@akhikhl) hosted at https://github.com/akhikhl/gretty .  The fork is to encourage additional maintenance and development contributions to the project.  The main change is that the plugin-group simply becomes `org.gretty`.
+
+Gradle/Jetty/Tomcat/Gretty users and developers are eternally grateful for Andrey's contribution of the Gretty codebase and look forward to his future contributions and guidance.
 
 * Changes in this version:
 
-* Compatibility with Gradle 4.0
+* Project fork - plugin group is now org.gretty.
 
-* Support of Jetty 9.4 (issue #365).
+* Compatibility with Gradle 4.6 (with thanks to Stefan Wolf)
 
-* Now it's possible to override versions of Jetty, Tomcat and servlet API via properties in "gradle.properties" file (issue #330).
-  See more information in chapter [overriding servlet container versions](https://gretty-gradle-plugin.github.io/gretty-doc/Overriding-servlet-container-versions.html) in the documentation.
+* Compatability with JDK9. Note that some latest container versions do not have full JDK9 compatibility at the time of release.
 
-* All integration tests now run against Firefox 54.
+* Tomcat 9 support (with thanks to Boris Petrov).
 
-* Fixed product generation.
+* Upgraded default Jetty 9.4 to latest.
 
-* Support of Spring Framework 4.3.9 and Spring Boot 1.5.4.
+* Updated SpringLoaded version, fixed #408.
 
-* Dropped support of Java 6.
+* Updated ASM version.
+
+* Updated Groovy version.
+
+* Gretty no longer adds org.slf4j:slf4j-nop:1.7.12 if SLF4J impl is missing, fixed #394.
 
 See also: [complete list of changes](changes.md) for more information.
 
