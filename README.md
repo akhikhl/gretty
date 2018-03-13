@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
 Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
-It supports Jetty versions 7, 8 and 9, Tomcat versions 7 and 8, multiple web-apps and many more.
+It supports Jetty versions 7, 8 and 9, Tomcat versions 7, 8 and 9, multiple web-apps and many more.
 It wraps servlet container functions as convenient Gradle tasks and configuration DSL.
 
 A complete list of Gretty features is available in [feature overview](https://gretty-gradle-plugin.github.io/gretty-doc/Feature-overview.html).
@@ -62,8 +62,8 @@ Since version 2.0.0 Gretty no longer supports JDK6.
 
 Gretty is an open-source project and is freely available in sources as well as in compiled form.
 
-Releases of Gretty up to and including version 2.0.0 are available at [Bintray](https://bintray.com/akhikhl/maven/gretty/view)
 Releases of Gretty (gretty.org fork) from 2.1.0 onwards are available at [Bintray](https://bintray.com/javabrett/maven/org.gretty/view)
+Old releases of Gretty up to and including version 2.0.0 are available at [Bintray](https://bintray.com/akhikhl/maven/gretty/view)
 
 #### Copyright and License
 
