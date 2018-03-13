@@ -54,7 +54,7 @@ You can learn about all Gretty features in [online documentation](https://gretty
 
 #### System requirements
 
-Gretty requires JDK7 or JDK8 and Gradle 1.10 or newer (Gradle 4.0 is highly recommended!).
+Gretty requires JDK7, JDK8 or JDK9 and Gradle 1.10 or newer (Gradle 4.0 is highly recommended!).
 
 Since version 2.0.0 Gretty no longer supports JDK6.
 
@@ -62,7 +62,8 @@ Since version 2.0.0 Gretty no longer supports JDK6.
 
 Gretty is an open-source project and is freely available in sources as well as in compiled form.
 
-All releases of Gretty are available at [Bintray](https://bintray.com/akhikhl/maven/gretty/view)
+Releases of Gretty up to and including version 2.0.0 are available at [Bintray](https://bintray.com/akhikhl/maven/gretty/view)
+Releases of Gretty (gretty.org fork) from 2.1.0 onwards are available at [Bintray](https://bintray.com/javabrett/maven/org.gretty/view)
 
 #### Copyright and License
 
