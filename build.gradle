@@ -1,8 +1,8 @@
 buildscript {
   project.ext {
-    if(has('privateRepoDir')) {
+    if (has('privateRepoDir')) {
       privateRepoDir = privateRepoDir instanceof File ? privateRepoDir.path : privateRepoDir.toString()
-      if(!new File(privateRepoDir).isAbsolute())
+      if (!new File(privateRepoDir).isAbsolute())
         privateRepoDir = new File(projectDir, privateRepoDir).canonicalPath
     } else
       privateRepoDir = new File(project.buildDir, 'privateRepo').canonicalPath
@@ -42,43 +42,43 @@ ext {
   project_scm = "https://github.com/${developerId}/${projectId}.git"
   license_url = "https://raw.github.com/${developerId}/${projectId}/master/LICENSE"
 
-  if( !has( 'bintrayUser' ) )
+  if (!has('bintrayUser'))
     bintrayUser = ''
 
-  if( !has( 'bintrayKey' ) )
+  if (!has('bintrayKey'))
     bintrayKey = ''
 
-  if( !has( 'bintrayRepo' ) )
+  if (!has('bintrayRepo'))
     bintrayRepo = ''
 
-  if( !has( 'bintrayPackage' ) )
+  if (!has('bintrayPackage'))
     bintrayPackage = ''
 
   bintrayGpgRequestBody = [:]
 
-  if( !has( 'bintraySubject' ) )
+  if (!has('bintraySubject'))
     bintraySubject = ''
   else
     bintrayGpgRequestBody.put('subject', bintraySubject)
 
-  if( !has( 'gpgPassphrase' ) )
+  if (!has( 'gpgPassphrase'))
     gpgPassphrase = ''
   else
     bintrayGpgRequestBody.put('passphrase', gpgPassphrase)
 
-  if( !has( 'gpgKey' ) )
+  if (!has('gpgKey'))
     gpgKey = ''
   else
     bintrayGpgRequestBody.put('private_key', gpgKey)
 
-  if( !has( 'bintrayDryRun' ) )
+  if (!has('bintrayDryRun'))
     bintrayDryRun = false
 
-  if( !has('artifactory_contextUrl'))
+  if (!has('artifactory_contextUrl'))
     artifactory_contextUrl = 'https://oss.jfrog.org/artifactory'
 }
 
-if(!bintrayDryRun)
+if (!bintrayDryRun)
   task bintraySign(type: org._10ne.gradle.rest.RestTask) {
     description 'Push to bintray and sign it.'
     httpMethod = 'post'
@@ -89,16 +89,16 @@ if(!bintrayDryRun)
     contentType = ContentType.JSON
   }
 
-task('buildIntegrationTests', type: GradleBuild) {
+task buildIntegrationTests(type: GradleBuild) {
   dir = file('integrationTests')
   tasks = [ 'build' ]
   project.tasks.build.finalizedBy it
   onlyIf { !project.tasks.build.getState().getFailure() }
 }
 
-task('testAll', dependsOn: tasks.build)
+task testAll(dependsOn: tasks.build)
 
-task('testAllIntegrationTests', type: GradleBuild) {
+task testAllIntegrationTests(type: GradleBuild) {
   dependsOn buildIntegrationTests
   dir = file('integrationTests')
   tasks = [ 'testAll' ]
@@ -106,7 +106,7 @@ task('testAllIntegrationTests', type: GradleBuild) {
   onlyIf { !project.tasks.testAll.getState().getFailure() }
 }
 
-task('cleanIntegrationTests', type: GradleBuild) {
+task cleanIntegrationTests(type: GradleBuild) {
   dir = file('integrationTests')
   tasks = [ 'clean' ]
   project.tasks.clean.dependsOn it

@@ -24,131 +24,131 @@ configurations {
 
 afterEvaluate {
 
-dependencies {
-  testCompile "org.codehaus.groovy:groovy-all:${groovy_version}"
-  testCompile "org.spockframework:spock-core:${spock_version}"
-}
-
-sourceCompatibility = '1.7'
-targetCompatibility = '1.7'
-
-task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
-  classifier = 'sources'
-  from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, description: 'Creates javadoc jar') {
-  dependsOn javadoc
-  classifier = 'javadoc'
-  from javadoc.destinationDir
-  if(tasks.findByName('groovydoc')) {
-    dependsOn groovydoc
-    from groovydoc.destinationDir
-  }
-}
-
-artifacts {
-  archives sourcesJar, javadocJar
-}
-
-def thisProject = project
-
-def configurePom = {
-  resolveStrategy = Closure.DELEGATE_FIRST
-  packaging 'jar'
-  description thisProject.description
-  url thisProject.project_website
-
-  scm {
-    url thisProject.project_scm
-    connection thisProject.project_scm
-    developerConnection thisProject.project_scm
+  dependencies {
+    testCompile "org.codehaus.groovy:groovy-all:${groovy_version}"
+    testCompile "org.spockframework:spock-core:${spock_version}"
   }
 
-  licenses {
-    license {
-      name thisProject.license
-      url thisProject.license_url
-      distribution 'repo'
+  sourceCompatibility = '1.7'
+  targetCompatibility = '1.7'
+
+  task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+  }
+
+  task javadocJar(type: Jar, description: 'Creates javadoc jar') {
+    dependsOn javadoc
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+    if(tasks.findByName('groovydoc')) {
+      dependsOn groovydoc
+      from groovydoc.destinationDir
     }
   }
 
-  developers {
-    developer {
-      id thisProject.developerId
-      name thisProject.developerName
-    }
+  artifacts {
+    archives sourcesJar, javadocJar
   }
-}
 
-publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      from components.java
-      pom.withXml {
-        asNode().children().last() + configurePom
+  def thisProject = project
+
+  def configurePom = {
+    resolveStrategy = Closure.DELEGATE_FIRST
+    packaging 'jar'
+    description thisProject.description
+    url thisProject.project_website
+
+    scm {
+      url thisProject.project_scm
+      connection thisProject.project_scm
+      developerConnection thisProject.project_scm
+    }
+
+    licenses {
+      license {
+        name thisProject.license
+        url thisProject.license_url
+        distribution 'repo'
       }
-      artifact tasks.sourcesJar
-      artifact tasks.javadocJar
     }
-  }
 
-  repositories {
-    maven {
-      name 'private'
-      url "file:/${project.rootProject.ext.privateRepoDir}"
-    }
-  }
-}
-
-install.repositories.mavenInstaller.pom*.whenConfigured { pom ->
-  pom.project {
-    name thisProject.name
-    configurePom.rehydrate(delegate, owner, thisObject).call()
-  }
-}
-
-project.task('publishToPrivateRepository') {
-  dependsOn "publishMavenJavaPublicationToPrivateRepository"
-}
-
-project.tasks.build.dependsOn project.tasks.publishToPrivateRepository
-rootProject.tasks.buildIntegrationTests.dependsOn project.tasks.publishToPrivateRepository
-rootProject.tasks.testAllIntegrationTests.dependsOn project.tasks.publishToPrivateRepository
-
-tasks.artifactoryPublish {
-  dependsOn { project.tasks.generatePomFileForMavenJavaPublication }
-  publications 'mavenJava'
-}
-
-bintray {
-  user = project.bintrayUser
-  key = project.bintrayKey
-  configurations = ['archives']
-  pkg {
-    repo = thisProject.bintrayRepo
-    name = thisProject.bintrayPackage
-    desc = thisProject.description
-    licenses = [ thisProject.license ]
-    vcsUrl = thisProject.project_scm
-    labels = thisProject.projectLabels.split(',')
-    version {
-      name = thisProject.version
-      vcsTag = thisProject.version
-      gpg {
-        sign = true
-        passphrase = thisProject.gpgPassphrase
+    developers {
+      developer {
+        id thisProject.developerId
+        name thisProject.developerName
       }
     }
   }
-  dryRun = thisProject.bintrayDryRun
-}
 
-tasks.bintrayUpload.dependsOn assemble
+  publishing {
+    publications {
+      mavenJava(MavenPublication) {
+        from components.java
+        pom.withXml {
+          asNode().children().last() + configurePom
+        }
+        artifact tasks.sourcesJar
+        artifact tasks.javadocJar
+      }
+    }
 
-if(!bintrayDryRun) {
-  tasks.bintrayUpload.finalizedBy rootProject.tasks.bintraySign
-  rootProject.tasks.bintraySign.onlyIf { !tasks.bintrayUpload.getState().getFailure() }
-}
+    repositories {
+      maven {
+        name 'private'
+        url "file:/${project.rootProject.ext.privateRepoDir}"
+      }
+    }
+  }
+
+  install.repositories.mavenInstaller.pom*.whenConfigured { pom ->
+    pom.project {
+      name thisProject.name
+      configurePom.rehydrate(delegate, owner, thisObject).call()
+    }
+  }
+
+  project.task('publishToPrivateRepository') {
+    dependsOn "publishMavenJavaPublicationToPrivateRepository"
+  }
+
+  project.tasks.build.dependsOn project.tasks.publishToPrivateRepository
+  rootProject.tasks.buildIntegrationTests.dependsOn project.tasks.publishToPrivateRepository
+  rootProject.tasks.testAllIntegrationTests.dependsOn project.tasks.publishToPrivateRepository
+
+  tasks.artifactoryPublish {
+    dependsOn { project.tasks.generatePomFileForMavenJavaPublication }
+    publications 'mavenJava'
+  }
+
+  bintray {
+    user = project.bintrayUser
+    key = project.bintrayKey
+    configurations = ['archives']
+    pkg {
+      repo = thisProject.bintrayRepo
+      name = thisProject.bintrayPackage
+      desc = thisProject.description
+      licenses = [ thisProject.license ]
+      vcsUrl = thisProject.project_scm
+      labels = thisProject.projectLabels.split(',')
+      version {
+        name = thisProject.version
+        vcsTag = thisProject.version
+        gpg {
+          sign = true
+          passphrase = thisProject.gpgPassphrase
+        }
+      }
+    }
+    dryRun = thisProject.bintrayDryRun
+  }
+
+  tasks.bintrayUpload.dependsOn assemble
+
+  if (!bintrayDryRun) {
+    tasks.bintrayUpload.finalizedBy rootProject.tasks.bintraySign
+    rootProject.tasks.bintraySign.onlyIf { !tasks.bintrayUpload.getState().getFailure() }
+  }
 
 } // afterEvaluate
