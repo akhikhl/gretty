@@ -112,7 +112,7 @@ task cleanIntegrationTests(type: GradleBuild) {
   project.tasks.clean.dependsOn it
 }
 
-task wrapper(type: Wrapper) {
+wrapper {
     gradleVersion = '4.6'
     distributionType = Wrapper.DistributionType.ALL
 }
