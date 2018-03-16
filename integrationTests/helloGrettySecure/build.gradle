@@ -12,7 +12,7 @@ dependencies {
 gretty {
   httpEnabled = false
   httpsEnabled = true
-  // Possible servletContainer values are 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8', 'tomcat9'. Default is 'jetty9'.
+  // Possible servletContainer values are 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8', 'tomcat85', 'tomcat9'. Default is 'jetty9'.
   servletContainer = 'jetty9'
   realm 'auth'
   // realmConfigFile is optional. When omitted, 'jetty-realm.properties' or 'tomcat-users.xml' is assumed.

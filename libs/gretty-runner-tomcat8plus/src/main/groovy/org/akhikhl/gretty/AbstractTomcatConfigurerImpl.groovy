@@ -7,23 +7,22 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
-import org.apache.catalina.Globals
-import org.apache.catalina.Service
+import org.apache.catalina.WebResourceRoot
 import org.apache.catalina.core.StandardContext
-import org.apache.catalina.deploy.WebXml
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
-import org.apache.naming.resources.VirtualDirContext
+import org.apache.catalina.webresources.StandardRoot
 import org.apache.tomcat.JarScanner
+import org.apache.tomcat.util.descriptor.web.WebXml
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 /**
  *
  * @author akhikhl
  */
-class TomcatConfigurerImpl implements TomcatConfigurer {
+abstract class AbstractTomcatConfigurerImpl implements TomcatConfigurer {
 
-  private static final Logger log = LoggerFactory.getLogger(TomcatConfigurerImpl)
+  private static final Logger log = LoggerFactory.getLogger(AbstractTomcatConfigurerImpl)
 
   @Override
   ContextConfig createContextConfig(URL[] classpathUrls) {
@@ -47,14 +46,14 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
   @Override
   JarScanner createJarScanner(JarScanner jarScanner, JarSkipPatterns skipPatterns) {
-    new JarScannerEx(skipPatterns)
+    new SkipPatternJarScanner(jarScanner, skipPatterns)
   }
 
   @Override
   void setBaseDir(Tomcat tomcat, File baseDir) {
     tomcat.baseDir = baseDir.absolutePath
-    tomcat.engine.baseDir = baseDir.absolutePath
-    System.setProperty(Globals.CATALINA_BASE_PROP, baseDir.absolutePath)
+    tomcat.server.setCatalinaHome(baseDir)
+    tomcat.server.setCatalinaBase(baseDir)
   }
 
   @Override
@@ -62,38 +61,23 @@ class TomcatConfigurerImpl implements TomcatConfigurer {
 
     context.setDocBase(webappParams.resourceBase)
 
-    List extraResourcePaths = []
+    WebResourceRoot root = new StandardRoot(context)
+    context.setResources(root)
 
     if(webappParams.extraResourceBases)
-      extraResourcePaths += webappParams.extraResourceBases.collect { "/=$it" }
+      webappParams.extraResourceBases.each { root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/', it, null, '/') }
+
 
     if (webappParams.webXml)
       context.setAltDDName(webappParams.webXml);
 
-    Set<File> classpathJarParentDirs = new LinkedHashSet()
-
-    webappParams.webappClassPath.findAll { it.endsWith('.jar') }.each {
+    Set classpathJarParentDirs = webappParams.webappClassPath.findAll { it.endsWith('.jar') }.collect({
       File jarFile = it.startsWith('file:') ? new File(new URI(it)) : new File(it)
-      classpathJarParentDirs.add jarFile
+      jarFile
+    }) as Set
+
+    classpathJarParentDirs.each { File it ->
+      root.createWebResourceSet(WebResourceRoot.ResourceSetType.POST, '/WEB-INF/lib/' + it.name, it.absolutePath, null, '/')
     }
-
-    def webInfLibs = classpathJarParentDirs.toList()
-
-    if(extraResourcePaths || webInfLibs) {
-      VirtualDirContext vdc = new VirtualDirContextEx()
-      vdc.setExtraResourcePaths(extraResourcePaths.join(','))
-      vdc.webInfJars = webInfLibs
-      context.setResources(vdc)
-    }
-  }
-
-  @Override
-  void setService(Tomcat tomcat, Service service) {
-    tomcat.service = service
-  }
-
-  @Override
-  void setEngine(Tomcat tomcat, Service service) {
-    tomcat.engine = service.getContainer()
   }
 }

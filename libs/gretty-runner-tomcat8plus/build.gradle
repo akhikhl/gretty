@@ -1,0 +1,16 @@
+apply from: rootProject.file('common.gradle')
+
+dependencies {
+  compile project(':libs:gretty-runner-tomcat'), {
+	exclude group: 'org.apache.tomcat.embed'
+	exclude group: 'javax.servlet', module: 'javax.servlet-api'
+  }
+  compile "org.apache.tomcat.embed:tomcat-embed-core:$tomcat8_version"
+  compile "org.apache.tomcat.embed:tomcat-embed-el:$tomcat8_version"
+  compile "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat8_version"
+  compile "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat8_version"
+  // this fixes incorrect dependency of tomcat-8.0.9 on ecj-4.4RC4
+  if (tomcat8_version == '8.0.9')
+	compile 'org.eclipse.jdt.core.compiler:ecj:4.4'
+  compile "javax.servlet:javax.servlet-api:$tomcat8_servlet_api_version"
+}

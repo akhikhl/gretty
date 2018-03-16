@@ -11,4 +11,4 @@ dependencies {
 
 // annotations are not supported in jetty7
 
-testAll.dependsOn defineIntegrationTestAllContainers(['jetty8', 'jetty9', 'tomcat7', 'tomcat8', 'tomcat9'])
+testAll.dependsOn defineIntegrationTestAllContainers(['jetty8', 'jetty9', 'tomcat7', 'tomcat8', 'tomcat85', 'tomcat9'])

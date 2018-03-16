@@ -16,11 +16,9 @@ import org.apache.catalina.startup.Tomcat
 class TomcatConfigurerImpl extends AbstractTomcatConfigurerImpl {
   @Override
   void setService(Tomcat tomcat, Service service) {
-    tomcat.service = service
   }
 
   @Override
   void setEngine(Tomcat tomcat, Service service) {
-    tomcat.engine = service.getContainer()
   }
 }

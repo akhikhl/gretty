@@ -1,0 +1,17 @@
+import org.gradle.util.VersionNumber
+
+apply from: rootProject.file('common.gradle')
+
+dependencies {
+  compile project(':libs:gretty-runner-tomcat8plus'), {
+    exclude group: 'org.apache.tomcat.embed'
+    exclude group: 'javax.servlet', module: 'javax.servlet-api'
+  }
+  compile "org.apache.tomcat.embed:tomcat-embed-core:$tomcat85_version"
+  compile "org.apache.tomcat.embed:tomcat-embed-el:$tomcat85_version"
+  compile "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat85_version"
+  if (VersionNumber.parse(tomcat85_version) <= VersionNumber.parse('8.5.2'))
+    compile "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat85_version"
+  compile "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat85_version"
+  compile "javax.servlet:javax.servlet-api:$tomcat85_servlet_api_version"
+}

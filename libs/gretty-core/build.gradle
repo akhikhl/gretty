@@ -29,6 +29,8 @@ tasks.processResources {
     tomcat7ServletApiVersion: project.tomcat7_servlet_api_version,
     tomcat8Version: project.tomcat8_version,
     tomcat8ServletApiVersion: project.tomcat8_servlet_api_version,
+    tomcat85Version: project.tomcat85_version,
+    tomcat85ServletApiVersion: project.tomcat85_servlet_api_version,
     tomcat9Version: project.tomcat9_version,
     tomcat9ServletApiVersion: project.tomcat9_servlet_api_version,
     springBootVersion: project.springBootVersion,

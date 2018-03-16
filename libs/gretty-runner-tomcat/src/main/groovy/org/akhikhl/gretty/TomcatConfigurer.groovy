@@ -8,6 +8,7 @@
  */
 package org.akhikhl.gretty
 
+import org.apache.catalina.Service
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.startup.ContextConfig
 import org.apache.catalina.startup.Tomcat
@@ -27,5 +28,8 @@ interface TomcatConfigurer {
   void setBaseDir(Tomcat tomcat, File baseDir)
 
   void setResourceBase(StandardContext context, Map webappParams)
-}
 
+  void setService(Tomcat tomcat, Service service)
+
+  void setEngine(Tomcat tomcat, Service service)
+}

@@ -10,7 +10,7 @@ dependencies {
 }
 
 gretty {
-  // Possible servletContainer values are 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8', 'tomcat9'. Default is 'jetty9'.
+  // Possible servletContainer values are 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8', 'tomcat85', 'tomcat9'. Default is 'jetty9'.
   // servletContainer = 'tomcat8'
   // httpsEnabled = true
 }

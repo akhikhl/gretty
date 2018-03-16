@@ -12,4 +12,4 @@ gretty {
 }
 
 defineIntegrationTest()
-testAll.dependsOn defineIntegrationTestAllContainers(['jetty9', 'tomcat7', 'tomcat8', 'tomcat9'])
+testAll.dependsOn defineIntegrationTestAllContainers(['jetty9', 'tomcat7', 'tomcat8', 'tomcat85', 'tomcat9'])

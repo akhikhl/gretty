@@ -69,8 +69,8 @@ class TomcatServerConfigurer {
       def services = server.findServices()
       assert services.length == 1
       service = services[0]
-      tomcat.service = service
-      tomcat.engine = service.getContainer()
+      configurer.setService(tomcat, service)
+      configurer.setEngine(tomcat, service)
       connectors = service.findConnectors()
       tomcat.host = service.getContainer().findChildren().find { it instanceof Host }
       tomcat.port = connectors[0].port

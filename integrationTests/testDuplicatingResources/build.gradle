@@ -7,7 +7,7 @@ dependencies {
 }
 
 ext {
-	integrationTestContainers = ['tomcat7', 'tomcat8', 'tomcat9']
+	integrationTestContainers = ['tomcat7', 'tomcat8', 'tomcat85', 'tomcat9']
 }
 
 gretty {

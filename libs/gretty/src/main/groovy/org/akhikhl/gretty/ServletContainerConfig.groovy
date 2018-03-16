@@ -168,8 +168,6 @@ class ServletContainerConfig {
             force "org.apache.tomcat.embed:tomcat-embed-core:$tomcat8_version"
             force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat8_version"
             force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat8_version"
-            if (VersionNumber.parse(tomcat8_version) <= VersionNumber.parse('8.5.2'))
-              force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat8_version"
             force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat8_version"
             // this fixes incorrect dependency of tomcat-8.0.9 on ecj-4.4RC4
             if(tomcat8_version == '8.0.9')
@@ -182,7 +180,33 @@ class ServletContainerConfig {
             grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.tomcat8ServletApiVersion}"
           }
         }
-      ]
+      ],
+      'tomcat85': [
+        servletContainerType: 'tomcat',
+        servletContainerVersion: { project -> project.ext.tomcat85Version },
+        servletContainerDescription: { project -> "Tomcat ${project.ext.tomcat85Version}" },
+        servletContainerRunnerConfig: 'grettyRunnerTomcat85',
+        servletContainerRunnerDependencies: { project ->
+          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-tomcat85:$grettyVersion"
+          addRedirectFilter(project, servletContainerRunnerConfig)
+          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
+            force "javax.servlet:javax.servlet-api:${project.ext.tomcat85ServletApiVersion}"
+            def tomcat85_version = project.ext.tomcat85Version
+            force "org.apache.tomcat.embed:tomcat-embed-core:$tomcat85_version"
+            force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat85_version"
+            force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat85_version"
+            if (VersionNumber.parse(tomcat85_version) <= VersionNumber.parse('8.5.2'))
+              force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat85_version"
+            force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat85_version"
+          }
+        },
+        servletApiVersion: { project -> project.ext.tomcat85ServletApiVersion },
+        servletApiDependencies: { project ->
+          project.dependencies {
+            grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.tomcat85ServletApiVersion}"
+          }
+        }
+      ],
     ]
     if (JavaVersion.current().isJava8Compatible()) {
       configs['jetty9.3'] = [
