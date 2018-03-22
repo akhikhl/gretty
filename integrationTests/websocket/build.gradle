@@ -8,6 +8,7 @@ gretty {
 
 dependencies {
   compile 'org.webjars:jquery:2.1.1'
+  compile 'org.webjars:sockjs-client:0.3.4-1'
 }
 
 defineIntegrationTest()
