@@ -119,7 +119,7 @@ class IntegrationTestPlugin extends BasePlugin {
   protected void configureRootProjectProperties(Project project) {
     super.configureRootProjectProperties(project)
     if(!project.hasProperty('geckoDriverArchiveFileName'))
-      project.ext.geckoDriverArchiveFileName = "geckodriver-v${project.geckoDriverVersion}-macos.tar.gz"
+      project.ext.geckoDriverArchiveFileName = "geckodriver-v${project.geckoDriverVersion}-${project.geckoDriverPlatform}.tar.gz"
     if(!project.hasProperty('geckoDriverDownloadUrl'))
       project.ext.geckoDriverDownloadUrl = "https://github.com/mozilla/geckodriver/releases/download/v${project.geckoDriverVersion}/${project.geckoDriverArchiveFileName}"
   }
