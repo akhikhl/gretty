@@ -11,7 +11,7 @@ dependencies {
   compile 'commons-io:commons-io:2.4'
   compile 'org.apache.commons:commons-lang3:3.3.2'
   compile 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.bcprov-jdk16:1.46_3'
-  compile 'org.springframework.boot:spring-boot-devtools:1.3.3.RELEASE'
+  compile "org.springframework.boot:spring-boot-devtools:$springBootVersion"
 }
 
 tasks.processResources {
