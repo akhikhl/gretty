@@ -1,5 +1,5 @@
 // include this file in subprojects:
-// apply from: rootProject.file('libs/common.gradle')
+// apply from: rootProject.file('common.gradle')
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
