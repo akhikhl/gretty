@@ -102,6 +102,19 @@ task testAllIntegrationTests(type: GradleBuild) {
   dependsOn buildIntegrationTests
   dir = file('integrationTests')
   tasks = [ 'testAll' ]
+  startParameter.projectProperties = [:]
+  if (project.hasProperty('geckoDriverPlatform')) {
+    startParameter.projectProperties.put('geckoDriverPlatform', project.geckoDriverPlatform)
+  }
+  if (project.hasProperty('geckoDriverVersion')) {
+    startParameter.projectProperties.put('geckoDriverVersion', project.geckoDriverVersion)
+  }
+  if (project.hasProperty('seleniumVersion')) {
+    startParameter.projectProperties.put('seleniumVersion', project.seleniumVersion)
+  }
+  if (project.hasProperty('gebVersion')) {
+    startParameter.projectProperties.put('gebVersion', project.gebVersion)
+  }
   project.tasks.testAll.finalizedBy it
   onlyIf { !project.tasks.testAll.getState().getFailure() }
 }

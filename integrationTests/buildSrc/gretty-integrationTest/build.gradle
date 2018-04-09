@@ -18,6 +18,7 @@ def projectProps = [
   buildOrigin: ('hostname'.execute().text.trim()),
   gebVersion: project.gebVersion,
   geckoDriverVersion: project.geckoDriverVersion,
+  geckoDriverPlatform: project.geckoDriverPlatform,
   groovy_version: project.groovy_version,
   seleniumVersion: project.seleniumVersion,
   spock_version: project.spock_version
