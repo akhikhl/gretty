@@ -35,3 +35,8 @@ buildscript {
 allprojects {
   version = rootProject.ext.parentGradleProps.version
 }
+
+wrapper {
+  gradleVersion = '4.6'
+  distributionType = Wrapper.DistributionType.ALL
+}
