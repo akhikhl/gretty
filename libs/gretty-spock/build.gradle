@@ -1,7 +1,7 @@
 apply from: rootProject.file('common.gradle')
 
 dependencies {
-  compile "org.codehaus.groovy:groovy-all:${groovy_version}"
-  compile "org.spockframework:spock-core:$spock_version"
+  compile libs.groovy_all
+  compile libs.spock
   compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 }

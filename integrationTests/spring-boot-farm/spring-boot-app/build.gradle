@@ -3,7 +3,7 @@ apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 apply plugin: 'org.gretty.internal.integrationTests.FarmIntegrationTestPlugin'
 
 dependencies {
-  compile "org.codehaus.groovy:groovy-all:$groovy_version"
+  compile libs.groovy_all
   compile 'org.webjars:bootstrap:3.2.0'
   compile 'org.webjars:jquery:2.1.1'
 }
