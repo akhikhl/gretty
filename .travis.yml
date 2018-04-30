@@ -1,8 +1,22 @@
 language: groovy
-jdk:
-  - openjdk7
-  - oraclejdk8
-  - oraclejdk9
+matrix:
+  include:
+  - jdk: openjdk7
+  - jdk: oraclejdk9
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['jetty7']"
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['jetty8']"
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['jetty9']"
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['tomcat7']"
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['tomcat8']"
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['tomcat85']"
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['tomcat9']"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
@@ -27,7 +41,7 @@ install:
 script:
   - |
     if [[ "${TRAVIS_JDK_VERSION}" == "oraclejdk8" && ( "${TRAVIS_BRANCH}" == "master" || "${TRAVIS_EVENT_TYPE}" == "pull_request" || "${TRAVIS_EVENT_TYPE}" == "cron" ) ]]; then
-      ./gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 build testAll
+      ./gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} build testAll
     else
       ./gradlew build
     fi
