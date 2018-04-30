@@ -2,6 +2,7 @@ language: groovy
 matrix:
   include:
   - jdk: oraclejdk9
+    env: JDK_JAVA_OPTIONS="--add-modules=java.xml.bind"
   - jdk: oraclejdk8
     env: TEST_ALL_CONTAINERS="['jetty7']"
   - jdk: oraclejdk8
