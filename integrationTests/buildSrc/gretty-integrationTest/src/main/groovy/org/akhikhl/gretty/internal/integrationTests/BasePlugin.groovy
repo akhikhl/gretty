@@ -113,6 +113,7 @@ class BasePlugin implements Plugin<Project> {
 
     applyPlugins(project)
     applyPluginsToRootProject(project.rootProject)
+    configureRootProjectProperties(project.rootProject)
     configureRepositories(project)
     configureExtensions(project)
     configureSourceSets(project)
@@ -121,9 +122,7 @@ class BasePlugin implements Plugin<Project> {
     project.afterEvaluate {
 
       configurePublications(project)
-      configureRootProjectProperties(project.rootProject)
       configureRootProjectTasksAfterEvaluate(project.rootProject)
-
       configureDependencies(project)
       configureTasksAfterEvaluate(project)
 
