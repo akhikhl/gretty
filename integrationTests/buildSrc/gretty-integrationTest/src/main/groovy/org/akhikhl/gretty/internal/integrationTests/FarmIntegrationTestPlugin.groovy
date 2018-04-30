@@ -27,6 +27,10 @@ class FarmIntegrationTestPlugin extends BasePlugin {
         // excluding jetty9.3/4 tests because of login bug
         integrationTestContainers = ServletContainerConfig.getConfigNames() - ['jetty9.3', 'jetty9.4']
 
+      if(project.hasProperty('testAllContainers') && project.testAllContainers) {
+        integrationTestContainers.retainAll(Eval.me(project.testAllContainers))
+      }
+
       integrationTestContainers.each { container ->
 
         project.farms.farm container, {

@@ -81,6 +81,10 @@ class IntegrationTestPlugin extends BasePlugin {
         integrationTestContainers -= ['jetty7', 'jetty8']
       }
 
+      if(project.hasProperty('testAllContainers') && project.testAllContainers) {
+        integrationTestContainers.retainAll(Eval.me(project.testAllContainers))
+      }
+
       integrationTestContainers.each { String container ->
 
         project.task('integrationTest_' + container, type: Test) { thisTask ->
