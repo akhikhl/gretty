@@ -72,8 +72,7 @@ class IntegrationTestPlugin extends BasePlugin {
       integrationTestAllContainersTask = project.task('integrationTestAllContainers')
 
       if(!integrationTestContainers)
-        // excluding jetty9.3/4 tests because of login bug
-        integrationTestContainers = ServletContainerConfig.getConfigNames() - ['jetty9.3', 'jetty9.4']
+        integrationTestContainers = ServletContainerConfig.getConfigNames()
 
       if(JavaVersion.current().isJava9Compatible()) {
         // excluding jetty7 and jetty8 under JDK9, can no longer compile JSPs to default 1.5 target,
