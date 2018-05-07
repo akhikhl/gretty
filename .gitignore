@@ -10,3 +10,4 @@ build
 *.ipr
 *.iws
 bin/
+.DS_Store
