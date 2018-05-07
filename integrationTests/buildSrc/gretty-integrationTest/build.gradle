@@ -21,11 +21,13 @@ def projectProps = [
   geckoDriverPlatform: project.geckoDriverPlatform,
   groovy_version: project.groovy_version,
   seleniumVersion: project.seleniumVersion,
-  spock_version: project.spock_version
+  spock_version: project.spock_version,
+  testAllContainers: project.testAllContainers
 ]
 
 processResources {
   inputs.properties projectProps
+  outputs.upToDateWhen{ false }
   filesMatching('**/project.properties') {
     filter ReplaceTokens, tokens: projectProps
   }

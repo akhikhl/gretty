@@ -115,6 +115,9 @@ task testAllIntegrationTests(type: GradleBuild) {
   if (project.hasProperty('gebVersion')) {
     startParameter.projectProperties.put('gebVersion', project.gebVersion)
   }
+  if (project.hasProperty('testAllContainers')) {
+    startParameter.projectProperties.put('testAllContainers', project.testAllContainers)
+  }
   project.tasks.testAll.finalizedBy it
   onlyIf { !project.tasks.testAll.getState().getFailure() }
 }
