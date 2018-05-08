@@ -24,7 +24,7 @@ class FarmIntegrationTestPlugin extends BasePlugin {
       farmIntegrationTestAllContainersTask = project.task('farmIntegrationTestAllContainers')
 
       if(!integrationTestContainers)
-        integrationTestContainers = ServletContainerConfig.getConfigNames()
+        integrationTestContainers = ServletContainerConfig.getConfigNames().collect() // returns immutable and we want to filter later
 
       if(project.hasProperty('testAllContainers') && project.testAllContainers) {
         integrationTestContainers.retainAll(Eval.me(project.testAllContainers))
