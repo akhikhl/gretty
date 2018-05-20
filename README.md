@@ -20,31 +20,21 @@ If you are new with Gretty, try [getting started](https://gretty-gradle-plugin.g
 
 #### :star: What's new
 
-March 12, 2018, Gretty(.org) 2.1.0 is out and immediately available at [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
-
-This release is a fork of the original project by Andrey Hihlovskiy (@akhikhl) hosted at https://github.com/akhikhl/gretty .  The fork is to encourage additional maintenance and development contributions to the project.  The main change is that the plugin-group simply becomes `org.gretty`.
-
-Gradle/Jetty/Tomcat/Gretty users and developers are eternally grateful for Andrey's contribution of the Gretty codebase and look forward to his future contributions and guidance.
+May 21, 2018, Gretty(.org) 2.2.0 is out and immediately available at [Gradle Plugins](https://plugins.gradle.org/plugin/org.gretty) and [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
 
 * Changes in this version:
 
-* Project fork - plugin group is now org.gretty.
+* Bumped default Tomcat 9 version to 9.0.6 (was 9.0.5).
 
-* Compatibility with Gradle 4.6 (with thanks to Stefan Wolf)
+* Support added for Tomcat 8.5 and Tomcat support refactoring (thanks Boris Petrov). Tomcat 8.5 replaces deprecated Tomcat 8.0.
 
-* Compatability with JDK9. Note that some latest container versions do not have full JDK9 compatibility at the time of release.
+* Bumped Spring Boot version to 1.5.9 (was 1.5.4).
 
-* Tomcat 9 support (with thanks to Boris Petrov).
+* Bumped versions of asm (6.1.1, was 6.0), Groovy (2.4.15, was 2.4.13) and Spring (4.3.16, was 4.3.9) (thanks Henrik Brautaset Aronsen).
 
-* Upgraded default Jetty 9.4 to latest.
-
-* Updated SpringLoaded version, fixed #408.
-
-* Updated ASM version.
-
-* Updated Groovy version.
-
-* Gretty no longer adds org.slf4j:slf4j-nop:1.7.12 if SLF4J impl is missing, fixed #394.
+* Fixed incompatibility with java-library plugin (thanks Ollie Freeman).
+ 
+* Dev: various build and test improvements.
 
 See also: [complete list of changes](changes.md) for more information.
 

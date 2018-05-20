@@ -2,6 +2,20 @@
 
 [![logo](https://gretty-gradle-plugin.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/gretty-gradle-plugin/gretty)
 
+### Version 2.2.0
+
+* Bumped default Tomcat 9 version to 9.0.6 (was 9.0.5).
+
+* Support added for Tomcat 8.5 and Tomcat support refactoring (thanks Boris Petrov). Tomcat 8.5 replaces deprecated Tomcat 8.0.
+
+* Bumped Spring Boot version to 1.5.9 (was 1.5.4).
+
+* Bumped versions of asm (6.1.1, was 6.0), Groovy (2.4.15, was 2.4.13) and Spring (4.3.16, was 4.3.9) (thanks Henrik Brautaset Aronsen).
+
+* Fixed incompatibility with java-library plugin (thanks Ollie Freeman).
+
+* Dev: various build and test improvements.
+
 ### Version 2.1.0 (gretty.org)
 
 * Project fork - plugin-group is now org.gretty.
