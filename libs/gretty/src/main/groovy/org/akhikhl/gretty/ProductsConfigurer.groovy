@@ -8,12 +8,15 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.gradle.api.Project
 
 /**
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 final class ProductsConfigurer {
 
   protected final Project project

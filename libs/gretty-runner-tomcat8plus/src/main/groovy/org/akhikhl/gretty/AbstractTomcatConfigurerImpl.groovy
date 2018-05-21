@@ -7,6 +7,9 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
+
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.apache.catalina.WebResourceRoot
 import org.apache.catalina.core.StandardContext
 import org.apache.catalina.startup.ContextConfig
@@ -20,6 +23,7 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 abstract class AbstractTomcatConfigurerImpl implements TomcatConfigurer {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractTomcatConfigurerImpl)

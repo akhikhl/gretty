@@ -8,10 +8,14 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+
 /**
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class FarmsConfig {
 
   protected final Map farmsMap_ = [:]

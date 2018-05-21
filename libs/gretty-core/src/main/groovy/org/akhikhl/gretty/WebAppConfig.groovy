@@ -9,12 +9,15 @@
 package org.akhikhl.gretty
 
 import groovy.transform.ToString
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.apache.commons.io.FilenameUtils
 
 /**
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 @ToString
 class WebAppConfig {
 

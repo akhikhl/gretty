@@ -8,6 +8,8 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.apache.catalina.Context
 import org.apache.catalina.connector.Connector
 import org.apache.catalina.startup.Tomcat
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class TomcatServerStartInfo {
 
   protected final Logger log

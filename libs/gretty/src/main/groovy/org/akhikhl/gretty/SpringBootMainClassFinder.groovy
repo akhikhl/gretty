@@ -10,10 +10,14 @@ package org.akhikhl.gretty
 
 import org.gradle.api.Project
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+
 /**
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class SpringBootMainClassFinder {
 
   protected static Iterable<File> getClassesDirs(Project project) {

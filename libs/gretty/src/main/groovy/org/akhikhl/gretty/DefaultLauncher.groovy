@@ -7,6 +7,9 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
+
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.gradle.api.Project
 import org.gradle.process.JavaExecSpec
 import org.gradle.tooling.GradleConnector
@@ -19,6 +22,7 @@ import java.util.concurrent.Future
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class DefaultLauncher extends LauncherBase {
 
   static File getPortPropertiesFile(Project project, ServerConfig serverConfig) {

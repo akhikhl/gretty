@@ -8,6 +8,9 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.gaffer.ConfigurationDelegate
 import ch.qos.logback.classic.gaffer.GafferConfigurator
@@ -21,6 +24,7 @@ import org.codehaus.groovy.control.CompilerConfiguration
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class GafferConfiguratorEx extends GafferConfigurator {
 
   GafferConfiguratorEx(LoggerContext context) {

@@ -8,6 +8,8 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
 import org.apache.catalina.LifecycleListener
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class SpringloadedCleanup implements LifecycleListener {
 
   protected final Logger log

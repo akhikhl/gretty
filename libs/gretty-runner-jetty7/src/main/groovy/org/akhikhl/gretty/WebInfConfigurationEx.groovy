@@ -8,11 +8,14 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.util.resource.ResourceCollection
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.webapp.WebInfConfiguration
 
+@CompileStatic(TypeCheckingMode.SKIP)
 class WebInfConfigurationEx extends WebInfConfiguration implements BaseResourceConfiguration {
 
   private List extraResourceBases
