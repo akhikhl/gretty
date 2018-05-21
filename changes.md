@@ -2,6 +2,10 @@
 
 [![logo](https://gretty-gradle-plugin.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/gretty-gradle-plugin/gretty)
 
+### Version 3.0.0
+
+* Support for JDK7 has been removed.
+
 ### Version 2.2.0
 
 * Bumped default Tomcat 9 version to 9.0.6 (was 9.0.5).

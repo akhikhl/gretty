@@ -29,8 +29,8 @@ afterEvaluate {
     testCompile "org.spockframework:spock-core:${spock_version}"
   }
 
-  sourceCompatibility = '1.7'
-  targetCompatibility = '1.7'
+  sourceCompatibility = '1.8'
+  targetCompatibility = '1.8'
 
   task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates sources jar') {
     classifier = 'sources'
