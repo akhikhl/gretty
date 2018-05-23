@@ -28,22 +28,25 @@ class JettyServerConfigurer {
   protected void configureWithBaseResource(Map webapp, context) {
 
     URL contextConfigFile = getContextConfigFile(context.baseResource, params.servletContainerId)
-    if(!contextConfigFile && webapp.contextConfigFile)
+    if (!contextConfigFile && webapp.contextConfigFile)
       contextConfigFile = new File(webapp.contextConfigFile).toURI().toURL()
     configurer.applyContextConfigFile(context, contextConfigFile)
 
     String realm = webapp.realm ?: params.realm
-    URL realmConfigFile = getRealmFile(context.baseResource, params.servletContainerId)
-    if(!realmConfigFile) {
-      if(webapp.realmConfigFile) {
-        realmConfigFile = new File(webapp.realmConfigFile).canonicalFile.toURI().toURL()
+    File realmConfigFile
+    URL realmConfigFileUrl = getRealmFile(context.baseResource, params.servletContainerId)
+    if (realmConfigFileUrl) {
+      realmConfigFile = new File(realmConfigFileUrl.toURI()).canonicalFile
+    } else {
+      if (webapp.realmConfigFile) {
+        realmConfigFile = new File(webapp.realmConfigFile).canonicalFile
       }
-      else if(params.realmConfigFile) {
-        realmConfigFile = new File(params.realmConfigFile).canonicalFile.toURI().toURL()
+      else if (params.realmConfigFile) {
+        realmConfigFile = new File(params.realmConfigFile).canonicalFile
       }
     }
-    if(realm && realmConfigFile) {
-      if(context.securityHandler.loginService == null) {
+    if (realm && realmConfigFile) {
+      if (context.securityHandler.loginService == null) {
         log.info 'Configuring {} with realm \'{}\', {}', context.contextPath, realm, realmConfigFile
         configurer.configureSecurity(context, realm, realmConfigFile.toString(), params.singleSignOn ?: false)
       } else
