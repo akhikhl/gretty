@@ -302,7 +302,7 @@ class ServletContainerConfig {
   }
 
   static getConfig(servletContainer) {
-    servletContainer = servletContainer ?: 'jetty9'
+    servletContainer = servletContainer ?: 'jetty9.4'
     def result = configs[servletContainer.toString()]
     if(!result)
       throw new Exception("Unsupported servlet container: $servletContainer")
@@ -326,7 +326,7 @@ class ServletContainerConfig {
     }
     if(compatibleConfigEntry)
       return compatibleConfigEntry.key
-    String defaultJettyServletContainer = 'jetty9'
+    String defaultJettyServletContainer = 'jetty9.4'
     log.warn 'Cannot find jetty container with compatible servlet-api to {}, defaulting to {}', servletContainer, defaultJettyServletContainer
     defaultJettyServletContainer
   }

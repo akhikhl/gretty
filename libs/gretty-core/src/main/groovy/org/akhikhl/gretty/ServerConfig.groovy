@@ -89,7 +89,7 @@ class ServerConfig {
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
-    result.servletContainer = 'jetty9'
+    result.servletContainer = 'jetty9.4'
     result.managedClassReload = false
     result.httpEnabled = true
     result.httpsEnabled = false
