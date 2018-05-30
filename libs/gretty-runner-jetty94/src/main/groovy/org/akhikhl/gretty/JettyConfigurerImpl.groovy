@@ -203,7 +203,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.setWebInfLib(webappClassPath.findAll { it.endsWith('.jar') }.collect { new File(it) })
     context.setExtraClasspath(webappClassPath.collect { it.endsWith('.jar') ? it : (it.endsWith('/') ? it : it + '/') }.join(';'))
     context.setInitParameter('org.eclipse.jetty.servlet.Default.useFileMappedBuffer', serverParams.productMode ? 'true' : 'false')
-    context.setAttribute('org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern',
+    context.setAttribute(WebInfConfiguration.CONTAINER_JAR_PATTERN,
         '.*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$');
     FilteringClassLoader classLoader = new FilteringClassLoader(context)
     classLoader.addServerClass('ch.qos.logback.')
