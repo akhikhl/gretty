@@ -1,8 +1,6 @@
 language: groovy
 matrix:
   include:
-  - jdk: oraclejdk9
-    env: JDK_JAVA_OPTIONS="--add-modules=java.xml.bind"
   - jdk: oraclejdk8
     env: TEST_ALL_CONTAINERS="['jetty7']"
   - jdk: oraclejdk8
@@ -16,6 +14,12 @@ matrix:
   - jdk: oraclejdk8
     env: TEST_ALL_CONTAINERS="['tomcat85']"
   - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['tomcat9']"
+  - jdk: oraclejdk9
+    env: TEST_ALL_CONTAINERS="['tomcat8']"
+  - jdk: oraclejdk9
+    env: TEST_ALL_CONTAINERS="['tomcat85']"
+  - jdk: oraclejdk9
     env: TEST_ALL_CONTAINERS="['tomcat9']"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -35,7 +39,10 @@ install:
   - true
 script:
   - |
-    if [[ "${TRAVIS_JDK_VERSION}" == "oraclejdk8" && ( "${TRAVIS_BRANCH}" == "master" || "${TRAVIS_EVENT_TYPE}" == "pull_request" || "${TRAVIS_EVENT_TYPE}" == "cron" ) ]]; then
+    if [[ "${TRAVIS_JDK_VERSION}" == "oraclejdk9" ]]; then
+      export JDK_JAVA_OPTIONS="--add-modules=java.xml.bind"
+    fi
+    if [[ ! -z $TEST_ALL_CONTAINERS && ( "${TRAVIS_BRANCH}" == "master" || "${TRAVIS_EVENT_TYPE}" == "pull_request" || "${TRAVIS_EVENT_TYPE}" == "cron" ) ]]; then
       ./gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} build testAll
     else
       ./gradlew build
