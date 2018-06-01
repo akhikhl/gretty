@@ -51,4 +51,6 @@ logger 'org.eclipse.jetty', WARN
 
 logger 'org.eclipse.jetty.annotations.AnnotationConfiguration', ERROR
 
+logger 'org.eclipse.jetty.annotations.AnnotationParser', ERROR
+
 logger 'org.eclipse.jetty.util.component.AbstractLifeCycle', ERROR
