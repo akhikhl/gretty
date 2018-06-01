@@ -66,22 +66,28 @@ class IntegrationTestPlugin extends BasePlugin {
 
       def integrationTestAllContainersTask = project.tasks.findByName('integrationTestAllContainers')
 
-      if(integrationTestAllContainersTask)
+      if (integrationTestAllContainersTask)
         return integrationTestAllContainersTask
 
       integrationTestAllContainersTask = project.task('integrationTestAllContainers')
 
-      if(!integrationTestContainers)
+      if (!integrationTestContainers)
         integrationTestContainers = ServletContainerConfig.getConfigNames().collect() // returns immutable and we want to filter later
 
-      if(JavaVersion.current().isJava9Compatible()) {
+      if (JavaVersion.current().isJava9Compatible()) {
         // excluding jetty7 and jetty8 under JDK9, can no longer compile JSPs to default 1.5 target,
         // see https://github.com/gretty-gradle-plugin/gretty/issues/15
         integrationTestContainers -= ['jetty7', 'jetty8']
       }
 
-      if(project.hasProperty('testAllContainers') && project.testAllContainers) {
+      if (project.hasProperty('testAllContainers') && project.testAllContainers) {
         integrationTestContainers.retainAll(Eval.me(project.testAllContainers))
+      }
+
+      // farmSecure tests not working on Jetty 9.3 and 9.4, see https://github.com/gretty-gradle-plugin/gretty/issues/67
+      if (project.path.startsWith(':farmSecure')) {
+        println "Excluding farmSecure tests from Jetty 9.3/9.4, see https://github.com/gretty-gradle-plugin/gretty/issues/67 ."
+        integrationTestContainers -= ['jetty9.3', 'jetty9.4']
       }
 
       integrationTestContainers.each { String container ->
@@ -89,7 +95,7 @@ class IntegrationTestPlugin extends BasePlugin {
         project.task('integrationTest_' + container, type: Test) { thisTask ->
           outputs.upToDateWhen { false }
           include '**/*IT.*', '**/*Spec.*', '**/*Test.*'
-          if(project.gradle.gradleVersion.startsWith('2.') || project.gradle.gradleVersion.startsWith('3.'))
+          if (project.gradle.gradleVersion.startsWith('2.') || project.gradle.gradleVersion.startsWith('3.'))
             testClassesDir = project.sourceSets.integrationTest.output.classesDir
           else
             testClassesDirs = project.sourceSets.integrationTest.output.classesDirs

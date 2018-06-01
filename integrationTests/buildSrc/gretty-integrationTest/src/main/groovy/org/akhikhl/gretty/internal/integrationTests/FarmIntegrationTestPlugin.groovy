@@ -16,18 +16,24 @@ class FarmIntegrationTestPlugin extends BasePlugin {
     project.ext.defineFarmIntegrationTestAllContainers = { Collection integrationTestContainers = null, Closure configureFarm ->
 
       def farmIntegrationTestAllContainersTask = project.tasks.findByName('farmIntegrationTestAllContainers')
-      if(farmIntegrationTestAllContainersTask)
+      if (farmIntegrationTestAllContainersTask)
         return farmIntegrationTestAllContainersTask
 
       project.ext.defineIntegrationTestAllContainers(integrationTestContainers)
 
       farmIntegrationTestAllContainersTask = project.task('farmIntegrationTestAllContainers')
 
-      if(!integrationTestContainers)
+      if (!integrationTestContainers)
         integrationTestContainers = ServletContainerConfig.getConfigNames().collect() // returns immutable and we want to filter later
 
-      if(project.hasProperty('testAllContainers') && project.testAllContainers) {
+      if (project.hasProperty('testAllContainers') && project.testAllContainers) {
         integrationTestContainers.retainAll(Eval.me(project.testAllContainers))
+      }
+
+      // farmSecure tests not working on Jetty 9.3 and 9.4, see https://github.com/gretty-gradle-plugin/gretty/issues/67
+      if (project.path.startsWith(':farmSecure')) {
+        println "Excluding farmSecure tests from Jetty 9.3/9.4, see https://github.com/gretty-gradle-plugin/gretty/issues/67 ."
+        integrationTestContainers -= ['jetty9.3', 'jetty9.4']
       }
 
       integrationTestContainers.each { container ->
