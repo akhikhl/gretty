@@ -42,3 +42,6 @@ include 'spring-boot-farm-secure:spring-boot-app'
 include 'spring-boot-farm-secure:spring-boot-webservice'
 include 'spring-boot-farm-secure:jee-webservice'
 include 'springBootWebSocket'
+
+enableFeaturePreview('STABLE_PUBLISHING')
+

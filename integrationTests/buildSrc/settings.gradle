@@ -1,2 +1,5 @@
 rootProject.name = rootProjectName
 include 'gretty-integrationTest'
+
+enableFeaturePreview('STABLE_PUBLISHING')
+

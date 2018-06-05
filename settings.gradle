@@ -23,3 +23,6 @@ if (JavaVersion.current().isJava8Compatible()) {
 include 'libs:gretty-spock'
 include 'libs:gretty-springboot'
 include 'libs:gretty-starter'
+
+enableFeaturePreview('STABLE_PUBLISHING')
+
