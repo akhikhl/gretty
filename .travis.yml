@@ -55,7 +55,7 @@ script:
     if [[ "${TRAVIS_JDK_VERSION}" == "oraclejdk9" ]]; then
       export JDK_JAVA_OPTIONS="--add-modules=java.xml.bind"
     fi
-    if [[ ! -z $TEST_ALL_CONTAINERS && ( "${TRAVIS_BRANCH}" == "master" || "${TRAVIS_EVENT_TYPE}" == "pull_request" || "${TRAVIS_EVENT_TYPE}" == "cron" ) ]]; then
+    if [[ ! -z $TEST_ALL_CONTAINERS && ( "${TRAVIS_BRANCH}" == "master" || "${TRAVIS_BRANCH}" == "gretty-2.x" || "${TRAVIS_EVENT_TYPE}" == "pull_request" || "${TRAVIS_EVENT_TYPE}" == "cron" ) ]]; then
       ./gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} build testAll
     else
       ./gradlew build
@@ -74,3 +74,12 @@ deploy:
       repo: gretty-gradle-plugin/gretty
       branch: master
       jdk: oraclejdk8
+      condition: $TEST_ALL_CONTAINERS =~ "jetty9.4'"
+  - provider: script
+    skip_cleanup: true
+    script: ./gradlew artifactoryPublish -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY} -PbintrayRepo=${BINTRAY_REPO} -PbintrayPackage=${BINTRAY_PACKAGE}
+    on:
+      repo: gretty-gradle-plugin/gretty
+      branch: gretty-2.x
+      jdk: oraclejdk8
+      condition: $TEST_ALL_CONTAINERS =~ "jetty9'"
