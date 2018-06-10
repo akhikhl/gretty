@@ -2,6 +2,8 @@ package org.akhikhl.gretty
 
 import groovy.servlet.ServletCategory
 import groovyx.net.http.URIBuilder
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import javax.servlet.*
 import java.util.regex.Pattern
 import javax.management.ObjectName
@@ -10,6 +12,7 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+@CompileStatic(TypeCheckingMode.SKIP)
 class RedirectFilter implements Filter {
 
   private static enum FilterAction {

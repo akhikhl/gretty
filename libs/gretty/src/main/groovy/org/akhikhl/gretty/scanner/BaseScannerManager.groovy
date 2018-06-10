@@ -5,11 +5,14 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 /**
  * @author timur.shakurov@dz.ru
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 abstract class BaseScannerManager implements ScannerManager {
     private static final Logger log = LoggerFactory.getLogger(BaseScannerManager.class)
 

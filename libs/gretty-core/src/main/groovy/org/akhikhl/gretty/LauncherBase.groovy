@@ -10,6 +10,8 @@ package org.akhikhl.gretty
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 abstract class LauncherBase implements Launcher {
 
   protected static int[] findFreePorts(int count, List<Integer> range = null) {

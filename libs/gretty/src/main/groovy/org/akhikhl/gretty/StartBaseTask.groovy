@@ -8,6 +8,8 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.akhikhl.gretty.scanner.JDKScannerManager
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
@@ -23,6 +25,7 @@ import org.springframework.boot.devtools.livereload.LiveReloadServer
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 abstract class StartBaseTask extends DefaultTask {
 
   boolean interactive = true

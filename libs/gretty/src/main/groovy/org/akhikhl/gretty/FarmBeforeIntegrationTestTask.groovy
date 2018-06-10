@@ -8,6 +8,8 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.gradle.api.Task
 import org.gradle.process.JavaForkOptions
 import org.slf4j.Logger
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class FarmBeforeIntegrationTestTask extends FarmStartTask {
 
   protected static final Logger log = LoggerFactory.getLogger(FarmBeforeIntegrationTestTask)

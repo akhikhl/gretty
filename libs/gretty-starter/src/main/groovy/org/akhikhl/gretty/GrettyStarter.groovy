@@ -9,11 +9,14 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonSlurper
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 
 /**
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class GrettyStarter {
 
   private static final Set specialArgNames = ['httpPort', 'httpsPort', 'servicePort', 'statusPort', 'httpEnabled', 'httpsEnabled', 'httpIdleTimeout', 'httpsIdleTimeout'] as Set

@@ -8,6 +8,10 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+
+@CompileStatic(TypeCheckingMode.SKIP)
 class FarmConfig {
 
   @Delegate

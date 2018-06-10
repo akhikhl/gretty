@@ -8,6 +8,8 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.apache.catalina.Host
 import org.apache.catalina.Lifecycle
 import org.apache.catalina.LifecycleEvent
@@ -29,6 +31,7 @@ import org.xml.sax.InputSource
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class TomcatServerConfigurer {
 
   protected final Logger log

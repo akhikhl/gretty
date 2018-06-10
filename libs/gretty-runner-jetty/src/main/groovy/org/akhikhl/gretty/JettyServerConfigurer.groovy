@@ -7,12 +7,16 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
+
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 /**
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class JettyServerConfigurer {
 
   protected final Logger log

@@ -8,11 +8,15 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+
 /**
  * Gradle task for starting jetty
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class AppStartTask extends StartBaseTask {
 
   @Delegate

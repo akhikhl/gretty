@@ -8,12 +8,15 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.eclipse.jetty.annotations.*
 import org.eclipse.jetty.annotations.AnnotationParser.DiscoverableAnnotationHandler
 import org.eclipse.jetty.util.MultiMap
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.webapp.WebAppContext
 
+@CompileStatic(TypeCheckingMode.SKIP)
 class AnnotationConfigurationEx extends AnnotationConfiguration {
 
   private final Set<String> classPath

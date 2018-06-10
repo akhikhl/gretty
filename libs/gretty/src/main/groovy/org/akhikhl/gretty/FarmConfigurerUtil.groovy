@@ -1,10 +1,13 @@
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 /**
  * @author sala
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class FarmConfigurerUtil {
 
   static Project resolveProjectRefToProject(Project project, projectRef) {

@@ -8,12 +8,15 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
+import groovy.transform.TypeCheckingMode
 
 /**
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 @ToString
 class ServerConfig {
 

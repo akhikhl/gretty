@@ -10,6 +10,8 @@
 package org.akhikhl.gretty
 
 import groovy.json.JsonBuilder
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.bundling.Zip
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class ProductConfigurer {
 
   protected static final Logger log = LoggerFactory.getLogger(ProductConfigurer)

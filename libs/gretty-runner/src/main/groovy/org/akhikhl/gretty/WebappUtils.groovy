@@ -8,12 +8,15 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.apache.commons.io.FilenameUtils
 
 /**
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class WebappUtils {
 
   static String getWebAppDestinationDirName(String resourceBase) {

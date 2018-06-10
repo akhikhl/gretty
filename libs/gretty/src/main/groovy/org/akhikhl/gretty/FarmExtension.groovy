@@ -8,6 +8,8 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
@@ -15,6 +17,7 @@ import org.gradle.api.Project
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class FarmExtension extends FarmConfig {
 
   final Project project

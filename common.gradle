@@ -22,6 +22,10 @@ configurations {
   compile.extendsFrom providedCompile
 }
 
+compileGroovy {
+	groovyOptions.configurationScript = file("${rootProject.projectDir}/gradle/config.groovy")
+}
+
 afterEvaluate {
 
   dependencies {

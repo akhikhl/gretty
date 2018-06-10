@@ -8,6 +8,8 @@
  */
 package org.akhikhl.gretty
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -22,6 +24,7 @@ import java.nio.file.Paths
  *
  * @author akhikhl
  */
+@CompileStatic(TypeCheckingMode.SKIP)
 class GrettyPlugin implements Plugin<Project> {
 
   protected static final Logger log = LoggerFactory.getLogger(GrettyPlugin)
