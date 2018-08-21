@@ -133,58 +133,6 @@ class ServletContainerConfig {
           }
         }
       ],
-      'tomcat7': [
-        servletContainerType: 'tomcat',
-        servletContainerVersion: { project -> project.ext.tomcat7Version },
-        servletContainerDescription: { project -> "Tomcat ${project.ext.tomcat7Version}" },
-        servletContainerRunnerConfig: 'grettyRunnerTomcat7',
-        servletContainerRunnerDependencies: { project ->
-          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-tomcat7:$grettyVersion"
-          addRedirectFilter(project, servletContainerRunnerConfig)
-          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
-            force "javax.servlet:javax.servlet-api:${project.ext.tomcat7ServletApiVersion}"
-            def tomcat7_version = project.ext.tomcat7Version
-            force "org.apache.tomcat.embed:tomcat-embed-core:$tomcat7_version"
-            force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat7_version"
-            force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat7_version"
-            force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat7_version"
-            force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat7_version"
-          }
-        },
-        servletApiVersion: { project -> project.ext.tomcat7ServletApiVersion },
-        servletApiDependencies: { project ->
-          project.dependencies {
-            grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.tomcat7ServletApiVersion}"
-          }
-        }
-      ],
-      'tomcat8': [
-        servletContainerType: 'tomcat',
-        servletContainerVersion: { project -> project.ext.tomcat8Version },
-        servletContainerDescription: { project -> "Tomcat ${project.ext.tomcat8Version}" },
-        servletContainerRunnerConfig: 'grettyRunnerTomcat8',
-        servletContainerRunnerDependencies: { project ->
-          project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-tomcat8:$grettyVersion"
-          addRedirectFilter(project, servletContainerRunnerConfig)
-          project.configurations[servletContainerRunnerConfig].resolutionStrategy {
-            force "javax.servlet:javax.servlet-api:${project.ext.tomcat8ServletApiVersion}"
-            def tomcat8_version = project.ext.tomcat8Version
-            force "org.apache.tomcat.embed:tomcat-embed-core:$tomcat8_version"
-            force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat8_version"
-            force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat8_version"
-            force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat8_version"
-            // this fixes incorrect dependency of tomcat-8.0.9 on ecj-4.4RC4
-            if(tomcat8_version == '8.0.9')
-              force 'org.eclipse.jdt.core.compiler:ecj:4.4'
-          }
-        },
-        servletApiVersion: { project -> project.ext.tomcat8ServletApiVersion },
-        servletApiDependencies: { project ->
-          project.dependencies {
-            grettyProvidedCompile "javax.servlet:javax.servlet-api:${project.ext.tomcat8ServletApiVersion}"
-          }
-        }
-      ],
       'tomcat85': [
         servletContainerType: 'tomcat',
         servletContainerVersion: { project -> project.ext.tomcat85Version },
@@ -200,7 +148,7 @@ class ServletContainerConfig {
             force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat85_version"
             force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat85_version"
             if (VersionNumber.parse(tomcat85_version) <= VersionNumber.parse('8.5.2'))
-              force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat85_version"
+              force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.2"
             force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat85_version"
           }
         },
@@ -344,7 +292,7 @@ class ServletContainerConfig {
     }
     if(compatibleConfigEntry)
       return compatibleConfigEntry.key
-    String defaultJettyServletContainer = 'tomcat8'
+    String defaultJettyServletContainer = 'tomcat9'
     log.warn 'Cannot find tomcat container with compatible servlet-api to {}, defaulting to {}', servletContainer, defaultJettyServletContainer
     defaultJettyServletContainer
   }

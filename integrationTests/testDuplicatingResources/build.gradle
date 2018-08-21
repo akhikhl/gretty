@@ -7,11 +7,11 @@ dependencies {
 }
 
 ext {
-	integrationTestContainers = ['tomcat7', 'tomcat8', 'tomcat85', 'tomcat9']
+	integrationTestContainers = ['tomcat85', 'tomcat9']
 }
 
 gretty {
-	servletContainer = 'tomcat7'
+	servletContainer = 'tomcat9'
 	contextPath = '/bug'
 }
 
