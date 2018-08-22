@@ -148,7 +148,7 @@ class ServletContainerConfig {
             force "org.apache.tomcat.embed:tomcat-embed-el:$tomcat85_version"
             force "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat85_version"
             if (VersionNumber.parse(tomcat85_version) <= VersionNumber.parse('8.5.2'))
-              force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.2"
+              force "org.apache.tomcat.embed:tomcat-embed-logging-log4j:$tomcat85_version"
             force "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat85_version"
           }
         },
