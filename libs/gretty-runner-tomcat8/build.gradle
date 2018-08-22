@@ -1,5 +1,0 @@
-apply from: rootProject.file('common.gradle')
-
-dependencies {
-  compile project(':libs:gretty-runner-tomcat8plus')
-}
