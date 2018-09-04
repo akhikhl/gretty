@@ -10,7 +10,7 @@ dependencies {
   compile 'commons-configuration:commons-configuration:1.10'
   compile 'commons-io:commons-io:2.4'
   compile 'org.apache.commons:commons-lang3:3.3.2'
-  compile 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.bcprov-jdk16:1.46_3'
+  compile 'org.bouncycastle:bcprov-jdk15on:1.60'
   compile "org.springframework.boot:spring-boot-devtools:$springBootVersion"
 }
 

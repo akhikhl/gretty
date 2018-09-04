@@ -8,6 +8,7 @@
  */
 package org.akhikhl.gretty
 
+import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.Security
 import java.security.SecureRandom
@@ -15,7 +16,7 @@ import java.security.cert.Certificate
 import org.apache.commons.lang3.RandomStringUtils
 import org.bouncycastle.jce.X509Principal
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.bouncycastle.jce.provider.asymmetric.ec.KeyPairGenerator
+import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi
 import org.bouncycastle.x509.X509V3CertificateGenerator
 import org.gradle.api.Project
 import org.slf4j.Logger
@@ -57,7 +58,7 @@ class CertificateGenerator {
     if(!keystoreFile.exists() || !certFile.exists() || !propertiesFile.exists()) {
       dir.mkdirs()
       log.info 'Generating RSA key'
-      def keyPairGenerator = KeyPairGenerator.getInstance('RSA', 'BC')
+      KeyPairGenerator keyPairGenerator = KeyPairGeneratorSpi.getInstance('RSA', 'BC')
       keyPairGenerator.initialize(1024, new SecureRandom())
       def KPair = keyPairGenerator.generateKeyPair()
       log.info 'Generating self-signed X.509 certificate'
