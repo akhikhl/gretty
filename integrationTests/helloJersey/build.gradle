@@ -4,6 +4,7 @@ apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 dependencies {
   compile "org.glassfish.jersey.containers:jersey-container-servlet-core:$jersey_version"
+  compile "org.glassfish.jersey.inject:jersey-hk2:$jersey_version"
   integrationTestCompile "javax.servlet:servlet-api:$jetty7_servlet_api_version"
 }
 
