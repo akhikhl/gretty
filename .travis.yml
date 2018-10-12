@@ -13,6 +13,10 @@ matrix:
     env: TEST_ALL_CONTAINERS="['tomcat85']"
   - jdk: oraclejdk11
     env: TEST_ALL_CONTAINERS="['tomcat9']"
+  - jdk: openjdk11
+    env: TEST_ALL_CONTAINERS="['tomcat85']"
+  - jdk: openjdk11
+    env: TEST_ALL_CONTAINERS="['tomcat9']"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
