@@ -9,9 +9,13 @@ matrix:
     env: TEST_ALL_CONTAINERS="['tomcat85']"
   - jdk: oraclejdk8
     env: TEST_ALL_CONTAINERS="['tomcat9']"
-  - jdk: oraclejdk10
+  - jdk: oraclejdk11
     env: TEST_ALL_CONTAINERS="['tomcat85']"
-  - jdk: oraclejdk10
+  - jdk: oraclejdk11
+    env: TEST_ALL_CONTAINERS="['tomcat9']"
+  - jdk: openjdk11
+    env: TEST_ALL_CONTAINERS="['tomcat85']"
+  - jdk: openjdk11
     env: TEST_ALL_CONTAINERS="['tomcat9']"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -31,9 +35,6 @@ install:
   - true
 script:
   - |
-    if [[ "${TRAVIS_JDK_VERSION}" == "oraclejdk10" ]]; then
-      export JDK_JAVA_OPTIONS="--add-modules=java.xml.bind"
-    fi
     if [[ ! -z $TEST_ALL_CONTAINERS && ( -z $TEST_ALL || "${TRAVIS_REPO_SLUG}" == "gretty-gradle-plugin/gretty" ) ]]; then
       ./gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} build testAll
     else
