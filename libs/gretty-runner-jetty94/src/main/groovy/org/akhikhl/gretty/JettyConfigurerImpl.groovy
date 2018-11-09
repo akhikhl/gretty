@@ -118,6 +118,9 @@ class JettyConfigurerImpl implements JettyConfigurer {
       if(!httpsConn.port)
         httpsConn.port = params.httpsPort ?: ServerDefaults.defaultHttpsPort
 
+      if(httpsConn.port == PortUtils.RANDOM_FREE_PORT)
+        httpsConn.port = PortUtils.findFreePort()
+
       def sslContextFactory = httpsConn.getConnectionFactories().find { it instanceof SslConnectionFactory }?.getSslContextFactory()
       if(sslContextFactory) {
         if(params.sslKeyStorePath) {
