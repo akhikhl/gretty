@@ -10,7 +10,7 @@ dependencies {
 }
 
 gretty {
-  servletContainer = 'tomcat9'
+  servletContainer = 'tomcat85'
   httpPort = getRandomFreePort()
   httpsPort = getRandomFreePort()
   httpsEnabled = true
