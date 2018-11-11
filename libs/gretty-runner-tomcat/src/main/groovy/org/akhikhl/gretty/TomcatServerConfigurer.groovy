@@ -133,6 +133,9 @@ class TomcatServerConfigurer {
       if(!httpsConn.port || httpsConn.port < 0)
         httpsConn.port = params.httpsPort ?: ServerDefaults.defaultHttpsPort
 
+      if(httpsConn.port == PortUtils.RANDOM_FREE_PORT)
+        httpsConn.port = PortUtils.findFreePort()
+
       if(params.sslKeyManagerPassword)
         httpsConn.setProperty('keyPass', params.sslKeyManagerPassword)
       if(params.sslKeyStorePath) {
