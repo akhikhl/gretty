@@ -1,0 +1,19 @@
+apply plugin: 'war'
+apply plugin: 'org.gretty'
+apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+dependencies {
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+  // We use Velocity for example of template processing within the webapp.
+  compile 'org.apache.velocity:velocity:1.7'
+}
+
+gretty {
+  httpPort = getRandomFreePort()
+  httpsPort = getRandomFreePort()
+  httpsEnabled = true
+}
+
+defineIntegrationTest()
+testAll.dependsOn defineIntegrationTestAllContainers(['jetty7', 'jetty8', 'jetty9'])
