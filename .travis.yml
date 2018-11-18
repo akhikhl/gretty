@@ -2,7 +2,6 @@ language: groovy
 matrix:
   include:
   - jdk: openjdk7
-  - jdk: oraclejdk9
   - jdk: oraclejdk8
     env: TEST_ALL_CONTAINERS="['jetty8']"
   - jdk: oraclejdk8
