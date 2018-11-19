@@ -7,6 +7,10 @@ matrix:
   - jdk: oraclejdk8
     env: TEST_ALL_CONTAINERS="['jetty9']"
   - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['jetty9.3']"
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['jetty9.4']"
+  - jdk: oraclejdk8
     env: TEST_ALL_CONTAINERS="['tomcat7']"
   - jdk: oraclejdk8
     env: TEST_ALL_CONTAINERS="['tomcat8']"
