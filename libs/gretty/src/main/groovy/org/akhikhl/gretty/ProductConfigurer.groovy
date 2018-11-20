@@ -38,7 +38,6 @@ class ProductConfigurer {
   protected ServerConfig sconfig
   protected List<WebAppConfig> wconfigs
   protected jsonConfig
-  protected String logbackConfig
   protected Map launchScripts = [:]
 
   ProductConfigurer(Project project, File baseOutputDir, String productName, ProductExtension product) {
@@ -72,11 +71,6 @@ class ProductConfigurer {
       inputs.property 'config', {
         resolveConfig()
         jsonConfig.toString()
-      }
-
-      inputs.property 'logbackConfig', {
-        resolveConfig()
-        logbackConfig
       }
 
       inputs.property 'launchScripts', {
