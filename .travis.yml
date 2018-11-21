@@ -3,21 +3,26 @@ matrix:
   include:
   - jdk: openjdk7
   - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['jetty8']"
+    env: TEST_ALL_CONTAINERS="['jetty8']" TEST_ALL_GRADLE_VERSION="4.10.2"
   - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['jetty9']"
+    env: TEST_ALL_CONTAINERS="['jetty9']" TEST_ALL_GRADLE_VERSION="4.10.2"
   - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['jetty9.3']"
+    env: TEST_ALL_CONTAINERS="['jetty9.3']" TEST_ALL_GRADLE_VERSION="4.10.2"
   - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['jetty9.4']"
+    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="4.10.2"
   - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['tomcat7']"
+    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="5.0-rc-4"
   - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['tomcat8']"
+    env: TEST_ALL_CONTAINERS="['tomcat7']" TEST_ALL_GRADLE_VERSION="4.10.2"
   - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['tomcat85']"
+    env: TEST_ALL_CONTAINERS="['tomcat8']" TEST_ALL_GRADLE_VERSION="4.10.2"
   - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['tomcat9']"
+    env: TEST_ALL_CONTAINERS="['tomcat85']" TEST_ALL_GRADLE_VERSION="4.10.2"
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['tomcat9']" TEST_ALL_GRADLE_VERSION="4.10.2"
+  allow_failures:
+  - jdk: oraclejdk8
+    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="5.0-rc-4"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
@@ -41,10 +46,10 @@ install:
   - true
 script:
   - |
+    ./gradlew build
     if [[ ! -z $TEST_ALL_CONTAINERS && ( -z $TEST_ALL || "${TRAVIS_REPO_SLUG}" == "gretty-gradle-plugin/gretty" ) ]]; then
-      ./gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} build testAll
-    else
-      ./gradlew build
+      ./gradlew wrapper --gradle-version ${TEST_ALL_GRADLE_VERSION} --distribution-type all
+      ./gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} testAll
     fi
 env:
   global:
