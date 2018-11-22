@@ -41,7 +41,8 @@ script:
     ./gradlew build
     if [[ ! -z $TEST_ALL_CONTAINERS && ( -z $TEST_ALL || "${TRAVIS_REPO_SLUG}" == "gretty-gradle-plugin/gretty" ) ]]; then
       ./gradlew wrapper --gradle-version ${TEST_ALL_GRADLE_VERSION} --distribution-type all
-      ./gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} testAll
+      cd integrationTests
+      ../gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} testAll
     fi
 env:
   global:
