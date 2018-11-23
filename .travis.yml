@@ -46,6 +46,7 @@ install:
   - true
 script:
   - |
+    set -e
     ./gradlew build
     if [[ ! -z $TEST_ALL_CONTAINERS && ( -z $TEST_ALL || "${TRAVIS_REPO_SLUG}" == "gretty-gradle-plugin/gretty" ) ]]; then
       ./gradlew wrapper --gradle-version ${TEST_ALL_GRADLE_VERSION} --distribution-type all
@@ -53,6 +54,7 @@ script:
       ../gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} testAll
       cd ..
     fi
+    set +e
 env:
   global:
     - secure: "yP1LR0IRe1CHjKKq21bAxTU/lLTFjmtx0Gaem0Ttl0HTvK72cyZQ3zs1VgGZfnsqjtDmT0KCipk7j0/S6kf4TxLE8esXT3t9twRO2hTpBO0AhJmvgiaLtOkrQx68I+LamUpVpkYod69yhvVHjJxxoBM8h6EgxricLD0cboO8l/hLFdBODHkUs+07olQyeiuXJ5xgdviC7jmEO5XhdIb2kVfXmdcCHAjw3ow4h/02gw0F6gt0fsPxNlaLqWr1hnmop1bcRJ02llBBf4odd7IZHYBtclrfYrKB1ID6VOra0QscEbTuCcZaSNCNPzt/xMuyOCDFZlKCatYpXo+lDqTASa8Np+Ck9yBpbcBED3NGyadbv9ASbKZOHc65n9drINSzcX3w50MaELxeypNMjQ9W9KghXKdCtAwTVe2OmzOS283OmBGz8PNOI1/t3+rYfqE5SkPiQDSRfJtiZqHDEu7TrxfdoumDQPw/znvtcW2MPrCQpxCnKhseT3EJ1SNJVGFzkcbyAfs90uW/fyWYVNhcfP4LgM4gDy4Ggh/5PTEAXQ9BWvVJ4fSCkZfgMriS9MmgI7054V/PgmZN1Io2UmYK3Nw77u3OpYr4Uz1PlMsWE5ilB09+pDeUZmDLzSF19Z8UV8wRsafYFaO8e9wK0aCtUHfxAbtbpF4daJxqT6+7LVw="
