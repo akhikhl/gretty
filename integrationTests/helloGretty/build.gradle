@@ -20,4 +20,4 @@ war {
 }
 
 defineIntegrationTest()
-testAll.dependsOn defineIntegrationTestAllContainers()
+testAll.dependsOn defineIntegrationTestAllContainers(), 'buildProduct'
