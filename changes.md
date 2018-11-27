@@ -2,6 +2,26 @@
 
 [![logo](https://gretty-gradle-plugin.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/gretty-gradle-plugin/gretty)
 
+### Version 2.3.0
+
+* Gradle 5.0 support (#93). Thanks Martin Chalupa (@chali) for bug-fixes and testing.
+
+* buildProduct fix for Gradle 5.0 (#91). Thanks Martin Chalupa (@chali).
+
+* Added getFreeRandomPort() support for httpsPort (#85). Thanks Josh Cummings (@jzheaux).
+
+* Default container version updates:
+
+    - jetty93_version = 9.3.25.v20180904
+    - jetty94_version = 9.4.14.v20181114
+    - tomcat8_version = 8.0.53
+    - tomcat85_version = 8.5.35
+    - tomcat9_version = 9.0.13
+
+* Support is removed for running Jetty 7.x containers in this release.  Jetty 7.x is EOL, please upgrade.
+
+* A modest performance improvement was achieved via #46 (Add `@CompileStatic` to most classes).
+
 ### Version 2.2.0
 
 * Bumped default Tomcat 9 version to 9.0.6 (was 9.0.5).
