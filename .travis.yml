@@ -4,7 +4,7 @@ matrix:
   - jdk: openjdk11
     env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="4.10.2"
   - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="5.0-rc-4"
+    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="5.0"
   - jdk: openjdk11
     env: TEST_ALL_CONTAINERS="['tomcat85']" TEST_ALL_GRADLE_VERSION="4.10.2"
   - jdk: openjdk11
@@ -19,7 +19,7 @@ matrix:
     env: TEST_ALL_CONTAINERS="['tomcat9']" TEST_ALL_GRADLE_VERSION="4.10.2"
   allow_failures:
   - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="5.0-rc-4"
+    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="5.0"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
