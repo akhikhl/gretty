@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/gretty-gradle-plugin/gretty.svg?branch=master)](https://travis-ci.org/gretty-gradle-plugin/gretty)
 ![Maintenance Status](https://img.shields.io/maintenance/yes/2018.svg)
-[![Latest release](https://img.shields.io/badge/release-2.2.0-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/v2.2.0)
+[![Latest release](https://img.shields.io/badge/release-2.3.0-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/v2.3.0)
 [![Snapshot](https://img.shields.io/badge/current-3.0.0--SNAPSHOT-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/master)
 [![License](https://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
@@ -19,6 +19,12 @@ A complete list of Gretty features is available in [feature overview](https://gr
 If you are new with Gretty, try [getting started](https://gretty-gradle-plugin.github.io/gretty-doc/Getting-started.html) page.
 
 #### :star: What's new
+
+November 28, 2018, Gretty 2.3.0 is out and available at [Gradle Plugins](https://plugins.gradle.org/plugin/org.gretty) and [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
+
+This release adds support for Gradle 5.0, which was released this week!  Please raise an issue if you find any issues running Gretty 2.3+ with Gradle 5.0.
+
+See also: [complete list of changes](changes.md) for more information.
 
 May 21, 2018, Gretty(.org) 2.2.0 is out and immediately available at [Gradle Plugins](https://plugins.gradle.org/plugin/org.gretty) and [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
 
