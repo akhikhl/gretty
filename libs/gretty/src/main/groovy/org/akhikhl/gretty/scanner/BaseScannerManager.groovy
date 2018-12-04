@@ -143,11 +143,11 @@ abstract class BaseScannerManager implements ScannerManager {
 
         sconfig.onScanFilesChanged*.call(changedFiles)
 
-        Map<WebAppConfig> webAppProjectReloads = [:]
+        Map<String, Set<String>> webAppProjectReloads = [:]
 
         def reloadProject = { String projectPath, String reloadMode ->
             if(webAppProjectReloads[projectPath] == null)
-                webAppProjectReloads[projectPath] = new HashSet()
+                webAppProjectReloads[projectPath] = new HashSet<String>()
             webAppProjectReloads[projectPath] += reloadMode
         }
 
