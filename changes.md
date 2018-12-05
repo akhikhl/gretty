@@ -6,6 +6,16 @@
 
 * Support for JDK7 has been removed.
 
+### Version 2.3.1
+
+* Upgraded to ASM 7.0 (#100, #97)
+
+* Fixed generics syntax error noticed by Gradle/Groovy upgrade (#95).
+
+* Workaround for Groovy @CompileStatic bug (#99)
+
+* 2.3.0 was missing artifact gretty-starter (#98)
+
 ### Version 2.3.0
 
 * Gradle 5.0 support (#93). Thanks Martin Chalupa (@chali) for bug-fixes and testing.
