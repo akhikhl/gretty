@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/gretty-gradle-plugin/gretty.svg?branch=master)](https://travis-ci.org/gretty-gradle-plugin/gretty)
 ![Maintenance Status](https://img.shields.io/maintenance/yes/2018.svg)
-[![Latest release](https://img.shields.io/badge/release-2.3.0-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/v2.3.0)
+[![Latest release](https://img.shields.io/badge/release-2.3.1-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/v2.3.1)
 [![Snapshot](https://img.shields.io/badge/current-2.4.0--SNAPSHOT-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/master)
 [![License](https://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
