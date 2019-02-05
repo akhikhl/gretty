@@ -440,6 +440,14 @@ final class ProjectUtils {
       wconfig.contextConfigFile = null
   }
 
+  static List<Project> getDependencyProjects(Project project, List<String> configurationNames) {
+    def result = [] as Set
+    configurationNames.each {
+      result += getDependencyProjects(project, it)
+    }
+    return result as List
+  }
+
   static List<Project> getDependencyProjects(Project project, String configurationName) {
     project.configurations[configurationName].dependencies.withType(ProjectDependency).collect{ it.dependencyProject }
   }

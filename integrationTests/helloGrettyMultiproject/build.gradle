@@ -1,0 +1,31 @@
+apply plugin: 'war'
+apply plugin: 'org.gretty'
+apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
+
+dependencies {
+  implementation(project(":helloGrettyMultiproject:subproject"))
+  compile 'org.webjars:bootstrap:3.2.0'
+  compile 'org.webjars:jquery:2.1.1'
+  // We use Velocity for example of template processing within the webapp.
+  compile 'org.apache.velocity:velocity:1.7'
+}
+
+gretty {
+  scanDependencies = true // undocumented
+
+  recompileOnSourceChange = true
+  reloadOnClassChange = true
+  reloadOnConfigChange = true
+  reloadOnLibChange = true
+}
+
+test {
+  testLogging.showStandardStreams = true
+}
+
+war {
+  archiveName 'helloGrettyMultiproject.war'
+}
+
+defineIntegrationTest()
+testAll.dependsOn defineIntegrationTestAllContainers(), 'buildProduct'
