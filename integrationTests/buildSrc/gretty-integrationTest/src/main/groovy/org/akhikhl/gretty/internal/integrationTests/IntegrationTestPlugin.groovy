@@ -153,7 +153,6 @@ class IntegrationTestPlugin extends BasePlugin {
           project.download {
             src project.geckoDriverDownloadUrl
             dest ext.outputDir
-            acceptAnyCertificate true
           }
         }
       }
