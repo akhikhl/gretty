@@ -35,6 +35,7 @@ class DefaultLauncher extends LauncherBase {
     (files.collect { it.toURI().toURL() }) as LinkedHashSet
   }
 
+  private Collection<URL> runnerClasspath
   protected Project project
 
   ScannerManager scannerManager
@@ -49,6 +50,12 @@ class DefaultLauncher extends LauncherBase {
   protected void afterJavaExec() {
     super.afterJavaExec()
     scannerManager?.stopScanner()
+  }
+
+  @Override
+  void beforeLaunch() {
+    runnerClasspath = getRunnerClassPath(project, sconfig)
+    super.beforeLaunch()
   }
 
   protected void beforeJavaExec() {
@@ -91,7 +98,6 @@ class DefaultLauncher extends LauncherBase {
   @Override
   protected void javaExec(JavaExecParams params) {
     project.javaexec { JavaExecSpec spec ->
-      def runnerClasspath = getRunnerClassPath(project, sconfig)
       if(log.isDebugEnabled())
         for(def path in runnerClasspath)
           log.debug 'Runner classpath: {}', path
