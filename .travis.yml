@@ -29,8 +29,8 @@ before_install:
   - sudo apt-get install -y zip curl locate libbcprov-java
 before_script:
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
+services:
+  - xvfb
 install:
   - true
 script:
