@@ -80,6 +80,11 @@ class IntegrationTestPlugin extends BasePlugin {
         integrationTestContainers -= ['jetty7', 'jetty8']
       }
 
+      if (JavaVersion.current().isJava10Compatible()) {
+        // excluding jetty9 under JDK10, can no longer compile JSPs to default 1.7 target,
+        integrationTestContainers -= ['jetty9']
+      }
+
       if (project.hasProperty('testAllContainers') && project.testAllContainers) {
         integrationTestContainers.retainAll(Eval.me(project.testAllContainers))
       }
