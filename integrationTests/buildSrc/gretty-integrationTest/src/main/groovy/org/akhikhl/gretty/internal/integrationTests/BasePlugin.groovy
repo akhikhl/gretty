@@ -98,7 +98,7 @@ class BasePlugin implements Plugin<Project> {
 
     if(!project.rootProject.tasks.findByName('wrapper'))
       project.rootProject.task('wrapper', type: Wrapper) {
-        gradleVersion = '2.14.1'
+        gradleVersion = '5.6.4'
       }
   }
 
