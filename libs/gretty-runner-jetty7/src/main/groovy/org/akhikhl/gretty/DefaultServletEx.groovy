@@ -10,7 +10,6 @@ package org.akhikhl.gretty
 
 import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.util.resource.FileResource
-import org.eclipse.jetty.util.resource.JarResource
 import org.eclipse.jetty.util.resource.Resource
 
 /**
@@ -27,7 +26,7 @@ class DefaultServletEx extends DefaultServlet {
         String webjarsPath = 'META-INF/resources' + pathInContext
         URL resourceURL = Thread.currentThread().getContextClassLoader().getResource(webjarsPath)
         if(resourceURL)
-          result = new JarResource(resourceURL)
+          result = Resource.newResource(resourceURL)
       }
     }
     result
