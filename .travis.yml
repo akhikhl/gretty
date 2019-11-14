@@ -2,21 +2,9 @@ language: groovy
 matrix:
   include:
   - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="4.10.2"
-  - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="5.0"
-  - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['tomcat85']" TEST_ALL_GRADLE_VERSION="4.10.2"
-  - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['tomcat9']" TEST_ALL_GRADLE_VERSION="4.10.2"
-  - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['jetty9.3']" TEST_ALL_GRADLE_VERSION="4.10.2"
-  - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['jetty9.4']" TEST_ALL_GRADLE_VERSION="4.10.2"
-  - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['tomcat85']" TEST_ALL_GRADLE_VERSION="4.10.2"
-  - jdk: oraclejdk8
-    env: TEST_ALL_CONTAINERS="['tomcat9']" TEST_ALL_GRADLE_VERSION="4.10.2"
+    env: TEST_ALL_CONTAINERS="['jetty9.3','jetty9.4','tomcat85','tomcat9']" TEST_ALL_GRADLE_VERSION="5.6.4"
+  - jdk: openjdk8
+    env: TEST_ALL_CONTAINERS="['jetty9.3','jetty9.4','tomcat85','tomcat9']" TEST_ALL_GRADLE_VERSION="5.6.4"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
@@ -29,8 +17,8 @@ before_install:
   - sudo apt-get install -y zip curl locate libbcprov-java
 before_script:
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
+services:
+  - xvfb
 install:
   - true
 script:
@@ -40,7 +28,7 @@ script:
     if [[ ! -z $TEST_ALL_CONTAINERS && ( -z $TEST_ALL || "${TRAVIS_REPO_SLUG}" == "gretty-gradle-plugin/gretty" ) ]]; then
       ./gradlew wrapper --gradle-version ${TEST_ALL_GRADLE_VERSION} --distribution-type all
       cd integrationTests
-      ../gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.20.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} testAll
+      ../gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.26.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} testAll
       cd ..
     fi
     set +e
@@ -57,7 +45,7 @@ deploy:
     on:
       repo: gretty-gradle-plugin/gretty
       branch: master
-      jdk: oraclejdk8
+      jdk: openjdk8
       condition: $TEST_ALL_CONTAINERS =~ "jetty9.4'"
   - provider: script
     skip_cleanup: true
@@ -65,5 +53,5 @@ deploy:
     on:
       repo: gretty-gradle-plugin/gretty
       branch: gretty-2.x
-      jdk: oraclejdk8
+      jdk: openjdk8
       condition: $TEST_ALL_CONTAINERS =~ "jetty9'"
