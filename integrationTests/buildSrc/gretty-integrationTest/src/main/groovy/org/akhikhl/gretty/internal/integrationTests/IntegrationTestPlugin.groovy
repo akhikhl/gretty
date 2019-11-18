@@ -31,6 +31,7 @@ class IntegrationTestPlugin extends BasePlugin {
     super.configureDependencies(project)
     project.dependencies {
       integrationTestCompile "org.codehaus.groovy:groovy:${project.groovy_version}"
+      integrationTestCompile "org.codehaus.groovy:groovy-dateutil:${project.groovy_version}"
       integrationTestCompile "org.codehaus.groovy:groovy-groovysh:${project.groovy_version}"
       integrationTestCompile "org.codehaus.groovy:groovy-json:${project.groovy_version}"
       integrationTestCompile "org.codehaus.groovy:groovy-nio:${project.groovy_version}"

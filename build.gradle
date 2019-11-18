@@ -155,6 +155,7 @@ artifactory {
 ext.libs = [
   groovy_all: [
     "org.codehaus.groovy:groovy:$groovy_version",
+    "org.codehaus.groovy:groovy-dateutil:$groovy_version",
     "org.codehaus.groovy:groovy-groovysh:$groovy_version",
     "org.codehaus.groovy:groovy-json:$groovy_version",
     "org.codehaus.groovy:groovy-nio:$groovy_version",
