@@ -11,6 +11,7 @@ package org.akhikhl.gretty
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.joran.JoranConfigurator
+import groovy.cli.commons.CliBuilder
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic

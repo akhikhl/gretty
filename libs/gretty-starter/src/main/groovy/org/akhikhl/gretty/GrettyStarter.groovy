@@ -8,6 +8,7 @@
  */
 package org.akhikhl.gretty
 
+import groovy.cli.commons.CliBuilder
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode

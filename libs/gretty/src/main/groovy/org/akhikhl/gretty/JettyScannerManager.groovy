@@ -30,7 +30,7 @@ final class JettyScannerManager extends BaseScannerManager implements ScannerMan
 
     scanner.addListener(new BulkListener() {
       void filesChanged(List<String> filenames) {
-        scanFilesChangedOverride(filenames)
+        scanFilesChanged(filenames)
       }
     });
 
@@ -46,16 +46,6 @@ final class JettyScannerManager extends BaseScannerManager implements ScannerMan
     });
   }
 
-  /*
-   * This method exists as a workaround for Groovy issue
-   * https://issues.apache.org/jira/browse/GROOVY-7862 which is
-   * fixed in Groovy 2.5.
-   *
-   * See https://github.com/gretty-gradle-plugin/gretty/issues/99 .
-   */
-  protected void scanFilesChangedOverride(Collection<String> changedFiles) {
-	  super.scanFilesChanged(changedFiles)
-  }
 
   @Override
   void startScanner() {

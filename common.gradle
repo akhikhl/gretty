@@ -29,8 +29,8 @@ compileGroovy {
 afterEvaluate {
 
   dependencies {
-    testCompile "org.codehaus.groovy:groovy-all:${groovy_version}"
-    testCompile "org.spockframework:spock-core:${spock_version}"
+    testCompile libs.groovy_all
+    testCompile libs.spock
   }
 
   sourceCompatibility = '1.8'
