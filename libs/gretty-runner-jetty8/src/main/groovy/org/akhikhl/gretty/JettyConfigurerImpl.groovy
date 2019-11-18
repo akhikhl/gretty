@@ -208,6 +208,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     if (webappParams.webXml != null) context.setDescriptor(webappParams.webXml);
     FilteringClassLoader classLoader = new FilteringClassLoader(context)
     classLoader.addServerClass('ch.qos.logback.')
+    classLoader.addServerClass('org.apache.groovy.')
     classLoader.addServerClass('org.slf4j.')
     classLoader.addServerClass('org.codehaus.groovy.')
     classLoader.addServerClass('groovy.')
