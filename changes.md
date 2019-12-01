@@ -2,6 +2,12 @@
 
 [![logo](https://gretty-gradle-plugin.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/gretty-gradle-plugin/gretty)
 
+### Version 3.0.1
+
+* Gradle 6.0 fixes - thanks @boris-petrov
+
+* Gradle 6.0 integration-tests now run on Travis
+
 ### Version 3.0.0
 
 * Gradle 6.0 support.
