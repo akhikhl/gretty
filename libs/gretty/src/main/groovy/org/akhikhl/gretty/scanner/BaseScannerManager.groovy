@@ -27,6 +27,7 @@ abstract class BaseScannerManager implements ScannerManager {
     protected ServerConfig sconfig
     protected List<WebAppConfig> webapps
     protected boolean managedClassReload
+    private final Map<Project, Set<File>> projectScanDirs
 
     protected Map fastReloadMap
 
@@ -62,6 +63,12 @@ abstract class BaseScannerManager implements ScannerManager {
         this.sconfig = sconfig
         this.webapps = webapps
         this.managedClassReload = managedClassReload
+        projectScanDirs = webapps.findAll { it.projectPath }.collectEntries { webapp ->
+            Set<File> scanDirs = new LinkedHashSet<>()
+            def proj = project.project(webapp.projectPath)
+            collectScanDirs(scanDirs, webapp.scanDependencies, proj)
+            [proj, scanDirs]
+        }
     }
 
     protected static void collectScanDirs(Collection<File> scanDirs, Boolean scanDependencies, Project proj) {
@@ -107,7 +114,7 @@ abstract class BaseScannerManager implements ScannerManager {
         for(WebAppConfig webapp in webapps) {
             if(webapp.projectPath) {
                 def proj = project.project(webapp.projectPath)
-                collectScanDirs(scanDirs, webapp.scanDependencies, proj)
+                scanDirs += projectScanDirs[proj]
                 for(def dir in webapp.scanDirs) {
                     if(!(dir instanceof File))
                         dir = proj.file(dir.toString())
@@ -122,7 +129,7 @@ abstract class BaseScannerManager implements ScannerManager {
         Set<File> scanDirs = new LinkedHashSet<>()
         if(webapp.projectPath) {
             def proj = project.project(webapp.projectPath)
-            collectScanDirs(scanDirs, webapp.scanDependencies, proj)
+            scanDirs += projectScanDirs[proj]
             for(def dir in webapp.scanDirs) {
                 if(!(dir instanceof File))
                     dir = proj.file(dir.toString())
