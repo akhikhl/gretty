@@ -27,7 +27,6 @@ task('myIntegrationTest', type: Test, dependsOn: 'test') {
   }
 
   jacoco {
-    append = false
     destinationFile = new File(project.buildDir, 'jacoco/integrationTest_client.exec')
     // excludes.add 'hellogretty.RequestResponseIT'
   }
@@ -38,7 +37,6 @@ task('myBeforeIntegrationTest', type: JettyBeforeIntegrationTestTask) {
   integrationTestTask 'myIntegrationTest'
 
   jacoco {
-    append = false
     destinationFile = new File(project.buildDir, 'jacoco/integrationTest_server.exec')
   }
 }
@@ -54,8 +52,8 @@ task('integrationTestClientReport', type: JacocoReport) {
 
   executionData project.tasks.myIntegrationTest
 
-  sourceDirectories = project.files(project.sourceSets.test.allSource.srcDirs)
-  classDirectories = project.sourceSets.test.output
+  sourceDirectories.setFrom project.files(project.sourceSets.test.allSource.srcDirs)
+  classDirectories.setFrom project.sourceSets.test.output
 
   def reportDir = project.reporting.file("jacoco/integrationTest_client/html")
   reports {
@@ -70,8 +68,8 @@ task('integrationTestServerReport', type: JacocoReport) {
 
   executionData tasks.myBeforeIntegrationTest
 
-  sourceDirectories = project.files(project.sourceSets.main.allSource.srcDirs)
-  classDirectories = project.sourceSets.main.output
+  sourceDirectories.setFrom project.files(project.sourceSets.main.allSource.srcDirs)
+  classDirectories.setFrom project.sourceSets.main.output
 
   def reportDir = project.reporting.file("jacoco/integrationTest_server/html")
   reports {

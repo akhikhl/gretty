@@ -21,7 +21,6 @@ gretty {
     // "jacoco" extension is created automatically for all JettyBeforeIntegrationTest tasks
     // and has type org.gradle.testing.jacoco.plugins.JacocoTaskExtension
     tasks.appBeforeIntegrationTest.jacoco {
-      append = false
       destinationFile = new File(project.buildDir, 'jacoco/integrationTest_server.exec')
       // excludes.add 'hellogretty.ExampleServlet'
     }
@@ -36,7 +35,6 @@ testAll.dependsOn defineIntegrationTest()
 // "jacoco" extension is created automatically for all Test tasks
 // and has type org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 tasks.integrationTest.jacoco {
-  append = false
   destinationFile = new File(project.buildDir, 'jacoco/integrationTest_client.exec')
   // excludes.add 'hellogretty.RequestResponseIT'
 }
@@ -47,8 +45,8 @@ task('integrationTestClientReport', type: JacocoReport) {
 
   executionData project.tasks.integrationTest
 
-  sourceDirectories = project.files(project.sourceSets.test.allSource.srcDirs)
-  classDirectories = project.sourceSets.test.output
+  sourceDirectories.setFrom project.files(project.sourceSets.test.allSource.srcDirs)
+  classDirectories.setFrom project.sourceSets.test.output
 
   def reportDir = project.reporting.file("jacoco/integrationTest_client/html")
   reports {
@@ -67,8 +65,8 @@ task('integrationTestServerReport', type: JacocoReport) {
   // (which is used internally by executionData) is not able to resolve recursive closures.
   executionData { tasks.jettyBeforeIntegrationTest.jacoco.destinationFile }
 
-  sourceDirectories = project.files(project.sourceSets.main.allSource.srcDirs)
-  classDirectories = project.sourceSets.main.output
+  sourceDirectories.setFrom project.files(project.sourceSets.main.allSource.srcDirs)
+  classDirectories.setFrom project.sourceSets.main.output
 
   def reportDir = project.reporting.file("jacoco/integrationTest_server/html")
   reports {

@@ -21,7 +21,7 @@ buildscript {
   dependencies {
     classpath 'org.apache.commons:commons-lang3:3.4'
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.8.1'
+    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.11.0'
     classpath "org._10ne.gradle:rest-gradle-plugin:0.4.2"
     classpath 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
   }

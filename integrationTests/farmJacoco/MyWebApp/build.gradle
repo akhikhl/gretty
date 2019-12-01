@@ -23,7 +23,6 @@ farm {
 
     // one server-side exec-file for all webapps
     tasks.farmBeforeIntegrationTest.jacoco {
-      append = false
       destinationFile = new File(project.buildDir, 'jacoco/farmIntegrationTest_server.exec')
     }
 
@@ -34,8 +33,8 @@ farm {
 
       executionData tasks.farmBeforeIntegrationTest
 
-      sourceDirectories = project.files(project.sourceSets.main.allSource.srcDirs)
-      classDirectories = project.sourceSets.main.output
+      sourceDirectories.setFrom project.files(project.sourceSets.main.allSource.srcDirs)
+      classDirectories.setFrom project.sourceSets.main.output
 
       doFirst {
         // Other webapp projects should be added in execution phase, not configuration phase.
@@ -63,7 +62,6 @@ farm {
 
 // client-side exec-file, not related to gretty
 tasks.integrationTest.jacoco {
-  append = false
   destinationFile = new File(project.buildDir, 'jacoco/integrationTest_client.exec')
 }
 
@@ -74,8 +72,8 @@ task('integrationTestClientReport', type: JacocoReport) {
 
   executionData tasks.integrationTest
 
-  sourceDirectories = project.files(project.sourceSets.test.allSource.srcDirs)
-  classDirectories = project.sourceSets.test.output
+  sourceDirectories.setFrom project.files(project.sourceSets.test.allSource.srcDirs)
+  classDirectories.setFrom project.sourceSets.test.output
 
   def reportDir = project.reporting.file("jacoco/integrationTest_client/html")
   reports {
