@@ -89,17 +89,9 @@ if (!bintrayDryRun)
     contentType = ContentType.JSON
   }
 
-task buildIntegrationTests(type: GradleBuild) {
-  dir = file('integrationTests')
-  tasks = [ 'build' ]
-  project.tasks.build.finalizedBy it
-  onlyIf { !project.tasks.build.getState().getFailure() }
-}
-
 task testAll(dependsOn: tasks.build)
 
 task testAllIntegrationTests(type: GradleBuild) {
-  dependsOn buildIntegrationTests
   dir = file('integrationTests')
   tasks = [ 'testAll' ]
   startParameter.projectProperties = [:]
