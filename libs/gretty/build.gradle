@@ -1,5 +1,5 @@
 plugins {
-  id 'com.gradle.plugin-publish' version '0.9.10'
+  id 'com.gradle.plugin-publish' version '0.10.1'
 }
 
 apply from: rootProject.file('common.gradle')
@@ -17,7 +17,7 @@ dependencies {
 
 pluginBundle {
   website = 'https://gretty-gradle-plugin.github.io/gretty-doc/'
-  vcsUrl = 'https://github.com/${developerId}/gretty'
+  vcsUrl = "https://github.com/${developerId}/gretty"
   description = 'Advanced gradle plugin for running web-apps on jetty and tomcat.'
 
   plugins {
