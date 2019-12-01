@@ -4,6 +4,14 @@
 
 ### Version 3.0.0
 
+* Gradle 6.0 support.
+
+* JDK11 support.
+
+* Support for Gradle <5.0 has been removed.
+
+* Support for Tomcat 7.x and Tomcat 8.0.x has been removed.
+
 * Support for JDK7 has been removed.
 
 ### Version 2.3.1

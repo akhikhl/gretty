@@ -20,6 +20,12 @@ If you are new with Gretty, try [getting started](https://gretty-gradle-plugin.g
 
 #### :star: What's new
 
+December 1, 2019, Gretty 3.0.0 is out and available at [Gradle Plugins](https://plugins.gradle.org/plugin/org.gretty) and [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
+
+This release introduces Gradle 6.0 support and retires support for JDK7, Gradle versions <5.0 and Tomcat 7.x and 8.0.x.
+
+See [complete list of changes](changes.md) for more information.
+
 December 5, 2018, Gretty 2.3.1 is out and available at [Gradle Plugins](https://plugins.gradle.org/plugin/org.gretty) and [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
 
 This maintenance release addresses some issues found in Gretty 2.3.0.  See [complete list of changes](changes.md) for more information.
@@ -54,10 +60,10 @@ You can learn about all Gretty features in [online documentation](https://gretty
 
 #### System requirements
 
-Gretty requires JDK8 or JDK9 and Gradle 1.10 or newer (Gradle 4.0 is highly recommended!).
+Gretty requires JDK8 or JDK11 and Gradle 5.0 or newer.
 
 - Since version 2.0.0 Gretty no longer supports JDK6.
-- Since version 3.0.0 Gretty no longer supports JDK7.
+- Since version 3.0.0 Gretty no longer supports JDK7, Gradle <5.0, Tomcat 7.x or Tomcat 8.0.x.
 
 #### Availability
 
