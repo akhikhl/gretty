@@ -159,9 +159,9 @@ class ProductConfigurer {
 
       dependsOn buildProductTask
 
-      baseName = productName ?: project.name
-      version = project.version
-      destinationDir = baseOutputDir
+      archiveBaseName = productName ?: project.name
+      archiveVersion = project.version
+      destinationDirectory = baseOutputDir
 
       from outputDir, { into outputDir.name }
 
