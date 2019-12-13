@@ -241,11 +241,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   URL findResourceURL(baseResource, String path) {
-    Resource res
-    if(baseResource instanceof ResourceCollection)
-      res = baseResource.findResource(path)
-    else
-      res = baseResource.addPath(path)
+    Resource res = baseResource.addPath(path)
     if(res.exists())
       return res.getURL()
     null
