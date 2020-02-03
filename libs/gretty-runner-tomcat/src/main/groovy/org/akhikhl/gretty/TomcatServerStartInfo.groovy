@@ -34,7 +34,7 @@ class TomcatServerStartInfo {
     if(connectors == null)
       connectors = tomcat.service.findConnectors()
 
-    def portsInfo = connectors.collect { it.port }
+    def portsInfo = connectors.collect { it.localPort }
     portsInfo = (portsInfo.size() == 1 ? 'port ' : 'ports ') + portsInfo.join(', ')
     log.info '{} started and listening on {}', params.servletContainerDescription, portsInfo
 
@@ -48,23 +48,23 @@ class TomcatServerStartInfo {
     for(Context context in tomcat.host.findChildren().findAll { it instanceof Context }) {
       log.info '{} runs at:', (context.name - '/')
       if(httpConn) {
-        log.info '  http://{}:{}{}', host, httpConn.port, context.path
+        log.info '  http://{}:{}{}', host, httpConn.localPort, context.path
         contextInfo.add([
           protocol: 'http',
           host: host,
-          port: httpConn.port,
+          port: httpConn.localPort,
           contextPath: context.path,
-          baseURI: "http://${host}:${httpConn.port}${context.path}"
+          baseURI: "http://${host}:${httpConn.localPort}${context.path}"
         ])
       }
       if(httpsConn) {
-        log.info '  https://{}:{}{}', host, httpsConn.port, context.path
+        log.info '  https://{}:{}{}', host, httpsConn.localPort, context.path
         contextInfo.add([
           protocol: 'https',
           host: host,
-          port: httpsConn.port,
+          port: httpsConn.localPort,
           contextPath: context.path,
-          baseURI: "https://${host}:${httpsConn.port}${context.path}"
+          baseURI: "https://${host}:${httpsConn.localPort}${context.path}"
         ])
       }
     }
@@ -74,13 +74,12 @@ class TomcatServerStartInfo {
     serverStartInfo.host = host
 
     if(httpConn)
-      serverStartInfo.httpPort = httpConn.port
+      serverStartInfo.httpPort = httpConn.localPort
 
     if(httpsConn)
-      serverStartInfo.httpsPort = httpsConn.port
+      serverStartInfo.httpsPort = httpsConn.localPort
 
     serverStartInfo.contexts = contextInfo
     serverStartInfo
   }
 }
-

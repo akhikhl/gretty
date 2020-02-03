@@ -105,7 +105,7 @@ class TomcatServerConfigurer {
         httpConn.port = params.httpPort ?: ServerDefaults.defaultHttpPort
 
       if(httpConn.port == PortUtils.RANDOM_FREE_PORT)
-        httpConn.port = PortUtils.findFreePort()
+        httpConn.port = 0
 
       if(params.httpIdleTimeout)
         httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout.toString())
@@ -134,7 +134,7 @@ class TomcatServerConfigurer {
         httpsConn.port = params.httpsPort ?: ServerDefaults.defaultHttpsPort
 
       if(httpsConn.port == PortUtils.RANDOM_FREE_PORT)
-        httpsConn.port = PortUtils.findFreePort()
+        httpsConn.port = 0
 
       if(params.sslKeyManagerPassword)
         httpsConn.setProperty('keyPass', params.sslKeyManagerPassword)
