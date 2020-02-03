@@ -13,6 +13,7 @@ dependencies {
   compile 'org.apache.commons:commons-lang3:3.3.2'
   compile 'org.bouncycastle:bcprov-jdk15on:1.60'
   compile "org.springframework.boot:spring-boot-devtools:$springBootVersion"
+  compile project(':libs:gretty-common')
 }
 
 tasks.processResources {
