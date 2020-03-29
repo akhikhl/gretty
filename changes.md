@@ -2,6 +2,18 @@
 
 [![logo](https://gretty-gradle-plugin.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/gretty-gradle-plugin/gretty)
 
+### Version 3.0.2
+
+* Fixes replacing use of deprecated Gradle properties.
+
+* Upgraded defaults to latest versions of Jetty and Tomcat.
+
+* Groovy updated to 2.5.10 along with dependencies.
+
+* Choose random free ports atomically to fix bug with random port generation.
+
+* Java 14 support.
+
 ### Version 3.0.1
 
 * Gradle 6.0 fixes - thanks @boris-petrov

@@ -20,6 +20,12 @@ If you are new with Gretty, try [getting started](https://gretty-gradle-plugin.g
 
 #### :star: What's new
 
+March 29, 2020, Gretty 3.0.2 is out and available at [Gradle Plugins](https://plugins.gradle.org/plugin/org.gretty) and [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
+
+This release brings Java 14 support, deprecation fixes for Gradle 6.x and bug-fixes.
+
+https://bintray.com/javabrett/maven/org.gretty/view
+
 December 2, 2019, Gretty 3.0.1 is out and available at [Gradle Plugins](https://plugins.gradle.org/plugin/org.gretty) and [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
 
 This release contains further fixes for Gradle 6.0 support.
