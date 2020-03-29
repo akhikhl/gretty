@@ -26,12 +26,6 @@ abstract class AppServiceTask extends DefaultTask {
 
   private static Logger log = LoggerFactory.getLogger(AppServiceTask)
 
-  /**
-   * Please don't use servicePort, it will be removed in Gretty 2.0
-   */
-  @Deprecated
-  Integer servicePort
-
   @TaskAction
   void action() {
     String command = getCommand()
@@ -50,7 +44,7 @@ abstract class AppServiceTask extends DefaultTask {
     int servicePort = portProps.servicePort as int
 
     log.debug 'Sending command {} to port {}', command, servicePort
-    ServiceProtocol.send(servicePort, command)
+    ServiceProtocol.createWriter(servicePort).write(command)
   }
 
   abstract String getCommand()

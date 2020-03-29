@@ -20,7 +20,7 @@ import groovy.transform.TypeCheckingMode
 @CompileStatic(TypeCheckingMode.SKIP)
 class GrettyStarter {
 
-  private static final Set specialArgNames = ['httpPort', 'httpsPort', 'servicePort', 'statusPort', 'httpEnabled', 'httpsEnabled', 'httpIdleTimeout', 'httpsIdleTimeout'] as Set
+  private static final Set specialArgNames = ['httpPort', 'httpsPort', 'statusPort', 'httpEnabled', 'httpsEnabled', 'httpIdleTimeout', 'httpsIdleTimeout'] as Set
 
   static void main(String[] args) {
 
@@ -129,7 +129,7 @@ class GrettyStarter {
         portProps.load(it)
       }
       int servicePort = portProps.servicePort as int
-      ServiceProtocol.send(servicePort, command)
+      ServiceProtocol.createWriter(servicePort).write(command)
       return
     }
 
