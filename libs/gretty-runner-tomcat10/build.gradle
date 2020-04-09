@@ -1,0 +1,10 @@
+apply from: rootProject.file('common.gradle')
+
+dependencies {
+    compile project(':libs:gretty-runner-tomcat')
+    compile "org.apache.tomcat.embed:tomcat-embed-core:$tomcat10_version"
+    compile "org.apache.tomcat.embed:tomcat-embed-el:$tomcat10_version"
+    compile "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcat10_version"
+    compile "org.apache.tomcat.embed:tomcat-embed-websocket:$tomcat10_version"
+    compile "jakarta.servlet:jakarta.servlet-api:$tomcat10_servlet_api_version"
+}
