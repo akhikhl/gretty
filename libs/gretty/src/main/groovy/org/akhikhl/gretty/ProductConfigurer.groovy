@@ -513,7 +513,7 @@ Version: ${project.version}"""
           if(wconfig.extraResourceBases)
             extraResourceBases wconfig.extraResourceBases.collect { 'extraResources/' + webappDestName + '/' + getFileName(it) }
           if(wconfig.initParameters)
-            initParams wconfig.initParameters
+            initParameters wconfig.initParameters
           if(wconfig.realm)
             realm wconfig.realm
           if(wconfig.realmConfigFile)
