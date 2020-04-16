@@ -246,7 +246,7 @@ class TomcatServerConfigurer {
     loader.setDelegate(true)
     context.setLoader(loader)
 
-    webapp.initParams?.each { key, value ->
+    webapp.initParameters?.each { key, value ->
       context.addParameter(key, value)
     }
 

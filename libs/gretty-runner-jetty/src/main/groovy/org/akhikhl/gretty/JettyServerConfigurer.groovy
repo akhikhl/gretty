@@ -103,7 +103,7 @@ class JettyServerConfigurer {
     if (context.respondsTo('setPersistTempDirectory')) // not supported on older jetty versions
       context.setPersistTempDirectory(true)
 
-    webapp.initParams?.each { key, value ->
+    webapp.initParameters?.each { key, value ->
       context.setInitParameter(key, value)
     }
 
