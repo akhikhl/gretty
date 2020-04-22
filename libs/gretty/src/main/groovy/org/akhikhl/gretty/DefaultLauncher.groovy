@@ -101,12 +101,31 @@ class DefaultLauncher extends LauncherBase {
       if(log.isDebugEnabled())
         for(def path in runnerClasspath)
           log.debug 'Runner classpath: {}', path
+
       spec.classpath = project.files(runnerClasspath)
       def jvmArgs = params.jvmArgs
+
       if(params.debug) {
-        jvmArgs.add '-Xdebug'
-        String debugArg = "-Xrunjdwp:transport=dt_socket,server=y,suspend=${params.debugSuspend ? 'y' : 'n'},address=${params.debugPort}"
-        jvmArgs.add debugArg
+        // Checking if we are in pre 5.6 Gradle API
+        if(spec.metaClass.getMetaProperty('debugOptions')==null) {
+          if(log.isDebugEnabled()) {
+            log.debug("Before Gradle 5.6 setting DebugOptions manually")
+          }
+          jvmArgs.add '-Xdebug'
+          String debugArg = "-Xrunjdwp:transport=dt_socket,server=y,suspend=${params.debugSuspend ? 'y' : 'n'},address=${params.debugPort}"
+          jvmArgs.add debugArg
+        } else {
+          if(log.isDebugEnabled()) {
+            log.debug("Gradle 5.6 or upper, using DebugOptions on javaExec")
+          }
+          spec.debug = true
+          spec.debugOptions {jd ->
+            jd.enabled = true
+            jd.port = params.debugPort
+            jd.server = true
+            jd.suspend = params.debugSuspend
+          }
+        }
         log.info 'DEBUG MODE, port={}, suspend={}', params.debugPort, params.debugSuspend
       }
       spec.jvmArgs jvmArgs
