@@ -9,4 +9,4 @@ dependencies {
   compile 'org.apache.velocity:velocity:1.7'
 }
 
-testAll.dependsOn defineIntegrationTestAllContainers(['jetty8', 'jetty9', 'tomcat85', 'tomcat9'])
+testAll.dependsOn defineIntegrationTestAllContainers()

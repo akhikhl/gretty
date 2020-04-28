@@ -7,7 +7,6 @@ dependencies {
 }
 
 gretty {
-  servletContainer = 'jetty9'
   contextPath = '/'
 }
 

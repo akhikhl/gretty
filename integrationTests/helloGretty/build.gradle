@@ -10,9 +10,6 @@ dependencies {
 }
 
 gretty {
-  // Possible servletContainer values are 'jetty7', 'jetty8', 'jetty9', 'tomcat85', 'tomcat9'. Default is 'jetty9'.
-  // servletContainer = 'tomcat8'
-  // httpsEnabled = true
   httpIdleTimeout = 424242
 }
 

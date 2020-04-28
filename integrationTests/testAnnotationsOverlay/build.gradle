@@ -6,6 +6,4 @@ gretty {
   overlay ':testAnnotations'
 }
 
-// annotations are not supported in jetty7
-
-testAll.dependsOn defineIntegrationTestAllContainers(['jetty8', 'jetty9', 'tomcat85', 'tomcat9'])
+testAll.dependsOn defineIntegrationTestAllContainers()

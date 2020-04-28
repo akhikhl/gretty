@@ -85,25 +85,8 @@ class IntegrationTestPlugin extends BasePlugin {
       if (!integrationTestContainers)
         integrationTestContainers = ServletContainerConfig.getConfigNames().collect() // returns immutable and we want to filter later
 
-      if (JavaVersion.current().isJava9Compatible()) {
-        // excluding jetty7 and jetty8 under JDK9, can no longer compile JSPs to default 1.5 target,
-        // see https://github.com/gretty-gradle-plugin/gretty/issues/15
-        integrationTestContainers -= ['jetty7', 'jetty8']
-      }
-
-      if (JavaVersion.current().isJava10Compatible()) {
-        // excluding jetty9 under JDK10, can no longer compile JSPs to default 1.7 target,
-        integrationTestContainers -= ['jetty9']
-      }
-
       if (project.hasProperty('testAllContainers') && project.testAllContainers) {
         integrationTestContainers.retainAll(Eval.me(project.testAllContainers))
-      }
-
-      // farmSecure tests not working on Jetty 9.3 and 9.4, see https://github.com/gretty-gradle-plugin/gretty/issues/67
-      if (project.path.startsWith(':farmSecure')) {
-        println "Excluding farmSecure tests from Jetty 9.3/9.4, see https://github.com/gretty-gradle-plugin/gretty/issues/67 ."
-        integrationTestContainers -= ['jetty9.3', 'jetty9.4']
       }
 
       integrationTestContainers.each { String container ->

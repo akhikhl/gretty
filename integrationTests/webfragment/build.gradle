@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-  compile 'javax.servlet:javax.servlet-api:3.0.1'
+  compile "jakarta.servlet:jakarta.servlet-api:$tomcat10_servlet_api_version"
   compile 'org.webjars:bootstrap:3.2.0'
   compile 'org.webjars:jquery:2.1.1'
   // We use Velocity for example of template processing within the webapp.

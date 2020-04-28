@@ -16,4 +16,5 @@ gretty {
 }
 
 defineIntegrationTest()
-testAll.dependsOn defineIntegrationTestAllContainers(['jetty7', 'jetty8', 'jetty9'])
+// FIXME (#162)
+// testAll.dependsOn defineIntegrationTestAllContainers(['jetty10'])

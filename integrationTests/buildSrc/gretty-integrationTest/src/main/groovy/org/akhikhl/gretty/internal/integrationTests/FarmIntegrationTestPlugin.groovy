@@ -30,12 +30,6 @@ class FarmIntegrationTestPlugin extends BasePlugin {
         integrationTestContainers.retainAll(Eval.me(project.testAllContainers))
       }
 
-      // farmSecure tests not working on Jetty 9.3 and 9.4, see https://github.com/gretty-gradle-plugin/gretty/issues/67
-      if (project.path.startsWith(':farmSecure')) {
-        println "Excluding farmSecure tests from Jetty 9.3/9.4, see https://github.com/gretty-gradle-plugin/gretty/issues/67 ."
-        integrationTestContainers -= ['jetty9.3', 'jetty9.4']
-      }
-
       integrationTestContainers.each { container ->
 
         project.farms.farm container, {

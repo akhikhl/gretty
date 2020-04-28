@@ -13,8 +13,6 @@ gretty {
   httpEnabled = false
   httpsEnabled = true
   httpsIdleTimeout = 424242
-  // Possible servletContainer values are 'jetty7', 'jetty8', 'jetty9', 'tomcat85', 'tomcat9'. Default is 'jetty9'.
-  servletContainer = 'jetty9'
   realm 'auth'
   // realmConfigFile is optional. When omitted, 'jetty-realm.properties' or 'tomcat-users.xml' is assumed.
   // If path is relative, the file will be searched in projectDir, build/resources/main and src/main/webapp/WEB-INF.

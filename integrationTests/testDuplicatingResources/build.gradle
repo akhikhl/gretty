@@ -6,12 +6,7 @@ dependencies {
 	compile 'io.reactivex:rxjava:1.1.5'
 }
 
-ext {
-	integrationTestContainers = ['tomcat85', 'tomcat9']
-}
-
 gretty {
-	servletContainer = 'tomcat9'
 	contextPath = '/bug'
 }
 

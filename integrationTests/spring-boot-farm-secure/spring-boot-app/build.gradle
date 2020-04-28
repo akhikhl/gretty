@@ -12,7 +12,6 @@ gretty {
   springBoot = true
   httpEnabled = false
   httpsEnabled = true
-  servletContainer = 'jetty9'
   realm = 'auth'
   realmConfigFile = '../security'
   singleSignOn = true
@@ -26,7 +25,7 @@ farm {
 
 defineIntegrationTest()
 
-testAll.dependsOn defineFarmIntegrationTestAllContainers(['jetty8', 'jetty9', 'tomcat85', 'tomcat9'], {
+testAll.dependsOn defineFarmIntegrationTestAllContainers({
   webapp project
   webapp ':spring-boot-farm-secure:spring-boot-webservice'
   webapp ':spring-boot-farm-secure:jee-webservice'

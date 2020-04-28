@@ -10,11 +10,11 @@ dependencies {
 }
 
 gretty {
-  servletContainer = 'tomcat85'
+  servletContainer = 'tomcat10'
   httpPort = getRandomFreePort()
   httpsPort = getRandomFreePort()
   httpsEnabled = true
 }
 
 defineIntegrationTest()
-testAll.dependsOn defineIntegrationTestAllContainers(['tomcat85', 'tomcat9'])
+testAll.dependsOn defineIntegrationTestAllContainers(['tomcat10'])
