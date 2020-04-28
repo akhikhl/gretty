@@ -18,8 +18,8 @@ abstract class BaseScannerManager implements ScannerManager {
 
     protected static final webConfigFiles = [
       'web.xml', 'web-fragment.xml',
-      'jetty.xml', 'jetty7.xml', 'jetty8.xml', 'jetty9.xml',
-      'jetty-env.xml', 'jetty7-env.xml', 'jetty8-env.xml', 'jetty9-env.xml',
+      'jetty.xml',
+      'jetty-env.xml',
       'tomcat-users.xml'
     ] as HashSet
 

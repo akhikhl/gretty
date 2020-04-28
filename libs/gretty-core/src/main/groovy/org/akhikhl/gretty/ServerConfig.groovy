@@ -77,7 +77,7 @@ class ServerConfig {
   static ServerConfig getDefaultServerConfig(String serverName) {
     ServerConfig result = new ServerConfig()
     result.jvmArgs = []
-    result.servletContainer = 'jetty9.4'
+    result.servletContainer = 'tomcat10'
     result.managedClassReload = false
     result.httpEnabled = true
     result.httpsEnabled = false
@@ -89,7 +89,7 @@ class ServerConfig {
     result.logFileName = serverName
     result.redeployMode = 'restart'
     result.logDir = "${System.getProperty('user.home')}/logs" as String
-    result.scanner = 'jetty'
+    result.scanner = 'jdk'
     result.portPropertiesFileName = 'gretty_ports.properties'
     result.liveReloadEnabled = false
     return result

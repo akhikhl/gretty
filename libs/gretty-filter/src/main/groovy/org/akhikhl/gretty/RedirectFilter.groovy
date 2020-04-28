@@ -4,7 +4,7 @@ import groovy.servlet.ServletCategory
 import groovyx.net.http.URIBuilder
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import javax.servlet.*
+import jakarta.servlet.*
 import java.util.regex.Pattern
 import javax.management.ObjectName
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -165,17 +165,10 @@ class RedirectFilter implements Filter {
       // jetty-specific
       def server = servletContext.contextHandler.server
       server.connectors.each { conn ->
-        if(server.version.startsWith('7.') || server.version.startsWith('8.')) {
-          if(conn.getClass().getName() == 'org.eclipse.jetty.server.bio.SocketConnector')
-            httpPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8080)
-          else if(conn.getClass().getName() == 'org.eclipse.jetty.server.ssl.SslSocketConnector')
-            httpsPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8443)
-        } else {
-          if(conn.protocols.find { it.startsWith 'http/' } && !conn.protocols.find { it.startsWith 'ssl-http/' })
-            httpPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8080)
-          else if(conn.protocols.find { it.startsWith 'http/' } && conn.protocols.find { it.startsWith 'ssl-http/' })
-            httpsPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8443)
-        }
+        if(conn.protocols.find { it.startsWith 'http/' } && !conn.protocols.find { it.startsWith 'ssl-http/' })
+          httpPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8080)
+        else if(conn.protocols.find { it.startsWith 'http/' } && conn.protocols.find { it.startsWith 'ssl-http/' })
+          httpsPort = conn.port instanceof Integer ? conn.port : Integer.parseInt(conn.port.toString(), 8443)
       }
     }
     else {

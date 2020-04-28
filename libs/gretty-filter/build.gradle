@@ -1,7 +1,7 @@
 apply from: rootProject.file('common.gradle')
 
 dependencies {
-  compile 'javax.servlet:servlet-api:2.5'
+  compile "jakarta.servlet:jakarta.servlet-api:$tomcat10_servlet_api_version"
   compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1', {
     exclude group: 'commons-logging', module: 'commons-logging'
   }
