@@ -6,15 +6,16 @@
  * See the file "LICENSE" for copying and usage permission.
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.net.URL;
+import java.util.List;
 
 public class HelloServlet2 extends HttpServlet {
 	@Override

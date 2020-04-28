@@ -8,17 +8,17 @@
  */
 package org.akhikhl.examples.gretty.websocket;
 
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.websocket.CloseReason;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.ClientEndpoint;
-import javax.websocket.server.ServerEndpoint;
 
 @ClientEndpoint
 @ServerEndpoint(value="/hello")
