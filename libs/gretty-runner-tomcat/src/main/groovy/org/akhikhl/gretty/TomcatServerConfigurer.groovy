@@ -189,7 +189,7 @@ class TomcatServerConfigurer {
         sslConfig.truststorePassword = params.sslTrustStorePassword
 
       if(params.httpsIdleTimeout)
-        httpsConn.setProperty('keepAliveTimeout', params.httpsIdleTimeout)
+        httpsConn.setProperty('keepAliveTimeout', params.httpsIdleTimeout.toString())
 
       httpsConn.setProperty('maxPostSize', '0')  // unlimited
 
