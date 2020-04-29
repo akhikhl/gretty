@@ -3,11 +3,7 @@ matrix:
   include:
   - jdk: openjdk11
     env: TEST_ALL_CONTAINERS="['tomcat10']" TEST_ALL_GRADLE_VERSION="5.6.4"
-  - jdk: openjdk8
-    env: TEST_ALL_CONTAINERS="['tomcat10']" TEST_ALL_GRADLE_VERSION="5.6.4"
   - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['tomcat10']" TEST_ALL_GRADLE_VERSION="6.3"
-  - jdk: openjdk8
     env: TEST_ALL_CONTAINERS="['tomcat10']" TEST_ALL_GRADLE_VERSION="6.3"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -42,6 +38,7 @@ env:
     - secure: "YIgwBJa9aVg9FQUwQzmw6utO17Jp/ZiwBJtfUP/xps9zmhtND7e0cZfLimljjbyfJ8CIPhmF2xd7Eu7aXNxRXe3p50/cok4fcfVtPX/Tirn1l5CM2IG2MJpABOpJdED71GFNkuej6gMhR461RfNn2c7XP1mTdO5cB7dGEOUy5ZnabyRHdO4IjH313LzA7fIGCR0cmqAepcVObRlxnbDG/JRGJA2icvR4t6HsI8M+Facslr/9rxt+BqECixglvzn3+M3zz34cJm9Y9hUDU1nPhBvwXba+P5MSj9Yy5ScW4CuOvDjud5bpZFaUsbCBeg0FMDPzLnynWSYUuE14RxydZ+tEuaiwPvVD+1/9uHB5szPueoOo2uVaSo47RMcjrwDwIinxYDU1/lkrTWxyIGyfFRWzO+CiIjPoyCoAfhWOLwiTMInNm+0BS77SYj1HnhsPGWnnODhUDhRt86ZbA0vrhiMZMq8TasvpWXiAndcDIRXYeXYRG6SBwl8bvsDwao5JkL2m3ufM/Y6c3u8RiC28g65toQ3d/33CIinZmEOEzMWvHH4cIaMFt4hzYnTbj9ug57XIqdH791kA6wtAsHNLHR30ZdRVMMGzm8IlaDM4t6btt0HCl+8lJBwkmKqik0z5RW/tJIM400cP5kfSNlFPcXTbLIV+HSQ2fH6KwsYfxgI="
     - JAVA_OPTS="-XX:PermSize=512M -XX:MaxPermSize=1G"
 
+# FIXME revisit deployment options: Jetty 9.x fell out-of-scope (#165)
 deploy:
   - provider: script
     skip_cleanup: true
