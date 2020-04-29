@@ -109,7 +109,7 @@ class TomcatServerConfigurer {
         httpConn.port = 0
 
       if(params.httpIdleTimeout)
-        httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout.toString())
+        assert httpConn.setProperty('keepAliveTimeout', params.httpIdleTimeout.toString())
 
       httpConn.maxPostSize = -1 // unlimited post size
 
@@ -127,7 +127,7 @@ class TomcatServerConfigurer {
         httpsConn = new Connector('HTTP/1.1')
         httpsConn.scheme = 'https'
         httpsConn.secure = true
-        httpsConn.setProperty('SSLEnabled', 'true')
+        assert httpsConn.setProperty('SSLEnabled', 'true')
     }
 
     if(httpsConn) {
@@ -189,7 +189,7 @@ class TomcatServerConfigurer {
         sslConfig.truststorePassword = params.sslTrustStorePassword
 
       if(params.httpsIdleTimeout)
-        httpsConn.setProperty('keepAliveTimeout', params.httpsIdleTimeout.toString())
+        assert httpsConn.setProperty('keepAliveTimeout', params.httpsIdleTimeout.toString())
 
       httpsConn.maxPostSize = -1  // unlimited
 
