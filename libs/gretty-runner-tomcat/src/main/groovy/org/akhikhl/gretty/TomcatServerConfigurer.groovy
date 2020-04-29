@@ -23,6 +23,7 @@ import org.apache.catalina.startup.Catalina
 import org.apache.catalina.startup.Tomcat
 import org.apache.catalina.startup.Tomcat.DefaultWebXmlListener
 import org.apache.catalina.startup.Tomcat.FixContextListener
+import org.apache.tomcat.util.net.SSLHostConfig
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.xml.sax.InputSource
@@ -136,8 +137,12 @@ class TomcatServerConfigurer {
       if(httpsConn.port == PortUtils.RANDOM_FREE_PORT)
         httpsConn.port = 0
 
+      def sslConfig = new SSLHostConfig()
+      httpsConn.addSslHostConfig(sslConfig)
+      def cert = sslConfig.getCertificates(true).first()
+
       if(params.sslKeyManagerPassword)
-        httpsConn.setProperty('keyPass', params.sslKeyManagerPassword)
+        cert.certificateKeyPassword = params.sslKeyManagerPassword
       if(params.sslKeyStorePath) {
         if(params.sslKeyStorePath.startsWith('classpath:')) {
           String resString = params.sslKeyStorePath - 'classpath:'
@@ -153,13 +158,13 @@ class TomcatServerConfigurer {
               outs << stm
             }
           }
-          httpsConn.setProperty('keystoreFile', keystoreFile.absolutePath)
+          cert.certificateKeystoreFile = keystoreFile.absolutePath
         }
         else
-          httpsConn.setProperty('keystoreFile', params.sslKeyStorePath)
+          cert.certificateKeystoreFile = params.sslKeyStorePath
       }
       if(params.sslKeyStorePassword)
-        httpsConn.setProperty('keystorePass', params.sslKeyStorePassword)
+        cert.certificateKeystorePassword = params.sslKeyStorePassword
       if(params.sslTrustStorePath) {
         if(params.sslTrustStorePath.startsWith('classpath:')) {
           String resString = params.sslTrustStorePath - 'classpath:'
@@ -175,13 +180,13 @@ class TomcatServerConfigurer {
               outs << stm
             }
           }
-          httpsConn.setProperty('truststoreFile', truststoreFile.absolutePath)
+          sslConfig.truststoreFile = truststoreFile.absolutePath
         }
         else
-          httpsConn.setProperty('truststoreFile', params.sslTrustStorePath)
+          sslConfig.truststoreFile = params.sslTrustStorePath
       }
       if(params.sslTrustStorePassword)
-        httpsConn.setProperty('truststorePass', params.sslTrustStorePassword)
+        sslConfig.truststorePassword = params.sslTrustStorePassword
 
       if(params.httpsIdleTimeout)
         httpsConn.setProperty('keepAliveTimeout', params.httpsIdleTimeout)
