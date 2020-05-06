@@ -8,18 +8,4 @@
  */
 package org.akhikhl.gretty
 
-import org.apache.catalina.Service
-import org.apache.catalina.startup.Tomcat
-
-class TomcatConfigurerImpl extends AbstractTomcatConfigurerImpl{
-
-    @Override
-    void setService(Tomcat tomcat, Service service) {
-
-    }
-
-    @Override
-    void setEngine(Tomcat tomcat, Service service) {
-
-    }
-}
+class TomcatConfigurerImpl extends AbstractTomcatConfigurerImpl {}

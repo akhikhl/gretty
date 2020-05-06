@@ -28,8 +28,4 @@ interface TomcatConfigurer {
   void setBaseDir(Tomcat tomcat, File baseDir)
 
   void setResourceBase(StandardContext context, Map webappParams)
-
-  void setService(Tomcat tomcat, Service service)
-
-  void setEngine(Tomcat tomcat, Service service)
 }
