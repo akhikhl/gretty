@@ -59,20 +59,6 @@ abstract class LauncherBase implements Launcher {
 
     File portPropertiesFile = getPortPropertiesFile()
     portPropertiesFile.parentFile.mkdirs()
-    if(portPropertiesFile.exists()) {
-      Properties portProps = new Properties()
-      portPropertiesFile.withReader 'UTF-8', {
-        portProps.load(it)
-      }
-      int servicePort = portProps.servicePort as int
-      int statusPort = portProps.statusPort as int
-      ServiceProtocol.createReader(statusPort).withCloseable { reader ->
-        def response = reader.readMessageAsync()
-        ServiceProtocol.createWriter(servicePort).write('status')
-        if (response.get() == 'started')
-          throw new RuntimeException('Web-server is already running.')
-      }
-    }
   }
 
   @Override
