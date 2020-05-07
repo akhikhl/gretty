@@ -54,3 +54,5 @@ logger 'org.eclipse.jetty.annotations.AnnotationConfiguration', ERROR
 logger 'org.eclipse.jetty.annotations.AnnotationParser', ERROR
 
 logger 'org.eclipse.jetty.util.component.AbstractLifeCycle', ERROR
+
+logger 'org.akhikhl.gretty', grettyDebug ? DEBUG : INFO

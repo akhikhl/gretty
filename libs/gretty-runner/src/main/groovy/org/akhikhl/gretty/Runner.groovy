@@ -45,15 +45,16 @@ final class Runner {
   static void main(String[] args) {
     def cli = new CliBuilder()
     cli.with {
+      d longOpt: 'debug', type: Boolean, 'enable debug logging'
       st longOpt: 'statusPort', required: true, args: 1, argName: 'statusPort', type: Integer, 'status port'
       smf longOpt: 'serverManagerFactory', required: true, args: 1, argName: 'serverManagerFactory', type: String, 'server manager factory'
     }
     def options = cli.parse(args)
-    Map params = [statusPort: options.statusPort as int, serverManagerFactory: options.serverManagerFactory]
+    Map params = [statusPort: options.statusPort as int, serverManagerFactory: options.serverManagerFactory, debug: options.debug]
     new Runner(params).run()
   }
 
-  static void initLogback(Map serverParams) {
+  void initLogback(Map serverParams) {
     LoggerContext logCtx = LoggerFactory.getILoggerFactory()
     logCtx.stop()
     Map loggerCache = LoggerFactory.getILoggerFactory().@loggerCache
@@ -78,6 +79,7 @@ final class Runner {
     binding.fileLogEnabled = Boolean.valueOf(serverParams.fileLogEnabled == null ? true : serverParams.fileLogEnabled)
     binding.logFileName = serverParams.logFileName
     binding.logDir = serverParams.logDir
+    binding.grettyDebug = params.debug
     new GafferConfiguratorEx(logCtx).run(binding, logbackConfigText)
   }
 
@@ -107,7 +109,7 @@ final class Runner {
   }
 
   private void run() {
-
+    LogUtil.setLevel(params.debug)
     boolean paramsLoaded = false
     def ServerManagerFactory = Class.forName(params.serverManagerFactory, true, this.getClass().classLoader)
     ServerManager serverManager = ServerManagerFactory.createServerManager()

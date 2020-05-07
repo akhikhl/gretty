@@ -194,6 +194,9 @@ abstract class LauncherBase implements Launcher {
           JavaExecParams params = new JavaExecParams()
           params.main = 'org.akhikhl.gretty.Runner'
           params.args = ["--statusPort=${reader.port}", "--serverManagerFactory=${getServerManagerFactory()}"]
+          if (log.isDebugEnabled()) {
+            params.args += "--debug"
+          }
           params.debug = config.getDebug()
           params.debugSuspend = config.getDebugSuspend()
           params.debugPort = config.getDebugPort()
