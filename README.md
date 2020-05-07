@@ -20,6 +20,28 @@ If you are new with Gretty, try [getting started](https://gretty-gradle-plugin.g
 
 #### :star: What's new
 
+May 7, 2020, Gretty 3.0.3 is out and available at [Gradle Plugins](https://plugins.gradle.org/plugin/org.gretty) and [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
+
+* Changes in this version:
+
+* Updated ASM to 8.0.1.
+
+* Fixed excess logging output and set initial log level (#150).
+
+* Removed deprecated check for already in-use ports (#147).
+
+* Added support for Gradle 5.6 debugging API.
+
+* Fixed incorrect serialization of the initParameters in productBuild.
+
+* Updated Tomcat 9 version and TC9 servlet API version.
+
+* Set javaExec debug options properly.
+
+* Updated Gradle 6 testing to use Gradle 6.3.
+
+See [complete list of changes](changes.md) for more information.
+
 March 29, 2020, Gretty 3.0.2 is out and available at [Gradle Plugins](https://plugins.gradle.org/plugin/org.gretty) and [Bintray](https://bintray.com/javabrett/maven/org.gretty/view).
 
 This release brings Java 14 support, deprecation fixes for Gradle 6.x and bug-fixes.

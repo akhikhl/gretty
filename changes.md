@@ -2,6 +2,24 @@
 
 [![logo](https://gretty-gradle-plugin.github.io/gretty-doc/images/gretty_logo.png "gretty logo")](https://github.com/gretty-gradle-plugin/gretty)
 
+### Version 3.0.3
+
+* Updated ASM to 8.0.1.
+
+* Fixed excess logging output and set initial log level (#150).
+
+* Removed deprecated check for already in-use ports (#147).
+
+* Added support for Gradle 5.6 debugging API.
+
+* Fixed incorrect serialization of the initParameters in productBuild.
+
+* Updated Tomcat 9 version and TC9 servlet API version.
+
+* Set javaExec debug options properly.
+
+* Updated Gradle 6 testing to use Gradle 6.3.
+
 ### Version 3.0.2
 
 * Fixes replacing use of deprecated Gradle properties.
