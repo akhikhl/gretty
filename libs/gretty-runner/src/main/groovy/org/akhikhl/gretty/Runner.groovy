@@ -144,7 +144,7 @@ final class Runner {
         }
         else if(data == 'restartWithEvent') {
           serverManager.stopServer()
-          serverManager.startServer(new ServerStartEventImpl())
+          serverManager.startServer(new ServerStartEventImpl(writer))
         }
         else if (data.startsWith('redeploy ')) {
           List<String> webappList = data.replace('redeploy ', '').split(' ').toList()
