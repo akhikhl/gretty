@@ -12,6 +12,11 @@ package org.akhikhl.gretty
 import groovy.json.JsonBuilder
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
+
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.bundling.Zip
@@ -146,6 +151,7 @@ class ProductConfigurer {
         writeLaunchScripts()
         writeTextFiles(createTextFiles(true))
         copyWebappFiles()
+        copyAdditionalFiles()
         copyStarter()
         copyRunner()
       }
@@ -542,6 +548,15 @@ Version: ${project.version}"""
     textFiles.each { fileName, fileText ->
       File file = new File(outputDir, fileName)
       file.text = fileText
+    }
+  }
+
+  protected void copyAdditionalFiles() {
+    Path outputPath = outputDir.toPath()
+    product.additionalFiles.each { source, target ->
+      Path targetPath = outputPath.resolve(target)
+      Files.createDirectories(targetPath.getParent())
+      Files.copy(project.rootDir.toPath().resolve(source), targetPath, StandardCopyOption.REPLACE_EXISTING)
     }
   }
 }

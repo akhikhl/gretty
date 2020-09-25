@@ -13,6 +13,11 @@ farm {
   webapp ':farm:MyWebService'
 }
 
+// adds additional file to the product build, for testing purpose
+product {
+  additionalFiles = ['./farm/README.md': './README.md']
+}
+
 defineIntegrationTest()
 
 testAll.dependsOn defineFarmIntegrationTestAllContainers({

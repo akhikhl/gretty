@@ -25,6 +25,13 @@ class ProductExtension {
   //
   boolean includeVersion = false
 
+  /**
+   * Additional files that should be included into product build.
+   * Key is source file path. Relative path is resolved against build root directory.
+   * Value is destination file path relative to the product root directory.
+   */
+  Map additionalFiles = [:]
+
   void webapp(Map options = [:], w) {
     if(w instanceof Project)
       w = w.path
