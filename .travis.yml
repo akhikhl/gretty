@@ -2,11 +2,11 @@ language: groovy
 matrix:
   include:
   - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['tomcat10']" TEST_ALL_GRADLE_VERSION="5.6.4"
+    env: TEST_ALL_CONTAINERS="['tomcat10']" GRADLE_VERSION="5.6.4"
   - jdk: openjdk15
-    env: TEST_ALL_CONTAINERS="['tomcat10']" TEST_ALL_GRADLE_VERSION="6.6.1"
+    env: TEST_ALL_CONTAINERS="['tomcat10']" GRADLE_VERSION="6.6.1"
   - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['tomcat10']" TEST_ALL_GRADLE_VERSION="6.6.1"
+    env: TEST_ALL_CONTAINERS="['tomcat10']" GRADLE_VERSION="6.6.1"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
@@ -26,9 +26,9 @@ install:
 script:
   - |
     set -e
+    ./gradlew wrapper --gradle-version ${GRADLE_VERSION} --distribution-type all
     ./gradlew build
     if [[ ! -z $TEST_ALL_CONTAINERS && ( -z $TEST_ALL || "${TRAVIS_REPO_SLUG}" == "gretty-gradle-plugin/gretty" ) ]]; then
-      ./gradlew wrapper --gradle-version ${TEST_ALL_GRADLE_VERSION} --distribution-type all
       cd integrationTests
       ../gradlew -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=0.27.0 -PtestAllContainers=${TEST_ALL_CONTAINERS} testAll
       cd ..
