@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import org.apache.catalina.core.StandardContext
 import org.apache.catalina.startup.Tomcat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -45,11 +46,23 @@ class TomcatServerManager implements ServerManager {
 
     log.debug '{} starting.', params.servletContainerDescription
 
-    tomcat = createServerConfigurer().createAndConfigureServer()
+    TomcatServerConfigurer serverConfigurer = createServerConfigurer()
+    tomcat = serverConfigurer.createAndConfigureServer()
 
     boolean result = false
     try {
+      /*
+       * First we start tomcat without any webapp and then add webapps one by one
+       * to make sure that web server is ready as soon as possible, so
+       * later loaded apps can send web requests to early loaded ones.
+       */
       tomcat.start()
+
+      for(Map webapp in params.webApps) {
+        StandardContext context = serverConfigurer.createContext(webapp, tomcat)
+        tomcat.host.addChild(context)
+      }
+
       result = true
     } catch(Throwable x) {
       log.error 'Error starting server', x

@@ -62,22 +62,11 @@ class JettyServerConfigurer {
 
     def server = configurer.createServer()
 
-    File baseDir = new File(params.baseDir)
-    new File(baseDir, 'webapps').mkdirs()
+    new File(params.baseDir, 'webapps').mkdirs()
 
     configurer.applyJettyXml(server, params.serverConfigFile)
-
     configurer.configureConnectors(server, params)
-
-    List handlers = []
-
-    for(Map webapp in params.webApps) {
-      def context = createContext(webapp, baseDir, server, configureContext)
-      handlers.add(context)
-    }
-
-    configurer.setHandlersToServer(server, handlers)
-
+    configurer.setHandlersToServer(server, [])
     return server
   }
 

@@ -6,11 +6,14 @@ apply plugin: 'org.gretty.internal.integrationTests.FarmIntegrationTestPlugin'
 dependencies {
   compile 'org.webjars:bootstrap:3.2.0'
   compile 'org.webjars:jquery:2.1.1'
+  compile 'org.apache.httpcomponents:httpclient:4.2.1'
 }
 
 farm {
-  webapp project
+  redeployMode = "redeploy"
+
   webapp ':farm:MyWebService'
+  webapp project
 }
 
 // adds additional file to the product build, for testing purpose
@@ -21,6 +24,6 @@ product {
 defineIntegrationTest()
 
 testAll.dependsOn defineFarmIntegrationTestAllContainers({
-  webapp project
   webapp ':farm:MyWebService'
+  webapp project
 })

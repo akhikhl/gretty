@@ -210,11 +210,6 @@ class TomcatServerConfigurer {
     if(params.singleSignOn && !tomcat.host.pipeline.valves.find { it instanceof SingleSignOn })
       tomcat.host.addValve(new SingleSignOn())
 
-    for(Map webapp in params.webApps) {
-      StandardContext context = createContext(webapp, tomcat, configureContext)
-      tomcat.host.addChild(context)
-    }
-
     tomcat
   }
 

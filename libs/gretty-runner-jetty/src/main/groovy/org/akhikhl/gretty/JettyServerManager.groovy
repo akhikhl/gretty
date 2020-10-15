@@ -41,11 +41,24 @@ final class JettyServerManager implements ServerManager {
 
     log.debug '{} starting.', params.servletContainerDescription
 
-    server = createServerConfigurer().createAndConfigureServer()
+    JettyServerConfigurer serverConfigurer = createServerConfigurer()
+    server = serverConfigurer.createAndConfigureServer()
 
     boolean result = false
     try {
+      /*
+       * First we start jetty without any webapp and then add webapps one by one
+       * to make sure that web server is ready as soon as possible, so
+       * later loaded apps can send web requests to early loaded ones.
+       */
       server.start()
+
+      File baseDir = new File(params.baseDir)
+      for(Map webapp in params.webApps) {
+          def context = serverConfigurer.createContext(webapp, baseDir, server)
+          configurer.addHandlerToServer(server, context)
+      }
+
       result = true
     } catch(Throwable x) {
       log.error 'Error starting server', x
@@ -98,13 +111,12 @@ final class JettyServerManager implements ServerManager {
       configurer.removeHandlerFromServer(server, it)
     }
     //
-    def contexts = contextPaths.collect { contextPath ->
+    contextPaths.collect { contextPath ->
       params.webApps.find { it.contextPath == contextPath }
-    }.collect {
+    }.each {
       def context = createServerConfigurer().createContext(it, new File(params.baseDir), server)
       configurer.addHandlerToServer(server, context)
       context
     }
-    contexts.each { it.start() }
   }
 }
