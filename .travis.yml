@@ -4,9 +4,9 @@ matrix:
   - jdk: openjdk11
     env: TEST_ALL_CONTAINERS="['tomcat10','jetty11']" GRADLE_VERSION="5.6.4"
   - jdk: openjdk15
-    env: TEST_ALL_CONTAINERS="['tomcat10','jetty11']" GRADLE_VERSION="6.6.1"
+    env: TEST_ALL_CONTAINERS="['tomcat10','jetty11']" GRADLE_VERSION="6.7"
   - jdk: openjdk11
-    env: TEST_ALL_CONTAINERS="['tomcat10','jetty11']" GRADLE_VERSION="6.6.1"
+    env: TEST_ALL_CONTAINERS="['tomcat10','jetty11']" GRADLE_VERSION="6.7"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
