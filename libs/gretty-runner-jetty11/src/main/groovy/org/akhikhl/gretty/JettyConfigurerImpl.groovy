@@ -40,7 +40,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
 
   @Override
   def addLifeCycleListener(lifecycle, listener) {
-    def lifeCycleListener = listener as LifeCycleListenerAdapter
+    def lifeCycleListener = listener as LifeCycle.Listener
     lifecycle.addLifeCycleListener(lifeCycleListener)
     lifeCycleListener
   }
@@ -219,7 +219,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
     classLoader.addServerClass('groovyjarjarasm.')
     classLoader.addServerClass('groovyjarjarcommonscli.')
     context.classLoader = classLoader
-    context.addLifeCycleListener(new LifeCycleListenerAdapter() {
+    context.addEventListener(new LifeCycle.Listener() {
       public void lifeCycleStopped(LifeCycle event) {
         context.classLoader = null
       }
