@@ -58,7 +58,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
   void applyJettyXml(server, String jettyXml) {
     if(jettyXml != null) {
       log.info 'Configuring server with {}', jettyXml
-      XmlConfiguration xmlConfiguration = new XmlConfiguration(new File(jettyXml).toURI().toURL())
+      XmlConfiguration xmlConfiguration = new XmlConfiguration(new PathResource(new File(jettyXml)))
       xmlConfiguration.configure(server)
     }
   }
