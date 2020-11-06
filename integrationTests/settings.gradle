@@ -8,7 +8,7 @@ include 'helloGrettyOverlay'
 // Jersey 3.0.0-M1 still depends on javax.servlet internally
 // include 'helloJersey'
 include 'extraResourceBases'
-include 'filterWebApp'
+include 'filterWebapp'
 include 'testAnnotations'
 include 'testAnnotationsOverlay'
 include 'testDependency'
