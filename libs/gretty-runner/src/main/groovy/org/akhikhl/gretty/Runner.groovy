@@ -80,7 +80,17 @@ final class Runner {
     binding.logFileName = serverParams.logFileName
     binding.logDir = serverParams.logDir
     binding.grettyDebug = params.debug
-    new GafferConfiguratorEx(logCtx).run(binding, logbackConfigText)
+    // FIXME #162 logback has temporarily suspended GafferConfigurator.
+    // We do not know if and when it will come back, see news of 2019-10-11:
+    // http://logback.qos.ch/news.html
+    // new GafferConfiguratorEx(logCtx).run(binding, logbackConfigText)
+    // Instead we use a fixed configuration file, which does not respect all the different
+    // logging toggles in Gretty:
+    Runner.class.getResource('/grettyRunnerLogback.xml').withInputStream {
+      JoranConfigurator configurator = new JoranConfigurator();
+      configurator.setContext(logCtx)
+      configurator.doConfigure(it)
+    }
   }
 
   private static Level stringToLoggingLevel(String str) {

@@ -71,6 +71,10 @@ class ServletContainerConfig {
           def asm_version = project.ext.asmVersion
           force "org.ow2.asm:asm:$asm_version"
           force "org.ow2.asm:asm-commons:$asm_version"
+
+          // FIXME #162 make Tomcat and Jetty agree on a common version of logback again?
+          force 'ch.qos.logback:logback-classic:1.3.0-alpha5'
+          force 'org.slf4j:slf4j-api:2.0.0-alpha1'
         }
       },
       servletApiVersion: { project -> project.ext.jetty11ServletApiVersion },
