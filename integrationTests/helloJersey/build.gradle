@@ -3,9 +3,10 @@ apply plugin: 'org.gretty'
 apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 dependencies {
-  compile "org.glassfish.jersey.containers:jersey-container-servlet-core:$jersey_version"
+  compile "org.glassfish.jersey.containers:jersey-container-servlet:$jersey_version"
   compile "org.glassfish.jersey.inject:jersey-hk2:$jersey_version"
   compile 'javax.xml.bind:jaxb-api:2.3.1'
+  integrationTestCompile "jakarta.servlet:jakarta.servlet-api:$tomcat10_servlet_api_version"
 }
 
 war {

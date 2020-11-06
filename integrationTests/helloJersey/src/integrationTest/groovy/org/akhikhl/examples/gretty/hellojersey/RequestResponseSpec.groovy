@@ -11,6 +11,7 @@ package org.akhikhl.examples.gretty.hellojersey
 import org.akhikhl.gretty.GrettyAjaxSpec
 import static groovyx.net.http.ContentType.*
 import static groovyx.net.http.Method.*
+import static jakarta.servlet.http.HttpServletResponse.*
 
 class RequestResponseSpec extends GrettyAjaxSpec {
 
