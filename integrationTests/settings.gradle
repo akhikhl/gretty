@@ -16,7 +16,7 @@ include 'testDuplicatingResources'
 include 'testInitParameter'
 // FIXME Jetty 10 servlet container is not implemented yet (#162)
 // include 'testJettyContextConfig'
-// include 'testJettyRandomPorts'
+include 'testJettyRandomPorts'
 // include 'testJettyServerConfig'
 include 'testTomcatContextConfig'
 include 'testTomcatRandomPorts'
