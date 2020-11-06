@@ -12,6 +12,7 @@ import org.eclipse.jetty.util.URIUtil
 import org.eclipse.jetty.util.log.Log
 import org.eclipse.jetty.util.log.Logger
 import org.eclipse.jetty.util.resource.Resource
+import org.eclipse.jetty.webapp.WebAppClassLoader
 import org.eclipse.jetty.webapp.WebAppContext
 
 /**
@@ -41,7 +42,10 @@ class JettyWebAppContext extends WebAppContext {
               webInfJarMap.put(fileName, it)
           }
       }
-      super.doStart()
+
+      WebAppClassLoader.runWithServerClassAccess {
+          super.doStart()
+      }
   }
 
   @Override
