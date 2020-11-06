@@ -4,9 +4,7 @@ include 'helloGrettyMultiproject'
 include 'helloGrettyMultiproject:subproject'
 include 'helloGrettySecure'
 include 'helloGrettyOverlay'
-// FIXME waits for Jakarta release of Jersey (#163)
-// Jersey 3.0.0-M1 still depends on javax.servlet internally
-// include 'helloJersey'
+include 'helloJersey'
 include 'extraResourceBases'
 include 'filterWebApp'
 include 'testAnnotations'
