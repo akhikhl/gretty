@@ -59,8 +59,8 @@ class ServletContainerConfig {
         addRedirectFilter(project, servletContainerRunnerConfig)
         project.configurations[servletContainerRunnerConfig].resolutionStrategy {
           force "jakarta.servlet:jakarta.servlet-api:${project.ext.jetty11ServletApiVersion}"
-          def jettyVversion = project.ext.jetty11Version
-          force "org.eclipse.jetty:jetty-server:$jettVersion"
+          def jettyVersion = project.ext.jetty11Version
+          force "org.eclipse.jetty:jetty-server:$jettyVersion"
           force "org.eclipse.jetty:jetty-servlet:$jettyVersion"
           force "org.eclipse.jetty:jetty-webapp:$jettyVersion"
           force "org.eclipse.jetty:jetty-security:$jettyVersion"
