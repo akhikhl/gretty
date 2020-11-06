@@ -11,7 +11,7 @@ package org.akhikhl.gretty;
 import org.eclipse.jetty.security.ServerAuthException;
 import org.eclipse.jetty.security.authentication.DeferredAuthentication;
 import org.eclipse.jetty.security.authentication.SessionAuthentication;
-import org.eclipse.jetty.security.authentication.SpnegoAuthenticator;
+import org.eclipse.jetty.security.authentication.ConfigurableSpnegoAuthenticator;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.UserIdentity;
@@ -19,10 +19,10 @@ import org.eclipse.jetty.util.MultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import static org.eclipse.jetty.security.authentication.FormAuthenticator.*;
 
@@ -30,7 +30,7 @@ import static org.eclipse.jetty.security.authentication.FormAuthenticator.*;
  *
  * @author akhikhl
  */
-public class SSOSpnegoAuthenticator extends SpnegoAuthenticator {
+public class SSOSpnegoAuthenticator extends ConfigurableSpnegoAuthenticator {
 
     private static final Logger LOG = LoggerFactory.getLogger(SSOSpnegoAuthenticator.class);
 

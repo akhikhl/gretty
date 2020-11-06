@@ -18,7 +18,7 @@ import org.eclipse.jetty.server.*
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.server.session.SessionHandler
 import org.eclipse.jetty.util.component.LifeCycle
-import org.eclipse.jetty.util.resource.FileResource
+import org.eclipse.jetty.util.resource.PathResource
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.util.resource.ResourceCollection
 import org.eclipse.jetty.util.ssl.SslContextFactory
@@ -105,7 +105,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
       HttpConfiguration https_config = new HttpConfiguration(http_config)
       https_config.addCustomizer(new SecureRequestCustomizer())
       httpsConn = new ServerConnector(server,
-        new SslConnectionFactory(new SslContextFactory(), 'http/1.1'),
+        new SslConnectionFactory(new SslContextFactory.Server(), 'http/1.1'),
         new HttpConnectionFactory(https_config))
     }
 
@@ -127,7 +127,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
             URL url = getClass().getResource(resString)
             if(url == null)
               throw new Exception("Could not resource referenced in sslKeyStorePath: '${resString}'")
-            sslContextFactory.setKeyStoreResource(new FileResource(url))
+            sslContextFactory.setKeyStoreResource(new PathResource(url))
           }
           else
             sslContextFactory.setKeyStorePath(params.sslKeyStorePath)
@@ -142,7 +142,7 @@ class JettyConfigurerImpl implements JettyConfigurer {
             URL url = getClass().getResource(resString)
             if(url == null)
               throw new Exception("Could not resource referenced in sslTrustStorePath: '${resString}'")
-            sslContextFactory.setTrustStoreResource(new FileResource(url))
+            sslContextFactory.setTrustStoreResource(new PathResource(url))
           }
           else
             sslContextFactory.setTrustStorePath(params.sslTrustStorePath)
