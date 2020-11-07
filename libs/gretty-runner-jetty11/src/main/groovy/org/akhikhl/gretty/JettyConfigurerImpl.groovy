@@ -209,21 +209,15 @@ class JettyConfigurerImpl implements JettyConfigurer {
     context.setInitParameter('org.eclipse.jetty.servlet.Default.useFileMappedBuffer', serverParams.productMode ? 'true' : 'false')
     context.setAttribute(MetaInfConfiguration.CONTAINER_JAR_PATTERN,
         '.*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$');
-    FilteringClassLoader classLoader = new FilteringClassLoader(context)
-    classLoader.addServerClass('ch.qos.logback.')
-    classLoader.addServerClass('org.slf4j.')
-    classLoader.addServerClass('org.codehaus.groovy.')
-    classLoader.addServerClass('groovy.')
-    classLoader.addServerClass('groovyx.')
-    classLoader.addServerClass('groovyjarjarantlr.')
-    classLoader.addServerClass('groovyjarjarasm.')
-    classLoader.addServerClass('groovyjarjarcommonscli.')
-    context.classLoader = classLoader
-    context.addEventListener(new LifeCycle.Listener() {
-      public void lifeCycleStopped(LifeCycle event) {
-        context.classLoader = null
-      }
+
+    context.addServerClassMatcher(new ClassMatcher().tap {
+      include'ch.qos.logback.'
+      include 'org.slf4j.'
+      include 'org.codehaus.groovy.'
+      include 'groovy.'
+      include 'groovyx.'
     })
+
     return context
   }
 
