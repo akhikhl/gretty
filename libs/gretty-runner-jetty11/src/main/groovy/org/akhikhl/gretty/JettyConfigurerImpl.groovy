@@ -218,6 +218,16 @@ class JettyConfigurerImpl implements JettyConfigurer {
       include 'groovyx.'
     })
 
+    context.addSystemClassMatcher(new ClassMatcher().tap {
+      // I do not know if the servlet classes are system classes in the truest sense.
+      // However, those must be loaded by the app class loader. Otherwise the check in
+      // org.eclipse.jetty.servlet.ServletHolder#checkServletType does not succeed, because
+      // class HttpServlet (loaded from the web app class loader) is not assignable to class
+      // HttpServlet (loaded from the app class loader). Hence the error message 'YourServlet
+      // is not a Jakarta servlet'.
+      include 'jakarta.'
+    })
+
     return context
   }
 
