@@ -36,7 +36,6 @@ class JettyConfigurerImpl implements JettyConfigurer {
   private static final Logger log = LoggerFactory.getLogger(JettyConfigurerImpl)
 
   private SSOAuthenticatorFactory ssoAuthenticatorFactory
-  private SessionHandler sharedSessionHandler
 
   @Override
   def addLifeCycleListener(lifecycle, listener) {
@@ -175,12 +174,9 @@ class JettyConfigurerImpl implements JettyConfigurer {
   void configureSessionManager(server, context, Map serverParams, Map webappParams) {
     SessionHandler sessionHandler
     if(serverParams.singleSignOn) {
-      sessionHandler = sharedSessionHandler
-      if(sessionHandler == null) {
-        sessionHandler = sharedSessionHandler = new SessionHandler()
-        sessionHandler.setMaxInactiveInterval(60 * 30) // 30 minutes
-        sessionHandler.getSessionCookieConfig().setPath('/')
-      }
+      sessionHandler = new SingleSignOnSessionHandler()
+      sessionHandler.setMaxInactiveInterval(60 * 30) // 30 minutes
+      sessionHandler.getSessionCookieConfig().setPath('/')
     } else {
       sessionHandler = new SessionHandler()
       sessionHandler.setMaxInactiveInterval(60 * 30) // 30 minutes
