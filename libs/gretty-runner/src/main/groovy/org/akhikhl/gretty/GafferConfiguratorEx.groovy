@@ -24,6 +24,8 @@ import org.codehaus.groovy.control.CompilerConfiguration
  *
  * @author akhikhl
  */
+// FIXME #162 recent logback versions do not include GafferConfigurator
+// see also: remark in Runner.groovy, the only call site
 @CompileStatic(TypeCheckingMode.SKIP)
 class GafferConfiguratorEx extends GafferConfigurator {
 

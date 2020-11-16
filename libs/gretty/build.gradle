@@ -11,7 +11,7 @@ dependencies {
     exclude group: 'ch.qos.logback', module: 'logback-classic'
   }
   compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
-  compile "org.eclipse.jetty:jetty-util:$jetty10_version"
+  compile "org.eclipse.jetty:jetty-util:$jetty11_version"
   compile gradleApi()
 }
 

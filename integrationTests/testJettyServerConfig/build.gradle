@@ -10,5 +10,4 @@ dependencies {
 }
 
 defineIntegrationTest()
-// FIXME (#162)
-// testAll.dependsOn defineIntegrationTestAllContainers([''jetty10'])
+testAll.dependsOn defineIntegrationTestAllContainers(['jetty11'])

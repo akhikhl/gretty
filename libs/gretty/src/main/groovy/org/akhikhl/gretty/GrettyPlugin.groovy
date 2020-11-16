@@ -768,10 +768,10 @@ class GrettyPlugin implements Plugin<Project> {
 
     project.ext {
       grettyVersion = Externalized.getString('grettyVersion')
-      if(!has('jetty10Version'))
-        jetty10Version = Externalized.getString('jetty10Version')
-      if(!has('jetty10ServletApiVersion'))
-        jetty10ServletApiVersion = Externalized.getString('jetty10ServletApiVersion')
+      if(!has('jetty11Version'))
+        jetty11Version = Externalized.getString('jetty11Version')
+      if(!has('jetty11ServletApiVersion'))
+        jetty11ServletApiVersion = Externalized.getString('jetty11ServletApiVersion')
       if(!has('tomcat10Version'))
         tomcat10Version = Externalized.getString('tomcat10Version')
       if(!has('tomcat10ServletApiVersion'))

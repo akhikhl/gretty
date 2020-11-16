@@ -1,0 +1,32 @@
+<!--
+  FIXME #162
+  This is a cheap replacement for the Gaffer configuration.
+  It should never ship.
+  Either Logback integrates the Gaffer configuration again,
+  or we find another solution to programmatic configuration
+  of Logback.
+-->
+<configuration>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="org.apache.catalina" level="WARN" />
+  <logger name="org.apache.coyote" level="WARN" />
+  <logger name="org.apache.jasper" level="WARN" />
+  <logger name="org.apache.tomcat" level="WARN" />
+  <logger name="org.eclipse.jetty" level="WARN" />
+
+  <logger name="org.eclipse.jetty.annotations.AnnotationConfiguration" level="ERROR" />
+  <logger name="org.eclipse.jetty.annotations.AnnotationParser" level="ERROR" />
+  <logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR" />
+
+  <logger name="org.akhikhl.gretty" level="DEBUG" />
+
+  <root level="debug">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

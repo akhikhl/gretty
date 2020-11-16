@@ -49,18 +49,18 @@ class ServletContainerConfig {
     String grettyVersion = Externalized.getString('grettyVersion')
     def runnerGroup = "org.gretty"
     def configs = [:]
-    configs['jetty10'] = [
+    configs['jetty11'] = [
       servletContainerType: 'jetty',
-      servletContainerVersion: { project -> project.ext.jetty10Version },
-      servletContainerDescription: { project -> "Jetty ${project.ext.jetty10Version}" },
-      servletContainerRunnerConfig: 'grettyRunnerJetty10',
+      servletContainerVersion: { project -> project.ext.jetty11Version },
+      servletContainerDescription: { project -> "Jetty ${project.ext.jetty11Version}" },
+      servletContainerRunnerConfig: 'grettyRunnerJetty11',
       servletContainerRunnerDependencies: { project ->
-        project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty10:$grettyVersion"
+        project.dependencies.add servletContainerRunnerConfig, "${runnerGroup}:gretty-runner-jetty11:$grettyVersion"
         addRedirectFilter(project, servletContainerRunnerConfig)
         project.configurations[servletContainerRunnerConfig].resolutionStrategy {
-          force "jakarta.servlet:jakarta.servlet-api:${project.ext.jetty10ServletApiVersion}"
-          def jettyVversion = project.ext.jetty10Version
-          force "org.eclipse.jetty:jetty-server:$jettVersion"
+          force "jakarta.servlet:jakarta.servlet-api:${project.ext.jetty11ServletApiVersion}"
+          def jettyVersion = project.ext.jetty11Version
+          force "org.eclipse.jetty:jetty-server:$jettyVersion"
           force "org.eclipse.jetty:jetty-servlet:$jettyVersion"
           force "org.eclipse.jetty:jetty-webapp:$jettyVersion"
           force "org.eclipse.jetty:jetty-security:$jettyVersion"
@@ -71,12 +71,16 @@ class ServletContainerConfig {
           def asm_version = project.ext.asmVersion
           force "org.ow2.asm:asm:$asm_version"
           force "org.ow2.asm:asm-commons:$asm_version"
+
+          // FIXME #162 make Tomcat and Jetty agree on a common version of logback again?
+          force 'ch.qos.logback:logback-classic:1.3.0-alpha5'
+          force 'org.slf4j:slf4j-api:2.0.0-alpha1'
         }
       },
-      servletApiVersion: { project -> project.ext.jetty10ServletApiVersion },
+      servletApiVersion: { project -> project.ext.jetty11ServletApiVersion },
       servletApiDependencies: { project ->
         project.dependencies {
-          grettyProvidedCompile "jakarta.servlet:jakarta.servlet-api:${project.ext.jetty10ServletApiVersion}"
+          grettyProvidedCompile "jakarta.servlet:jakarta.servlet-api:${project.ext.jetty11ServletApiVersion}"
           grettyProvidedCompile 'jakarta.websocket:jakarta.websocket-api:2.0.0-M1'
         }
       }
@@ -135,7 +139,7 @@ class ServletContainerConfig {
     }
     if(compatibleConfigEntry)
       return compatibleConfigEntry.key
-    String defaultJettyServletContainer = 'jetty10'
+    String defaultJettyServletContainer = 'jetty11'
     log.warn 'Cannot find jetty container with compatible servlet-api to {}, defaulting to {}', servletContainer, defaultJettyServletContainer
     defaultJettyServletContainer
   }
