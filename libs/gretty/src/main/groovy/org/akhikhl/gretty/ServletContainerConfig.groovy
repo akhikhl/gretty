@@ -115,7 +115,7 @@ class ServletContainerConfig {
   }
 
   static getConfig(servletContainer) {
-    servletContainer = servletContainer ?: 'tomcat10'
+    servletContainer = servletContainer ?: 'jetty11'
     def result = configs[servletContainer.toString()]
     if(!result)
       throw new Exception("Unsupported servlet container: $servletContainer")
