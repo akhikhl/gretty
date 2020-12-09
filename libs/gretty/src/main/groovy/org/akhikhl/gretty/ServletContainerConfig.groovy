@@ -81,7 +81,7 @@ class ServletContainerConfig {
       servletApiDependencies: { project ->
         project.dependencies {
           grettyProvidedCompile "jakarta.servlet:jakarta.servlet-api:${project.ext.jetty11ServletApiVersion}"
-          grettyProvidedCompile 'jakarta.websocket:jakarta.websocket-api:2.0.0-M1'
+          grettyProvidedCompile 'jakarta.websocket:jakarta.websocket-api:2.0.0'
         }
       }
     ]
@@ -107,7 +107,7 @@ class ServletContainerConfig {
       servletApiDependencies: { project ->
         project.dependencies {
           grettyProvidedCompile "jakarta.servlet:jakarta.servlet-api:${project.ext.tomcat10ServletApiVersion}"
-          grettyProvidedCompile 'jakarta.websocket:jakarta.websocket-api:2.0.0-M1'
+          grettyProvidedCompile 'jakarta.websocket:jakarta.websocket-api:2.0.0'
         }
       }
     ]
