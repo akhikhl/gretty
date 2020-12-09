@@ -7,6 +7,7 @@
  * See the file "CONTRIBUTORS" for complete list of contributors.
  */
 package org.akhikhl.gretty
+
 import org.akhikhl.gretty.scanner.BaseScannerManager
 import org.eclipse.jetty.util.Scanner
 import org.eclipse.jetty.util.Scanner.BulkListener
@@ -29,17 +30,21 @@ final class JettyScannerManager extends BaseScannerManager implements ScannerMan
     scanner.scanInterval = sconfig.scanInterval
 
     scanner.addListener(new BulkListener() {
-      void filesChanged(List<String> filenames) {
+      @Override
+      void filesChanged(Set<String> filenames) {
         scanFilesChanged(filenames)
       }
     });
 
     scanner.reportDirs = true
-    scanner.recursive = true
+    scanner.scanDepth = Scanner.MAX_SCAN_DEPTH
 
     scanner.addListener(new ScanCycleListener() {
+      @Override
       void scanEnded(int cycle) {
       }
+
+      @Override
       void scanStarted(int cycle) {
         sconfig.onScan*.call(cycle)
       }
