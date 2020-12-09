@@ -67,7 +67,7 @@ abstract class BaseScannerManager implements ScannerManager {
             Set<File> scanDirs = new LinkedHashSet<>()
             def proj = project.project(webapp.projectPath)
             collectScanDirs(scanDirs, webapp.scanDependencies, proj)
-            [proj, scanDirs]
+            [proj, scanDirs.findAll { it.exists() }]
         }
     }
 
