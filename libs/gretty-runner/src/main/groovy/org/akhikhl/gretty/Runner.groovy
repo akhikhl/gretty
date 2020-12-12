@@ -83,6 +83,8 @@ final class Runner {
     // FIXME #162 logback has temporarily suspended GafferConfigurator.
     // We do not know if and when it will come back, see news of 2019-10-11:
     // http://logback.qos.ch/news.html
+    // We've opened an issue in their bug tracker about enabling it again:
+    // https://jira.qos.ch/projects/LOGBACK/issues/LOGBACK-1541
     // new GafferConfiguratorEx(logCtx).run(binding, logbackConfigText)
     // Instead we use a fixed configuration file, which does not respect all the different
     // logging toggles in Gretty:
