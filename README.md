@@ -6,7 +6,7 @@
 [![Snapshot](https://img.shields.io/badge/current-3.0.4--SNAPSHOT-47b31f.svg)](https://github.com/gretty-gradle-plugin/gretty/tree/master)
 [![License](https://img.shields.io/badge/license-MIT-47b31f.svg)](#copyright-and-license)
 
-Gretty is a feature-rich gradle plugin for running web-apps on embedded servlet containers.
+Gretty is a feature-rich Gradle plugin for running web-apps on embedded servlet containers.
 It supports Jetty version 11, Tomcat version 10, multiple web-apps and many more.
 It wraps servlet container functions as convenient Gradle tasks and configuration DSL.
 
@@ -81,7 +81,7 @@ May 21, 2018, Gretty(.org) 2.2.0 is out and immediately available at [Gradle Plu
 * Bumped versions of asm (6.1.1, was 6.0), Groovy (2.4.15, was 2.4.13) and Spring (4.3.16, was 4.3.9) (thanks Henrik Brautaset Aronsen).
 
 * Fixed incompatibility with java-library plugin (thanks Ollie Freeman).
- 
+
 * Dev: various build and test improvements.
 
 See also: [complete list of changes](changes.md) for more information.
@@ -92,10 +92,11 @@ You can learn about all Gretty features in [online documentation](https://gretty
 
 #### System requirements
 
-Gretty requires JDK8 or JDK11 and Gradle 5.0 or newer.
+Gretty requires JDK11+ and Gradle 6.0 or newer.
 
 - Since version 2.0.0 Gretty no longer supports JDK6.
 - Since version 3.0.0 Gretty no longer supports JDK7, Gradle <5.0, Tomcat 7.x or Tomcat 8.0.x.
+- Since version 4.0.0 Gretty supports only JDK 11+, Gradle 6.0+, Tomcat 10.x and Jetty 11.x
 
 #### Availability
 
@@ -106,6 +107,6 @@ Old releases of Gretty up to and including version 2.0.0 are available at [Bintr
 
 #### Copyright and License
 
-Copyright 2013-2018 (c) Andrey Hihlovskiy, Timur Shakurov and [contributors](CONTRIBUTORS).
+Copyright 2013-2020 (c) Andrey Hihlovskiy, Timur Shakurov and [contributors](CONTRIBUTORS).
 
 All versions, present and past, of Gretty are licensed under [MIT license](LICENSE).
