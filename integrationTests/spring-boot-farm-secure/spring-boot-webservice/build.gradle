@@ -2,7 +2,7 @@ apply plugin: 'org.gretty'
 apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 dependencies {
-  compile libs.groovy_all
+  implementation libs.groovy_all
 }
 
 gretty {

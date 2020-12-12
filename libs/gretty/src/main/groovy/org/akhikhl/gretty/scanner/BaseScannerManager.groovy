@@ -87,7 +87,7 @@ abstract class BaseScannerManager implements ScannerManager {
         // collect project dependencies of _all_ configurations that the build author _might_ have used
         // and that are relevant at runtime
         List<Project> dependencyProjects =
-                ProjectUtils.getDependencyProjects(p, ['compile', 'implementation', 'runtime', 'runtimeOnly'])
+                ProjectUtils.getDependencyProjects(p, ['implementation', 'runtimeOnly'])
         for(Project project: dependencyProjects) {
             // adding sourceSets of dependecy project
             scanDirs.addAll(project.sourceSets.main.allSource.srcDirs)
@@ -172,7 +172,7 @@ abstract class BaseScannerManager implements ScannerManager {
                     for(WebAppConfig wconfig in dependantWebAppProjects) {
                         if(wconfig.recompileOnSourceChange) {
                             log.info 'changed file {} is dependency of {}, the latter will be recompiled', f, wconfig.projectPath
-                            reloadProject(wconfig.projectPath, 'compile')
+                            reloadProject(wconfig.projectPath, 'implementation')
                             if(managedClassReload)
                                 webAppConfigsToRestart.add(wconfig)
                             // Otherwise there's no need to restart. When compilation finishes, scanner will wake up again and then restart.
@@ -190,7 +190,7 @@ abstract class BaseScannerManager implements ScannerManager {
                 def proj = project.project(wconfig.projectPath)
                 if(proj.sourceSets.main.allSource.srcDirs.find { f.startsWith(it.absolutePath) }) {
                     if(wconfig.recompileOnSourceChange) {
-                        reloadProject(wconfig.projectPath, 'compile')
+                        reloadProject(wconfig.projectPath, 'implementation')
                         // restart is done when reacting to class change, not source change
                     }
                 } else if (proj.sourceSets.main.output.files.find { f.startsWith(it.absolutePath) }) {
@@ -210,13 +210,13 @@ abstract class BaseScannerManager implements ScannerManager {
                 } else if (isWebConfigFile(new File(f))) {
                     if(wconfig.reloadOnConfigChange) {
                         log.info 'file {} is configuration file, servlet-container will be restarted', f
-                        reloadProject(wconfig.projectPath, 'compile')
+                        reloadProject(wconfig.projectPath, 'implementation')
                         webAppConfigsToRestart.add(wconfig)
                     }
                 } else if(f.startsWith(new File(ProjectUtils.getWebAppDir(proj), 'WEB-INF/lib').absolutePath)) {
                     if(wconfig.reloadOnLibChange) {
                         log.info 'file {} is in WEB-INF/lib, servlet-container will be restarted', f
-                        reloadProject(wconfig.projectPath, 'compile')
+                        reloadProject(wconfig.projectPath, 'implementation')
                         webAppConfigsToRestart.add(wconfig)
                     }
                 } else if(ProjectReloadUtils.satisfiesOneOfReloadSpecs(f, fastReloadMap[proj.path])) {
@@ -224,7 +224,7 @@ abstract class BaseScannerManager implements ScannerManager {
                     reloadProject(wconfig.projectPath, 'fastReload')
                 } else {
                     log.info 'file {} is not in fastReload directories, switching to fullReload', f
-                    reloadProject(wconfig.projectPath, 'compile')
+                    reloadProject(wconfig.projectPath, 'implementation')
                     webAppConfigsToRestart.add(wconfig)
                 }
             }
@@ -232,7 +232,7 @@ abstract class BaseScannerManager implements ScannerManager {
 
         webAppProjectReloads.each { String projectPath, Set reloadModes ->
             Project proj = project.project(projectPath)
-            if(reloadModes.contains('compile')) {
+            if(reloadModes.contains('implementation')) {
                 log.info 'Recompiling {}', (projectPath == ':' ? proj.name : projectPath)
                 WebAppConfig wconfig = webapps.find { it.projectPath == projectPath }
                 ProjectConnection connection = GradleConnector.newConnector().useInstallation(proj.gradle.gradleHomeDir).forProjectDirectory(proj.projectDir).connect()

@@ -1,6 +1,6 @@
 apply from: rootProject.file('common.gradle')
 
 dependencies {
-	compile "org.codehaus.groovy:groovy:$groovy_version"
-	compile "org.slf4j:slf4j-api:$slf4j_version"
+	api "org.codehaus.groovy:groovy:$groovy_version"
+	api "org.slf4j:slf4j-api:$slf4j_version"
 }

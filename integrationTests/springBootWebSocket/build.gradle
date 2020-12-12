@@ -2,8 +2,8 @@ apply plugin: 'org.gretty'
 apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 dependencies {
-  compile 'org.webjars:sockjs-client:0.3.4-1'
-  compile 'org.webjars:stomp-websocket:2.3.3'
+  implementation 'org.webjars:sockjs-client:0.3.4-1'
+  implementation 'org.webjars:stomp-websocket:2.3.3'
 }
 
 gretty {

@@ -1,5 +1,5 @@
 apply from: rootProject.file('common.gradle')
 
 dependencies {
-  compile project(':libs:gretty-runner')
+  api project(':libs:gretty-runner')
 }

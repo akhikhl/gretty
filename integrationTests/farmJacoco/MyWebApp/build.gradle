@@ -4,8 +4,8 @@ apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 apply plugin: 'jacoco'
 
 dependencies {
-  compile 'org.webjars:bootstrap:3.2.0'
-  compile 'org.webjars:jquery:2.1.1'
+  implementation 'org.webjars:bootstrap:3.2.0'
+  implementation 'org.webjars:jquery:2.1.1'
 }
 
 jacoco {

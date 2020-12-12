@@ -1,7 +1,7 @@
 apply from: rootProject.file('common.gradle')
 
 dependencies {
-  compile project(':libs:gretty-core')
+  api project(':libs:gretty-core')
 }
 
 jar {

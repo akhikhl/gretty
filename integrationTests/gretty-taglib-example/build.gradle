@@ -3,7 +3,7 @@ apply plugin: 'org.gretty'
 apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 dependencies {
-  compile 'javax.servlet:jstl:1.2'
+  implementation 'javax.servlet:jstl:1.2'
 }
 
 gretty {

@@ -302,7 +302,7 @@ class GrettyPlugin implements Plugin<Project> {
 
         project.ext.finalArchivePath = archiveTask.archivePath
 
-        archiveTask.archiveName = 'partial.' + (project.tasks.findByName('war') ? 'war' : 'jar')
+        archiveTask.archiveFileName = 'partial.' + (project.tasks.findByName('war') ? 'war' : 'jar')
 
         // 'explodeWebApps' task is only activated by 'overlayArchive' task
         project.task('explodeWebApps', group: 'gretty') {

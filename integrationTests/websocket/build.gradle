@@ -3,8 +3,8 @@ apply plugin: 'org.gretty'
 apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 dependencies {
-  compile 'org.webjars:jquery:2.1.1'
-  compile 'org.webjars:sockjs-client:0.3.4-1'
+  implementation 'org.webjars:jquery:2.1.1'
+  implementation 'org.webjars:sockjs-client:0.3.4-1'
 }
 
 defineIntegrationTest()

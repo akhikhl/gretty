@@ -3,7 +3,7 @@ apply plugin: 'org.gretty'
 apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 dependencies {
-	compile 'io.reactivex:rxjava:1.1.5'
+	implementation 'io.reactivex:rxjava:1.1.5'
 }
 
 gretty {

@@ -1,6 +1,7 @@
 // include this file in subprojects:
 // apply from: rootProject.file('common.gradle')
 
+apply plugin: 'java-library'
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
@@ -19,7 +20,7 @@ version = rootProject.version
 
 configurations {
   providedCompile
-  compile.extendsFrom providedCompile
+  api.extendsFrom providedCompile
 }
 
 compileGroovy {
@@ -29,8 +30,8 @@ compileGroovy {
 afterEvaluate {
 
   dependencies {
-    testCompile libs.groovy_all
-    testCompile libs.spock
+    testImplementation libs.groovy_all
+    testImplementation libs.spock
   }
 
   sourceCompatibility = JavaVersion.VERSION_11
@@ -45,6 +46,7 @@ afterEvaluate {
     dependsOn javadoc
     classifier = 'javadoc'
     from javadoc.destinationDir
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     if(tasks.findByName('groovydoc')) {
       dependsOn groovydoc
       from groovydoc.destinationDir

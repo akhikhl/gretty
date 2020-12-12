@@ -30,23 +30,23 @@ class IntegrationTestPlugin extends BasePlugin {
   protected void configureDependencies(Project project) {
     super.configureDependencies(project)
     project.dependencies {
-      integrationTestCompile "org.codehaus.groovy:groovy:${project.groovy_version}"
-      integrationTestCompile "org.codehaus.groovy:groovy-dateutil:${project.groovy_version}"
-      integrationTestCompile "org.codehaus.groovy:groovy-groovysh:${project.groovy_version}"
-      integrationTestCompile "org.codehaus.groovy:groovy-json:${project.groovy_version}"
-      integrationTestCompile "org.codehaus.groovy:groovy-nio:${project.groovy_version}"
-      integrationTestCompile "org.codehaus.groovy:groovy-macro:${project.groovy_version}"
-      integrationTestCompile "org.codehaus.groovy:groovy-templates:${project.groovy_version}"
-      integrationTestCompile "org.codehaus.groovy:groovy-xml:${project.groovy_version}"
-      integrationTestCompile project.dependencies.create("org.spockframework:spock-core:${project.spock_version}") {
+      integrationTestImplementation "org.codehaus.groovy:groovy:${project.groovy_version}"
+      integrationTestImplementation "org.codehaus.groovy:groovy-dateutil:${project.groovy_version}"
+      integrationTestImplementation "org.codehaus.groovy:groovy-groovysh:${project.groovy_version}"
+      integrationTestImplementation "org.codehaus.groovy:groovy-json:${project.groovy_version}"
+      integrationTestImplementation "org.codehaus.groovy:groovy-nio:${project.groovy_version}"
+      integrationTestImplementation "org.codehaus.groovy:groovy-macro:${project.groovy_version}"
+      integrationTestImplementation "org.codehaus.groovy:groovy-templates:${project.groovy_version}"
+      integrationTestImplementation "org.codehaus.groovy:groovy-xml:${project.groovy_version}"
+      integrationTestImplementation project.dependencies.create("org.spockframework:spock-core:${project.spock_version}") {
         exclude module: "groovy-all"
       }
-      integrationTestCompile project.dependencies.create("org.gebish:geb-spock:${project.gebVersion}") {
+      integrationTestImplementation project.dependencies.create("org.gebish:geb-spock:${project.gebVersion}") {
         exclude module: "groovy-all"
       }
-      integrationTestCompile "org.seleniumhq.selenium:selenium-support:${project.seleniumVersion}"
-      integrationTestCompile "org.seleniumhq.selenium:selenium-firefox-driver:${project.seleniumVersion}"
-      integrationTestCompile "org.gretty:gretty-spock:${project.version}"
+      integrationTestImplementation "org.seleniumhq.selenium:selenium-support:${project.seleniumVersion}"
+      integrationTestImplementation "org.seleniumhq.selenium:selenium-firefox-driver:${project.seleniumVersion}"
+      integrationTestImplementation "org.gretty:gretty-spock:${project.version}"
     }
   }
 

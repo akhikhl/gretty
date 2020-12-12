@@ -3,10 +3,10 @@ apply plugin: 'groovy'
 import org.apache.tools.ant.filters.*
 
 dependencies {
-  compile gradleApi()
-  compile "commons-configuration:commons-configuration:$commons_configuration_version"
-  compile "de.undercouch:gradle-download-task:$gradle_download_task_version"
-  compile "org.gretty:gretty:$version"
+  implementation gradleApi()
+  implementation "commons-configuration:commons-configuration:$commons_configuration_version"
+  implementation "de.undercouch:gradle-download-task:$gradle_download_task_version"
+  implementation "org.gretty:gretty:$version"
 }
 
 def projectProps = [

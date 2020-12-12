@@ -3,7 +3,7 @@ apply plugin: 'org.gretty'
 apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 dependencies {
-  compile project(':webfragment')
+  implementation project(':webfragment')
 }
 
 defineIntegrationTest()

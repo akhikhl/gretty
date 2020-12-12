@@ -5,14 +5,14 @@ plugins {
 apply from: rootProject.file('common.gradle')
 
 dependencies {
-  compile project(':libs:gretty-core'), {
+  implementation project(':libs:gretty-core'), {
     // gradle API provides it's own versions of groovy-all and logback.
     exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     exclude group: 'ch.qos.logback', module: 'logback-classic'
   }
-  compile "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
-  compile "org.eclipse.jetty:jetty-util:$jetty11_version"
-  compile gradleApi()
+  implementation "org.springframework.boot:spring-boot-loader-tools:${springBootVersion}"
+  implementation "org.eclipse.jetty:jetty-util:$jetty11_version"
+  implementation gradleApi()
 }
 
 pluginBundle {

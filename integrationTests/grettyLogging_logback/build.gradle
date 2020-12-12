@@ -3,7 +3,7 @@ apply plugin: 'org.gretty'
 apply plugin: 'org.gretty.internal.integrationTests.IntegrationTestPlugin'
 
 dependencies {
-  compile 'ch.qos.logback:logback-classic:1.1.2'
+  implementation 'ch.qos.logback:logback-classic:1.1.2'
 }
 
 defineIntegrationTest()
