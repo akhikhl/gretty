@@ -49,13 +49,5 @@ deploy:
     on:
       repo: gretty-gradle-plugin/gretty
       branch: master
-      jdk: openjdk8
-      condition: $TEST_ALL_CONTAINERS =~ "jetty9.4'"
-  - provider: script
-    skip_cleanup: true
-    script: ./gradlew artifactoryPublish -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY} -PbintrayRepo=${BINTRAY_REPO} -PbintrayPackage=${BINTRAY_PACKAGE}
-    on:
-      repo: gretty-gradle-plugin/gretty
-      branch: gretty-2.x
-      jdk: openjdk8
-      condition: $TEST_ALL_CONTAINERS =~ "jetty9'"
+      jdk: openjdk11
+      condition: "$GRADLE_VERSION = 5.6.4"
