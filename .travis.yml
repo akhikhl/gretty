@@ -1,5 +1,8 @@
+os: linux
+dist: xenial
+
 language: groovy
-matrix:
+jobs:
   fast_finish: true
   include:
   - jdk: openjdk11
@@ -44,7 +47,6 @@ env:
 # FIXME revisit deployment options: Jetty 9.x fell out-of-scope (#165)
 deploy:
   - provider: script
-    skip_cleanup: true
     script: ./gradlew artifactoryPublish -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY} -PbintrayRepo=${BINTRAY_REPO} -PbintrayPackage=${BINTRAY_PACKAGE}
     on:
       repo: gretty-gradle-plugin/gretty
