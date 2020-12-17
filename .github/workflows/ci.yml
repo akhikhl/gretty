@@ -46,7 +46,7 @@ jobs:
           set +e
 
       - name: Publish to Bintray
-        if: ${{ matrix.java == 11 }}
+        if: ${{ matrix.java == 11 && github.ref == 'refs/heads/master' && github.event_name == 'push' }}
         env:
           BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
