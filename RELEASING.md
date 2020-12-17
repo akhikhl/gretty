@@ -3,7 +3,7 @@
 - Set release version, drop `-SNAPSHOT`.
 - Update all required doc files - see a previous release tag for an example of what should be updated.
 - Final release commit should be signed with `-S -s`.
-- Check build passes on Travis.
+- Check build passes on GitHub Actions.
 - Tag release using `git tag -a -s -m "release ?.?.?" v?.?.?`.
 - Checkout tag.
 - Set JDK path to a JDK8 installation.
