@@ -45,6 +45,9 @@ ext {
   if (!has('bintrayUser'))
     bintrayUser = ''
 
+  if (!has('bintrayUserOrg'))
+    bintrayUserOrg = ''
+
   if (!has('bintrayKey'))
     bintrayKey = ''
 

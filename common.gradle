@@ -132,6 +132,7 @@ afterEvaluate {
     configurations = ['archives']
     pkg {
       repo = thisProject.bintrayRepo
+      userOrg = thisProject.bintrayUserOrg
       name = thisProject.bintrayPackage
       desc = thisProject.description
       licenses = [ thisProject.license ]
@@ -151,7 +152,7 @@ afterEvaluate {
 
   tasks.bintrayUpload.dependsOn assemble
 
-  if (!bintrayDryRun) {
+  if (!bintrayDryRun && gpgPassphrase) {
     tasks.bintrayUpload.finalizedBy rootProject.tasks.bintraySign
     rootProject.tasks.bintraySign.onlyIf { !tasks.bintrayUpload.getState().getFailure() }
   }
