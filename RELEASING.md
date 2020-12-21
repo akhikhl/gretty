@@ -18,6 +18,18 @@
  export GPG_PASSPHRASE="<secret>"
 ```
 
+If releasing to a shared/org repository in Bintray, instead set:
+
+```
+ export BINTRAY_USER="<your-bintray-username>"
+ export BINTRAY_KEY="<secret>"
+ export BINTRAY_USER_ORG="gretty-gradle-plugin"
+ export BINTRAY_REPO="gretty"
+ export BINTRAY_PACKAGE="org.gretty"
+```
+
+... i.e. don't set `GPG_PASSPHRASE` (Bintray signs it with their key) and instead set `BINTRAY_USER_ORG`.
+
 - Check `~/.gradle/gradle.properties` for credentials for plugins.gradle.org:
 
 ```
@@ -28,7 +40,8 @@ gradle.publish.secret=<secret>
 - Push to bintray (again I lead with a space):
 
 ```
- ./gradlew bintrayUpload -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY} -PbintrayRepo=${BINTRAY_REPO} -PbintrayPackage=${BINTRAY_PACKAGE} -PgpgPassphrase="${GPG_PASSPHRASE}"
+ ./gradlew bintrayUpload -PbintrayUser=${BINTRAY_USER} -PbintrayKey=${BINTRAY_KEY} -PbintrayUserOrg=${BINTRAY_USER_ORG} -PbintrayRepo=${BINTRAY_REPO} -PbintrayPackage=${BINTRAY_PACKAGE} -PgpgPassphrase="${GPG_PASSPHRASE}"
+
 ```
 
 - Publish to plugins.gradle.org:
