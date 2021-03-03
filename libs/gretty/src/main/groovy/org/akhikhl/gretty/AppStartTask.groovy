@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import org.gradle.api.tasks.Internal
 
 /**
  * Gradle task for starting jetty
@@ -17,7 +18,7 @@ import groovy.transform.TypeCheckingMode
  * @author akhikhl
  */
 @CompileStatic(TypeCheckingMode.SKIP)
-class AppStartTask extends StartBaseTask implements ServerConfigWithInputs {
+class AppStartTask extends StartBaseTask implements ServerConfigWithInputs, WebAppConfigWithInputs {
 
   @Delegate
   private ServerConfig serverConfig = new ServerConfig()
@@ -29,6 +30,7 @@ class AppStartTask extends StartBaseTask implements ServerConfigWithInputs {
     servletContainer
   }
 
+  @Internal
   protected boolean getEffectiveInplace() {
     if(webAppConfig.inplace != null)
       webAppConfig.inplace
@@ -38,6 +40,7 @@ class AppStartTask extends StartBaseTask implements ServerConfigWithInputs {
       true
   }
 
+  @Internal
   protected String getEffectiveInplaceMode() {
     if(webAppConfig.inplaceMode != null)
       webAppConfig.inplaceMode
