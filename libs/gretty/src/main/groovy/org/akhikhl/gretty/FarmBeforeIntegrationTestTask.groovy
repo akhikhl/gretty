@@ -11,6 +11,7 @@ package org.akhikhl.gretty
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.Task
+import org.gradle.api.tasks.Internal
 import org.gradle.process.JavaForkOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -84,10 +85,12 @@ class FarmBeforeIntegrationTestTask extends FarmStartTask {
     true
   }
 
+  @Internal
   String getIntegrationTestTask() {
     integrationTestTask_ ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
   }
 
+  @Internal
   boolean getIntegrationTestTaskAssigned() {
     integrationTestTaskAssigned
   }
