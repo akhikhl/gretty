@@ -11,6 +11,7 @@ package org.akhikhl.gretty
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.Project
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -45,6 +46,7 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     System.out.println 'Server stopped.'
   }
 
+  @Internal
   Iterable<Project> getIntegrationTestProjects() {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Set<Project> result = new LinkedHashSet()
@@ -53,14 +55,17 @@ class FarmAfterIntegrationTestTask extends FarmStopTask {
     result
   }
 
+  @Internal
   String getIntegrationTestTask() {
     integrationTestTask_ ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
   }
 
+  @Internal
   boolean getIntegrationTestTaskAssigned() {
     integrationTestTaskAssigned
   }
 
+  @Internal
   Iterable<Project> getWebAppProjects() {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Map wrefs = [:]

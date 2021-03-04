@@ -10,10 +10,11 @@ package org.akhikhl.gretty
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  *
  * @author akhikhl
@@ -22,6 +23,7 @@ abstract class FarmServiceTask extends DefaultTask {
 
   private static Logger log = LoggerFactory.getLogger(FarmServiceTask)
 
+  @Input @Optional
   String farmName = ''
 
   @TaskAction
@@ -45,5 +47,6 @@ abstract class FarmServiceTask extends DefaultTask {
     ServiceProtocol.createWriter(servicePort).write(command)
   }
 
+  @Input @Optional
   abstract String getCommand()
 }
