@@ -9,6 +9,9 @@
 package org.akhikhl.gretty
 
 import org.gradle.api.Project
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 
 /**
  *
@@ -16,6 +19,7 @@ import org.gradle.api.Project
  */
 class FarmStartTask extends StartBaseTask implements TaskWithServerConfig {
 
+  @Input
   String farmName = ''
 
   @Delegate
@@ -27,11 +31,14 @@ class FarmStartTask extends StartBaseTask implements TaskWithServerConfig {
   // list of projects or project paths
   protected final List integrationTestProjects = []
 
+  @Input
   boolean inplace = true
 
   // specifying default inplaceMode to override (optionally) by child applications
+  @Input @Optional
   String inplaceMode = 'soft'
 
+  @Internal
   Iterable<Project> getIntegrationTestProjects() {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Set<Project> result = new LinkedHashSet()
@@ -82,6 +89,7 @@ class FarmStartTask extends StartBaseTask implements TaskWithServerConfig {
     "gradle farmStop${farmName}"
   }
 
+  @Internal
   Iterable<WebAppConfig> getWebAppConfigsForProjects() {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Map wrefs = [:]
@@ -92,6 +100,7 @@ class FarmStartTask extends StartBaseTask implements TaskWithServerConfig {
     configurer.getWebAppConfigsForProjects(wrefs, inplace, inplaceMode)
   }
 
+  @Internal
   Iterable<Project> getWebAppProjects() {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Map wrefs = [:]
