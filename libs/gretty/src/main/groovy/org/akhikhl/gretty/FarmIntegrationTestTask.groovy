@@ -12,6 +12,8 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -24,6 +26,7 @@ class FarmIntegrationTestTask extends DefaultTask {
 
   protected static final Logger log = LoggerFactory.getLogger(FarmIntegrationTestTask)
 
+  @Input
   String farmName = ''
 
   private String integrationTestTask_
@@ -34,6 +37,7 @@ class FarmIntegrationTestTask extends DefaultTask {
   // list of projects or project paths
   protected final List integrationTestProjects = []
 
+  @Internal
   Iterable<Project> getIntegrationTestProjects() {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Set<Project> result = new LinkedHashSet()
@@ -42,14 +46,17 @@ class FarmIntegrationTestTask extends DefaultTask {
     result
   }
 
+  @Internal
   String getIntegrationTestTask() {
     integrationTestTask_ ?: new FarmConfigurer(project).getProjectFarm(farmName).integrationTestTask
   }
 
+  @Internal
   boolean getIntegrationTestTaskAssigned() {
     integrationTestTaskAssigned
   }
 
+  @Internal
   Iterable<Project> getWebAppProjects() {
     FarmConfigurer configurer = new FarmConfigurer(project)
     Map wrefs = [:]
