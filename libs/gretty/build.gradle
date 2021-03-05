@@ -38,3 +38,7 @@ pluginBundle {
     }
   }
 }
+
+validatePlugins {
+  enableStricterValidation = true
+}
