@@ -16,6 +16,15 @@ dependencies {
   implementation gradleApi()
 }
 
+gradlePlugin {
+  plugins {
+    grettyPlugin {
+      id = 'org.gretty'
+      implementationClass = 'org.akhikhl.gretty.GrettyPlugin'
+    }
+  }
+}
+
 pluginBundle {
   website = 'https://gretty-gradle-plugin.github.io/gretty-doc/'
   vcsUrl = "https://github.com/${developerId}/gretty"
