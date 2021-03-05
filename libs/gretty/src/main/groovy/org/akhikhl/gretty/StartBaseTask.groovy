@@ -15,6 +15,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.internal.TaskInternal
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.JavaForkOptions
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
@@ -28,9 +31,13 @@ import org.springframework.boot.devtools.livereload.LiveReloadServer
 @CompileStatic(TypeCheckingMode.SKIP)
 abstract class StartBaseTask extends DefaultTask {
 
+  @Internal
   boolean interactive = true
+  @Internal
   boolean debug = false
+  @Internal
   Integer debugPort
+  @Internal
   Boolean debugSuspend
 
   private JacocoHelper jacocoHelper
@@ -38,6 +45,7 @@ abstract class StartBaseTask extends DefaultTask {
   protected final List<Closure> prepareServerConfigClosures = []
   protected final List<Closure> prepareWebAppConfigClosures = []
 
+  @Internal
   Map serverStartInfo
 
   StartBaseTask() {
@@ -130,14 +138,17 @@ abstract class StartBaseTask extends DefaultTask {
     }
   }
 
+  @Internal
   protected boolean getDefaultJacocoEnabled() {
     false
   }
 
+  @Internal
   protected boolean getIntegrationTest() {
     false
   }
 
+  @Internal
   JacocoTaskExtension getJacoco() {
     jacocoHelper?.jacoco
   }
@@ -162,6 +173,7 @@ abstract class StartBaseTask extends DefaultTask {
     }
   }
 
+  @Internal
   protected final LauncherConfig getLauncherConfig() {
 
     def self = this
@@ -244,18 +256,22 @@ abstract class StartBaseTask extends DefaultTask {
     sconfig.managedClassReload
   }
 
+  @Internal
   Collection<URL> getRunnerClassPath() {
     DefaultLauncher.getRunnerClassPath(project, getStartConfig().serverConfig)
   }
 
+  @Internal
   protected abstract StartConfig getStartConfig()
 
+  @Internal
   protected abstract String getStopCommand()
 
   /**
    * key is context path, value is collection of classpath URLs
    * @return
    */
+  @Internal
   Map<String, Collection<URL> > getWebappClassPaths() {
     LauncherConfig config = getLauncherConfig()
     WebAppClassPathResolver resolver = config.getWebAppClassPathResolver()

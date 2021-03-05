@@ -12,6 +12,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -47,5 +48,6 @@ abstract class AppServiceTask extends DefaultTask {
     ServiceProtocol.createWriter(servicePort).write(command)
   }
 
+  @Internal
   abstract String getCommand()
 }
