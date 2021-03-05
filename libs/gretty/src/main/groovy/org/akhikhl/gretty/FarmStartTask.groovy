@@ -14,7 +14,7 @@ import org.gradle.api.Project
  *
  * @author akhikhl
  */
-class FarmStartTask extends StartBaseTask implements ServerConfigWithInputs {
+class FarmStartTask extends StartBaseTask implements TaskWithServerConfig {
 
   String farmName = ''
 

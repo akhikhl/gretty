@@ -18,7 +18,7 @@ import org.gradle.api.tasks.Internal
  * @author akhikhl
  */
 @CompileStatic(TypeCheckingMode.SKIP)
-class AppStartTask extends StartBaseTask implements ServerConfigWithInputs, WebAppConfigWithInputs {
+class AppStartTask extends StartBaseTask implements TaskWithServerConfig, TaskWithWebAppConfig {
 
   @Delegate
   private ServerConfig serverConfig = new ServerConfig()

@@ -8,7 +8,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 
-interface WebAppConfigWithInputs {
+interface TaskWithWebAppConfig {
 
     @Input
     @Optional

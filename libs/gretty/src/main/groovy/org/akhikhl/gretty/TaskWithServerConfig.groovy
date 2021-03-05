@@ -9,7 +9,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 
-interface ServerConfigWithInputs {
+interface TaskWithServerConfig {
     @Optional
     @Input
     List<String> getJvmArgs()
