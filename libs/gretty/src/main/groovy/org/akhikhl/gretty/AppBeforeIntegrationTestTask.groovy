@@ -10,6 +10,7 @@ package org.akhikhl.gretty
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import org.gradle.api.tasks.Internal
 import org.gradle.process.JavaForkOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -39,10 +40,12 @@ class AppBeforeIntegrationTestTask extends AppStartTask {
     true
   }
 
+  @Internal
   String getIntegrationTestTask() {
     integrationTestTask_ ?: project.gretty.integrationTestTask
   }
 
+  @Internal
   boolean getIntegrationTestTaskAssigned() {
     integrationTestTaskAssigned
   }
