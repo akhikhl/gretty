@@ -17,7 +17,7 @@ import groovy.transform.TypeCheckingMode
  * @author akhikhl
  */
 @CompileStatic(TypeCheckingMode.SKIP)
-class AppStartTask extends StartBaseTask {
+class AppStartTask extends StartBaseTask implements ServerConfigWithInputs {
 
   @Delegate
   private ServerConfig serverConfig = new ServerConfig()
