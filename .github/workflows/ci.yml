@@ -39,9 +39,9 @@ jobs:
         run: |
           set -e
           ./gradlew --no-daemon wrapper --gradle-version $GRADLE_VERSION --distribution-type all
-          ./gradlew --no-daemon build
+          ./gradlew --no-daemon --warning-mode all build
           cd integrationTests
-          ../gradlew --no-daemon -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=$GECKO_DRIVER_VERSION -PtestAllContainers=$TEST_ALL_CONTAINERS testAll
+          ../gradlew --no-daemon --warning-mode all -PgeckoDriverPlatform=linux64 -PgeckoDriverVersion=$GECKO_DRIVER_VERSION -PtestAllContainers=$TEST_ALL_CONTAINERS testAll
           cd ..
           set +e
 
@@ -50,4 +50,4 @@ jobs:
         env:
           BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        run: ./gradlew --no-daemon artifactoryPublish -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PbintrayRepo=$BINTRAY_REPO -PbintrayPackage=$BINTRAY_PACKAGE
+        run: ./gradlew --no-daemon --warning-mode all artifactoryPublish -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PbintrayRepo=$BINTRAY_REPO -PbintrayPackage=$BINTRAY_PACKAGE
